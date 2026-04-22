@@ -338,7 +338,7 @@ async function saveFoda() {
       ...payload,
       title:      'Análisis FODA — Hospital Santa Margarita',
       period:     today.substring(0, 7), // YYYY-MM
-      status:     'vigente',
+      status:     'borrador',
       created_by: _user.id
     }
     const res = await db.from('swot_analyses').insert(insertPayload).select().single()
