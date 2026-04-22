@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+
+      <div class="sb-section">Principal</div>
+      <a class="nav-link active" href="dashboard.html">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="sb-section">ISO 9001:2015</div>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-building"></i>
+        <span>Contexto del SGC</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-star"></i>
+        <span>Liderazgo y Política</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Riesgos y Objetivos</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-file-lines"></i>
+        <span>Control de Documentos</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-handshake"></i>
+        <span>Proveedores</span>
+      </a>
+
+      <a class="nav-link" href="#" id="nav-nc">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <span>No Conformidades</span>
+        <span class="nav-badge" id="badge-nc" style="display:none">0</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Indicadores</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Auditorías Internas</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Revisión por Dirección</span>
+      </a>
+
+      <div class="sb-section">Otros</div>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-face-smile"></i>
+        <span>Satisfacción y Quejas</span>
+      </a>
+
+      <a class="nav-link" href="#">
+        <i class="fa-solid fa-users"></i>
+        <span>Comités</span>
+      </a>
+
+    </nav>
+
+    <!-- User info -->
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Dashboard Ejecutivo</div>
+        <div class="topbar-sub" id="topbar-sub">Sistema de Gestión de Calidad</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge">
+          <i class="fa-solid fa-certificate"></i>
+          ISO 9001:2015
+        </span>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- ── KPIs ───────────────────────────────── -->
+      <div class="sec-title">
+        <i class="fa-solid fa-gauge-high"></i>
+        Indicadores Clave de Desempeño
+      </div>
+
+      <div class="kpi-grid">
+
+        <!-- NC Abiertas -->
+        <div class="kpi-card c-gray" id="card-nc">
+          <div class="kpi-ico"><i class="fa-solid fa-circle-xmark"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-nc">—</div>
+            <div class="kpi-lbl">No Conformidades Abiertas</div>
+            <div class="kpi-sub">Requieren acción correctiva</div>
+          </div>
+        </div>
+
+        <!-- Auditorías -->
+        <div class="kpi-card c-blue" id="card-auditorias">
+          <div class="kpi-ico"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-auditorias">—</div>
+            <div class="kpi-lbl">Auditorías en el Año</div>
+            <div class="kpi-sub" id="kpi-auditorias-sub">Plan anual de auditorías</div>
+          </div>
+        </div>
+
+        <!-- Documentos vigentes -->
+        <div class="kpi-card c-green" id="card-docs">
+          <div class="kpi-ico"><i class="fa-solid fa-file-circle-check"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-docs">—</div>
+            <div class="kpi-lbl">Documentos Vigentes</div>
+            <div class="kpi-sub">Lista maestra de documentos</div>
+          </div>
+        </div>
+
+        <!-- Satisfacción -->
+        <div class="kpi-card c-gray" id="card-satisfaccion">
+          <div class="kpi-ico"><i class="fa-solid fa-face-smile"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-satisfaccion">—</div>
+            <div class="kpi-lbl">Satisfacción del Usuario</div>
+            <div class="kpi-sub">Promedio anual de encuestas</div>
+          </div>
+        </div>
+
+        <!-- Acciones vencidas -->
+        <div class="kpi-card c-gray" id="card-vencidas">
+          <div class="kpi-ico"><i class="fa-solid fa-clock"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-vencidas">—</div>
+            <div class="kpi-lbl">Acciones Vencidas</div>
+            <div class="kpi-sub">Planes de acción fuera de fecha</div>
+          </div>
+        </div>
+
+        <!-- Indicadores activos -->
+        <div class="kpi-card c-cyan" id="card-indicadores">
+          <div class="kpi-ico"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-indicadores">—</div>
+            <div class="kpi-lbl">Indicadores Activos</div>
+            <div class="kpi-sub">En seguimiento de calidad</div>
+          </div>
+        </div>
+
+      </div><!-- /kpi-grid -->
+
+      <!-- ── Charts ─────────────────────────────── -->
+      <div class="sec-title">
+        <i class="fa-solid fa-chart-bar"></i>
+        Análisis Visual
+      </div>
+
+      <div class="charts-grid">
+
+        <!-- NC por estado -->
+        <div class="chart-card">
+          <div class="chart-head">
+            <div>
+              <div class="chart-ttl">No Conformidades por Estado</div>
+              <div class="chart-sub">Distribución actual del ciclo de vida</div>
+            </div>
+          </div>
+          <div class="chart-box"><canvas id="chart-nc"></canvas></div>
+        </div>
+
+        <!-- Documentos por estado -->
+        <div class="chart-card">
+          <div class="chart-head">
+            <div>
+              <div class="chart-ttl">Documentos por Estado</div>
+              <div class="chart-sub">Lista maestra del SGC</div>
+            </div>
+          </div>
+          <div class="chart-box"><canvas id="chart-docs"></canvas></div>
+        </div>
+
+        <!-- Satisfacción últimos 6 meses — ancho completo -->
+        <div class="chart-card chart-full">
+          <div class="chart-head">
+            <div>
+              <div class="chart-ttl">Satisfacción del Usuario — Últimos 6 Meses</div>
+              <div class="chart-sub">Promedio mensual de encuestas (meta institucional ≥ 90%)</div>
+            </div>
+            <span class="pill pill-green" style="flex-shrink:0">Meta: 90%</span>
+          </div>
+          <div class="chart-box" style="height:230px"><canvas id="chart-satisfaction"></canvas></div>
+        </div>
+
+      </div><!-- /charts-grid -->
+
+      <!-- ── NC recientes ───────────────────────── -->
+      <div class="sec-title">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        No Conformidades Recientes
+      </div>
+      <div class="list-card">
+        <div id="recent-nc">
+          <div class="spin-wrap"><i class="fa-solid fa-spinner fa-spin"></i> Cargando…</div>
+        </div>
+      </div>
+
+      <!-- ── Próximas auditorías ────────────────── -->
+      <div class="sec-title">
+        <i class="fa-solid fa-calendar-check"></i>
+        Próximas Auditorías
+      </div>
+      <div class="list-card">
+        <div id="upcoming-audits">
+          <div class="spin-wrap"><i class="fa-solid fa-spinner fa-spin"></i> Cargando…</div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+
+</div><!-- /layout -->
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
