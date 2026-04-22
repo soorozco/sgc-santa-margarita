@@ -49,12 +49,17 @@ function applyRoleUI() {
 // SECCIÓN 4.3 — ALCANCE Y EXCLUSIONES
 // ══════════════════════════════════════════════════════════════
 async function loadContext() {
-  const { data } = await db.from('sgc_context')
-    .select('*').order('updated_at', { ascending: false }).limit(1).single()
+  const { data, error } = await db.from('sgc_context')
+    .select('id, scope_declaration, scope_justification, exclusions, updated_at, updated_by')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) console.error('[SGC Context]', error.message)
 
   _ctx   = data || null
   _ctxId = data?.id || null
-  _exclusions = data?.exclusions || []
+  _exclusions = Array.isArray(data?.exclusions) ? data.exclusions : []
 
   renderScopeView()
 }
@@ -85,7 +90,7 @@ function renderScopeView() {
           <span class="excl-clause">${esc(e.clause)}</span>
           <div>
             <div class="excl-text">${esc(e.clause)}</div>
-            <div class="excl-just">${esc(e.justification)}</div>
+            <div class="excl-just">Justificación: ${esc(e.justification)}</div>
           </div>
         </li>`).join('')
     }
@@ -133,8 +138,7 @@ function renderExclusionEditList() {
     <li class="exclusion-item">
       <span class="excl-clause">${esc(e.clause)}</span>
       <div style="flex:1">
-        <div class="excl-text">${esc(e.clause)}</div>
-        <div class="excl-just">${esc(e.justification)}</div>
+        <div class="excl-text">${esc(e.justification)}</div>
       </div>
       <button class="btn-action red" onclick="removeExclusion(${i})" title="Eliminar">
         <i class="fa-solid fa-trash"></i>
@@ -186,7 +190,10 @@ async function saveScope() {
   if (_ctxId) {
     ({ error } = await db.from('sgc_context').update(payload).eq('id', _ctxId))
   } else {
-    const res = await db.from('sgc_context').insert(payload).select().single()
+    const res = await db.from('sgc_context')
+      .insert({ ...payload, created_by: _user.id })
+      .select('id, scope_declaration, scope_justification, exclusions, updated_at')
+      .single()
     error  = res.error
     _ctx   = res.data
     _ctxId = res.data?.id
@@ -216,8 +223,13 @@ const FODA_CONFIG = [
 ]
 
 async function loadFoda() {
-  const { data } = await db.from('swot_analyses')
-    .select('*').order('created_at', { ascending:false }).limit(1).single()
+  const { data, error } = await db.from('swot_analyses')
+    .select('id, strengths, weaknesses, opportunities, threats, analysis_date, updated_at, created_at')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (error) console.error('[SGC FODA]', error.message)
 
   _foda   = data || null
   _fodaId = data?.id || null
@@ -229,10 +241,10 @@ async function loadFoda() {
       oportunidades: parseItems(data.opportunities),
       amenazas:      parseItems(data.threats)
     }
-    const updEl = document.getElementById('foda-updated')
+    const updEl  = document.getElementById('foda-updated')
     const dateRef = data.analysis_date || data.updated_at || data.created_at
     if (updEl && dateRef)
-      updEl.textContent = `Actualizado: ${fmtDate(dateRef.split('T')[0])}`
+      updEl.textContent = `Actualizado: ${fmtDate(String(dateRef).split('T')[0])}`
   }
 
   renderFodaGrid()
