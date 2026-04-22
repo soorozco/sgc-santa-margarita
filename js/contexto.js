@@ -217,7 +217,7 @@ const FODA_CONFIG = [
 
 async function loadFoda() {
   const { data } = await db.from('swot_analyses')
-    .select('*').eq('is_current', true).order('analysis_date', { ascending:false }).limit(1).single()
+    .select('*').order('created_at', { ascending:false }).limit(1).single()
 
   _foda   = data || null
   _fodaId = data?.id || null
@@ -230,8 +230,9 @@ async function loadFoda() {
       amenazas:      parseItems(data.threats)
     }
     const updEl = document.getElementById('foda-updated')
-    if (updEl && data.analysis_date)
-      updEl.textContent = `Actualizado: ${fmtDate(data.analysis_date)}`
+    const dateRef = data.analysis_date || data.updated_at || data.created_at
+    if (updEl && dateRef)
+      updEl.textContent = `Actualizado: ${fmtDate(dateRef.split('T')[0])}`
   }
 
   renderFodaGrid()
@@ -317,21 +318,30 @@ async function saveFoda() {
   btn.disabled = true
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…'
 
+  const today = new Date().toISOString().split('T')[0]
   const payload = {
     strengths:     JSON.stringify(_fodaData.fortalezas),
     weaknesses:    JSON.stringify(_fodaData.debilidades),
     opportunities: JSON.stringify(_fodaData.oportunidades),
     threats:       JSON.stringify(_fodaData.amenazas),
-    analysis_date: new Date().toISOString().split('T')[0],
+    analysis_date: today,
     is_current:    true,
-    created_by:    _user.id
+    updated_at:    new Date().toISOString()
   }
 
   let error
   if (_fodaId) {
     ({ error } = await db.from('swot_analyses').update(payload).eq('id', _fodaId))
   } else {
-    const res = await db.from('swot_analyses').insert(payload).select().single()
+    // Insert requires: title, period, status + content
+    const insertPayload = {
+      ...payload,
+      title:      'Análisis FODA — Hospital Santa Margarita',
+      period:     today.substring(0, 7), // YYYY-MM
+      status:     'vigente',
+      created_by: _user.id
+    }
+    const res = await db.from('swot_analyses').insert(insertPayload).select().single()
     error   = res.error
     _foda   = res.data
     _fodaId = res.data?.id
