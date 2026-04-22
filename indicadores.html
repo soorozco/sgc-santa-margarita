@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indicadores de Calidad — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/indicadores.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link active" href="indicadores.html">
+        <i class="fa-solid fa-chart-line"></i><span>Indicadores</span>
+      </a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Indicadores de Calidad</div>
+        <div class="topbar-sub">Cláusula 9.1 — Seguimiento y Medición</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar indicador…">
+        </div>
+        <select class="filter-sel" id="f-dept">
+          <option value="">Todos los departamentos</option>
+        </select>
+        <select class="filter-sel" id="f-freq">
+          <option value="">Toda frecuencia</option>
+          <option value="diario">Diario</option>
+          <option value="semanal">Semanal</option>
+          <option value="mensual">Mensual</option>
+          <option value="trimestral">Trimestral</option>
+          <option value="anual">Anual</option>
+        </select>
+        <select class="filter-sel" id="f-semaforo">
+          <option value="">Todos los estados</option>
+          <option value="verde">✅ En meta</option>
+          <option value="amarillo">⚠️ Cerca de meta</option>
+          <option value="rojo">❌ Fuera de meta</option>
+          <option value="sin-datos">— Sin medición</option>
+        </select>
+        <button class="btn-primary" id="btn-new-ind" onclick="openNewInd()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Nuevo Indicador
+        </button>
+      </div>
+
+      <!-- Count -->
+      <div class="ind-count" id="ind-count">Cargando indicadores…</div>
+
+      <!-- Cards grid -->
+      <div class="ind-grid" id="ind-grid">
+        <div class="grid-empty">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <strong>Cargando…</strong>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+
+<!-- ═══════════ MODAL — Nuevo Indicador ═══════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Nuevo Indicador de Calidad
+        <small>Define el indicador, su meta y frecuencia de medición</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del indicador <span class="req">*</span></label>
+          <input type="text" id="new-name" placeholder="Ej. Tasa de Satisfacción del Paciente">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento responsable</label>
+          <select id="new-dept"><option value="">— General —</option></select>
+        </div>
+        <div class="field">
+          <label>Responsable / Cargo</label>
+          <input type="text" id="new-responsible" placeholder="Nombre o cargo">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción / Fórmula de cálculo</label>
+          <textarea id="new-formula" rows="2"
+            placeholder="Ej. (Encuestas satisfactorias / Total encuestas) × 100"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row three">
+        <div class="field">
+          <label>Unidad de medida <span class="req">*</span></label>
+          <input type="text" id="new-unit" placeholder="Ej. %, días, casos">
+        </div>
+        <div class="field">
+          <label>Frecuencia <span class="req">*</span></label>
+          <select id="new-freq">
+            <option value="mensual">Mensual</option>
+            <option value="diario">Diario</option>
+            <option value="semanal">Semanal</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>¿Mayor valor = mejor?</label>
+          <select id="new-higher-better">
+            <option value="true">Sí (ej. satisfacción)</option>
+            <option value="false">No (ej. tiempo de espera)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row three">
+        <div class="field">
+          <label>Meta <span class="req">*</span></label>
+          <input type="number" id="new-target" placeholder="Ej. 90" step="any">
+          <div class="field-hint">Valor objetivo a alcanzar</div>
+        </div>
+        <div class="field">
+          <label>Mínimo aceptable</label>
+          <input type="number" id="new-min" placeholder="Ej. 80" step="any">
+          <div class="field-hint">Por debajo = semáforo rojo</div>
+        </div>
+        <div class="field">
+          <label>Línea base</label>
+          <input type="number" id="new-baseline" placeholder="Ej. 75" step="any">
+          <div class="field-hint">Valor de referencia inicial</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewInd()">
+        <i class="fa-solid fa-floppy-disk"></i> Crear Indicador
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle Indicador ═══════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="detail-name">—</span>
+        <small id="detail-dept">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('tab-overview',this)">
+        <i class="fa-solid fa-gauge-high"></i> Resumen
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-mediciones',this)">
+        <i class="fa-solid fa-chart-line"></i> Mediciones
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-config',this)">
+        <i class="fa-solid fa-gear"></i> Configuración
+      </div>
+    </div>
+
+    <div class="modal-body" style="padding:0">
+
+      <!-- TAB 1: Resumen -->
+      <div class="tab-panel active" id="tab-overview" style="padding:20px 24px">
+
+        <!-- Semáforo grande -->
+        <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;
+             background:#f8fafc;border-radius:var(--rsm);padding:16px 20px;border:1px solid var(--border)">
+          <div id="big-traffic" style="width:64px;height:64px;border-radius:50%;
+               display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">
+          </div>
+          <div>
+            <div style="font-size:1.6rem;font-weight:700;color:var(--txt)" id="big-value">—</div>
+            <div style="font-size:.857rem;color:var(--txt2)" id="big-label">Sin medición registrada</div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:.75rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.04em">Meta</div>
+            <div style="font-size:1.2rem;font-weight:700;color:var(--txt)" id="big-target">—</div>
+            <div style="font-size:.75rem;color:var(--txt3)" id="big-unit">—</div>
+          </div>
+        </div>
+
+        <!-- Info grid -->
+        <div class="info-grid">
+          <div class="info-item"><label>Unidad</label><span id="d-unit">—</span></div>
+          <div class="info-item"><label>Frecuencia</label><span id="d-freq">—</span></div>
+          <div class="info-item"><label>Meta</label><span id="d-target">—</span></div>
+          <div class="info-item"><label>Mínimo aceptable</label><span id="d-min">—</span></div>
+          <div class="info-item"><label>Última medición</label><span id="d-last-date">—</span></div>
+          <div class="info-item"><label>Responsable</label><span id="d-responsible">—</span></div>
+        </div>
+
+        <div class="section-sep"><i class="fa-solid fa-function" style="margin-right:6px"></i>Fórmula de cálculo</div>
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--rsm);
+             padding:12px 14px;font-size:.857rem;color:var(--txt);line-height:1.7;margin-bottom:16px"
+             id="d-formula">—</div>
+
+        <!-- Mini chart -->
+        <div class="section-sep"><i class="fa-solid fa-chart-line" style="margin-right:6px"></i>Tendencia reciente</div>
+        <div class="chart-area">
+          <canvas id="chart-mini"></canvas>
+          <div class="chart-no-data" id="chart-no-data" style="display:none">
+            <i class="fa-solid fa-chart-line"></i>
+            Sin mediciones suficientes para mostrar la tendencia
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Mediciones -->
+      <div class="tab-panel" id="tab-mediciones" style="padding:20px 24px">
+
+        <div id="add-meas-wrap">
+          <!-- shown if canWrite -->
+        </div>
+
+        <div class="section-sep"><i class="fa-solid fa-list" style="margin-right:6px"></i>Historial de mediciones</div>
+
+        <table class="meas-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th class="center">Valor</th>
+              <th class="center">vs Meta</th>
+              <th>Registrado por</th>
+              <th>Notas</th>
+              <th class="center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="meas-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--txt3)">
+              Cargando mediciones…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 3: Configuración -->
+      <div class="tab-panel" id="tab-config" style="padding:20px 24px">
+        <div id="config-form-wrap">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/indicadores.js"></script>
+</body>
+</html>
