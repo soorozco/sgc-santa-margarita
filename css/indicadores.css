@@ -210,3 +210,116 @@
 .toggle input:checked + .toggle-slider { background:var(--blue); }
 .toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
 .toggle-label { font-size:.857rem; color:var(--txt2); }
+
+/* ── Rediseño de tarjetas (v2) ──────────────────────────────── */
+.ind-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; }
+.ind-card-badges { display:flex; gap:5px; flex-wrap:wrap; flex:1; margin-right:8px; align-items:center; }
+.ind-code { font-family:'SF Mono','Fira Mono',monospace; font-size:.714rem; font-weight:700;
+  background:#f1f5f9; color:var(--txt2); padding:2px 8px; border-radius:var(--rxs); white-space:nowrap; }
+.ind-origin-badge { font-size:.686rem; font-weight:700; padding:2px 9px; border-radius:10px; white-space:nowrap; }
+.origin-financiero   { background:#eff6ff; color:#1d4ed8; }
+.origin-operativo    { background:#fff7ed; color:#c2410c; }
+.origin-calidad      { background:#f0fdf4; color:#15803d; }
+.origin-seguridad    { background:#fef2f2; color:#b91c1c; }
+.origin-rrhh         { background:#f5f3ff; color:#7c3aed; }
+.origin-satisfaccion { background:#ecfeff; color:#0e7490; }
+.origin-other        { background:var(--gray-lt); color:var(--txt2); }
+
+.ind-card-name { font-size:.929rem; font-weight:600; color:var(--txt); line-height:1.35; margin-bottom:5px; }
+.ind-card-info { font-size:.75rem; color:var(--txt3); margin-bottom:11px;
+  display:flex; gap:5px; align-items:center; flex-wrap:wrap; }
+.ind-card-info i { font-size:10px; }
+
+.ind-limits-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:12px; }
+.limit-badge { font-size:.686rem; font-weight:600; text-align:center; padding:4px 5px;
+  border-radius:var(--rxs); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:block; }
+.lim-red    { background:var(--red-lt);   color:var(--red);   border:1px solid #fecaca; }
+.lim-yellow { background:#fef3c7;         color:#92400e;      border:1px solid #fde68a; }
+.lim-green  { background:var(--green-lt); color:var(--green); border:1px solid #bbf7d0; }
+.lim-na     { background:var(--gray-lt);  color:var(--txt3);  border:1px solid var(--border); }
+
+.ind-card-foot2 { display:flex; align-items:center; justify-content:space-between;
+  border-top:1px solid var(--border); padding-top:10px; }
+.ind-current { font-size:1.35rem; font-weight:700; color:var(--txt); }
+.ind-current.verde    { color:var(--green); }
+.ind-current.amarillo { color:#d97706; }
+.ind-current.rojo     { color:var(--red); }
+.ind-current.sin-datos { color:var(--txt3); font-size:1rem; }
+.ind-unit { font-size:.75rem; font-weight:400; color:var(--txt3); margin-left:2px; }
+.ind-freq-info { font-size:.714rem; color:var(--txt3); }
+.ind-freq-info i { margin-right:3px; }
+
+/* ── Separador semáforo en modal ────────────────────────────── */
+.sem-sep { background:#f8fafc; border:1px solid var(--border); border-radius:var(--rsm);
+  padding:8px 14px; font-size:.786rem; font-weight:700; color:var(--txt2);
+  display:flex; align-items:center; gap:8px; margin:16px 0 12px; }
+
+/* ── Rangos en modal detalle ─────────────────────────────────── */
+.detail-limits-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:18px; }
+.detail-limit-item { text-align:center; }
+.dl-label { font-size:.686rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.05em; margin-bottom:5px; }
+.dl-label.red    { color:var(--red); }
+.dl-label.yellow { color:#d97706; }
+.dl-label.green  { color:var(--green); }
+.dl-val { font-size:.857rem; font-weight:600; padding:6px 10px;
+  border-radius:var(--rsm); display:block; }
+
+/* ── Redesigned indicator cards ─────────────────────────────── */
+.ind-card-top {
+  display:flex; flex-direction:row; align-items:flex-start;
+  justify-content:space-between; margin-bottom:10px;
+}
+.ind-card-badges { display:flex; flex-wrap:wrap; gap:5px; align-items:center; flex:1; margin-right:10px; }
+.ind-code {
+  font-family:'SF Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  background:#f1f5f9; color:var(--txt2);
+  padding:2px 8px; border-radius:var(--rxs);
+  font-size:.714rem; font-weight:700;
+}
+.ind-origin-badge {
+  font-size:.686rem; font-weight:700; padding:2px 8px; border-radius:10px;
+}
+.origin-financiero  { background:#eff6ff; color:#1d4ed8; }
+.origin-operativo   { background:#fff7ed; color:#c2410c; }
+.origin-calidad     { background:#f0fdf4; color:#15803d; }
+.origin-seguridad   { background:#fef2f2; color:#b91c1c; }
+.origin-rrhh        { background:#f5f3ff; color:#7c3aed; }
+.origin-satisfaccion{ background:#ecfeff; color:#0e7490; }
+.origin-other       { background:var(--gray-lt); color:var(--txt2); }
+
+.ind-card-name  { font-size:.929rem; font-weight:600; margin-bottom:6px; color:var(--txt); }
+.ind-card-info  { font-size:.75rem; color:var(--txt3); margin-bottom:12px; display:flex; flex-wrap:wrap; gap:4px; }
+.ind-limits-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-bottom:12px; }
+.limit-badge {
+  font-size:.686rem; font-weight:600; text-align:center;
+  padding:4px 6px; border-radius:var(--rxs);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.lim-red    { background:var(--red-lt);  color:var(--red);   border:1px solid #fecaca; }
+.lim-yellow { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+.lim-green  { background:var(--green-lt);color:var(--green); border:1px solid #bbf7d0; }
+
+.ind-current       { font-size:1.4rem; font-weight:700; color:var(--txt); }
+.ind-current.verde    { color:var(--green); }
+.ind-current.amarillo { color:#d97706; }
+.ind-current.rojo     { color:var(--red); }
+.ind-current.sin-datos{ color:var(--txt3); }
+.ind-unit     { font-size:.75rem; font-weight:400; color:var(--txt3); }
+.ind-freq-info{ font-size:.75rem; color:var(--txt3); }
+
+/* ── Semáforo range separator in form ───────────────────────── */
+.sem-sep {
+  background:#f8fafc; border:1px solid var(--border); border-radius:var(--rsm);
+  padding:8px 12px; font-size:.786rem; font-weight:700; color:var(--txt2);
+  display:flex; align-items:center; gap:8px; margin:16px 0 12px;
+}
+
+/* ── Detail modal limit grid ────────────────────────────────── */
+.detail-limits-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+.dl-label {
+  font-size:.686rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.04em; color:var(--txt3); display:block; margin-bottom:4px;
+}
+.dl-val { display:block; }
+

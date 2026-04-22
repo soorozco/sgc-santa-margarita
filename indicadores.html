@@ -79,6 +79,15 @@
         <select class="filter-sel" id="f-dept">
           <option value="">Todos los departamentos</option>
         </select>
+        <select class="filter-sel" id="f-origin">
+          <option value="">Todos los orígenes</option>
+          <option value="Financiero">Financiero</option>
+          <option value="Operativo">Operativo</option>
+          <option value="Calidad">Calidad</option>
+          <option value="Seguridad">Seguridad</option>
+          <option value="Recursos Humanos">Recursos Humanos</option>
+          <option value="Satisfacción">Satisfacción</option>
+        </select>
         <select class="filter-sel" id="f-freq">
           <option value="">Toda frecuencia</option>
           <option value="diario">Diario</option>
@@ -125,40 +134,62 @@
       <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-
+      <div class="form-row">
+        <div class="field">
+          <label>Código <span class="req">*</span></label>
+          <input type="text" id="new-code" placeholder="HSM-ID-52">
+          <div class="field-hint">Generado automáticamente · editable</div>
+        </div>
+        <div class="field">
+          <label>Proceso / Departamento</label>
+          <select id="new-dept"><option value="">— General —</option></select>
+        </div>
+      </div>
       <div class="form-row one">
         <div class="field">
           <label>Nombre del indicador <span class="req">*</span></label>
-          <input type="text" id="new-name" placeholder="Ej. Tasa de Satisfacción del Paciente">
+          <input type="text" id="new-name" placeholder="Ej. Precisión de manejo de caja">
         </div>
       </div>
-
       <div class="form-row">
         <div class="field">
-          <label>Departamento responsable</label>
-          <select id="new-dept"><option value="">— General —</option></select>
-        </div>
-        <div class="field">
-          <label>Responsable / Cargo</label>
+          <label>Reporta / Responsable</label>
           <input type="text" id="new-responsible" placeholder="Nombre o cargo">
         </div>
+        <div class="field">
+          <label>Origen / Categoría</label>
+          <select id="new-origin">
+            <option value="">— Sin categoría —</option>
+            <option value="Financiero">Financiero</option>
+            <option value="Operativo">Operativo</option>
+            <option value="Calidad">Calidad</option>
+            <option value="Seguridad">Seguridad</option>
+            <option value="Recursos Humanos">Recursos Humanos</option>
+            <option value="Satisfacción">Satisfacción</option>
+          </select>
+        </div>
       </div>
-
       <div class="form-row one">
         <div class="field">
-          <label>Descripción / Fórmula de cálculo</label>
-          <textarea id="new-formula" rows="2"
-            placeholder="Ej. (Encuestas satisfactorias / Total encuestas) × 100"></textarea>
+          <label>Descripción del indicador</label>
+          <textarea id="new-description" rows="2"
+            placeholder="¿Qué mide este indicador y por qué es importante?"></textarea>
         </div>
       </div>
-
+      <div class="form-row one">
+        <div class="field">
+          <label>Fórmula de cálculo</label>
+          <textarea id="new-formula" rows="2"
+            placeholder="Ej. (Registros conformes / Total registros) × 100"></textarea>
+        </div>
+      </div>
       <div class="form-row three">
         <div class="field">
-          <label>Unidad de medida <span class="req">*</span></label>
-          <input type="text" id="new-unit" placeholder="Ej. %, días, casos">
+          <label>Variable <span class="req">*</span></label>
+          <input type="text" id="new-unit" placeholder="%, #, días…">
         </div>
         <div class="field">
-          <label>Frecuencia <span class="req">*</span></label>
+          <label>Período <span class="req">*</span></label>
           <select id="new-freq">
             <option value="mensual">Mensual</option>
             <option value="diario">Diario</option>
@@ -175,25 +206,38 @@
           </select>
         </div>
       </div>
-
+      <div class="sem-sep">
+        <i class="fa-solid fa-traffic-light"></i> Rangos del Semáforo
+      </div>
       <div class="form-row three">
         <div class="field">
-          <label>Meta <span class="req">*</span></label>
-          <input type="number" id="new-target" placeholder="Ej. 90" step="any">
-          <div class="field-hint">Valor objetivo a alcanzar</div>
+          <label style="color:var(--red)">🔴 Límite inferior (rojo)</label>
+          <input type="text" id="new-limit-low" placeholder="Ej. &lt; 98%">
+          <div class="field-hint">Fuera de meta</div>
         </div>
         <div class="field">
-          <label>Mínimo aceptable</label>
-          <input type="number" id="new-min" placeholder="Ej. 80" step="any">
-          <div class="field-hint">Por debajo = semáforo rojo</div>
+          <label style="color:#d97706">🟡 Límite medio (amarillo)</label>
+          <input type="text" id="new-limit-mid" placeholder="Ej. 98 – 99.4%">
+          <div class="field-hint">Cerca de meta</div>
         </div>
         <div class="field">
-          <label>Línea base</label>
-          <input type="number" id="new-baseline" placeholder="Ej. 75" step="any">
-          <div class="field-hint">Valor de referencia inicial</div>
+          <label style="color:var(--green)">🟢 Meta (verde)</label>
+          <input type="text" id="new-limit-high" placeholder="Ej. ≥ 99.5%">
+          <div class="field-hint">En meta</div>
         </div>
       </div>
-
+      <div class="form-row">
+        <div class="field">
+          <label>Meta (valor numérico, para cálculo automático)</label>
+          <input type="number" id="new-target" placeholder="Ej. 99.5" step="any">
+          <div class="field-hint">Opcional — activa el semáforo automático</div>
+        </div>
+        <div class="field">
+          <label>Mínimo aceptable (numérico)</label>
+          <input type="number" id="new-min" placeholder="Ej. 98" step="any">
+          <div class="field-hint">Umbral entre rojo y amarillo</div>
+        </div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
@@ -250,15 +294,25 @@
           </div>
         </div>
 
+        <!-- Limit ranges -->
+        <div id="detail-limits-row" style="margin-bottom:16px"></div>
+
         <!-- Info grid -->
         <div class="info-grid">
-          <div class="info-item"><label>Unidad</label><span id="d-unit">—</span></div>
-          <div class="info-item"><label>Frecuencia</label><span id="d-freq">—</span></div>
+          <div class="info-item"><label>Código</label><span id="d-code">—</span></div>
+          <div class="info-item"><label>Origen</label><span id="d-origin">—</span></div>
+          <div class="info-item"><label>Variable</label><span id="d-unit">—</span></div>
+          <div class="info-item"><label>Período</label><span id="d-freq">—</span></div>
           <div class="info-item"><label>Meta</label><span id="d-target">—</span></div>
           <div class="info-item"><label>Mínimo aceptable</label><span id="d-min">—</span></div>
           <div class="info-item"><label>Última medición</label><span id="d-last-date">—</span></div>
           <div class="info-item"><label>Responsable</label><span id="d-responsible">—</span></div>
         </div>
+
+        <div class="section-sep"><i class="fa-solid fa-align-left" style="margin-right:6px"></i>Descripción</div>
+        <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--rsm);
+             padding:12px 14px;font-size:.857rem;color:var(--txt);line-height:1.7;margin-bottom:16px"
+             id="d-description">—</div>
 
         <div class="section-sep"><i class="fa-solid fa-function" style="margin-right:6px"></i>Fórmula de cálculo</div>
         <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--rsm);
