@@ -7750,6 +7750,10 @@ const INDICADORES = [
 
 let nOk = 0, nErr = 0
 
+// Columns we want to insert — will be filtered to only those that exist in the table
+const EXTRA_COLS = ['code','origin','description','limit_low_text','limit_mid_text','limit_high_text','is_higher_better','formula']
+let _availableCols = null  // detected at runtime
+
 function log(msg, cls='') {
   const el = document.getElementById('log')
   el.innerHTML += '<span class="' + cls + '">' + msg + '</span>\n'
@@ -7762,6 +7766,48 @@ function setProgress(done, total) {
     done + ' de ' + total + ' procesados…'
 }
 
+// ── Detect which columns exist in the table via direct fetch to information_schema ──
+async function detectSchema(session) {
+  log('🔍 Verificando esquema de la tabla quality_indicators…', 'inf')
+
+  // Try each extra column by selecting it with limit 0 — fastest way to check
+  const present = []
+  const missing = []
+
+  for (const col of EXTRA_COLS) {
+    const { error } = await db.from('quality_indicators').select(col).limit(0)
+    if (error && error.message && error.message.includes('column')) {
+      missing.push(col)
+    } else {
+      present.push(col)
+    }
+  }
+
+  if (missing.length > 0) {
+    log('⚠️  Columnas NO encontradas (falta migración): ' + missing.join(', '), 'err')
+    log('', '')
+    log('╔══════════════════════════════════════════════════════╗', 'err')
+    log('║  Copia y ejecuta este SQL en Supabase SQL Editor:   ║', 'err')
+    log('╚══════════════════════════════════════════════════════╝', 'err')
+    log('', '')
+
+    let sql = 'ALTER TABLE quality_indicators\n'
+    const lines = missing.map(c => {
+      if (c === 'is_higher_better') return "  ADD COLUMN IF NOT EXISTS is_higher_better BOOLEAN DEFAULT true"
+      return `  ADD COLUMN IF NOT EXISTS ${c} TEXT`
+    })
+    sql += lines.join(',\n') + ';\nNOTIFY pgrst, \'reload schema\';'
+    log(sql, 'err')
+    log('', '')
+    log('Después recarga esta página y vuelve a intentarlo.', 'err')
+  } else {
+    log('✅ Todas las columnas existen. Procediendo con importación completa.', 'ok')
+  }
+
+  log('   Columnas disponibles: ' + present.join(', '), 'inf')
+  return present
+}
+
 async function startImport() {
   const btn = document.getElementById('btn-import')
   btn.disabled = true
@@ -7772,13 +7818,19 @@ async function startImport() {
   // Check auth
   const { data: { session } } = await db.auth.getSession()
   if (!session) { log('❌ No hay sesión activa. Por favor entra al SGC primero y regresa aquí.','err'); btn.disabled=false; return }
+  log('✅ Sesión activa: ' + session.user.email, 'ok')
+
+  // Detect schema
+  _availableCols = await detectSchema(session)
 
   // Load departments
+  log('', '')
   log('Cargando departamentos…','inf')
   const { data: depts } = await db.from('departments').select('id,name').eq('is_active',true).limit(200)
   const deptMap = {}
   if (depts) depts.forEach(d => { deptMap[d.name.trim().toLowerCase()] = d.id })
   log('  ' + Object.keys(deptMap).length + ' departamentos cargados.','inf')
+  log('', '')
 
   const total = INDICADORES.length
   const BATCH  = 10
@@ -7787,8 +7839,25 @@ async function startImport() {
     const batch = INDICADORES.slice(i, i + BATCH).map(r => {
       const proc  = (r._process || '').trim().toLowerCase()
       const deptId = deptMap[proc] || null
-      const row = { ...r, responsible_department_id: deptId }
-      delete row._process
+
+      // Base payload — always-present columns
+      const row = {
+        name:                     r.name,
+        unit:                     r.unit,
+        measurement_frequency:    r.measurement_frequency,
+        target_value:             r.target_value   ?? null,
+        min_acceptable:           r.min_acceptable ?? null,
+        responsible_position:     r.responsible_position ?? null,
+        responsible_department_id: deptId,
+        is_active:                r.is_active,
+        created_by:               r.created_by
+      }
+
+      // Only add extra columns if they exist in the schema
+      for (const col of _availableCols) {
+        if (r[col] !== undefined) row[col] = r[col]
+      }
+
       return row
     })
 
@@ -7797,11 +7866,13 @@ async function startImport() {
       log('❌ Filas ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + error.message, 'err')
       nErr += batch.length
     } else {
-      batch.forEach(r => log('✅ ' + r.code + '  ' + r.name.substring(0,50), 'ok'))
+      const firstCode = batch[0].code || ('#' + (i+1))
+      const lastCode  = batch[batch.length-1].code || ('#' + Math.min(i+BATCH,total))
+      log('✅ ' + firstCode + ' → ' + lastCode + ' (' + batch.length + ' registros)', 'ok')
       nOk += batch.length
     }
     setProgress(Math.min(i + BATCH, total), total)
-    await new Promise(res => setTimeout(res, 120))
+    await new Promise(res => setTimeout(res, 150))
   }
 
   setProgress(total, total)
@@ -7812,6 +7883,20 @@ async function startImport() {
   log('', '')
   log('══════════════════════════════════', 'inf')
   log('Resultado: ' + nOk + ' importados, ' + nErr + ' errores', nErr > 0 ? 'err' : 'ok')
+
+  if (nOk > 0 && nErr === 0) {
+    log('', '')
+    log('🎉 Importación exitosa. Ahora ve a Indicadores en el SGC.', 'ok')
+  }
+  if (nOk > 0 && _availableCols.length < EXTRA_COLS.length) {
+    log('', '')
+    const missing = EXTRA_COLS.filter(c => !_availableCols.includes(c))
+    log('⚠️  Se importaron ' + nOk + ' registros SIN los campos: ' + missing.join(', '), 'err')
+    log('   Agrega las columnas faltantes y usa la opción "Actualizar campos extra" más adelante.', 'err')
+  }
+
+  btn.disabled = false
+  btn.textContent = '🔄 Volver a intentar'
 }
 
 // Check session on load
