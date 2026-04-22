@@ -14,16 +14,28 @@ let _editingFoda = false
 
 // ── Init ────────────────────────────────────────────────────────
 async function initContexto() {
-  const auth = await requireAuth()
-  if (!auth) return
-  _user    = auth.user
-  _profile = auth.profile
-  _role    = auth.profile?.roles?.name || 'lector'
+  try {
+    const auth = await requireAuth()
+    if (!auth) return
+    _user    = auth.user
+    _profile = auth.profile
+    _role    = auth.profile?.roles?.name || 'lector'
 
-  renderUserInfo()
-  setCurrentDate()
-  await Promise.all([loadContext(), loadFoda(), loadParties()])
-  applyRoleUI()
+    renderUserInfo()
+    setCurrentDate()
+
+    // allSettled: si una sección falla no bloquea las demás
+    const [rCtx, rFoda, rParties] = await Promise.allSettled([
+      loadContext(), loadFoda(), loadParties()
+    ])
+    if (rCtx.status     === 'rejected') console.error('[SGC] loadContext falló:', rCtx.reason)
+    if (rFoda.status    === 'rejected') console.error('[SGC] loadFoda falló:', rFoda.reason)
+    if (rParties.status === 'rejected') console.error('[SGC] loadParties falló:', rParties.reason)
+
+    applyRoleUI()
+  } catch (err) {
+    console.error('[SGC] initContexto error crítico:', err)
+  }
 }
 
 function renderUserInfo() {
@@ -49,19 +61,23 @@ function applyRoleUI() {
 // SECCIÓN 4.3 — ALCANCE Y EXCLUSIONES
 // ══════════════════════════════════════════════════════════════
 async function loadContext() {
-  const { data, error } = await db.from('sgc_context')
-    .select('id, scope_declaration, scope_justification, exclusions, updated_at, updated_by')
-    .order('updated_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  try {
+    const { data, error } = await db.from('sgc_context')
+      .select('id, scope_declaration, scope_justification, exclusions, updated_at, updated_by')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-  if (error) console.error('[SGC Context]', error.message)
+    if (error) { console.error('[SGC Context]', error.message); return }
 
-  _ctx   = data || null
-  _ctxId = data?.id || null
-  _exclusions = Array.isArray(data?.exclusions) ? data.exclusions : []
+    _ctx   = data || null
+    _ctxId = data?.id || null
+    _exclusions = Array.isArray(data?.exclusions) ? data.exclusions : []
 
-  renderScopeView()
+    renderScopeView()
+  } catch (err) {
+    console.error('[SGC Context] excepción:', err.message)
+  }
 }
 
 function renderScopeView() {
@@ -223,31 +239,36 @@ const FODA_CONFIG = [
 ]
 
 async function loadFoda() {
-  const { data, error } = await db.from('swot_analyses')
-    .select('id, strengths, weaknesses, opportunities, threats, analysis_date, updated_at, created_at')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+  try {
+    const { data, error } = await db.from('swot_analyses')
+      .select('id, strengths, weaknesses, opportunities, threats, analysis_date, updated_at, created_at')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-  if (error) console.error('[SGC FODA]', error.message)
+    if (error) { console.error('[SGC FODA]', error.message); renderFodaGrid(); return }
 
-  _foda   = data || null
-  _fodaId = data?.id || null
+    _foda   = data || null
+    _fodaId = data?.id || null
 
-  if (data) {
-    _fodaData = {
-      fortalezas:    parseItems(data.strengths),
-      debilidades:   parseItems(data.weaknesses),
-      oportunidades: parseItems(data.opportunities),
-      amenazas:      parseItems(data.threats)
+    if (data) {
+      _fodaData = {
+        fortalezas:    parseItems(data.strengths),
+        debilidades:   parseItems(data.weaknesses),
+        oportunidades: parseItems(data.opportunities),
+        amenazas:      parseItems(data.threats)
+      }
+      const updEl  = document.getElementById('foda-updated')
+      const dateRef = data.analysis_date || data.updated_at || data.created_at
+      if (updEl && dateRef)
+        updEl.textContent = `Actualizado: ${fmtDate(String(dateRef).split('T')[0])}`
     }
-    const updEl  = document.getElementById('foda-updated')
-    const dateRef = data.analysis_date || data.updated_at || data.created_at
-    if (updEl && dateRef)
-      updEl.textContent = `Actualizado: ${fmtDate(String(dateRef).split('T')[0])}`
-  }
 
-  renderFodaGrid()
+    renderFodaGrid()
+  } catch (err) {
+    console.error('[SGC FODA] excepción:', err.message)
+    renderFodaGrid()
+  }
 }
 
 function parseItems(val) {
@@ -383,11 +404,18 @@ async function saveFoda() {
 // SECCIÓN 4.2 — PARTES INTERESADAS
 // ══════════════════════════════════════════════════════════════
 async function loadParties() {
-  const { data, error } = await db.from('interested_parties')
-    .select('*').eq('is_active', true).order('type').order('name')
+  try {
+    const { data, error } = await db.from('interested_parties')
+      .select('*').eq('is_active', true).order('type').order('name')
 
-  _parties = data || []
-  renderPartiesTable()
+    if (error) { console.error('[SGC Partes]', error.message); renderPartiesTable(); return }
+
+    _parties = data || []
+    renderPartiesTable()
+  } catch (err) {
+    console.error('[SGC Partes] excepción:', err.message)
+    renderPartiesTable()
+  }
 }
 
 function renderPartiesTable() {
