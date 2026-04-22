@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Conformidades — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/noconformidades.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link active" href="noconformidades.html">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <span>No Conformidades</span>
+        <span class="nav-badge" id="badge-nc" style="display:none">0</span>
+      </a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">No Conformidades</div>
+        <div class="topbar-sub">Cláusulas 8.7 y 10.2 — Acción Correctiva</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por folio, descripción o área…">
+        </div>
+        <select class="filter-sel" id="f-dept">
+          <option value="">Todos los departamentos</option>
+        </select>
+        <select class="filter-sel" id="f-source">
+          <option value="">Todas las fuentes</option>
+          <option value="auditoria_interna">Auditoría Interna</option>
+          <option value="queja_cliente">Queja del Paciente</option>
+          <option value="supervision">Supervisión</option>
+          <option value="revision_proceso">Revisión de Proceso</option>
+          <option value="otro">Otro</option>
+        </select>
+        <button class="btn-secondary" onclick="exportCSV()">
+          <i class="fa-solid fa-download"></i> Exportar CSV
+        </button>
+        <button class="btn-primary" id="btn-new-nc" onclick="openNewNC()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Nueva NC
+        </button>
+      </div>
+
+      <!-- Status chips -->
+      <div class="status-chips">
+        <div class="chip active-all" data-status="" onclick="filterByChip(this,'')">
+          <i class="fa-solid fa-list"></i> Todas <span class="chip-count" id="cnt-all">0</span>
+        </div>
+        <div class="chip" data-status="abierto" onclick="filterByChip(this,'abierto')">
+          <i class="fa-solid fa-circle-exclamation"></i> Abiertas <span class="chip-count" id="cnt-abierto">0</span>
+        </div>
+        <div class="chip" data-status="en_proceso" onclick="filterByChip(this,'en_proceso')">
+          <i class="fa-solid fa-gears"></i> En Proceso <span class="chip-count" id="cnt-proceso">0</span>
+        </div>
+        <div class="chip" data-status="pendiente_verificacion" onclick="filterByChip(this,'pendiente_verificacion')">
+          <i class="fa-solid fa-clock"></i> Pend. Verificación <span class="chip-count" id="cnt-verif">0</span>
+        </div>
+        <div class="chip" data-status="cerrado" onclick="filterByChip(this,'cerrado')">
+          <i class="fa-solid fa-circle-check"></i> Cerradas <span class="chip-count" id="cnt-cerrado">0</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="nc-count">Cargando…</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Descripción</th>
+              <th>Área / Proceso</th>
+              <th>Fuente</th>
+              <th class="center">Fecha</th>
+              <th class="center">Días</th>
+              <th class="center">Estado</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="nc-tbody">
+            <tr><td colspan="8" class="table-empty">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <strong>Cargando…</strong>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div><!-- /layout -->
+
+
+<!-- ═══════════ MODAL — Nueva NC ═══════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Nueva No Conformidad
+        <small>Complete los datos del hallazgo detectado</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento / Área <span class="req">*</span></label>
+          <select id="new-dept"><option value="">— Seleccionar —</option></select>
+        </div>
+        <div class="field">
+          <label>Fuente de detección <span class="req">*</span></label>
+          <select id="new-source">
+            <option value="">— Seleccionar —</option>
+            <option value="auditoria_interna">Auditoría Interna</option>
+            <option value="queja_cliente">Queja del Paciente</option>
+            <option value="supervision">Supervisión</option>
+            <option value="revision_proceso">Revisión de Proceso</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha de detección <span class="req">*</span></label>
+          <input type="date" id="new-date">
+        </div>
+        <div class="field">
+          <label>Detectado por <span class="req">*</span></label>
+          <input type="text" id="new-detected-by" placeholder="Nombre o cargo">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción del hallazgo <span class="req">*</span></label>
+          <textarea id="new-description" rows="4"
+            placeholder="Describa de forma clara y objetiva la no conformidad detectada, incluyendo qué, dónde y cuándo ocurrió…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Cláusula ISO relacionada</label>
+          <input type="text" id="new-clause" placeholder="Ej. 8.5.1, 7.5.3">
+        </div>
+        <div class="field">
+          <label>Acción inmediata tomada</label>
+          <input type="text" id="new-immediate" placeholder="Acción de contención aplicada">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewNC()">
+        <i class="fa-solid fa-floppy-disk"></i> Registrar NC
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle NC ═══════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="detail-folio">—</span>
+        <small id="detail-desc-ttl">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('tab-info',this)">
+        <i class="fa-solid fa-circle-info"></i> Información
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-causas',this)">
+        <i class="fa-solid fa-sitemap"></i> Análisis de Causas
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-plan',this)">
+        <i class="fa-solid fa-list-check"></i> Plan de Acción
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-cierre',this)">
+        <i class="fa-solid fa-flag-checkered"></i> Cierre
+      </div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- TAB 1: Información general -->
+      <div class="tab-panel active" id="tab-info">
+
+        <div class="workflow-bar" id="detail-workflow"></div>
+        <div id="detail-action-bar"></div>
+
+        <div class="info-grid">
+          <div class="info-item"><label>Folio</label><span id="d-folio">—</span></div>
+          <div class="info-item"><label>Estado</label><span id="d-status">—</span></div>
+          <div class="info-item"><label>Departamento</label><span id="d-dept">—</span></div>
+          <div class="info-item"><label>Fuente</label><span id="d-source">—</span></div>
+          <div class="info-item"><label>Fecha detección</label><span id="d-date">—</span></div>
+          <div class="info-item"><label>Detectado por</label><span id="d-detected">—</span></div>
+          <div class="info-item"><label>Cláusula ISO</label><span id="d-clause">—</span></div>
+          <div class="info-item"><label>Fecha cierre</label><span id="d-closed">—</span></div>
+        </div>
+
+        <div class="section-sep"><i class="fa-solid fa-file-lines" style="margin-right:6px"></i>Descripción del Hallazgo</div>
+        <p id="d-description" style="font-size:.857rem;color:var(--txt);line-height:1.7;margin-bottom:18px">—</p>
+
+        <div class="section-sep"><i class="fa-solid fa-bolt" style="margin-right:6px"></i>Acción Inmediata</div>
+        <p id="d-immediate" style="font-size:.857rem;color:var(--txt2);line-height:1.7">—</p>
+      </div>
+
+      <!-- TAB 2: Análisis de Causas -->
+      <div class="tab-panel" id="tab-causas">
+        <div class="section-sep" style="margin-top:4px">
+          <i class="fa-solid fa-diagram-project" style="margin-right:6px"></i>
+          Diagrama de Ishikawa — 6 M's
+        </div>
+        <p style="font-size:.786rem;color:var(--txt3);margin-bottom:14px">
+          Identifique las causas raíz en cada categoría. Puede editar si tiene permisos.
+        </p>
+
+        <div class="ishikawa-grid" id="ishikawa-view">
+          <!-- rendered by JS -->
+        </div>
+
+        <div class="section-sep"><i class="fa-solid fa-route" style="margin-right:6px"></i>Causa Raíz Principal</div>
+        <div id="root-cause-view" style="font-size:.857rem;color:var(--txt);line-height:1.7;
+             background:#f8fafc;border-radius:var(--rsm);padding:12px 14px;border:1px solid var(--border)">—</div>
+
+        <div id="causas-edit-section" style="display:none;margin-top:16px">
+          <div class="section-sep"><i class="fa-solid fa-pen" style="margin-right:6px"></i>Editar Causas</div>
+          <div class="ishikawa-grid" id="ishikawa-edit"></div>
+          <div class="form-row one" style="margin-top:10px">
+            <div class="field">
+              <label>Causa Raíz Principal</label>
+              <textarea id="edit-root-cause" rows="3"
+                placeholder="Resuma la causa raíz determinada tras el análisis…"></textarea>
+            </div>
+          </div>
+          <div style="text-align:right;margin-top:10px">
+            <button class="btn-primary" onclick="saveCausas()">
+              <i class="fa-solid fa-floppy-disk"></i> Guardar Causas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Plan de Acción -->
+      <div class="tab-panel" id="tab-plan">
+
+        <div id="plan-progress-wrap" style="display:none">
+          <div class="plan-progress">
+            <div class="plan-progress-label">
+              <span>Avance del plan</span>
+              <span id="plan-pct">0%</span>
+            </div>
+            <div class="plan-progress-bar">
+              <div class="plan-progress-fill" id="plan-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-header">
+          <h4><i class="fa-solid fa-list-check" style="margin-right:6px;color:var(--blue)"></i>
+            Acciones Correctivas</h4>
+          <button class="btn-primary" id="btn-add-action" onclick="toggleAddForm()" style="display:none">
+            <i class="fa-solid fa-plus"></i> Agregar Acción
+          </button>
+        </div>
+
+        <!-- Add action form (hidden by default) -->
+        <div class="add-action-form" id="add-action-form" style="display:none">
+          <div class="form-row one">
+            <div class="field">
+              <label>Descripción de la acción <span class="req">*</span></label>
+              <textarea id="act-desc" rows="2" placeholder="¿Qué acción correctiva se realizará?"></textarea>
+            </div>
+          </div>
+          <div class="form-row three">
+            <div class="field">
+              <label>Responsable <span class="req">*</span></label>
+              <input type="text" id="act-responsible" placeholder="Nombre o cargo">
+            </div>
+            <div class="field">
+              <label>Fecha límite <span class="req">*</span></label>
+              <input type="date" id="act-due">
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <button class="btn-success" onclick="saveAction()" style="width:100%">
+                <i class="fa-solid fa-check"></i> Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="actions-list">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <!-- TAB 4: Cierre -->
+      <div class="tab-panel" id="tab-cierre">
+        <div id="cierre-bar"></div>
+
+        <div class="section-sep"><i class="fa-solid fa-clipboard-check" style="margin-right:6px"></i>Verificación de Eficacia</div>
+
+        <div class="form-row one" id="verif-form" style="display:none">
+          <div class="field">
+            <label>Resultado de la verificación</label>
+            <textarea id="verif-result" rows="3"
+              placeholder="Describa cómo se verificó que la acción correctiva fue eficaz y el problema no recurrirá…"></textarea>
+          </div>
+          <div style="text-align:right;margin-top:10px">
+            <button class="btn-success" onclick="saveVerification()">
+              <i class="fa-solid fa-circle-check"></i> Marcar como Verificado y Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="verif-result-view" style="display:none">
+          <div style="background:#f8fafc;border:1px solid var(--border);border-radius:var(--rsm);
+               padding:14px;font-size:.857rem;color:var(--txt);line-height:1.7" id="d-verif-text">—</div>
+        </div>
+
+        <div id="cierre-info" style="display:none;margin-top:16px">
+          <div class="info-grid">
+            <div class="info-item"><label>Fecha de cierre</label><span id="d-close-date">—</span></div>
+            <div class="info-item"><label>Cerrada por</label><span id="d-close-by">—</span></div>
+          </div>
+        </div>
+
+        <div id="cierre-empty" style="text-align:center;padding:30px;color:var(--txt3);font-size:.857rem">
+          <i class="fa-solid fa-clock" style="display:block;font-size:2rem;margin-bottom:8px;color:var(--border)"></i>
+          Complete el plan de acción antes de verificar y cerrar la NC.
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/noconformidades.js"></script>
+</body>
+</html>
