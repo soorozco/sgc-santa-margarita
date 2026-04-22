@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contexto del SGC — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/contexto.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link active" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="#"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Contexto del SGC</div>
+        <div class="topbar-sub">Cláusula 4 — Contexto de la Organización</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Banner -->
+      <div class="ctx-banner">
+        <div class="ctx-banner-icon"><i class="fa-solid fa-hospital"></i></div>
+        <div>
+          <h2>Hospital Santa Margarita — Manual de Calidad</h2>
+          <p>Sistema de Gestión de Calidad certificado bajo la norma ISO 9001:2015.<br>
+             Este módulo documenta el contexto organizacional, alcance, exclusiones, análisis FODA y partes interesadas.</p>
+          <div class="ctx-banner-pills">
+            <span class="ctx-pill"><i class="fa-solid fa-certificate" style="margin-right:4px"></i>ISO 9001:2015</span>
+            <span class="ctx-pill" id="banner-scope-pill">Cargando alcance…</span>
+            <span class="ctx-pill" id="banner-updated">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ Sección 4.3 — Alcance y Exclusiones ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-bullseye"></i>
+            Alcance del SGC y Exclusiones
+            <span class="clause-badge">4.3</span>
+          </div>
+          <button class="btn-edit" id="btn-edit-scope" onclick="toggleEditScope()">
+            <i class="fa-solid fa-pen"></i> Editar
+          </button>
+        </div>
+        <div class="ctx-section-body">
+
+          <!-- Vista lectura -->
+          <div id="scope-view">
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.05em;color:var(--txt3);margin-bottom:8px">
+              Declaración del Alcance
+            </div>
+            <div class="scope-text" id="d-scope">
+              <span style="color:var(--txt3);font-style:italic">Sin declaración de alcance registrada.</span>
+            </div>
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.05em;color:var(--txt3);margin-bottom:8px">
+              Justificación del Alcance
+            </div>
+            <p id="d-scope-just" style="font-size:.857rem;color:var(--txt2);
+               line-height:1.7;margin-bottom:18px">—</p>
+
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.05em;color:var(--txt3);margin-bottom:10px">
+              Exclusiones de la Norma
+            </div>
+            <ul class="exclusion-list" id="exclusion-list">
+              <li style="font-size:.857rem;color:var(--txt3);padding:10px 0;font-style:italic">
+                Sin exclusiones registradas. El SGC aplica en su totalidad.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Vista edición -->
+          <div class="scope-edit" id="scope-edit">
+            <div class="form-row one" style="margin-bottom:14px">
+              <div class="field">
+                <label>Declaración del Alcance <span class="req">*</span></label>
+                <textarea id="edit-scope" rows="4"
+                  placeholder="Ej. El SGC del Hospital Santa Margarita aplica a los procesos de atención médica, hospitalización, urgencias, quirófano y servicios de apoyo diagnóstico…"></textarea>
+              </div>
+            </div>
+            <div class="form-row one" style="margin-bottom:18px">
+              <div class="field">
+                <label>Justificación del Alcance</label>
+                <textarea id="edit-scope-just" rows="3"
+                  placeholder="Explica por qué el alcance fue delimitado de esta forma…"></textarea>
+              </div>
+            </div>
+
+            <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.05em;color:var(--txt3);margin-bottom:10px">
+              Exclusiones de la Norma ISO 9001:2015
+            </div>
+            <ul class="exclusion-list" id="exclusion-edit-list"></ul>
+
+            <button class="btn-secondary" onclick="toggleAddExcl()" style="margin-bottom:14px">
+              <i class="fa-solid fa-plus"></i> Agregar Exclusión
+            </button>
+            <div class="add-excl-form" id="add-excl-form">
+              <div class="form-row">
+                <div class="field">
+                  <label>Cláusula excluida <span class="req">*</span></label>
+                  <input type="text" id="excl-clause" placeholder="Ej. 8.3 — Diseño y Desarrollo">
+                </div>
+                <div class="field">
+                  <label>Justificación <span class="req">*</span></label>
+                  <input type="text" id="excl-just" placeholder="Razón de la exclusión">
+                </div>
+              </div>
+              <button class="btn-primary" onclick="addExclusion()" style="margin-top:4px">
+                <i class="fa-solid fa-plus"></i> Agregar
+              </button>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+              <button class="btn-secondary" onclick="toggleEditScope()">Cancelar</button>
+              <button class="btn-primary" id="btn-save-scope" onclick="saveScope()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Alcance
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ══════ Sección 4.1 — FODA ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-diagram-project"></i>
+            Análisis FODA — Contexto Interno y Externo
+            <span class="clause-badge">4.1</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:.75rem;color:var(--txt3)" id="foda-updated">—</span>
+            <button class="btn-edit" id="btn-edit-foda" onclick="toggleEditFoda()">
+              <i class="fa-solid fa-pen"></i> Editar
+            </button>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <div class="foda-grid" id="foda-grid">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ Sección 4.2 — Partes Interesadas ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-people-group"></i>
+            Partes Interesadas Pertinentes
+            <span class="clause-badge">4.2</span>
+          </div>
+          <button class="btn-primary" id="btn-add-party" onclick="toggleAddParty()" style="display:none">
+            <i class="fa-solid fa-plus"></i> Agregar Parte
+          </button>
+        </div>
+        <div class="ctx-section-body">
+
+          <!-- Add form -->
+          <div class="add-party-form" id="add-party-form">
+            <div class="form-row">
+              <div class="field">
+                <label>Nombre / Grupo <span class="req">*</span></label>
+                <input type="text" id="p-name" placeholder="Ej. Pacientes y familiares">
+              </div>
+              <div class="field">
+                <label>Tipo</label>
+                <select id="p-type">
+                  <option value="externo">Externo</option>
+                  <option value="interno">Interno</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="field">
+                <label>Necesidades</label>
+                <textarea id="p-needs" rows="2"
+                  placeholder="¿Qué necesita esta parte interesada del hospital?"></textarea>
+              </div>
+              <div class="field">
+                <label>Expectativas</label>
+                <textarea id="p-expectations" rows="2"
+                  placeholder="¿Qué espera obtener como resultado?"></textarea>
+              </div>
+            </div>
+            <div class="form-row one">
+              <div class="field">
+                <label>Método de seguimiento</label>
+                <input type="text" id="p-monitoring"
+                  placeholder="Ej. Encuestas de satisfacción, reuniones trimestrales…">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+              <button class="btn-secondary" onclick="toggleAddParty()">Cancelar</button>
+              <button class="btn-primary" onclick="saveParty()">
+                <i class="fa-solid fa-floppy-disk"></i> Guardar
+              </button>
+            </div>
+          </div>
+
+          <table class="parties-table">
+            <thead>
+              <tr>
+                <th>Parte Interesada</th>
+                <th>Tipo</th>
+                <th>Necesidades</th>
+                <th>Expectativas</th>
+                <th>Seguimiento</th>
+                <th class="center" style="width:60px"></th>
+              </tr>
+            </thead>
+            <tbody id="parties-tbody">
+              <tr><td colspan="6" class="parties-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/contexto.js"></script>
+</body>
+</html>
