@@ -8,11 +8,13 @@ async function requireAuth() {
 }
 
 async function getProfile(userId) {
-  const { data } = await db
+  const { data, error } = await db
     .from('profiles')
     .select('*, roles(name, display_name), departments(name)')
     .eq('id', userId)
     .single()
+  if (error) console.error('[SGC] getProfile error:', error.message, '| userId:', userId)
+  if (data)  console.log('[SGC] perfil cargado:', data.full_name, '| rol:', data.roles?.name)
   return data
 }
 
