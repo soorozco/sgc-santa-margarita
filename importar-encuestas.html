@@ -114,6 +114,17 @@ const db = supabase.createClient(SUPABASE_URL, ANON_KEY)
 
 let nOk = 0, nErr = 0
 
+// All columns we want to insert — probed individually before first batch
+const ALL_COLS = [
+  'external_id','survey_date','patient_name','room_number','doctor_name','area',
+  'q_tramites_ingreso','q_info_normas','q_tiempo_espera','q_atencion_enfermeria',
+  'q_atencion_medico','q_privacidad','q_higiene','q_vigilancia','q_alimentos',
+  'q_servicio_general','q_tramites_egreso',
+  'would_recommend','comment_type','comment_category','comments',
+  'is_active','created_by'
+]
+let _okCols = null
+
 function log(msg, cls='') {
   const el = document.getElementById('log')
   el.innerHTML += '<span class="' + cls + '">' + msg + '</span>\n'
@@ -122,6 +133,27 @@ function log(msg, cls='') {
 function setProgress(done, total) {
   document.getElementById('prog').style.width = ((done/total)*100) + '%'
   document.getElementById('status').textContent = done + ' de ' + total + ' procesadas…'
+}
+
+async function probeColumns() {
+  log('🔍 Detectando columnas disponibles…','inf')
+  const ok = [], miss = []
+  for (const col of ALL_COLS) {
+    const { error } = await db.from('satisfaction_surveys').select(col).limit(0)
+    if (error && error.message && error.message.toLowerCase().includes('column')) {
+      miss.push(col)
+    } else {
+      ok.push(col)
+    }
+  }
+  if (miss.length) {
+    log('⚠️  Columnas no encontradas en caché: ' + miss.join(', '),'err')
+    log('   Se importará solo con las columnas disponibles.','err')
+  } else {
+    log('✅ Todas las columnas detectadas correctamente.','ok')
+  }
+  log('   Disponibles: ' + ok.join(', '),'inf')
+  return ok
 }
 
 async function startImport() {
@@ -137,27 +169,42 @@ async function startImport() {
   // Verify table exists
   log('🔍 Verificando tabla satisfaction_surveys…','inf')
   const { error: tErr } = await db.from('satisfaction_surveys').select('id').limit(1)
-  if (tErr && tErr.message.includes('relation')) {
+  if (tErr && tErr.message && tErr.message.includes('relation')) {
     log('❌ La tabla no existe. Ejecuta primero el SQL del Paso 1.','err')
     btn.disabled = false; return
   }
   log('✅ Tabla encontrada.','ok')
+
+  // Probe columns
+  _okCols = await probeColumns()
   log('','')
 
   const total = SURVEYS.length
   const BATCH = 20
 
   for (let i = 0; i < total; i += BATCH) {
-    const batch = SURVEYS.slice(i, i + BATCH)
-    const { error } = await db.from('satisfaction_surveys')
-      .upsert(batch, { onConflict: 'external_id', ignoreDuplicates: false })
+    // Build payloads with only detected columns
+    const batch = SURVEYS.slice(i, i + BATCH).map(r => {
+      const row = {}
+      for (const col of _okCols) {
+        if (r[col] !== undefined) row[col] = r[col]
+      }
+      return row
+    })
+
+    // Use upsert only if external_id column is available, else insert
+    let error
+    if (_okCols.includes('external_id')) {
+      ({ error } = await db.from('satisfaction_surveys')
+        .upsert(batch, { onConflict: 'external_id', ignoreDuplicates: false }))
+    } else {
+      ({ error } = await db.from('satisfaction_surveys').insert(batch))
+    }
 
     if (error) {
       log('❌ Filas ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + error.message, 'err')
       nErr += batch.length
     } else {
-      const first = batch[0].patient_name || batch[0].external_id
-      const last  = batch[batch.length-1].patient_name || batch[batch.length-1].external_id
       log('✅ ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + batch.length + ' encuestas', 'ok')
       nOk += batch.length
     }
