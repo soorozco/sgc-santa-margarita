@@ -135,27 +135,6 @@ function setProgress(done, total) {
   document.getElementById('status').textContent = done + ' de ' + total + ' procesadas…'
 }
 
-async function probeColumns() {
-  log('🔍 Detectando columnas disponibles…','inf')
-  const ok = [], miss = []
-  for (const col of ALL_COLS) {
-    const { error } = await db.from('satisfaction_surveys').select(col).limit(0)
-    if (error && error.message && error.message.toLowerCase().includes('column')) {
-      miss.push(col)
-    } else {
-      ok.push(col)
-    }
-  }
-  if (miss.length) {
-    log('⚠️  Columnas no encontradas en caché: ' + miss.join(', '),'err')
-    log('   Se importará solo con las columnas disponibles.','err')
-  } else {
-    log('✅ Todas las columnas detectadas correctamente.','ok')
-  }
-  log('   Disponibles: ' + ok.join(', '),'inf')
-  return ok
-}
-
 async function startImport() {
   const btn = document.getElementById('btn-import')
   btn.disabled = true
@@ -166,40 +145,23 @@ async function startImport() {
   const { data: { session } } = await db.auth.getSession()
   if (!session) { log('❌ Sin sesión. Entra al SGC primero.','err'); btn.disabled=false; return }
 
-  // Verify table exists
-  log('🔍 Verificando tabla satisfaction_surveys…','inf')
-  const { error: tErr } = await db.from('satisfaction_surveys').select('id').limit(1)
-  if (tErr && tErr.message && tErr.message.includes('relation')) {
-    log('❌ La tabla no existe. Ejecuta primero el SQL del Paso 1.','err')
+  // Verify RPC function exists
+  log('🔍 Verificando función import_survey_batch…','inf')
+  const { error: rpcTest } = await db.rpc('import_survey_batch', { rows: [] })
+  if (rpcTest && rpcTest.message && rpcTest.message.includes('function')) {
+    log('❌ La función no existe. Ejecuta el SQL del Paso 1 primero.','err')
     btn.disabled = false; return
   }
-  log('✅ Tabla encontrada.','ok')
-
-  // Probe columns
-  _okCols = await probeColumns()
+  log('✅ Función RPC encontrada — usando inserción directa (sin caché).','ok')
   log('','')
 
   const total = SURVEYS.length
   const BATCH = 20
 
   for (let i = 0; i < total; i += BATCH) {
-    // Build payloads with only detected columns
-    const batch = SURVEYS.slice(i, i + BATCH).map(r => {
-      const row = {}
-      for (const col of _okCols) {
-        if (r[col] !== undefined) row[col] = r[col]
-      }
-      return row
-    })
+    const batch = SURVEYS.slice(i, i + BATCH)
 
-    // Use upsert only if external_id column is available, else insert
-    let error
-    if (_okCols.includes('external_id')) {
-      ({ error } = await db.from('satisfaction_surveys')
-        .upsert(batch, { onConflict: 'external_id', ignoreDuplicates: false }))
-    } else {
-      ({ error } = await db.from('satisfaction_surveys').insert(batch))
-    }
+    const { data, error } = await db.rpc('import_survey_batch', { rows: batch })
 
     if (error) {
       log('❌ Filas ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + error.message, 'err')
@@ -209,7 +171,7 @@ async function startImport() {
       nOk += batch.length
     }
     setProgress(Math.min(i+BATCH, total), total)
-    await new Promise(r => setTimeout(r, 100))
+    await new Promise(r => setTimeout(r, 80))
   }
 
   setProgress(total, total)
