@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/satisfaccion.css">
+  <link rel="stylesheet" href="css/satisfaccion.css?v=2">
 </head>
 <body>
 <div class="layout">
@@ -226,7 +226,8 @@
         </div>
         <div class="field">
           <label>Habitación</label>
-          <input type="text" id="n-room" placeholder="Ej. JP15">
+          <input type="text" id="n-room" list="n-room-list" placeholder="Selecciona área primero…" autocomplete="off">
+          <datalist id="n-room-list"></datalist>
         </div>
       </div>
       <div class="form-row">
@@ -236,8 +237,8 @@
         </div>
         <div class="field">
           <label>Área / Servicio <span class="req">*</span></label>
-          <select id="n-area">
-            <option value="">— Seleccionar —</option>
+          <select id="n-area" onchange="onAreaChange()">
+            <option value="">— Seleccionar área primero —</option>
             <option>Central Juan Pablo II</option>
             <option>Central Planta Baja (PB)</option>
             <option>Central Planta Baja (PA)</option>
@@ -282,40 +283,16 @@
         </label>
       </div>
 
-      <!-- Comentarios -->
-      <div class="rating-section-title"><i class="fa-solid fa-comment"></i> Comentarios adicionales</div>
-      <div style="margin-bottom:12px">
-        <div style="font-size:.75rem;font-weight:700;color:var(--txt2);text-transform:uppercase;margin-bottom:8px">Tipo de comentario</div>
-        <div class="ctype-row" id="ctype-row">
-          <button type="button" class="ctype-btn" onclick="setCtype('')">Sin comentario</button>
-          <button type="button" class="ctype-btn" onclick="setCtype('QUEJA')">🔴 Queja</button>
-          <button type="button" class="ctype-btn" onclick="setCtype('SUGERENCIA')">🟡 Sugerencia</button>
-          <button type="button" class="ctype-btn" onclick="setCtype('FELICITACION')">🟢 Felicitación</button>
-        </div>
+      <!-- Comentarios — múltiples bloques -->
+      <div class="rating-section-title">
+        <i class="fa-solid fa-comments"></i> Comentarios adicionales
+        <button type="button" class="btn-add-comment" onclick="addCommentBlock()">
+          <i class="fa-solid fa-plus"></i> Agregar comentario
+        </button>
       </div>
-      <div id="ctype-detail" style="display:none">
-        <div class="form-row">
-          <div class="field">
-            <label>Categoría</label>
-            <select id="n-cat">
-              <option value="">— Sin categoría —</option>
-              <option value="ENFERMERIA">Enfermería</option>
-              <option value="MEDICO">Médico</option>
-              <option value="ALIMENTOS">Alimentos</option>
-              <option value="LIMPIEZA">Limpieza</option>
-              <option value="INSTALACIONES">Instalaciones</option>
-              <option value="SEGURIDAD">Seguridad</option>
-              <option value="ADMINISTRATIVO">Administrativo</option>
-              <option value="OTROS">Otros</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="form-row one">
-        <div class="field">
-          <label>Texto del comentario</label>
-          <textarea id="n-comment" rows="3" placeholder="Escriba aquí el comentario del paciente…"></textarea>
-        </div>
+      <div id="comments-container"><!-- bloques generados por JS --></div>
+      <div class="no-comments-msg" id="no-comments-msg">
+        Sin comentarios. Haz clic en <strong>Agregar comentario</strong> para añadir quejas, sugerencias o felicitaciones.
       </div>
 
     </div>
@@ -354,13 +331,7 @@
         <div class="detail-scores-grid" id="d-scores-grid"><!-- rendered by JS --></div>
         <div class="section-sep"><i class="fa-solid fa-thumbs-up"></i> ¿Recomendaría el hospital?</div>
         <div id="d-recommend" style="font-size:1.1rem;font-weight:700;margin-bottom:16px">—</div>
-        <div id="d-comment-block" style="display:none">
-          <div class="section-sep"><i class="fa-solid fa-comment"></i> Comentario</div>
-          <div id="d-comment-card" class="comment-card" style="margin-bottom:0">
-            <div class="comment-head" id="d-comment-head"></div>
-            <div class="comment-txt" id="d-comment-txt"></div>
-          </div>
-        </div>
+        <div id="d-comment-block" style="display:none"><!-- generado por JS --></div>
       </div>
 
       <!-- Tab: Información -->
@@ -387,6 +358,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/satisfaccion.js"></script>
+<script src="js/satisfaccion.js?v=2"></script>
 </body>
 </html>

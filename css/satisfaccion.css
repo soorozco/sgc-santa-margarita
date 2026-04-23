@@ -275,6 +275,43 @@
 .tab-panel { display:none; padding:20px 24px; }
 .tab-panel.active { display:block; }
 
+/* ── Comment block (multi-comment form) ─────────────────────── */
+.btn-add-comment {
+  margin-left:auto; display:inline-flex; align-items:center; gap:6px;
+  padding:5px 13px; background:var(--blue-lt); color:var(--blue);
+  font-size:.75rem; font-weight:700; border-radius:var(--rsm);
+  border:1.5px solid var(--blue); cursor:pointer; transition:var(--ease);
+}
+.btn-add-comment:hover { background:var(--blue); color:#fff; }
+
+.comment-block {
+  border:1.5px solid var(--border); border-radius:var(--rsm);
+  padding:14px 16px; margin-bottom:12px;
+  background:#fafbfd;
+}
+.cb-head {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.cb-num {
+  font-size:.75rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--blue);
+  display:flex; align-items:center; gap:6px;
+}
+.cb-remove {
+  width:26px; height:26px; border-radius:6px; border:1px solid var(--border);
+  background:var(--white); color:var(--txt3); font-size:13px;
+  display:inline-flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:var(--ease);
+}
+.cb-remove:hover { background:var(--red-lt); border-color:var(--red); color:var(--red); }
+
+.no-comments-msg {
+  text-align:center; padding:14px; color:var(--txt3); font-size:.857rem;
+  border:1.5px dashed var(--border); border-radius:var(--rsm);
+  margin-bottom:12px;
+}
+
 /* ── Pagination ──────────────────────────────────────────────── */
 .pagination { display:flex; align-items:center; justify-content:center; gap:6px;
   padding:16px; border-top:1px solid var(--border); }

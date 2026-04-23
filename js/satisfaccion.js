@@ -8,7 +8,7 @@ let _filtered= []      // after filters
 let _page    = 1
 const PAGE_SIZE = 20
 let _chartTrend = null
-let _ctype   = ''      // current comment type selection in new form
+let _comments = []     // comment blocks in new survey form [{type,category,text}]
 
 // ── Rating map ────────────────────────────────────────────────
 const RATING = { 'Excelente':5, 'Bueno':4, 'Regular':3, 'Malo':2, 'Pésimo':1 }
@@ -36,6 +36,36 @@ const METRIC_KEY = {
   alimentos:  'q_alimentos',
   higiene:    'q_higiene',
 }
+
+// ── Rooms by area ─────────────────────────────────────────────
+const ROOMS_BY_AREA = {
+  'Central Juan Pablo II':       ['JP01','JP02','JP03','JP04','JP05','JP06','JP07','JP08',
+                                   'JP09','JP10','JP11','JP12','JP13','JP14','JP15','JP16','JP17'],
+  'Central Planta Baja (PB)':    ['PB104','PB105','PB107','PB109','PB111','PB112',
+                                   'PB113','PB114','PB115','PB116','PB117'],
+  'Central Planta Baja (PA)':    ['PA204','PA206','PA207','PA212','PA213',
+                                   'PA214','PA215','PA216','PA218'],
+  'Central Planta Alta':         ['PA202'],
+  'Central Ginecología':         ['GIN01','GIN02','GIN03','GIN05','GIN06','GIN07',
+                                   'GIN08','GIN10','GIN11','GIN13','GIN15','GIN16','GIN17'],
+  'Central Pediatría':           ['PED01','PED02','PED03','PED04','PED05'],
+  'Master Suite':                ['SU01','SU02','SU03'],
+  'Quirófano':                   ['QX01','QX02'],
+  'Unidad de Terapia Intensiva': ['UTI01','UTI02','UTI03','UTI04'],
+  'Urgencias':                   ['ACV01'],
+}
+
+// Comment categories shared across all blocks
+const CAT_OPTIONS_HTML = `
+  <option value="">— Sin categoría —</option>
+  <option value="ENFERMERIA">Enfermería</option>
+  <option value="MEDICO">Médico</option>
+  <option value="ALIMENTOS">Alimentos</option>
+  <option value="LIMPIEZA">Limpieza</option>
+  <option value="INSTALACIONES">Instalaciones</option>
+  <option value="SEGURIDAD">Seguridad</option>
+  <option value="ADMINISTRATIVO">Administrativo</option>
+  <option value="OTROS">Otros</option>`
 
 // ── Init ──────────────────────────────────────────────────────
 async function initSat() {
@@ -81,7 +111,25 @@ async function loadSurveys() {
   renderKPIs()
   renderScoresPanel()
   updateChart()
-  renderComments()
+}
+
+// ── Comment helpers ───────────────────────────────────────────
+// Returns array of {type, category, text} for a survey
+function getCommentsList(s) {
+  if (s.comments_detail && Array.isArray(s.comments_detail) && s.comments_detail.length) {
+    return s.comments_detail
+  }
+  if (s.comments && s.comments.trim()) {
+    return [{ type: s.comment_type || null, category: s.comment_category || null, text: s.comments }]
+  }
+  return []
+}
+
+// Returns array of uppercase type strings for a survey
+function getSurveyCommentTypes(s) {
+  return getCommentsList(s)
+    .map(c => (c.type || '').toUpperCase())
+    .filter(Boolean)
 }
 
 // ── Filters ───────────────────────────────────────────────────
@@ -95,13 +143,17 @@ function applyFilters() {
   _filtered = _surveys.filter(s => {
     if (area && s.area !== area) return false
     if (rec  && s.would_recommend !== (rec === 'SI')) return false
-    if (ctype && (s.comment_type || '').toUpperCase() !== ctype) return false
+    if (ctype) {
+      const types = getSurveyCommentTypes(s)
+      if (!types.includes(ctype)) return false
+    }
     if (month) {
       const ym = (s.survey_date || '').substring(0,7)
       if (ym !== month) return false
     }
     if (q) {
-      const txt = [s.patient_name, s.doctor_name, s.room_number, s.area, s.comments]
+      const comments = getCommentsList(s).map(c => c.text || '').join(' ')
+      const txt = [s.patient_name, s.doctor_name, s.room_number, s.area, comments]
         .filter(Boolean).join(' ').toLowerCase()
       if (!txt.includes(q)) return false
     }
@@ -110,6 +162,7 @@ function applyFilters() {
 
   _page = 1
   renderTable()
+  renderComments()
   document.getElementById('enc-count').textContent =
     _filtered.length + ' encuesta' + (_filtered.length !== 1 ? 's' : '') + ' encontrada' + (_filtered.length !== 1 ? 's' : '')
 }
@@ -133,9 +186,9 @@ function renderKPIs() {
     recPct + '<span class="kpi-unit">%</span>'
   document.getElementById('kpi-rec-sub').textContent = recYes + ' de ' + n + ' pacientes'
 
-  // Quejas & sugerencias
-  const quejas = _surveys.filter(s => (s.comment_type||'').toUpperCase() === 'QUEJA').length
-  const sugs   = _surveys.filter(s => (s.comment_type||'').toUpperCase() === 'SUGERENCIA').length
+  // Count surveys that have at least one queja / sugerencia
+  const quejas = _surveys.filter(s => getSurveyCommentTypes(s).includes('QUEJA')).length
+  const sugs   = _surveys.filter(s => getSurveyCommentTypes(s).includes('SUGERENCIA')).length
   document.getElementById('kpi-quejas').textContent = quejas
   document.getElementById('kpi-sug').textContent    = sugs
 }
@@ -242,9 +295,18 @@ function updateChart() {
 // ── Comments panel ────────────────────────────────────────────
 function renderComments() {
   const ctype = document.getElementById('f-ctype')?.value || ''
-  let pool = _surveys.filter(s => s.comments && s.comments.trim())
-  if (ctype) pool = pool.filter(s => (s.comment_type||'').toUpperCase() === ctype)
-  pool = pool.slice(0,12)
+
+  // Expand surveys into individual comment entries for display
+  let pool = []
+  _surveys.forEach(s => {
+    getCommentsList(s).forEach(c => {
+      if (!c.text || !c.text.trim()) return
+      const ct = (c.type || '').toUpperCase()
+      if (ctype && ct !== ctype) return
+      pool.push({ survey: s, comment: c })
+    })
+  })
+  pool = pool.slice(0, 12)
 
   const list = document.getElementById('comment-list')
   if (!list) return
@@ -254,8 +316,8 @@ function renderComments() {
     return
   }
 
-  list.innerHTML = pool.map(s => {
-    const ct   = (s.comment_type||'').toUpperCase()
+  list.innerHTML = pool.map(({ survey: s, comment: c }) => {
+    const ct   = (c.type || '').toUpperCase()
     const cls  = ct==='QUEJA'?'queja': ct==='SUGERENCIA'?'sugerencia': ct==='FELICITACION'?'felicitacion':''
     const bcls = ct==='QUEJA'?'badge-queja': ct==='SUGERENCIA'?'badge-sugerencia': ct==='FELICITACION'?'badge-felicitacion':'badge-categoria'
     const icon = ct==='QUEJA'?'🔴': ct==='SUGERENCIA'?'🟡': ct==='FELICITACION'?'🟢':'💬'
@@ -263,12 +325,12 @@ function renderComments() {
     <div class="comment-card ${cls}">
       <div class="comment-head">
         ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ct}</span>` : ''}
-        ${s.comment_category ? `<span class="badge-categoria">${esc(s.comment_category)}</span>` : ''}
+        ${c.category ? `<span class="badge-categoria">${esc(c.category)}</span>` : ''}
         <span class="comment-patient">${esc(s.patient_name||'Anónimo')}</span>
         ${s.room_number ? `<span class="comment-room">· ${esc(s.room_number)}</span>` : ''}
         <span class="comment-meta">${fmtDate(s.survey_date)}</span>
       </div>
-      <div class="comment-txt">${esc(s.comments)}</div>
+      <div class="comment-txt">${esc(c.text)}</div>
       ${s.area ? `<div class="comment-area"><i class="fa-solid fa-location-dot"></i> ${esc(s.area)}</div>` : ''}
     </div>`
   }).join('')
@@ -292,8 +354,14 @@ function renderTable() {
     const enf = s.q_atencion_enfermeria
     const med = s.q_atencion_medico
     const gen = s.q_servicio_general
-    const ct  = (s.comment_type||'').toUpperCase()
     const rec = s.would_recommend
+    const types = getSurveyCommentTypes(s)
+    const typeBadges = types.length
+      ? types.map(ct => {
+          const cls = ct==='QUEJA'?'badge-queja':ct==='SUGERENCIA'?'badge-sugerencia':'badge-felicitacion'
+          return `<span class="comment-badge ${cls}">${ct}</span>`
+        }).join(' ')
+      : '—'
     return `
     <tr style="cursor:pointer" onclick="openDetail('${s.id}')">
       <td style="white-space:nowrap">${fmtDate(s.survey_date)}</td>
@@ -306,7 +374,7 @@ function renderTable() {
       <td class="center">${ratingBadge(med)}</td>
       <td class="center">${ratingBadge(gen)}</td>
       <td class="center">${rec===true?'<span class="recommend-yes">✅ Sí</span>':rec===false?'<span class="recommend-no">❌ No</span>':'—'}</td>
-      <td>${ct ? `<span class="comment-badge ${ct==='QUEJA'?'badge-queja':ct==='SUGERENCIA'?'badge-sugerencia':'badge-felicitacion'}">${ct}</span>` : '—'}</td>
+      <td>${typeBadges}</td>
       <td class="center">
         <button class="btn-action" onclick="event.stopPropagation();openDetail('${s.id}')" title="Ver detalle">
           <i class="fa-solid fa-eye"></i>
@@ -377,18 +445,28 @@ function openDetail(id) {
       ? '<span class="recommend-no"><i class="fa-solid fa-circle-xmark"></i> No regresaría ni recomendaría</span>'
       : '—'
 
-  // Comment
+  // Comments — support multiple
+  const comments = getCommentsList(s)
   const cb = document.getElementById('d-comment-block')
-  if (s.comments && s.comments.trim()) {
+  if (comments.length > 0) {
+    const plural = comments.length > 1
     cb.style.display = 'block'
-    const ct   = (s.comment_type||'').toUpperCase()
-    const bcls = ct==='QUEJA'?'badge-queja': ct==='SUGERENCIA'?'badge-sugerencia': ct==='FELICITACION'?'badge-felicitacion':''
-    const card = document.getElementById('d-comment-card')
-    card.className = 'comment-card ' + (ct==='QUEJA'?'queja': ct==='SUGERENCIA'?'sugerencia': ct==='FELICITACION'?'felicitacion':'')
-    document.getElementById('d-comment-head').innerHTML =
-      (ct ? `<span class="comment-badge ${bcls}">${ct}</span>` : '') +
-      (s.comment_category ? `<span class="badge-categoria">${esc(s.comment_category)}</span>` : '')
-    document.getElementById('d-comment-txt').textContent = s.comments
+    cb.innerHTML =
+      `<div class="section-sep"><i class="fa-solid fa-comments"></i> Comentario${plural?'s':''}</div>` +
+      comments.map(c => {
+        const ct   = (c.type || '').toUpperCase()
+        const cls  = ct==='QUEJA'?'queja': ct==='SUGERENCIA'?'sugerencia': ct==='FELICITACION'?'felicitacion':''
+        const bcls = ct==='QUEJA'?'badge-queja': ct==='SUGERENCIA'?'badge-sugerencia': ct==='FELICITACION'?'badge-felicitacion':''
+        const icon = ct==='QUEJA'?'🔴': ct==='SUGERENCIA'?'🟡': ct==='FELICITACION'?'🟢':'💬'
+        return `
+        <div class="comment-card ${cls}" style="margin-bottom:8px">
+          <div class="comment-head">
+            ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ct}</span>` : ''}
+            ${c.category ? `<span class="badge-categoria">${esc(c.category)}</span>` : ''}
+          </div>
+          <div class="comment-txt">${esc(c.text)}</div>
+        </div>`
+      }).join('')
   } else {
     cb.style.display = 'none'
   }
@@ -408,7 +486,110 @@ function openDetail(id) {
   openModal('modal-detail')
 }
 
-// ── New survey form ───────────────────────────────────────────
+// ── New survey form — area → rooms ────────────────────────────
+function onAreaChange() {
+  const area = document.getElementById('n-area')?.value
+  const dl   = document.getElementById('n-room-list')
+  const roomInput = document.getElementById('n-room')
+  if (!dl) return
+
+  const rooms = ROOMS_BY_AREA[area] || []
+  dl.innerHTML = rooms.map(r => `<option value="${r}">`).join('')
+
+  if (roomInput) {
+    roomInput.placeholder = rooms.length ? 'Seleccionar habitación…' : 'Sin habitaciones registradas'
+    // Clear room if it no longer belongs to the chosen area
+    if (rooms.length > 0 && roomInput.value && !rooms.includes(roomInput.value)) {
+      roomInput.value = ''
+    }
+  }
+}
+
+// ── New survey form — multi-comment blocks ────────────────────
+function _saveCommentTexts() {
+  _comments.forEach((c, i) => {
+    const textEl = document.getElementById(`cb-text-${i}`)
+    if (textEl) c.text = textEl.value
+    const catEl = document.getElementById(`cb-cat-${i}`)
+    if (catEl) c.category = catEl.value
+  })
+}
+
+function addCommentBlock() {
+  _saveCommentTexts()
+  _comments.push({ type: 'QUEJA', category: '', text: '' })
+  renderCommentBlocks()
+}
+
+function removeCommentBlock(idx) {
+  _saveCommentTexts()
+  _comments.splice(idx, 1)
+  renderCommentBlocks()
+}
+
+function setBlockType(idx, type) {
+  _saveCommentTexts()
+  _comments[idx].type = type
+  renderCommentBlocks()
+}
+
+function renderCommentBlocks() {
+  const container = document.getElementById('comments-container')
+  const noMsg     = document.getElementById('no-comments-msg')
+  if (!container) return
+
+  if (_comments.length === 0) {
+    container.innerHTML = ''
+    if (noMsg) noMsg.style.display = 'block'
+    return
+  }
+  if (noMsg) noMsg.style.display = 'none'
+
+  container.innerHTML = _comments.map((c, idx) => {
+    const types = ['QUEJA','SUGERENCIA','FELICITACION']
+    const icons  = { QUEJA:'🔴', SUGERENCIA:'🟡', FELICITACION:'🟢' }
+    const labels = { QUEJA:'Queja', SUGERENCIA:'Sugerencia', FELICITACION:'Felicitación' }
+    const typeBtns = types.map(t => {
+      const active = c.type === t ? 'active-' + t.toLowerCase() : ''
+      return `<button type="button" class="ctype-btn ${active}"
+                onclick="setBlockType(${idx},'${t}')">${icons[t]} ${labels[t]}</button>`
+    }).join('')
+
+    return `<div class="comment-block" id="cb-${idx}">
+      <div class="cb-head">
+        <span class="cb-num"><i class="fa-solid fa-comment"></i> Comentario ${idx + 1}</span>
+        <button type="button" class="cb-remove" onclick="removeCommentBlock(${idx})" title="Quitar comentario">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="ctype-row" style="margin-bottom:10px">${typeBtns}</div>
+      <div class="form-row">
+        <div class="field">
+          <label>Categoría</label>
+          <select id="cb-cat-${idx}" onchange="_comments[${idx}].category=this.value">
+            ${CAT_OPTIONS_HTML}
+          </select>
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Texto del comentario</label>
+          <textarea id="cb-text-${idx}" rows="2"
+            placeholder="Escriba aquí el comentario del paciente…"
+            oninput="_comments[${idx}].text=this.value">${esc(c.text || '')}</textarea>
+        </div>
+      </div>
+    </div>`
+  }).join('')
+
+  // Restore select values (innerHTML resets them)
+  _comments.forEach((c, idx) => {
+    const catSel = document.getElementById(`cb-cat-${idx}`)
+    if (catSel && c.category) catSel.value = c.category
+  })
+}
+
+// ── New survey form — build & reset ──────────────────────────
 function buildRatingQuestions() {
   const OPTS = ['Excelente','Bueno','Regular','Malo','Pésimo']
   const container = document.getElementById('rating-questions')
@@ -433,32 +614,19 @@ function setTodayDate() {
   if (el) el.value = new Date().toISOString().split('T')[0]
 }
 
-function setCtype(type) {
-  _ctype = type
-  const btns = document.querySelectorAll('#ctype-row .ctype-btn')
-  btns.forEach(b => {
-    b.className = 'ctype-btn'
-    if (type && b.textContent.toUpperCase().includes(type)) {
-      b.classList.add('active-' + type.toLowerCase())
-    } else if (!type && b.textContent.includes('Sin')) {
-      b.style.fontWeight = '700'
-    }
-  })
-  document.getElementById('ctype-detail').style.display = type ? 'block' : 'none'
-}
-
 function openNewSurvey() {
-  // Reset form
+  // Reset all fields
   QUESTIONS.forEach(q => { document.querySelectorAll(`[name="${q.key}"]`).forEach(r => r.checked=false) })
-  document.getElementById('n-patient').value  = ''
-  document.getElementById('n-room').value     = ''
-  document.getElementById('n-doctor').value   = ''
-  document.getElementById('n-area').value     = ''
-  document.getElementById('n-comment').value  = ''
-  document.getElementById('n-cat').value      = ''
+  document.getElementById('n-patient').value = ''
+  document.getElementById('n-room').value    = ''
+  document.getElementById('n-doctor').value  = ''
+  document.getElementById('n-area').value    = ''
+  document.getElementById('n-room-list').innerHTML = ''
+  document.getElementById('n-room').placeholder = 'Selecciona área primero…'
   const rec = document.querySelector('[name="n-rec"][value="SI"]')
   if (rec) rec.checked = true
-  setCtype('')
+  _comments = []
+  renderCommentBlocks()
   setTodayDate()
   openModal('modal-new')
 }
@@ -469,17 +637,27 @@ async function submitNewSurvey() {
   if (!area) { showToast('El área/servicio es obligatoria.','red'); return }
   if (!date) { showToast('La fecha es obligatoria.','red'); return }
 
+  // Save any unsaved textarea values
+  _saveCommentTexts()
+
+  // Filter out comment blocks with no text
+  const validComments = _comments.filter(c => c.text && c.text.trim())
+
+  // Primary comment fields (first valid comment, for backward compatibility)
+  const primary = validComments[0] || null
+
   const payload = {
-    patient_name:  document.getElementById('n-patient')?.value.trim() || null,
-    room_number:   document.getElementById('n-room')?.value.trim()    || null,
-    doctor_name:   document.getElementById('n-doctor')?.value.trim()  || null,
+    patient_name:     document.getElementById('n-patient')?.value.trim() || null,
+    room_number:      document.getElementById('n-room')?.value.trim()    || null,
+    doctor_name:      document.getElementById('n-doctor')?.value.trim()  || null,
     area,
-    survey_date:   date,
-    would_recommend: document.querySelector('[name="n-rec"]:checked')?.value === 'SI',
-    comment_type:    _ctype || null,
-    comment_category: _ctype ? (document.getElementById('n-cat')?.value || null) : null,
-    comments:      document.getElementById('n-comment')?.value.trim() || null,
-    created_by:    _user.id
+    survey_date:      date,
+    would_recommend:  document.querySelector('[name="n-rec"]:checked')?.value === 'SI',
+    comment_type:     primary ? primary.type    || null : null,
+    comment_category: primary ? primary.category|| null : null,
+    comments:         primary ? primary.text.trim()     : null,
+    comments_detail:  validComments.length > 0 ? validComments : null,
+    created_by:       _user.id
   }
 
   QUESTIONS.forEach(q => {

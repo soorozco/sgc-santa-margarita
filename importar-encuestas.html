@@ -89,6 +89,13 @@ CREATE POLICY "authenticated update" ON satisfaction_surveys FOR UPDATE TO authe
 
 GRANT SELECT, INSERT, UPDATE ON satisfaction_surveys TO authenticated;
 
+NOTIFY pgrst, 'reload schema';
+
+-- ── Paso 2 (opcional): columna para múltiples comentarios ──
+-- Ejecuta esto si quieres capturar más de un comentario por encuesta
+ALTER TABLE satisfaction_surveys
+  ADD COLUMN IF NOT EXISTS comments_detail JSONB;
+
 NOTIFY pgrst, 'reload schema';</div>
   </details>
 
