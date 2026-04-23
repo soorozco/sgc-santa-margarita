@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Satisfacción de Pacientes — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/satisfaccion.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link active" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Satisfacción de Pacientes</div>
+        <div class="topbar-sub">Cláusula 9.1.2 — Seguimiento de Percepción del Cliente</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ── KPI Cards ── -->
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-lbl"><i class="fa-solid fa-clipboard-list"></i> Total Encuestas</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub" id="kpi-total-sub">cargando…</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-lbl"><i class="fa-solid fa-star"></i> Satisfacción General</div>
+          <div class="kpi-val" id="kpi-sat"><span class="kpi-unit">—</span></div>
+          <div class="kpi-sub">promedio (sobre 5.0)</div>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-lbl"><i class="fa-solid fa-thumbs-up"></i> Recomendarían</div>
+          <div class="kpi-val" id="kpi-rec">—<span class="kpi-unit">%</span></div>
+          <div class="kpi-sub" id="kpi-rec-sub">de los pacientes</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-lbl"><i class="fa-solid fa-triangle-exclamation"></i> Quejas</div>
+          <div class="kpi-val" id="kpi-quejas">—</div>
+          <div class="kpi-sub" id="kpi-quejas-sub">en el período</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-lbl"><i class="fa-solid fa-lightbulb"></i> Sugerencias</div>
+          <div class="kpi-val" id="kpi-sug">—</div>
+          <div class="kpi-sub">en el período</div>
+        </div>
+      </div>
+
+      <!-- ── Charts + Score bars ── -->
+      <div class="sat-layout">
+        <!-- Tendencia mensual -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-ttl"><i class="fa-solid fa-chart-line"></i> Tendencia de Satisfacción</div>
+            <select class="filter-sel" id="chart-metric" onchange="updateChart()" style="font-size:.786rem;padding:5px 28px 5px 10px">
+              <option value="general">Servicio General</option>
+              <option value="enfermeria">Enfermería</option>
+              <option value="medico">Atención Médica</option>
+              <option value="alimentos">Alimentos</option>
+              <option value="higiene">Higiene</option>
+            </select>
+          </div>
+          <div class="panel-body">
+            <div class="chart-area"><canvas id="chart-trend"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Scores por dimensión -->
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-ttl"><i class="fa-solid fa-bars"></i> Promedio por Dimensión</div>
+          </div>
+          <div class="panel-body" id="scores-panel" style="padding-top:10px">
+            <div style="text-align:center;color:var(--txt3);padding:30px 0">Cargando…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Últimas quejas/sugerencias ── -->
+      <div class="panel" style="margin-bottom:22px">
+        <div class="panel-head">
+          <div class="panel-ttl"><i class="fa-solid fa-comments"></i> Comentarios Recientes</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select class="filter-sel" id="f-ctype" onchange="applyFilters()" style="font-size:.786rem;padding:5px 28px 5px 10px">
+              <option value="">Todos los tipos</option>
+              <option value="QUEJA">Quejas</option>
+              <option value="SUGERENCIA">Sugerencias</option>
+              <option value="FELICITACION">Felicitaciones</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="comment-list" id="comment-list">
+            <div style="text-align:center;color:var(--txt3);padding:20px">Cargando comentarios…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Toolbar encuestas ── -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar paciente, médico, habitación…" oninput="applyFilters()">
+        </div>
+        <select class="filter-sel" id="f-area" onchange="applyFilters()">
+          <option value="">Todas las áreas</option>
+        </select>
+        <select class="filter-sel" id="f-month" onchange="applyFilters()">
+          <option value="">Todos los meses</option>
+        </select>
+        <select class="filter-sel" id="f-rec" onchange="applyFilters()">
+          <option value="">Recomendaría</option>
+          <option value="SI">✅ Sí recomendaría</option>
+          <option value="NO">❌ No recomendaría</option>
+        </select>
+        <button class="btn-primary" id="btn-new-enc" onclick="openNewSurvey()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Nueva Encuesta
+        </button>
+      </div>
+
+      <!-- ── Tabla de encuestas ── -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="enc-count">Cargando encuestas…</span>
+          <button class="btn-secondary" onclick="exportCSV()" style="font-size:.786rem;padding:6px 12px">
+            <i class="fa-solid fa-download"></i> Exportar CSV
+          </button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Paciente</th>
+              <th>Área</th>
+              <th class="center">Enf.</th>
+              <th class="center">Médico</th>
+              <th class="center">General</th>
+              <th class="center">Recomienda</th>
+              <th>Comentario</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="enc-tbody">
+            <tr><td colspan="9" class="table-empty">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <strong>Cargando…</strong>
+            </td></tr>
+          </tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+
+<!-- ═══════════ MODAL — Nueva Encuesta ═══════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">Nueva Encuesta de Satisfacción
+        <small>Formulario FT-CA-33 — Transcripción de encuesta física</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Datos del paciente -->
+      <div class="rating-section-title"><i class="fa-solid fa-user"></i> Datos del Paciente</div>
+      <div class="form-row">
+        <div class="field">
+          <label>Paciente</label>
+          <input type="text" id="n-patient" placeholder="Nombre del paciente">
+        </div>
+        <div class="field">
+          <label>Habitación</label>
+          <input type="text" id="n-room" placeholder="Ej. JP15">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Médico tratante</label>
+          <input type="text" id="n-doctor" placeholder="Nombre del médico">
+        </div>
+        <div class="field">
+          <label>Área / Servicio <span class="req">*</span></label>
+          <select id="n-area">
+            <option value="">— Seleccionar —</option>
+            <option>Central Juan Pablo II</option>
+            <option>Central Planta Baja (PB)</option>
+            <option>Central Planta Baja (PA)</option>
+            <option>Central Planta Alta</option>
+            <option>Central Ginecología</option>
+            <option>Central Pediatría</option>
+            <option>Master Suite</option>
+            <option>Quirófano</option>
+            <option>Unidad de Terapia Intensiva</option>
+            <option>Urgencias</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha de la encuesta <span class="req">*</span></label>
+          <input type="date" id="n-date">
+        </div>
+      </div>
+
+      <!-- Calificaciones -->
+      <div class="rating-section-title" style="margin-top:8px">
+        <i class="fa-solid fa-star"></i> Calificaciones
+        <span style="font-size:.75rem;font-weight:400;text-transform:none;letter-spacing:0;margin-left:auto;color:var(--txt3)">
+          5=Excelente · 4=Bueno · 3=Regular · 2=Malo · 1=Pésimo
+        </span>
+      </div>
+      <div class="rating-questions" id="rating-questions">
+        <!-- rendered by JS -->
+      </div>
+
+      <!-- Recomendaría -->
+      <div class="rating-section-title"><i class="fa-solid fa-thumbs-up"></i> ¿Regresaría o recomendaría el hospital?</div>
+      <div class="recommend-row">
+        <label class="recommend-opt">
+          <input type="radio" name="n-rec" value="SI" checked>
+          <span class="recommend-yes">✅ Sí</span>
+        </label>
+        <label class="recommend-opt">
+          <input type="radio" name="n-rec" value="NO">
+          <span class="recommend-no">❌ No</span>
+        </label>
+      </div>
+
+      <!-- Comentarios -->
+      <div class="rating-section-title"><i class="fa-solid fa-comment"></i> Comentarios adicionales</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:.75rem;font-weight:700;color:var(--txt2);text-transform:uppercase;margin-bottom:8px">Tipo de comentario</div>
+        <div class="ctype-row" id="ctype-row">
+          <button type="button" class="ctype-btn" onclick="setCtype('')">Sin comentario</button>
+          <button type="button" class="ctype-btn" onclick="setCtype('QUEJA')">🔴 Queja</button>
+          <button type="button" class="ctype-btn" onclick="setCtype('SUGERENCIA')">🟡 Sugerencia</button>
+          <button type="button" class="ctype-btn" onclick="setCtype('FELICITACION')">🟢 Felicitación</button>
+        </div>
+      </div>
+      <div id="ctype-detail" style="display:none">
+        <div class="form-row">
+          <div class="field">
+            <label>Categoría</label>
+            <select id="n-cat">
+              <option value="">— Sin categoría —</option>
+              <option value="ENFERMERIA">Enfermería</option>
+              <option value="MEDICO">Médico</option>
+              <option value="ALIMENTOS">Alimentos</option>
+              <option value="LIMPIEZA">Limpieza</option>
+              <option value="INSTALACIONES">Instalaciones</option>
+              <option value="SEGURIDAD">Seguridad</option>
+              <option value="ADMINISTRATIVO">Administrativo</option>
+              <option value="OTROS">Otros</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Texto del comentario</label>
+          <textarea id="n-comment" rows="3" placeholder="Escriba aquí el comentario del paciente…"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewSurvey()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Encuesta
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle Encuesta ═══════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="d-patient-name">—</span>
+        <small id="d-survey-meta">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="tab-bar" style="padding:0 24px">
+      <div class="tab-btn active" onclick="switchTab('dtab-scores',this)">
+        <i class="fa-solid fa-star"></i> Calificaciones
+      </div>
+      <div class="tab-btn" onclick="switchTab('dtab-info',this)">
+        <i class="fa-solid fa-info-circle"></i> Información
+      </div>
+    </div>
+    <div class="modal-body" style="padding:0">
+
+      <!-- Tab: Calificaciones -->
+      <div class="tab-panel active" id="dtab-scores">
+        <div class="detail-scores-grid" id="d-scores-grid"><!-- rendered by JS --></div>
+        <div class="section-sep"><i class="fa-solid fa-thumbs-up"></i> ¿Recomendaría el hospital?</div>
+        <div id="d-recommend" style="font-size:1.1rem;font-weight:700;margin-bottom:16px">—</div>
+        <div id="d-comment-block" style="display:none">
+          <div class="section-sep"><i class="fa-solid fa-comment"></i> Comentario</div>
+          <div id="d-comment-card" class="comment-card" style="margin-bottom:0">
+            <div class="comment-head" id="d-comment-head"></div>
+            <div class="comment-txt" id="d-comment-txt"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Información -->
+      <div class="tab-panel" id="dtab-info">
+        <div class="info-grid">
+          <div class="info-item"><label>Paciente</label><span id="d-patient">—</span></div>
+          <div class="info-item"><label>Habitación</label><span id="d-room">—</span></div>
+          <div class="info-item"><label>Médico</label><span id="d-doctor">—</span></div>
+          <div class="info-item"><label>Área</label><span id="d-area">—</span></div>
+          <div class="info-item"><label>Fecha</label><span id="d-date">—</span></div>
+          <div class="info-item"><label>ID Encuesta</label><span id="d-id" style="font-family:monospace;font-size:.786rem">—</span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/satisfaccion.js"></script>
+</body>
+</html>

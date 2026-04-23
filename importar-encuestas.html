@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Importar Encuestas — SGC Hospital Santa Margarita</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,sans-serif;background:#f1f5f9;display:flex;align-items:center;
+         justify-content:center;min-height:100vh;padding:24px}
+    .card{background:#fff;border-radius:16px;padding:36px;max-width:680px;width:100%;
+          box-shadow:0 8px 32px rgba(0,0,0,.12)}
+    h1{font-size:1.3rem;color:#1e293b;margin-bottom:6px}
+    .sub{font-size:.857rem;color:#64748b;margin-bottom:28px}
+    .prog-wrap{background:#f1f5f9;border-radius:8px;height:12px;overflow:hidden;margin:16px 0}
+    .prog-bar{height:100%;background:linear-gradient(90deg,#1a3554,#2563eb);transition:width .3s;width:0%}
+    .status{font-size:.857rem;color:#475569;margin:10px 0 18px;min-height:20px}
+    .log{background:#0f172a;color:#94a3b8;border-radius:8px;padding:16px;
+         font-family:monospace;font-size:.75rem;height:280px;overflow-y:auto;line-height:1.6;margin-bottom:20px}
+    .log .ok  {color:#4ade80}
+    .log .err {color:#f87171}
+    .log .inf {color:#60a5fa}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;
+         background:linear-gradient(135deg,#1a3554,#2563eb);color:#fff;
+         font-size:.9rem;font-weight:600;border-radius:8px;cursor:pointer;
+         box-shadow:0 2px 8px rgba(37,99,235,.35);transition:all .2s;border:none;margin-right:10px}
+    .btn:hover:not(:disabled){transform:translateY(-1px)}
+    .btn:disabled{opacity:.5;cursor:not-allowed}
+    .summary{display:flex;gap:16px;margin-top:18px}
+    .sbox{flex:1;text-align:center;padding:14px;border-radius:8px}
+    .sbox.ok {background:#f0fdf4;color:#15803d}
+    .sbox.err{background:#fef2f2;color:#b91c1c}
+    .sbox .n{font-size:2rem;font-weight:700}
+    .sbox .l{font-size:.75rem;font-weight:600;text-transform:uppercase}
+    .badge{display:inline-flex;align-items:center;gap:6px;font-size:.786rem;
+           font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:20px}
+    .badge.auth {background:#f0fdf4;color:#15803d}
+    .badge.noauth{background:#fef2f2;color:#b91c1c}
+    .sql-box{background:#0f172a;color:#93c5fd;border-radius:8px;padding:16px;
+             font-family:monospace;font-size:.75rem;line-height:1.7;margin:16px 0;white-space:pre-wrap}
+    details summary{cursor:pointer;font-size:.857rem;color:#2563eb;font-weight:600;margin-bottom:8px}
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>📋 Importador de Encuestas de Satisfacción</h1>
+  <p class="sub">SGC Hospital Santa Margarita — 232 encuestas históricas</p>
+
+  <div id="auth-status" class="badge noauth">⏳ Verificando sesión…</div>
+
+  <details style="margin-bottom:20px">
+    <summary>📋 Paso 1: Crear tabla en Supabase (clic para ver SQL)</summary>
+    <div class="sql-box">-- Ejecuta este SQL en Supabase → SQL Editor
+CREATE TABLE IF NOT EXISTS satisfaction_surveys (
+  id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id          TEXT UNIQUE,
+  survey_date          DATE NOT NULL,
+  patient_name         TEXT,
+  room_number          TEXT,
+  doctor_name          TEXT,
+  area                 TEXT,
+  q_tramites_ingreso   SMALLINT CHECK (q_tramites_ingreso   BETWEEN 1 AND 5),
+  q_info_normas        SMALLINT CHECK (q_info_normas        BETWEEN 1 AND 5),
+  q_tiempo_espera      SMALLINT CHECK (q_tiempo_espera      BETWEEN 1 AND 5),
+  q_atencion_enfermeria SMALLINT CHECK (q_atencion_enfermeria BETWEEN 1 AND 5),
+  q_atencion_medico    SMALLINT CHECK (q_atencion_medico    BETWEEN 1 AND 5),
+  q_privacidad         SMALLINT CHECK (q_privacidad         BETWEEN 1 AND 5),
+  q_higiene            SMALLINT CHECK (q_higiene            BETWEEN 1 AND 5),
+  q_vigilancia         SMALLINT CHECK (q_vigilancia         BETWEEN 1 AND 5),
+  q_alimentos          SMALLINT CHECK (q_alimentos          BETWEEN 1 AND 5),
+  q_servicio_general   SMALLINT CHECK (q_servicio_general   BETWEEN 1 AND 5),
+  q_tramites_egreso    SMALLINT CHECK (q_tramites_egreso    BETWEEN 1 AND 5),
+  would_recommend      BOOLEAN,
+  comment_type         TEXT CHECK (comment_type IN ('QUEJA','SUGERENCIA','FELICITACION')),
+  comment_category     TEXT,
+  comments             TEXT,
+  is_active            BOOLEAN DEFAULT true,
+  created_by           UUID,
+  created_at           TIMESTAMPTZ DEFAULT now(),
+  updated_at           TIMESTAMPTZ DEFAULT now()
+);
+
+-- RLS
+ALTER TABLE satisfaction_surveys ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "authenticated read"  ON satisfaction_surveys FOR SELECT TO authenticated USING (true);
+CREATE POLICY "authenticated insert" ON satisfaction_surveys FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "authenticated update" ON satisfaction_surveys FOR UPDATE TO authenticated USING (true);
+
+GRANT SELECT, INSERT, UPDATE ON satisfaction_surveys TO authenticated;
+
+NOTIFY pgrst, 'reload schema';</div>
+  </details>
+
+  <div class="prog-wrap"><div class="prog-bar" id="prog"></div></div>
+  <div class="status" id="status">Completa el Paso 1, luego haz clic en "Iniciar Importación".</div>
+
+  <div class="log" id="log"><span class="inf">Listo. Presiona el botón cuando la tabla esté creada.</span></div>
+
+  <button class="btn" id="btn-import" onclick="startImport()" disabled>⚡ Iniciar Importación</button>
+
+  <div class="summary" id="summary" style="display:none">
+    <div class="sbox ok"><div class="n" id="n-ok">0</div><div class="l">✅ Importadas</div></div>
+    <div class="sbox err"><div class="n" id="n-err">0</div><div class="l">❌ Errores</div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="surveys_data.js"></script>
+<script>
+const SUPABASE_URL = "https://tdxkvvmdxnbarjsaknse.supabase.co"
+const ANON_KEY     = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkeGt2dm1keG5iYXJqc2FrbnNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4MTcxNzUsImV4cCI6MjA5MjM5MzE3NX0.pxCo12p7H6JzAeDRlroZx5DkhZBcAeYEOQmVGwzSIAc"
+const db = supabase.createClient(SUPABASE_URL, ANON_KEY)
+
+let nOk = 0, nErr = 0
+
+function log(msg, cls='') {
+  const el = document.getElementById('log')
+  el.innerHTML += '<span class="' + cls + '">' + msg + '</span>\n'
+  el.scrollTop = el.scrollHeight
+}
+function setProgress(done, total) {
+  document.getElementById('prog').style.width = ((done/total)*100) + '%'
+  document.getElementById('status').textContent = done + ' de ' + total + ' procesadas…'
+}
+
+async function startImport() {
+  const btn = document.getElementById('btn-import')
+  btn.disabled = true
+  document.getElementById('log').innerHTML = ''
+  document.getElementById('summary').style.display = 'none'
+  nOk = 0; nErr = 0
+
+  const { data: { session } } = await db.auth.getSession()
+  if (!session) { log('❌ Sin sesión. Entra al SGC primero.','err'); btn.disabled=false; return }
+
+  // Verify table exists
+  log('🔍 Verificando tabla satisfaction_surveys…','inf')
+  const { error: tErr } = await db.from('satisfaction_surveys').select('id').limit(1)
+  if (tErr && tErr.message.includes('relation')) {
+    log('❌ La tabla no existe. Ejecuta primero el SQL del Paso 1.','err')
+    btn.disabled = false; return
+  }
+  log('✅ Tabla encontrada.','ok')
+  log('','')
+
+  const total = SURVEYS.length
+  const BATCH = 20
+
+  for (let i = 0; i < total; i += BATCH) {
+    const batch = SURVEYS.slice(i, i + BATCH)
+    const { error } = await db.from('satisfaction_surveys')
+      .upsert(batch, { onConflict: 'external_id', ignoreDuplicates: false })
+
+    if (error) {
+      log('❌ Filas ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + error.message, 'err')
+      nErr += batch.length
+    } else {
+      const first = batch[0].patient_name || batch[0].external_id
+      const last  = batch[batch.length-1].patient_name || batch[batch.length-1].external_id
+      log('✅ ' + (i+1) + '–' + Math.min(i+BATCH,total) + ': ' + batch.length + ' encuestas', 'ok')
+      nOk += batch.length
+    }
+    setProgress(Math.min(i+BATCH, total), total)
+    await new Promise(r => setTimeout(r, 100))
+  }
+
+  setProgress(total, total)
+  document.getElementById('status').textContent = '¡Importación terminada!'
+  document.getElementById('n-ok').textContent  = nOk
+  document.getElementById('n-err').textContent = nErr
+  document.getElementById('summary').style.display = 'flex'
+  log('','')
+  log('══════════════════════════════════','inf')
+  log('Resultado: ' + nOk + ' importadas, ' + nErr + ' errores', nErr>0?'err':'ok')
+  if (nOk > 0 && nErr === 0) {
+    log('','')
+    log('🎉 ¡Listo! Ve a Satisfacción y Quejas en el SGC.','ok')
+  }
+  btn.disabled = false
+  btn.textContent = '🔄 Volver a intentar'
+}
+
+;(async () => {
+  const { data: { session } } = await db.auth.getSession()
+  const el = document.getElementById('auth-status')
+  if (session) {
+    el.className = 'badge auth'
+    el.textContent = '✅ Sesión activa: ' + session.user.email
+    document.getElementById('btn-import').disabled = false
+    document.getElementById('status').textContent = 'Sesión detectada. Completa el Paso 1 y luego importa.'
+  } else {
+    el.className = 'badge noauth'
+    el.textContent = '❌ Sin sesión — Entra primero al SGC en otra pestaña'
+  }
+})()
+</script>
+</body>
+</html>
