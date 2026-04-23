@@ -81,7 +81,7 @@ async function loadIndicadores() {
   showLoading()
   const { data, error } = await db
     .from('quality_indicators')
-    .select('*, departments(id,name)')
+    .select('*, dept:responsible_department_id(id,name)')
     .order('code', { ascending: true })
 
   if (error) { showError(error.message); return }
@@ -164,7 +164,7 @@ function applyFilters() {
     const lastVal = ind._last?.value ?? null
     const sem     = getSemaforo(ind, lastVal)
     const txt     = ((ind.name||'') + ' ' + (ind.code||'') + ' ' +
-                     (ind.departments?.name||'') + ' ' +
+                     (ind.dept?.name||'') + ' ' +
                      (ind.responsible_position||'') + ' ' + (ind.origin||'')).toLowerCase()
     return (!q        || txt.includes(q))
         && (!dept     || ind.responsible_department_id === dept)
@@ -202,7 +202,7 @@ function renderGrid(inds) {
     const originBadge = ind.origin ? '<span class="ind-origin-badge origin-' + originKey(ind.origin) + '">' + esc(ind.origin) + '</span>' : ''
 
     const resp = ind.responsible_position ? esc(ind.responsible_position) : '—'
-    const dept = ind.departments?.name    ? esc(ind.departments.name)     : 'General'
+    const dept = ind.dept?.name    ? esc(ind.dept.name)     : 'General'
 
     // Límites — texto o fallback numérico
     var limLow, limMid, limHigh
@@ -332,7 +332,7 @@ async function openDetail(indId) {
   const unit = ind.unit || ''
 
   setText('detail-name',  ind.name)
-  setText('detail-dept',  ind.departments?.name || 'General')
+  setText('detail-dept',  ind.dept?.name || 'General')
   setText('d-code',       ind.code || '—')
   setText('d-origin',     ind.origin || '—')
   setText('d-unit',       unit)
