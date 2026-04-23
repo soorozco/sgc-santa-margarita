@@ -7750,8 +7750,15 @@ const INDICADORES = [
 
 let nOk = 0, nErr = 0
 
-// Columns we want to insert — will be filtered to only those that exist in the table
-const EXTRA_COLS = ['code','origin','description','limit_low_text','limit_mid_text','limit_high_text','is_higher_better','formula']
+// All columns beyond the guaranteed core — probed at runtime before insert
+// Core (always exist): name, unit, measurement_frequency, is_active, created_by
+const EXTRA_COLS = [
+  'code','origin','description','formula',
+  'limit_low_text','limit_mid_text','limit_high_text',
+  'is_higher_better',
+  'target_value','min_acceptable',
+  'responsible_position','responsible_department_id'
+]
 let _availableCols = null  // detected at runtime
 
 function log(msg, cls='') {
@@ -7840,22 +7847,22 @@ async function startImport() {
       const proc  = (r._process || '').trim().toLowerCase()
       const deptId = deptMap[proc] || null
 
-      // Base payload — always-present columns
+      // Core payload — only columns that ALWAYS exist in any version of the table
       const row = {
-        name:                     r.name,
-        unit:                     r.unit,
-        measurement_frequency:    r.measurement_frequency,
-        target_value:             r.target_value   ?? null,
-        min_acceptable:           r.min_acceptable ?? null,
-        responsible_position:     r.responsible_position ?? null,
-        responsible_department_id: deptId,
-        is_active:                r.is_active,
-        created_by:               r.created_by
+        name:                  r.name,
+        unit:                  r.unit,
+        measurement_frequency: r.measurement_frequency,
+        is_active:             r.is_active,
+        created_by:            r.created_by
       }
 
-      // Only add extra columns if they exist in the schema
+      // Add optional columns only if detected in schema
       for (const col of _availableCols) {
-        if (r[col] !== undefined) row[col] = r[col]
+        if (col === 'responsible_department_id') {
+          row[col] = deptId
+        } else if (r[col] !== undefined) {
+          row[col] = r[col] ?? null
+        }
       }
 
       return row
