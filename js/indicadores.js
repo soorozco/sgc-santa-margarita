@@ -487,13 +487,13 @@ async function saveMeasurement() {
   if (!date)        { showToast('Selecciona la fecha de medición.', 'red'); return }
   if (isNaN(value)) { showToast('Ingresa un valor numérico válido.', 'red'); return }
 
-  const { error } = await db.from('indicator_measurements').insert({
-    indicator_id:     _currentInd.id,
-    measurement_date: date,
-    value,
-    notes:            notes || null,
-    measured_by:      _user.id,
-    measured_by_name: _profile?.full_name || _user.email
+  const { error } = await db.rpc('save_indicator_measurement', {
+    p_indicator_id:     _currentInd.id,
+    p_measurement_date: date,
+    p_value:            value,
+    p_notes:            notes || null,
+    p_measured_by:      _user.id,
+    p_measured_by_name: _profile?.full_name || _user.email
   })
   if (error) { showToast('Error: ' + error.message, 'red'); return }
 
