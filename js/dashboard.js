@@ -12,7 +12,7 @@ async function initDashboard() {
 
   setCurrentDate()
   renderUserInfo()
-  await Promise.all([loadKPIs(), loadRecentNC(), loadUpcomingAudits()])
+  await Promise.all([loadKPIs(), loadRecentNC(), loadUpcomingAudits(), loadRecentSurveys()])
   await loadCharts()
 }
 
@@ -54,19 +54,19 @@ async function loadKPIs() {
     db.from('audits').select('*', { count: 'exact', head: true })
       .gte('audit_date', `${year}-01-01`).lte('audit_date', `${year}-12-31`),
     db.from('documents').select('*', { count: 'exact', head: true }).eq('status', 'vigente'),
-    db.from('satisfaction_surveys').select('satisfaction_percentage')
-      .not('satisfaction_percentage', 'is', null)
+    db.from('satisfaction_surveys').select('q_servicio_general, would_recommend')
+      .not('q_servicio_general', 'is', null)
       .gte('survey_date', `${year}-01-01`),
     db.from('action_plan_items').select('*', { count: 'exact', head: true })
       .lt('due_date', today).not('status', 'in', '("completado","cancelado")'),
     db.from('quality_indicators').select('*', { count: 'exact', head: true }).eq('is_active', true)
   ])
 
-  // Satisfacción promedio
+  // Satisfacción promedio — basado en q_servicio_general (1-5) convertido a %
   let satPct = null
   if (surveys && surveys.length > 0) {
-    satPct = surveys.reduce((s, r) => s + (r.satisfaction_percentage || 0), 0) / surveys.length
-    satPct = satPct.toFixed(1)
+    const avg = surveys.reduce((s, r) => s + (r.q_servicio_general || 0), 0) / surveys.length
+    satPct = ((avg / 5) * 100).toFixed(1)
   }
 
   // NC abiertas
@@ -91,10 +91,11 @@ async function loadKPIs() {
   const satColor = satPct === null ? 'c-gray'
                  : satPct >= 90   ? 'c-green'
                  : satPct >= 70   ? 'c-orange' : 'c-red'
+  const recYes = surveys ? surveys.filter(s => s.would_recommend === true).length : 0
   setKPI('card-satisfaccion', 'kpi-satisfaccion',
     satPct !== null ? `${satPct}%` : '—',
     satColor,
-    satPct !== null ? `${surveys.length} encuestas este año` : 'Sin encuestas registradas')
+    satPct !== null ? `${surveys.length} encuestas · ${recYes} recomendarían` : 'Sin encuestas registradas')
 
   // Acciones vencidas
   setKPI('card-vencidas', 'kpi-vencidas', accionesVenc ?? 0,
@@ -207,14 +208,14 @@ async function chartSatisfaccion() {
 
     const { data } = await db
       .from('satisfaction_surveys')
-      .select('satisfaction_percentage')
+      .select('q_servicio_general')
       .gte('survey_date', `${y}-${m}-01`)
       .lte('survey_date', `${y}-${m}-${last}`)
-      .not('satisfaction_percentage', 'is', null)
+      .not('q_servicio_general', 'is', null)
 
     if (data && data.length > 0) {
-      const avg = data.reduce((s, r) => s + r.satisfaction_percentage, 0) / data.length
-      avgScores.push(Math.round(avg * 10) / 10)
+      const avg = data.reduce((s, r) => s + (r.q_servicio_general || 0), 0) / data.length
+      avgScores.push(Math.round((avg / 5 * 100) * 10) / 10)
     } else {
       avgScores.push(null)
     }
@@ -332,6 +333,51 @@ async function loadUpcomingAudits() {
       </div>
     </div>
   `).join('')
+}
+
+// ── Encuestas recientes ───────────────────────────────────────────
+async function loadRecentSurveys() {
+  const { data } = await db
+    .from('satisfaction_surveys')
+    .select('patient_name, area, survey_date, q_servicio_general, would_recommend, comment_type')
+    .order('survey_date', { ascending: false })
+    .limit(5)
+
+  const el = document.getElementById('recent-surveys')
+  if (!el) return
+
+  if (!data || data.length === 0) {
+    el.innerHTML = emptyState('fa-face-smile', 'No hay encuestas registradas aún.')
+    return
+  }
+
+  el.innerHTML = data.map(s => {
+    const score = s.q_servicio_general
+    const pct   = score ? Math.round((score / 5) * 100) : null
+    const color = pct === null ? 'gray' : pct >= 80 ? 'green' : pct >= 60 ? 'orange' : 'red'
+    const ct    = (s.comment_type || '').toUpperCase()
+    const ctBadge = ct === 'QUEJA' ? '<span class="pill pill-red">Queja</span>'
+                  : ct === 'SUGERENCIA' ? '<span class="pill pill-orange">Sugerencia</span>'
+                  : ct === 'FELICITACION' ? '<span class="pill pill-green">Felicitación</span>' : ''
+    return `
+    <div class="list-item" style="cursor:pointer" onclick="window.location='satisfaccion.html'">
+      <div class="list-dot ${color}"></div>
+      <div class="list-content">
+        <div class="list-title">${esc(s.patient_name || 'Anónimo')} — ${esc(s.area || '—')}</div>
+        <div class="list-meta">
+          <span>${fmtDate(s.survey_date)}</span>
+          ${pct !== null ? `<span>·</span><span style="font-weight:600;color:var(--${color === 'green' ? 'green' : color === 'orange' ? 'orange' : 'red'})">${pct}%</span>` : ''}
+          ${s.would_recommend === false ? '<span class="pill pill-red">No recomendaría</span>' : ''}
+          ${ctBadge}
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function esc(s) {
+  if (!s) return ''
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
 // ── Helpers ───────────────────────────────────────────────────────
