@@ -417,7 +417,7 @@ function renderBigTraffic(ind, sem, lastVal) {
 async function loadMeasurements(indId) {
   const { data } = await db
     .from('indicator_measurements')
-    .select('*, profiles:measured_by(full_name)')
+    .select('*')
     .eq('indicator_id', indId)
     .order('measurement_date', { ascending: false })
     .limit(24)
@@ -448,7 +448,7 @@ function renderMeasTable() {
       '<td>' + fmtDate(m.measurement_date) + '</td>' +
       '<td class="center"><span class="meas-val ' + sem + '">' + m.value + ' ' + unit + '</span></td>' +
       '<td class="center">' + vsStr + '</td>' +
-      '<td>' + esc(m.profiles?.full_name || m.measured_by_name || '—') + '</td>' +
+      '<td>' + esc(m.measured_by_name || '—') + '</td>' +
       '<td>' + esc(m.notes || '—') + '</td>' +
       '<td class="center">' +
         (canWrite ? '<button class="btn-action red" onclick="deleteMeasurement(\'' + m.id + '\')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>' : '—') +
