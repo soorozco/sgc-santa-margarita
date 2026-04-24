@@ -493,8 +493,7 @@ async function saveMeasurement() {
     value,
     notes:            notes || null,
     measured_by:      _user.id,
-    measured_by_name: _profile?.full_name || _user.email,
-    created_by:       _user.id
+    measured_by_name: _profile?.full_name || _user.email
   })
   if (error) { showToast('Error: ' + error.message, 'red'); return }
 
