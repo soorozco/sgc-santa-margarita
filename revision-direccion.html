@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revisión por la Dirección — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/revision-direccion.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link active" href="revision-direccion.html">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Revisión por Dirección</span>
+      </a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Revisión por la Dirección</div>
+        <div class="topbar-sub">Cláusula 9.3 — Revisión por la Alta Dirección</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-lbl">Total Revisiones</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub" id="kpi-total-sub">registradas</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-lbl">Completadas este año</div>
+          <div class="kpi-val" id="kpi-completadas">—</div>
+          <div class="kpi-sub" id="kpi-completadas-sub">en <span id="kpi-year">—</span></div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-lbl">En Proceso</div>
+          <div class="kpi-val" id="kpi-en-proceso">—</div>
+          <div class="kpi-sub">revisiones activas</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-lbl">Acciones Pendientes</div>
+          <div class="kpi-val" id="kpi-pendientes">—</div>
+          <div class="kpi-sub">salidas por completar</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por número, período o lugar…"
+                 oninput="applyFilters()">
+        </div>
+        <select class="filter-sel" id="f-status" onchange="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="PLANIFICADA">Planificada</option>
+          <option value="EN_PROCESO">En Proceso</option>
+          <option value="COMPLETADA">Completada</option>
+        </select>
+        <select class="filter-sel" id="f-year" onchange="applyFilters()">
+          <option value="">Todos los años</option>
+        </select>
+        <button class="btn-primary" id="btn-new-rd" onclick="openNewReview()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Nueva Revisión
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="rd-count">Cargando…</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Período</th>
+              <th class="center">Fecha</th>
+              <th class="center">Participantes</th>
+              <th class="center">Estado</th>
+              <th class="center">Entradas</th>
+              <th class="center">Salidas</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="rd-tbody">
+            <tr><td colspan="8" class="table-empty">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <strong>Cargando…</strong>
+            </td></tr>
+          </tbody>
+        </table>
+        <div id="pagination" class="pagination"></div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div><!-- /layout -->
+
+
+<!-- ═══════════ MODAL — Nueva Revisión ═══════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Nueva Revisión por la Dirección
+        <small>Complete los datos para programar la revisión</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Número de revisión <span class="req">*</span></label>
+          <input type="text" id="new-number" placeholder="Ej. RD-2026-001">
+          <div class="field-hint">Se sugiere automáticamente según el año actual</div>
+        </div>
+        <div class="field">
+          <label>Período <span class="req">*</span></label>
+          <input type="text" id="new-period" placeholder="Ej. Primer Semestre 2026">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha de revisión <span class="req">*</span></label>
+          <input type="date" id="new-date">
+        </div>
+        <div class="field">
+          <label>Próxima revisión</label>
+          <input type="date" id="new-next-date">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Lugar <span class="req">*</span></label>
+          <input type="text" id="new-location" value="Sala de Juntas">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewReview()">
+        <i class="fa-solid fa-floppy-disk"></i> Programar Revisión
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle Revisión ═══════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="detail-number">—</span>
+        <small id="detail-period">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('tab-general', this)">
+        <i class="fa-solid fa-circle-info"></i> General
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-participantes', this)">
+        <i class="fa-solid fa-users"></i> Participantes
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-entradas', this)">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Entradas
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-salidas', this)">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Salidas
+      </div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- TAB 1: General -->
+      <div class="tab-panel active" id="tab-general">
+
+        <div class="info-grid" style="margin-bottom:20px">
+          <div class="info-item"><label>Número</label><span id="d-number">—</span></div>
+          <div class="info-item"><label>Período</label><span id="d-period">—</span></div>
+          <div class="info-item"><label>Fecha de revisión</label><span id="d-review-date">—</span></div>
+          <div class="info-item"><label>Creada por</label><span id="d-created-by">—</span></div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Estado</label>
+            <select id="d-status-sel">
+              <option value="PLANIFICADA">Planificada</option>
+              <option value="EN_PROCESO">En Proceso</option>
+              <option value="COMPLETADA">Completada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Lugar</label>
+            <input type="text" id="d-location" placeholder="Sala de Juntas">
+          </div>
+        </div>
+
+        <div class="form-row one">
+          <div class="field">
+            <label>Próxima revisión</label>
+            <input type="date" id="d-next-date">
+          </div>
+        </div>
+
+        <div class="form-row one">
+          <div class="field">
+            <label>Conclusiones generales</label>
+            <textarea id="d-conclusions" rows="5"
+              placeholder="Resuma las conclusiones de la revisión, decisiones tomadas y compromisos adquiridos…"></textarea>
+          </div>
+        </div>
+
+        <div style="text-align:right">
+          <button class="btn-primary" onclick="saveGeneral()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: Participantes -->
+      <div class="tab-panel" id="tab-participantes">
+
+        <div class="section-sep">
+          <i class="fa-solid fa-user-group"></i> Lista de Participantes
+        </div>
+
+        <div id="attendees-list">
+          <!-- rendered by JS -->
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn-secondary" onclick="addAttendee()">
+            <i class="fa-solid fa-user-plus"></i> Agregar participante
+          </button>
+          <button class="btn-primary" onclick="saveAttendees()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: Entradas (ISO 9.3.2) -->
+      <div class="tab-panel" id="tab-entradas">
+
+        <div class="section-sep">
+          <i class="fa-solid fa-list-check"></i> Entradas de la Revisión — Cláusula 9.3.2
+        </div>
+        <p style="font-size:.786rem;color:var(--txt3);margin-bottom:16px">
+          Evalúe cada categoría requerida por la norma ISO 9001:2015 y agregue notas cuando sea necesario.
+        </p>
+
+        <div id="inputs-list">
+          <!-- rendered by JS -->
+        </div>
+
+        <div style="text-align:right;margin-top:18px">
+          <button class="btn-primary" onclick="saveInputs()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Entradas
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 4: Salidas -->
+      <div class="tab-panel" id="tab-salidas">
+
+        <div class="section-sep">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Salidas de la Revisión — Cláusula 9.3.3
+        </div>
+        <p style="font-size:.786rem;color:var(--txt3);margin-bottom:16px">
+          Registre las decisiones y acciones derivadas de la revisión: mejoras, cambios al SGC y necesidades de recursos.
+        </p>
+
+        <div id="outputs-list">
+          <!-- rendered by JS -->
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn-secondary" onclick="addOutput()">
+            <i class="fa-solid fa-plus"></i> Agregar acción
+          </button>
+          <button class="btn-primary" onclick="saveOutputs()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Salidas
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/revision-direccion.js"></script>
+</body>
+</html>
