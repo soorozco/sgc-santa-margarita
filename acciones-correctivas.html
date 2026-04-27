@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acciones Correctivas — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/acciones-correctivas.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><i class="fa-solid fa-cross"></i></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-handshake"></i><span>Proveedores</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link active" href="acciones-correctivas.html">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Acciones Correctivas</span>
+      </a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Acciones Correctivas</div>
+        <div class="topbar-sub">Cláusula 10.2 — Mejora continua y tratamiento de no conformidades</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-lbl">Total</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub">planes registrados</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-lbl">Abiertas</div>
+          <div class="kpi-val" id="kpi-abiertas">—</div>
+          <div class="kpi-sub">requieren atención</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-lbl">En Proceso</div>
+          <div class="kpi-val" id="kpi-en-proceso">—</div>
+          <div class="kpi-sub">actividades en curso</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-lbl">Cerradas</div>
+          <div class="kpi-val" id="kpi-cerradas">—</div>
+          <div class="kpi-sub">eficacia verificada</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-lbl">Actividades Vencidas</div>
+          <div class="kpi-val" id="kpi-vencidas">—</div>
+          <div class="kpi-sub">fuera de fecha límite</div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por N°, descripción o responsable…"
+                 oninput="applyFilters()">
+        </div>
+        <select class="filter-sel" id="f-status" onchange="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="abierto">Abierta</option>
+          <option value="en_proceso">En Proceso</option>
+          <option value="cerrado">Cerrada</option>
+        </select>
+        <button class="btn-primary" id="btn-new-ac" onclick="openNewAC()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Nueva Acción
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="ac-count">Cargando…</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:60px">N°</th>
+              <th>No Conformidad / Hallazgo</th>
+              <th>Responsable</th>
+              <th class="center">Detección</th>
+              <th class="center">Actividades</th>
+              <th class="center">Estado</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="ac-tbody">
+            <tr><td colspan="7" class="table-empty">
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              <strong>Cargando…</strong>
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div><!-- /layout -->
+
+
+<!-- ═══════════ MODAL — Nueva Acción Correctiva ═══════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Nueva Acción Correctiva
+        <small>Registre el hallazgo y el plan de acción</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="padding:20px 24px">
+
+      <div class="form-row">
+        <div class="field">
+          <label>N° de Acción <span class="req">*</span></label>
+          <input type="text" id="new-number" placeholder="Ej. AC-2026-001">
+        </div>
+        <div class="field">
+          <label>Fecha de Detección <span class="req">*</span></label>
+          <input type="date" id="new-date">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Fuente / Origen <span class="req">*</span></label>
+          <select id="new-source">
+            <option value="Queja y/o sugerencia">Queja y/o sugerencia</option>
+            <option value="Auditoría interna">Auditoría interna</option>
+            <option value="Auditoría externa">Auditoría externa</option>
+            <option value="Revisión por la dirección">Revisión por la dirección</option>
+            <option value="Indicadores de calidad">Indicadores de calidad</option>
+            <option value="Otro">Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Responsable General <span class="req">*</span></label>
+          <input type="text" id="new-responsible" placeholder="Nombre o cargo">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción de la No Conformidad / Hallazgo <span class="req">*</span></label>
+          <textarea id="new-description" rows="3" placeholder="Describa el hallazgo o no conformidad detectada…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Análisis de Causa Raíz</label>
+          <textarea id="new-rootcause" rows="3" placeholder="¿Cuál es la causa que originó el problema?…"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewAC()">
+        <i class="fa-solid fa-floppy-disk"></i> Registrar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle Acción Correctiva ═══════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="detail-number">—</span>
+        <small id="detail-source">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('tab-info', this)">
+        <i class="fa-solid fa-circle-info"></i> Información
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-actividades', this)">
+        <i class="fa-solid fa-list-check"></i> Actividades
+        <span class="tab-badge" id="tab-act-count"></span>
+      </div>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- TAB 1: Información General -->
+      <div class="tab-panel active" id="tab-info">
+
+        <div class="info-grid" style="margin-bottom:18px">
+          <div class="info-item"><label>N° Acción</label><span id="d-number">—</span></div>
+          <div class="info-item"><label>Fecha de Detección</label><span id="d-date">—</span></div>
+          <div class="info-item"><label>Fuente</label><span id="d-source">—</span></div>
+          <div class="info-item"><label>Registrado por</label><span id="d-created-by">—</span></div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Estado</label>
+            <select id="d-status">
+              <option value="abierto">Abierta</option>
+              <option value="en_proceso">En Proceso</option>
+              <option value="cerrado">Cerrada</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Responsable General</label>
+            <input type="text" id="d-responsible" placeholder="Nombre o cargo">
+          </div>
+        </div>
+
+        <div class="form-row one">
+          <div class="field">
+            <label>No Conformidad / Hallazgo</label>
+            <textarea id="d-description" rows="4"
+              placeholder="Descripción del hallazgo o no conformidad…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row one">
+          <div class="field">
+            <label>Análisis de Causa Raíz</label>
+            <textarea id="d-rootcause" rows="4"
+              placeholder="Causas que originaron el problema…"></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="field">
+            <label>Verificación de Eficacia</label>
+            <textarea id="d-effectiveness" rows="3"
+              placeholder="Resultados de la verificación de la eficacia…"></textarea>
+          </div>
+          <div class="field">
+            <label>Fecha de Cierre</label>
+            <input type="date" id="d-close-date">
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-top:8px">
+          <button class="btn-primary" onclick="saveInfo()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar
+          </button>
+        </div>
+      </div><!-- /tab-info -->
+
+      <!-- TAB 2: Actividades -->
+      <div class="tab-panel" id="tab-actividades">
+
+        <div class="section-sep">
+          <i class="fa-solid fa-list-check"></i> Plan de Actividades Correctivas
+        </div>
+        <p style="font-size:.786rem;color:var(--txt3);margin-bottom:16px">
+          Registre cada actividad del plan de acción con su responsable y fecha compromiso.
+        </p>
+
+        <div id="activities-list">
+          <!-- rendered by JS -->
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn-secondary" id="btn-add-activity" onclick="addActivity()">
+            <i class="fa-solid fa-plus"></i> Agregar actividad
+          </button>
+          <button class="btn-primary" onclick="saveActivities()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Actividades
+          </button>
+        </div>
+      </div><!-- /tab-actividades -->
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/acciones-correctivas.js"></script>
+</body>
+</html>
