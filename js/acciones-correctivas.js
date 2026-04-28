@@ -1,10 +1,12 @@
 // ─── Acciones Correctivas — Cláusula 10.2 ──────────────────────
 
-let _user       = null
-let _profile    = null
-let _role       = null
-let _allAC      = []
-let _currentAC  = null
+const BUCKET = 'evidencias'
+
+let _user           = null
+let _profile        = null
+let _role           = null
+let _allAC          = []
+let _currentAC      = null
 let _editActivities = []
 
 // ── Init ────────────────────────────────────────────────────────
@@ -63,7 +65,7 @@ function renderKPIs() {
   let total = _allAC.length, abiertas = 0, enProceso = 0, cerradas = 0, vencidas = 0
 
   _allAC.forEach(ac => {
-    if (ac.status === 'abierto')     abiertas++
+    if (ac.status === 'abierto')         abiertas++
     else if (ac.status === 'en_proceso') enProceso++
     else if (ac.status === 'cerrado')    cerradas++
 
@@ -99,7 +101,8 @@ function applyFilters() {
 function renderTable(list) {
   const tbody = document.getElementById('ac-tbody')
   const count = document.getElementById('ac-count')
-  if (count) count.textContent = `${list.length} acción${list.length !== 1 ? 'es' : ''} correctiva${list.length !== 1 ? 's' : ''}`
+  if (count) count.textContent =
+    `${list.length} acción${list.length !== 1 ? 'es' : ''} correctiva${list.length !== 1 ? 's' : ''}`
   if (!tbody) return
 
   if (list.length === 0) {
@@ -113,13 +116,14 @@ function renderTable(list) {
 
   const today = new Date()
   tbody.innerHTML = list.map(ac => {
-    const acts = ac.activities || []
-    const done = acts.filter(a => a.status === 'completado').length
-    const pct  = acts.length ? Math.round(done / acts.length * 100) : 0
+    const acts    = ac.activities || []
+    const done    = acts.filter(a => a.status === 'completado').length
+    const pct     = acts.length ? Math.round(done / acts.length * 100) : 0
+    const evCount = acts.reduce((s, a) => s + (a.evidence?.length || 0), 0)
     const hasOverdue = acts.some(a =>
-      a.status !== 'completado' && a.status !== 'cancelado' && a.due_date && new Date(a.due_date) < today
+      a.status !== 'completado' && a.status !== 'cancelado' &&
+      a.due_date && new Date(a.due_date) < today
     )
-
     return `
     <tr>
       <td><span class="ac-number">${esc(ac.number || '—')}</span></td>
@@ -134,6 +138,7 @@ function renderTable(list) {
           <span class="act-fraction">${done}/${acts.length}</span>
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
           ${hasOverdue ? '<span class="overdue-badge">VENCIDA</span>' : ''}
+          ${evCount ? `<span class="ev-count-badge"><i class="fa-solid fa-paperclip"></i> ${evCount}</span>` : ''}
         </div>
       </td>
       <td class="center"><span class="${statusClass(ac.status)}">${statusLabel(ac.status)}</span></td>
@@ -183,15 +188,10 @@ async function submitNewAC() {
 
   const { error } = await db.rpc('save_plan_correctivo', {
     p_row: {
-      number:         num,
-      detection_date: date,
-      source:         src,
-      responsible:    resp,
-      nc_description: desc,
-      root_cause:     root || null,
-      status:         'abierto',
-      activities:     [],
-      created_by:     _user.id
+      number: num, detection_date: date, source: src,
+      responsible: resp, nc_description: desc,
+      root_cause: root || null, status: 'abierto',
+      activities: [], created_by: _user.id
     }
   })
 
@@ -216,7 +216,6 @@ async function openDetail(id) {
   setText('detail-number', ac.number || '—')
   setText('detail-source', ac.source || '—')
 
-  // Tab Info
   setText('d-number',     ac.number || '—')
   setText('d-date',       fmtDate(ac.detection_date))
   setText('d-source',     ac.source || '—')
@@ -229,11 +228,12 @@ async function openDetail(id) {
   setVal('d-effectiveness', ac.effectiveness_verification || '')
   setVal('d-close-date',    ac.close_date ? ac.close_date.split('T')[0] : '')
 
-  // Tab Actividades
   _editActivities = JSON.parse(JSON.stringify(ac.activities || []))
+  // Ensure every activity has an evidence array
+  _editActivities.forEach(a => { if (!a.evidence) a.evidence = [] })
+
   renderActivities()
   updateTabBadge()
-
   switchTab('tab-info', document.querySelector('.tab-btn'))
   openModal('modal-detail')
 }
@@ -259,7 +259,6 @@ async function saveInfo() {
   }
 
   const { error } = await db.rpc('save_plan_correctivo', { p_row: payload })
-
   if (error) { showToast('Error: ' + error.message, 'red'); return }
 
   Object.assign(_currentAC, {
@@ -280,7 +279,7 @@ async function saveInfo() {
 
 // ── Actividades ──────────────────────────────────────────────────
 function renderActivities() {
-  const list = document.getElementById('activities-list')
+  const list     = document.getElementById('activities-list')
   if (!list) return
   const canWrite = ['administrador','responsable_calidad','jefe_departamento','auditor'].includes(_role)
 
@@ -295,46 +294,203 @@ function renderActivities() {
 
   const today = new Date()
   list.innerHTML = _editActivities.map((a, i) => {
-    const overdue = a.due_date && new Date(a.due_date) < today
+    const overdue  = a.due_date && new Date(a.due_date) < today
       && a.status !== 'completado' && a.status !== 'cancelado'
+    const evidence = a.evidence || []
+
     return `
-    <div class="activity-row">
-      <div class="activity-num">${i + 1}</div>
-      <div class="activity-main">
-        <textarea rows="2" oninput="_editActivities[${i}].description=this.value"
-          placeholder="Descripción de la actividad…"
-          ${canWrite ? '' : 'readonly'}
-        >${esc(a.description || '')}</textarea>
-        <div class="activity-meta">
-          <input type="text" value="${esc(a.responsible || '')}"
-            oninput="_editActivities[${i}].responsible=this.value"
-            placeholder="Responsable"
-            ${canWrite ? '' : 'readonly'}
-          >
-          <input type="date" value="${a.due_date ? a.due_date.split('T')[0] : ''}"
-            onchange="_editActivities[${i}].due_date=this.value"
-            ${canWrite ? '' : 'readonly'}
-          >
-          ${overdue ? '<span class="overdue-badge">VENCIDA</span>' : ''}
-          <select onchange="_editActivities[${i}].status=this.value" ${canWrite ? '' : 'disabled'}>
-            <option value="pendiente"  ${a.status==='pendiente' ?'selected':''}>Pendiente</option>
-            <option value="en_proceso" ${a.status==='en_proceso'?'selected':''}>En Proceso</option>
-            <option value="completado" ${a.status==='completado'?'selected':''}>Completado</option>
-            <option value="cancelado"  ${a.status==='cancelado' ?'selected':''}>Cancelado</option>
-          </select>
+    <div class="activity-card" id="act-card-${i}">
+
+      <!-- Header row -->
+      <div class="activity-header">
+        <span class="activity-num">${i + 1}</span>
+        <div class="activity-main">
+          <textarea rows="2" oninput="_editActivities[${i}].description=this.value"
+            placeholder="Descripción de la actividad…"
+            ${canWrite ? '' : 'readonly'}>${esc(a.description || '')}</textarea>
+          <div class="activity-meta">
+            <input type="text" value="${esc(a.responsible || '')}"
+              oninput="_editActivities[${i}].responsible=this.value"
+              placeholder="Responsable"
+              ${canWrite ? '' : 'readonly'}>
+            <input type="date" value="${a.due_date ? a.due_date.split('T')[0] : ''}"
+              onchange="_editActivities[${i}].due_date=this.value"
+              ${canWrite ? '' : 'readonly'}>
+            ${overdue ? '<span class="overdue-badge">VENCIDA</span>' : ''}
+            <select onchange="_editActivities[${i}].status=this.value" ${canWrite ? '' : 'disabled'}>
+              <option value="pendiente"  ${a.status==='pendiente' ?'selected':''}>Pendiente</option>
+              <option value="en_proceso" ${a.status==='en_proceso'?'selected':''}>En Proceso</option>
+              <option value="completado" ${a.status==='completado'?'selected':''}>Completado</option>
+              <option value="cancelado"  ${a.status==='cancelado' ?'selected':''}>Cancelado</option>
+            </select>
+          </div>
         </div>
+        ${canWrite ? `<button class="btn-remove" onclick="removeActivity(${i})" title="Eliminar actividad">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>` : ''}
       </div>
-      ${canWrite ? `<button class="btn-remove" onclick="removeActivity(${i})" title="Eliminar">
-        <i class="fa-solid fa-trash-can"></i>
+
+      <!-- Evidence section -->
+      <div class="evidence-section">
+        <div class="evidence-label">
+          <i class="fa-solid fa-paperclip"></i>
+          Evidencias
+          ${evidence.length ? `<span class="evidence-count">${evidence.length}</span>` : ''}
+        </div>
+        <div class="evidence-list" id="ev-list-${i}">
+          ${renderEvidenceItems(evidence, i, canWrite)}
+        </div>
+        ${canWrite ? `
+        <label class="btn-attach" title="Subir PDF o imagen">
+          <i class="fa-solid fa-cloud-arrow-up"></i> Adjuntar
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp"
+            multiple onchange="uploadEvidence(${i}, this)" style="display:none">
+        </label>` : ''}
+      </div>
+
+    </div>`
+  }).join('')
+}
+
+// ── Evidence rendering ───────────────────────────────────────────
+function renderEvidenceItems(evidence, actIdx, canWrite) {
+  if (!evidence.length) return '<span class="ev-empty">Sin archivos adjuntos</span>'
+
+  return evidence.map((ev, evIdx) => {
+    const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(ev.name)
+    const icon    = isImage
+      ? `<img src="${ev.url}" class="ev-thumb" onerror="this.style.display='none'">`
+      : `<i class="fa-solid fa-file-pdf ev-icon-pdf"></i>`
+
+    return `
+    <div class="evidence-item" id="ev-item-${actIdx}-${evIdx}">
+      <a href="${ev.url}" target="_blank" rel="noopener" class="ev-file-link" title="${esc(ev.name)}">
+        ${icon}
+        <span class="ev-name">${esc(ev.name)}</span>
+      </a>
+      ${canWrite ? `
+      <button class="ev-delete" onclick="removeEvidence(${actIdx},${evIdx})"
+        title="Eliminar evidencia">
+        <i class="fa-solid fa-xmark"></i>
       </button>` : ''}
     </div>`
   }).join('')
 }
 
+// ── Upload evidence ──────────────────────────────────────────────
+async function uploadEvidence(actIdx, input) {
+  const files = Array.from(input.files)
+  if (!files.length || !_currentAC) return
+
+  const MAX_MB = 10
+  for (const file of files) {
+    if (file.size > MAX_MB * 1024 * 1024) {
+      showToast(`"${file.name}" supera ${MAX_MB} MB.`, 'red')
+      input.value = ''
+      return
+    }
+  }
+
+  // Show spinner on the card
+  const card = document.getElementById(`act-card-${actIdx}`)
+  const spinner = document.createElement('div')
+  spinner.className = 'ev-uploading'
+  spinner.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo…'
+  card?.querySelector('.evidence-section')?.appendChild(spinner)
+
+  const planId = _currentAC.id
+
+  for (const file of files) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_')
+    const path     = `ac/${planId}/${actIdx}_${Date.now()}_${safeName}`
+
+    const { data, error } = await db.storage
+      .from(BUCKET)
+      .upload(path, file, { upsert: false })
+
+    if (error) {
+      showToast(`Error al subir "${file.name}": ${error.message}`, 'red')
+      continue
+    }
+
+    const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path)
+    const publicUrl = urlData?.publicUrl || ''
+
+    if (!_editActivities[actIdx].evidence) _editActivities[actIdx].evidence = []
+    _editActivities[actIdx].evidence.push({
+      name: file.name,
+      path,
+      url:  publicUrl,
+      type: file.type
+    })
+  }
+
+  spinner.remove()
+  input.value = ''
+
+  // Re-render only the evidence section of this card
+  const evList = document.getElementById(`ev-list-${actIdx}`)
+  const canWrite = ['administrador','responsable_calidad','jefe_departamento','auditor'].includes(_role)
+  if (evList) {
+    evList.innerHTML = renderEvidenceItems(_editActivities[actIdx].evidence || [], actIdx, canWrite)
+  }
+  // Update label count
+  const evLabel = card?.querySelector('.evidence-label')
+  const cnt = _editActivities[actIdx].evidence?.length || 0
+  if (evLabel) {
+    const badge = evLabel.querySelector('.evidence-count')
+    if (cnt) {
+      if (badge) badge.textContent = cnt
+      else evLabel.insertAdjacentHTML('beforeend', `<span class="evidence-count">${cnt}</span>`)
+    } else if (badge) badge.remove()
+  }
+
+  showToast(`${files.length > 1 ? files.length + ' archivos subidos' : 'Archivo subido'}. Guarda para confirmar.`, 'green')
+}
+
+// ── Remove evidence ──────────────────────────────────────────────
+async function removeEvidence(actIdx, evIdx) {
+  const ev = _editActivities[actIdx]?.evidence?.[evIdx]
+  if (!ev) return
+
+  if (!confirm(`¿Eliminar "${ev.name}"? Esta acción no se puede deshacer.`)) return
+
+  // Delete from storage
+  const { error } = await db.storage.from(BUCKET).remove([ev.path])
+  if (error) {
+    showToast('No se pudo eliminar el archivo: ' + error.message, 'red')
+    return
+  }
+
+  _editActivities[actIdx].evidence.splice(evIdx, 1)
+
+  const evList = document.getElementById(`ev-list-${actIdx}`)
+  const canWrite = ['administrador','responsable_calidad','jefe_departamento','auditor'].includes(_role)
+  if (evList) {
+    evList.innerHTML = renderEvidenceItems(_editActivities[actIdx].evidence || [], actIdx, canWrite)
+  }
+
+  // Update count badge
+  const card = document.getElementById(`act-card-${actIdx}`)
+  const evLabel = card?.querySelector('.evidence-label')
+  const cnt = _editActivities[actIdx].evidence?.length || 0
+  if (evLabel) {
+    const badge = evLabel.querySelector('.evidence-count')
+    if (cnt && badge)      badge.textContent = cnt
+    else if (!cnt && badge) badge.remove()
+  }
+
+  showToast('Evidencia eliminada.', 'green')
+}
+
+// ── Add / Remove activity ────────────────────────────────────────
 function addActivity() {
-  _editActivities.push({ description:'', responsible:'', due_date:'', status:'pendiente' })
+  _editActivities.push({ description:'', responsible:'', due_date:'', status:'pendiente', evidence:[] })
   renderActivities()
   updateTabBadge()
+  // Scroll to new card
+  const list = document.getElementById('activities-list')
+  if (list) list.lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' })
 }
 
 function removeActivity(idx) {
@@ -343,6 +499,7 @@ function removeActivity(idx) {
   updateTabBadge()
 }
 
+// ── Save Activities ──────────────────────────────────────────────
 async function saveActivities() {
   if (!_currentAC) return
 
@@ -368,7 +525,7 @@ async function saveActivities() {
   const idx = _allAC.findIndex(a => a.id === _currentAC.id)
   if (idx > -1) _allAC[idx].activities = _currentAC.activities
 
-  showToast('Actividades guardadas.', 'green')
+  showToast('Actividades y evidencias guardadas.', 'green')
   updateTabBadge()
   renderKPIs()
   applyFilters()
@@ -397,12 +554,12 @@ function closeModal(id) { document.getElementById(id)?.classList.remove('open') 
 
 // ── Helpers ──────────────────────────────────────────────────────
 function statusClass(s) {
-  const map = { abierto:'status-abierto', en_proceso:'status-en_proceso', cerrado:'status-cerrado' }
-  return map[s] || 'status-abierto'
+  const m = { abierto:'status-abierto', en_proceso:'status-en_proceso', cerrado:'status-cerrado' }
+  return m[s] || 'status-abierto'
 }
 function statusLabel(s) {
-  const map = { abierto:'Abierta', en_proceso:'En Proceso', cerrado:'Cerrada' }
-  return map[s] || s || '—'
+  const m = { abierto:'Abierta', en_proceso:'En Proceso', cerrado:'Cerrada' }
+  return m[s] || s || '—'
 }
 function fmtDate(d) {
   if (!d) return '—'
