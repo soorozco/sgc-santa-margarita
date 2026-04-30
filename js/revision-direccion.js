@@ -16,6 +16,20 @@ let _profile = null
 let _role    = null
 
 // ── Default FT-CA-32 Ver 2 form_data structure ────────────────────────────────
+// form_data JSONB stores structured/tabular data.
+// Flat text columns in the DB store the same data in plain text (for legacy).
+// Column mapping:
+//   folio                      → review number
+//   improvement_opportunities  → general conclusions
+//   prepared_by                → created_by (uuid)
+//   user_satisfaction_results  → desemp_3a_results
+//   user_satisfaction_followup → desemp_3a_plan
+//   stakeholder_internal_results → desemp_3b_results
+//   stakeholder_followup       → desemp_3b_plan
+//   resources_current_situation→ recursos_current
+//   resources_future_intentions→ recursos_future
+//   risk_effectiveness_summary → riesgos section
+
 function defaultFormData() {
   return {
     prev_actions:      [],   // [{description, responsible, deadline, status}]
@@ -36,6 +50,21 @@ function defaultFormData() {
     oportunidades:     '',
     signatories:       []    // [{name, position, signed}]
   }
+}
+
+// Build form_data from flat DB columns (for reviews created before form_data existed)
+function formDataFromFlatColumns(rev) {
+  const fd = defaultFormData()
+  fd.changes_internal  = rev.internal_external_changes || ''
+  fd.desemp_3a_results = rev.user_satisfaction_results   || ''
+  fd.desemp_3a_plan    = rev.user_satisfaction_followup  || ''
+  fd.desemp_3b_results = rev.stakeholder_internal_results || ''
+  fd.desemp_3b_plan    = rev.stakeholder_followup        || ''
+  fd.recursos_current  = rev.resources_current_situation || ''
+  fd.recursos_future   = rev.resources_future_intentions || ''
+  fd.riesgos_measures  = rev.risk_effectiveness_summary  || ''
+  fd.oportunidades     = rev.improvement_opportunities   || ''
+  return fd
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -102,7 +131,7 @@ function applyFilters() {
     if (status && r.status !== status) return false
     if (year   && !(r.review_date || '').startsWith(year)) return false
     if (q) {
-      const txt = [r.review_number, r.period, r.location].filter(Boolean).join(' ').toLowerCase()
+      const txt = [r.folio, r.period, r.location].filter(Boolean).join(' ').toLowerCase()
       if (!txt.includes(q)) return false
     }
     return true
@@ -157,7 +186,7 @@ function renderTable() {
     return `
     <tr style="cursor:pointer" onclick="openDetail('${r.id}')">
       <td>
-        <div class="rd-number">${esc(r.review_number || '—')}</div>
+        <div class="rd-number">${esc(r.folio || '—')}</div>
         <div class="rd-period">${esc(r.period || '—')}</div>
       </td>
       <td class="center" style="white-space:nowrap">${fmtDate(r.review_date)}</td>
@@ -206,7 +235,7 @@ function calcFormCompletion(fd) {
 // ── New review modal ───────────────────────────────────────────────────────────
 function openNewReview() {
   const year      = new Date().getFullYear()
-  const countYear = _reviews.filter(r => (r.review_date || '').startsWith(String(year))).length
+  const countYear = _reviews.filter(r => (r.folio || '').includes(String(year))).length
   const num       = String(countYear + 1).padStart(3, '0')
 
   document.getElementById('new-number').value    = `RD-${year}-${num}`
@@ -266,19 +295,22 @@ async function openDetail(id) {
   _editAttendees = JSON.parse(JSON.stringify(Array.isArray(rev.attendees) ? rev.attendees : []))
   _editOutputs   = JSON.parse(JSON.stringify(Array.isArray(rev.outputs)   ? rev.outputs   : []))
 
-  // Merge stored form_data with defaults
-  const stored = (rev.form_data && typeof rev.form_data === 'object') ? rev.form_data : {}
+  // Merge stored form_data with defaults.
+  // If form_data is empty/missing, migrate from flat columns.
+  const stored = (rev.form_data && typeof rev.form_data === 'object' && Object.keys(rev.form_data).length > 0)
+    ? rev.form_data
+    : formDataFromFlatColumns(rev)
   _editFormData = Object.assign(defaultFormData(), stored)
 
   // Header
-  setText('detail-number', rev.review_number || '—')
+  setText('detail-number', rev.folio  || '—')
   setText('detail-period', rev.period || '—')
 
   // General tab
-  setText('d-number',      rev.review_number || '—')
-  setText('d-period',      rev.period        || '—')
+  setText('d-number',      rev.folio   || '—')
+  setText('d-period',      rev.period  || '—')
   setText('d-review-date', fmtDate(rev.review_date))
-  setText('d-created-by',  rev.created_by    || '—')
+  setText('d-created-by',  rev.prepared_by || '—')
 
   const statusSel = document.getElementById('d-status-sel')
   if (statusSel) statusSel.value = rev.status || 'PLANIFICADA'
@@ -290,7 +322,7 @@ async function openDetail(id) {
   if (nextEl) nextEl.value = rev.next_review_date || ''
 
   const concEl = document.getElementById('d-conclusions')
-  if (concEl) concEl.value = rev.general_conclusions || ''
+  if (concEl) concEl.value = rev.improvement_opportunities || ''
 
   // Render dynamic tabs
   renderAttendeesTab()
@@ -311,7 +343,7 @@ function _collectGeneralValues() {
     status:      document.getElementById('d-status-sel')?.value  || _currentRev.status,
     location:    document.getElementById('d-location')?.value    || _currentRev.location,
     next_date:   document.getElementById('d-next-date')?.value   || _currentRev.next_review_date,
-    conclusions: document.getElementById('d-conclusions')?.value || _currentRev.general_conclusions || ''
+    conclusions: document.getElementById('d-conclusions')?.value || _currentRev.improvement_opportunities || ''
   }
 }
 
@@ -401,10 +433,10 @@ async function saveGeneral() {
   if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
 
   const g = _collectGeneralValues()
-  _currentRev.status              = g.status
-  _currentRev.location            = g.location
-  _currentRev.next_review_date    = g.next_date || null
-  _currentRev.general_conclusions = g.conclusions
+  _currentRev.status                    = g.status
+  _currentRev.location                  = g.location
+  _currentRev.next_review_date          = g.next_date || null
+  _currentRev.improvement_opportunities = g.conclusions
   _updateLocalReview()
   showToast('Información general guardada.', 'green')
   renderKPIs(); renderTable()
