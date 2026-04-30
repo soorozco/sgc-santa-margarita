@@ -287,6 +287,111 @@
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
 
+/* ── Form code badge ─────────────────────────────────────────── */
+.form-code-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:6px; font-size:.714rem; font-weight:700;
+  background:#f0f4ff; color:#2563eb; border:1px solid #bfdbfe;
+  letter-spacing:.03em;
+}
+
+/* ── FT-CA-32 section blocks ─────────────────────────────────── */
+.rd-section {
+  background:var(--white);
+  border:1.5px solid var(--border);
+  border-radius:var(--r);
+  padding:20px;
+  margin-bottom:18px;
+}
+.rd-section-title {
+  display:flex; align-items:center; gap:10px;
+  font-size:.857rem; font-weight:700; color:var(--txt);
+  margin-bottom:16px; padding-bottom:10px; border-bottom:1.5px solid var(--border);
+}
+.rd-section-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:50%;
+  background:var(--blue); color:white; font-size:.75rem; font-weight:800;
+  flex-shrink:0;
+}
+.rd-subsection {
+  background:#f8fafc;
+  border:1px solid var(--border);
+  border-radius:var(--rsm);
+  padding:16px;
+  margin-bottom:14px;
+}
+.rd-subsection:last-child { margin-bottom:0; }
+.rd-subsection-title {
+  font-size:.786rem; font-weight:700; color:var(--blue);
+  display:flex; align-items:center; gap:7px;
+  margin-bottom:14px; text-transform:uppercase; letter-spacing:.04em;
+}
+
+/* ── Mini inline tables (prev_actions, 3c, 3d) ───────────────── */
+.rd-mini-table {
+  border:1.5px solid var(--border); border-radius:var(--rsm);
+  overflow:hidden; margin-bottom:4px;
+}
+.rd-mini-head {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; background:#f1f5f9;
+  font-size:.714rem; font-weight:700; color:var(--txt2);
+  text-transform:uppercase; letter-spacing:.04em;
+  border-bottom:1px solid var(--border);
+}
+.rd-mini-row {
+  display:flex; align-items:center; gap:8px;
+  padding:8px 12px; border-bottom:1px solid var(--border);
+  background:var(--white);
+}
+.rd-mini-row:last-child { border-bottom:none; }
+.rd-mini-row:hover { background:#f8fafc; }
+.rd-mini-input {
+  width:100%; padding:6px 9px; border:1.5px solid var(--border);
+  border-radius:6px; font-size:.786rem; font-family:var(--font);
+  color:var(--txt); background:white; transition:var(--ease);
+}
+.rd-mini-input:focus { outline:none; border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(37,99,235,.1); }
+.rd-mini-select {
+  width:100%; padding:6px 28px 6px 9px; border:1.5px solid var(--border);
+  border-radius:6px; font-size:.786rem; font-family:var(--font);
+  color:var(--txt); background:white; appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 8px center; transition:var(--ease);
+}
+.rd-mini-select:focus { outline:none; border-color:var(--blue); }
+.rd-empty-hint {
+  text-align:center; padding:16px; color:var(--txt3); font-size:.786rem;
+  border:1.5px dashed var(--border); border-radius:var(--rsm);
+}
+
+/* ── Risk row ────────────────────────────────────────────────── */
+.rd-risk-row {
+  display:flex; gap:14px; flex-wrap:wrap;
+}
+.rd-risk-item {
+  flex:1; min-width:140px;
+  display:flex; align-items:center; gap:8px;
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:var(--rsm); padding:12px 14px;
+}
+.rd-risk-low  { border-left:4px solid #16a34a; }
+.rd-risk-mid  { border-left:4px solid #d97706; }
+.rd-risk-high { border-left:4px solid #dc2626; }
+.rd-risk-label {
+  font-size:.714rem; font-weight:700; color:var(--txt2); white-space:nowrap;
+  display:flex; align-items:center; gap:5px;
+}
+.rd-risk-item input[type=number] {
+  width:70px; padding:6px 8px; border:1.5px solid var(--border);
+  border-radius:6px; font-size:.929rem; font-weight:700; color:var(--txt);
+  background:#f8fafc; text-align:center; font-family:var(--font); transition:var(--ease);
+}
+.rd-risk-item input[type=number]:focus { outline:none; border-color:var(--blue); background:white; }
+.rd-risk-unit { font-size:.857rem; font-weight:700; color:var(--txt3); }
+
 /* ── Pagination ──────────────────────────────────────────────── */
 .pagination { display:flex; align-items:center; justify-content:center; gap:6px;
   padding:16px; border-top:1px solid var(--border); }

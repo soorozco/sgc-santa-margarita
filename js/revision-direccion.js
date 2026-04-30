@@ -1,36 +1,44 @@
-// ─── Revisión por la Dirección — Cláusula 9.3 ─────────────────
+// ─── Revisión por la Dirección — Cláusula 9.3 / FT-CA-32 Ver 2 ─────────────
 
-// ── State ─────────────────────────────────────────────────────
-let _reviews      = []   // all loaded reviews
-let _filtered     = []   // after filters
+// ── State ─────────────────────────────────────────────────────────────────────
+let _reviews      = []
+let _filtered     = []
 let _page         = 1
 const PAGE_SIZE   = 15
-let _currentRev   = null // full review object being edited
+let _currentRev   = null
 
-let _editAttendees = []  // [{name, position, attended}]
-let _editInputs    = []  // [{key, label, rating, notes}]
-let _editOutputs   = []  // [{id, type, description, responsible, due_date, status}]
+let _editAttendees = []   // [{name, position, attended}]
+let _editOutputs   = []   // [{id, type, description, responsible, due_date, status}]
+let _editFormData  = {}   // FT-CA-32 Ver 2 structured sections
 
 let _user    = null
 let _profile = null
 let _role    = null
 
-// ── ISO 9.3.2 standard input categories ───────────────────────
-const ISO_INPUTS = [
-  { key:'prev_actions',    label:'Estado de acciones de revisiones anteriores' },
-  { key:'context_changes', label:'Cambios en cuestiones externas e internas pertinentes al SGC' },
-  { key:'sat_cliente',     label:'Satisfacción del cliente y retroalimentación de partes interesadas' },
-  { key:'obj_calidad',     label:'Grado en que se han logrado los objetivos de calidad' },
-  { key:'proc_products',   label:'Desempeño de los procesos y conformidad de productos y servicios' },
-  { key:'nc_correctivas',  label:'No conformidades y acciones correctivas' },
-  { key:'seguimiento',     label:'Resultados de seguimiento y medición' },
-  { key:'auditorias',      label:'Resultados de las auditorías internas' },
-  { key:'proveedores',     label:'Desempeño de los proveedores externos' },
-  { key:'recursos',        label:'Adecuación de los recursos' },
-  { key:'riesgos',         label:'Eficacia de las acciones tomadas para riesgos y oportunidades' },
-]
+// ── Default FT-CA-32 Ver 2 form_data structure ────────────────────────────────
+function defaultFormData() {
+  return {
+    prev_actions:      [],   // [{description, responsible, deadline, status}]
+    changes_internal:  '',
+    changes_external:  '',
+    desemp_3a_results: '',
+    desemp_3a_plan:    '',
+    desemp_3b_results: '',
+    desemp_3b_plan:    '',
+    desemp_3c:         [],   // [{objective, indicator, goal, result, compliance}]
+    desemp_3d:         [],   // [{area, type, description, ac_number, status}]
+    recursos_current:  '',
+    recursos_future:   '',
+    riesgos_bajo:      '',
+    riesgos_medio:     '',
+    riesgos_alto:      '',
+    riesgos_measures:  '',
+    oportunidades:     '',
+    signatories:       []    // [{name, position, signed}]
+  }
+}
 
-// ── Init ──────────────────────────────────────────────────────
+// ── Init ──────────────────────────────────────────────────────────────────────
 async function initRD() {
   try {
     const auth = await requireAuth()
@@ -46,7 +54,6 @@ async function initRD() {
     if (dateEl) dateEl.textContent = new Date().toLocaleDateString('es-MX',
       { weekday:'long', day:'numeric', month:'long', year:'numeric' })
 
-    // Show "Nueva Revisión" only to admins / responsable_calidad
     const canWrite = ['administrador','responsable_calidad'].includes(_role)
     const btn = document.getElementById('btn-new-rd')
     if (btn) btn.style.display = canWrite ? 'inline-flex' : 'none'
@@ -57,7 +64,7 @@ async function initRD() {
   }
 }
 
-// ── Load reviews from Supabase ─────────────────────────────────
+// ── Load reviews ───────────────────────────────────────────────────────────────
 async function loadReviews() {
   showTableLoading()
   const { data, error } = await db
@@ -73,7 +80,7 @@ async function loadReviews() {
   renderKPIs()
 }
 
-// ── Year filter builder ───────────────────────────────────────
+// ── Year filter ────────────────────────────────────────────────────────────────
 function buildYearFilter() {
   const years = [...new Set(
     _reviews.map(r => (r.review_date || '').substring(0, 4)).filter(Boolean)
@@ -85,7 +92,7 @@ function buildYearFilter() {
     years.map(y => `<option value="${y}"${y===cur?' selected':''}>${y}</option>`).join('')
 }
 
-// ── Filters ───────────────────────────────────────────────────
+// ── Filters ────────────────────────────────────────────────────────────────────
 function applyFilters() {
   const q      = (document.getElementById('search-input')?.value || '').toLowerCase().trim()
   const status = document.getElementById('f-status')?.value || ''
@@ -108,26 +115,17 @@ function applyFilters() {
   if (cnt) cnt.textContent = _filtered.length + ' revisión' + (_filtered.length !== 1 ? 'es' : '') + ' encontrada' + (_filtered.length !== 1 ? 's' : '')
 }
 
-// ── KPIs ──────────────────────────────────────────────────────
+// ── KPIs ───────────────────────────────────────────────────────────────────────
 function renderKPIs() {
   const thisYear = String(new Date().getFullYear())
-
-  // Total
   setText('kpi-total', _reviews.length)
-  setText('kpi-total-sub', 'registradas')
-
-  // Completadas este año
   const completadasYear = _reviews.filter(r =>
     r.status === 'COMPLETADA' && (r.review_date || '').startsWith(thisYear)
   ).length
   setText('kpi-completadas', completadasYear)
   setText('kpi-year', thisYear)
+  setText('kpi-en-proceso', _reviews.filter(r => r.status === 'EN_PROCESO').length)
 
-  // En proceso
-  const enProceso = _reviews.filter(r => r.status === 'EN_PROCESO').length
-  setText('kpi-en-proceso', enProceso)
-
-  // Acciones pendientes across all reviews
   let pending = 0
   _reviews.forEach(r => {
     const outputs = Array.isArray(r.outputs) ? r.outputs : []
@@ -136,7 +134,7 @@ function renderKPIs() {
   setText('kpi-pendientes', pending)
 }
 
-// ── Table ─────────────────────────────────────────────────────
+// ── Table ──────────────────────────────────────────────────────────────────────
 function renderTable() {
   const tbody = document.getElementById('rd-tbody')
   const start = (_page - 1) * PAGE_SIZE
@@ -146,33 +144,28 @@ function renderTable() {
     tbody.innerHTML = `<tr><td colspan="8" class="table-empty">
       <i class="fa-solid fa-folder-open"></i>
       <strong>Sin revisiones</strong>Sin resultados para los filtros seleccionados.</td></tr>`
-    renderPagination()
-    return
+    renderPagination(); return
   }
 
   tbody.innerHTML = page.map(r => {
     const attendees = Array.isArray(r.attendees) ? r.attendees : []
-    const inputs    = Array.isArray(r.inputs)    ? r.inputs    : []
     const outputs   = Array.isArray(r.outputs)   ? r.outputs   : []
-    const rated     = inputs.filter(i => i.rating).length
+    const fd        = r.form_data || {}
     const pendOut   = outputs.filter(o => o.status === 'PENDIENTE').length
+    const fdPct     = calcFormCompletion(fd)
 
     return `
     <tr style="cursor:pointer" onclick="openDetail('${r.id}')">
       <td>
         <div class="rd-number">${esc(r.review_number || '—')}</div>
-      </td>
-      <td>
         <div class="rd-period">${esc(r.period || '—')}</div>
       </td>
       <td class="center" style="white-space:nowrap">${fmtDate(r.review_date)}</td>
-      <td class="center">
-        <span class="mini-count">${attendees.length}</span>
-      </td>
+      <td class="center"><span class="mini-count">${attendees.length}</span></td>
       <td class="center">${statusBadge(r.status)}</td>
       <td class="center">
-        <span class="mini-count">
-          <span class="rated">${rated}</span> / ${ISO_INPUTS.length}
+        <span class="mini-count ${fdPct === 100 ? 'rated' : ''}">
+          ${fdPct}%
         </span>
       </td>
       <td class="center">
@@ -192,9 +185,26 @@ function renderTable() {
   renderPagination()
 }
 
-// ── Open new review modal ─────────────────────────────────────
+function calcFormCompletion(fd) {
+  if (!fd || typeof fd !== 'object') return 0
+  const checks = [
+    (fd.prev_actions?.length > 0),
+    !!fd.changes_internal,
+    !!fd.changes_external,
+    !!fd.desemp_3a_results,
+    !!fd.desemp_3b_results,
+    (fd.desemp_3c?.length > 0),
+    (fd.desemp_3d?.length > 0),
+    !!fd.recursos_current,
+    !!fd.riesgos_bajo,
+    (fd.signatories?.length > 0)
+  ]
+  const done = checks.filter(Boolean).length
+  return Math.round((done / checks.length) * 100)
+}
+
+// ── New review modal ───────────────────────────────────────────────────────────
 function openNewReview() {
-  // Auto-suggest review number: RD-YYYY-NNN
   const year      = new Date().getFullYear()
   const countYear = _reviews.filter(r => (r.review_date || '').startsWith(String(year))).length
   const num       = String(countYear + 1).padStart(3, '0')
@@ -203,12 +213,11 @@ function openNewReview() {
   document.getElementById('new-period').value    = ''
   document.getElementById('new-date').value      = ''
   document.getElementById('new-next-date').value = ''
-  document.getElementById('new-location').value  = 'Sala de Juntas'
+  document.getElementById('new-location').value  = 'Sala de Juntas, Hospital Santa Margarita'
 
   openModal('modal-new')
 }
 
-// ── Submit new review ─────────────────────────────────────────
 async function submitNewReview() {
   const number   = document.getElementById('new-number').value.trim()
   const period   = document.getElementById('new-period').value.trim()
@@ -226,12 +235,12 @@ async function submitNewReview() {
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…'
 
   const { data, error } = await db.rpc('create_management_review', {
-    p_review_number:   number,
-    p_period:          period,
-    p_review_date:     date,
+    p_review_number:    number,
+    p_period:           period,
+    p_review_date:      date,
     p_next_review_date: nextDate,
-    p_location:        location,
-    p_created_by:      _user.id
+    p_location:         location,
+    p_created_by:       _user.id
   })
 
   if (error) {
@@ -248,28 +257,18 @@ async function submitNewReview() {
   await loadReviews()
 }
 
-// ── Open detail modal ─────────────────────────────────────────
+// ── Open detail modal ──────────────────────────────────────────────────────────
 async function openDetail(id) {
   const rev = _reviews.find(r => r.id === id)
   if (!rev) return
-
   _currentRev = rev
 
-  // Initialize edit state
   _editAttendees = JSON.parse(JSON.stringify(Array.isArray(rev.attendees) ? rev.attendees : []))
   _editOutputs   = JSON.parse(JSON.stringify(Array.isArray(rev.outputs)   ? rev.outputs   : []))
 
-  // Inputs: merge ISO template with stored data, ensuring all 11 categories exist
-  const storedInputs = Array.isArray(rev.inputs) ? rev.inputs : []
-  _editInputs = ISO_INPUTS.map(iso => {
-    const stored = storedInputs.find(s => s.key === iso.key)
-    return {
-      key:    iso.key,
-      label:  iso.label,
-      rating: stored?.rating || null,
-      notes:  stored?.notes  || ''
-    }
-  })
+  // Merge stored form_data with defaults
+  const stored = (rev.form_data && typeof rev.form_data === 'object') ? rev.form_data : {}
+  _editFormData = Object.assign(defaultFormData(), stored)
 
   // Header
   setText('detail-number', rev.review_number || '—')
@@ -297,6 +296,7 @@ async function openDetail(id) {
   renderAttendeesTab()
   renderInputsTab()
   renderOutputsTab()
+  renderAcuerdosTab()
 
   // Reset to first tab
   document.querySelectorAll('#modal-detail .tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0))
@@ -305,20 +305,80 @@ async function openDetail(id) {
   openModal('modal-detail')
 }
 
-// ── _collectCurrentState: read all tab forms into edit state ───
+// ── Collect helpers ────────────────────────────────────────────────────────────
 function _collectGeneralValues() {
   return {
-    status:       document.getElementById('d-status-sel')?.value  || _currentRev.status,
-    location:     document.getElementById('d-location')?.value    || _currentRev.location,
-    next_date:    document.getElementById('d-next-date')?.value   || _currentRev.next_review_date,
-    conclusions:  document.getElementById('d-conclusions')?.value || _currentRev.general_conclusions || ''
+    status:      document.getElementById('d-status-sel')?.value  || _currentRev.status,
+    location:    document.getElementById('d-location')?.value    || _currentRev.location,
+    next_date:   document.getElementById('d-next-date')?.value   || _currentRev.next_review_date,
+    conclusions: document.getElementById('d-conclusions')?.value || _currentRev.general_conclusions || ''
   }
 }
 
-// ── Save General tab ──────────────────────────────────────────
-async function saveGeneral() {
-  if (!_currentRev) return
-  const g = _collectGeneralValues()
+function _collectFormData() {
+  const fd = _editFormData
+  // Cambios
+  fd.changes_internal = document.getElementById('fd-changes-internal')?.value || ''
+  fd.changes_external = document.getElementById('fd-changes-external')?.value || ''
+  // 3a
+  fd.desemp_3a_results = document.getElementById('fd-3a-results')?.value || ''
+  fd.desemp_3a_plan    = document.getElementById('fd-3a-plan')?.value    || ''
+  // 3b
+  fd.desemp_3b_results = document.getElementById('fd-3b-results')?.value || ''
+  fd.desemp_3b_plan    = document.getElementById('fd-3b-plan')?.value    || ''
+  // Recursos
+  fd.recursos_current = document.getElementById('fd-recursos-current')?.value || ''
+  fd.recursos_future  = document.getElementById('fd-recursos-future')?.value  || ''
+  // Riesgos
+  fd.riesgos_bajo     = document.getElementById('fd-riesgo-bajo')?.value    || ''
+  fd.riesgos_medio    = document.getElementById('fd-riesgo-medio')?.value   || ''
+  fd.riesgos_alto     = document.getElementById('fd-riesgo-alto')?.value    || ''
+  fd.riesgos_measures = document.getElementById('fd-riesgos-measures')?.value || ''
+  // Acuerdos
+  fd.oportunidades = document.getElementById('fd-oportunidades')?.value || ''
+
+  // Prev actions (table rows)
+  const paLen = fd.prev_actions.length
+  fd.prev_actions = Array.from({length: paLen}, (_, idx) => ({
+    description: document.getElementById(`pa-desc-${idx}`)?.value || '',
+    responsible: document.getElementById(`pa-resp-${idx}`)?.value || '',
+    deadline:    document.getElementById(`pa-dead-${idx}`)?.value || '',
+    status:      document.getElementById(`pa-stat-${idx}`)?.value || 'pendiente'
+  }))
+
+  // 3c (objectives table)
+  const c3cLen = fd.desemp_3c.length
+  fd.desemp_3c = Array.from({length: c3cLen}, (_, idx) => ({
+    objective:  document.getElementById(`c3c-obj-${idx}`)?.value  || '',
+    indicator:  document.getElementById(`c3c-ind-${idx}`)?.value  || '',
+    goal:       document.getElementById(`c3c-goal-${idx}`)?.value || '',
+    result:     document.getElementById(`c3c-res-${idx}`)?.value  || '',
+    compliance: document.getElementById(`c3c-comp-${idx}`)?.value || 'cumplido'
+  }))
+
+  // 3d (audits/NC table)
+  const c3dLen = fd.desemp_3d.length
+  fd.desemp_3d = Array.from({length: c3dLen}, (_, idx) => ({
+    area:        document.getElementById(`c3d-area-${idx}`)?.value || '',
+    type:        document.getElementById(`c3d-type-${idx}`)?.value || 'observacion',
+    description: document.getElementById(`c3d-desc-${idx}`)?.value || '',
+    ac_number:   document.getElementById(`c3d-ac-${idx}`)?.value   || '',
+    status:      document.getElementById(`c3d-stat-${idx}`)?.value || 'abierto'
+  }))
+
+  // Signatories
+  const sigLen = fd.signatories.length
+  fd.signatories = Array.from({length: sigLen}, (_, idx) => ({
+    name:     document.getElementById(`sig-name-${idx}`)?.value  || '',
+    position: document.getElementById(`sig-pos-${idx}`)?.value   || '',
+    signed:   document.getElementById(`sig-check-${idx}`)?.checked || false
+  }))
+}
+
+// ── RPC call helper ────────────────────────────────────────────────────────────
+async function _saveToSupabase(formDataOverride) {
+  const g  = _collectGeneralValues()
+  const fd = formDataOverride || _editFormData
 
   const { error } = await db.rpc('update_management_review', {
     p_id:                  _currentRev.id,
@@ -327,116 +387,87 @@ async function saveGeneral() {
     p_next_review_date:    g.next_date || null,
     p_general_conclusions: g.conclusions,
     p_attendees:           _editAttendees,
-    p_inputs:              _editInputs,
-    p_outputs:             _editOutputs
+    p_inputs:              [],
+    p_outputs:             _editOutputs,
+    p_form_data:           fd
   })
+  return error
+}
 
+// ── Save General ───────────────────────────────────────────────────────────────
+async function saveGeneral() {
+  if (!_currentRev) return
+  const error = await _saveToSupabase()
   if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
 
-  // Update local state
+  const g = _collectGeneralValues()
   _currentRev.status              = g.status
   _currentRev.location            = g.location
   _currentRev.next_review_date    = g.next_date || null
   _currentRev.general_conclusions = g.conclusions
   _updateLocalReview()
-
   showToast('Información general guardada.', 'green')
-  setText('detail-number', _currentRev.review_number || '—')
-  renderKPIs()
-  renderTable()
+  renderKPIs(); renderTable()
 }
 
-// ── Save Attendees tab ────────────────────────────────────────
+// ── Save Attendees ─────────────────────────────────────────────────────────────
 async function saveAttendees() {
   if (!_currentRev) return
   _collectAttendeeValues()
-
-  const g = _collectGeneralValues()
-
-  const { error } = await db.rpc('update_management_review', {
-    p_id:                  _currentRev.id,
-    p_status:              g.status,
-    p_location:            g.location,
-    p_next_review_date:    g.next_date || null,
-    p_general_conclusions: g.conclusions,
-    p_attendees:           _editAttendees,
-    p_inputs:              _editInputs,
-    p_outputs:             _editOutputs
-  })
-
+  const error = await _saveToSupabase()
   if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
-
   _currentRev.attendees = JSON.parse(JSON.stringify(_editAttendees))
   _updateLocalReview()
   showToast('Participantes guardados.', 'green')
   renderTable()
 }
 
-// ── Save Inputs tab ───────────────────────────────────────────
+// ── Save Entradas (FT-CA-32 form_data) ────────────────────────────────────────
 async function saveInputs() {
   if (!_currentRev) return
-  _collectInputNotes()
-
-  const g = _collectGeneralValues()
-
-  const { error } = await db.rpc('update_management_review', {
-    p_id:                  _currentRev.id,
-    p_status:              g.status,
-    p_location:            g.location,
-    p_next_review_date:    g.next_date || null,
-    p_general_conclusions: g.conclusions,
-    p_attendees:           _editAttendees,
-    p_inputs:              _editInputs,
-    p_outputs:             _editOutputs
-  })
-
+  _collectFormData()
+  const error = await _saveToSupabase()
   if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
-
-  _currentRev.inputs = JSON.parse(JSON.stringify(_editInputs))
+  _currentRev.form_data = JSON.parse(JSON.stringify(_editFormData))
   _updateLocalReview()
   showToast('Entradas guardadas.', 'green')
   renderTable()
 }
 
-// ── Save Outputs tab ──────────────────────────────────────────
+// ── Save Outputs ───────────────────────────────────────────────────────────────
 async function saveOutputs() {
   if (!_currentRev) return
   _saveOutputTexts()
-
-  const g = _collectGeneralValues()
-
-  const { error } = await db.rpc('update_management_review', {
-    p_id:                  _currentRev.id,
-    p_status:              g.status,
-    p_location:            g.location,
-    p_next_review_date:    g.next_date || null,
-    p_general_conclusions: g.conclusions,
-    p_attendees:           _editAttendees,
-    p_inputs:              _editInputs,
-    p_outputs:             _editOutputs
-  })
-
+  const error = await _saveToSupabase()
   if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
-
   _currentRev.outputs = JSON.parse(JSON.stringify(_editOutputs))
   _updateLocalReview()
   showToast('Salidas guardadas.', 'green')
-  renderKPIs()
-  renderTable()
+  renderKPIs(); renderTable()
 }
 
-// ── Update the _reviews array with current edit state ─────────
+// ── Save Acuerdos ──────────────────────────────────────────────────────────────
+async function saveAcuerdos() {
+  if (!_currentRev) return
+  _collectFormData()
+  const error = await _saveToSupabase()
+  if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
+  _currentRev.form_data = JSON.parse(JSON.stringify(_editFormData))
+  _updateLocalReview()
+  showToast('Acuerdos y firmas guardados.', 'green')
+}
+
 function _updateLocalReview() {
   const idx = _reviews.findIndex(r => r.id === _currentRev.id)
   if (idx !== -1) _reviews[idx] = { ..._reviews[idx], ..._currentRev }
 }
 
-// ── Attendees tab ─────────────────────────────────────────────
+// ── TAB: Participantes ─────────────────────────────────────────────────────────
 function _collectAttendeeValues() {
   _editAttendees.forEach((att, idx) => {
-    const nameEl  = document.getElementById(`att-name-${idx}`)
-    const posEl   = document.getElementById(`att-pos-${idx}`)
-    const attEl   = document.getElementById(`att-check-${idx}`)
+    const nameEl = document.getElementById(`att-name-${idx}`)
+    const posEl  = document.getElementById(`att-pos-${idx}`)
+    const attEl  = document.getElementById(`att-check-${idx}`)
     if (nameEl) att.name     = nameEl.value
     if (posEl)  att.position = posEl.value
     if (attEl)  att.attended = attEl.checked
@@ -446,12 +477,10 @@ function _collectAttendeeValues() {
 function renderAttendeesTab() {
   const container = document.getElementById('attendees-list')
   if (!container) return
-
   if (_editAttendees.length === 0) {
     container.innerHTML = '<div class="attendees-empty">Sin participantes registrados. Agregue el primero con el botón de abajo.</div>'
     return
   }
-
   container.innerHTML = _editAttendees.map((att, idx) => `
     <div class="attendee-row" id="att-row-${idx}">
       <div class="attendee-field-name">
@@ -477,7 +506,6 @@ function addAttendee() {
   _collectAttendeeValues()
   _editAttendees.push({ name: '', position: '', attended: true })
   renderAttendeesTab()
-  // Focus the new name field
   const last = _editAttendees.length - 1
   setTimeout(() => document.getElementById(`att-name-${last}`)?.focus(), 50)
 }
@@ -488,81 +516,347 @@ function removeAttendee(idx) {
   renderAttendeesTab()
 }
 
-// ── Inputs tab ────────────────────────────────────────────────
-function _collectInputNotes() {
-  _editInputs.forEach((inp, idx) => {
-    const notesEl = document.getElementById(`inp-notes-${idx}`)
-    if (notesEl) inp.notes = notesEl.value
-  })
-}
-
+// ── TAB: Entradas / FT-CA-32 Ver 2 ────────────────────────────────────────────
 function renderInputsTab() {
-  const container = document.getElementById('inputs-list')
-  if (!container) return
+  const c = document.getElementById('inputs-list')
+  if (!c) return
+  const fd = _editFormData
 
-  container.innerHTML = _editInputs.map((inp, idx) => {
-    const r = inp.rating
-    const showNotes = r === 'MEJORA' || r === 'CRITICO'
-    return `
-    <div class="iso-input-row" id="inp-row-${idx}">
-      <div class="iso-input-label">
-        <div class="iso-input-num">${String(idx + 1).padStart(2, '0')}</div>
-        <div class="iso-input-label-txt">${esc(inp.label)}</div>
+  c.innerHTML = `
+
+    <!-- ─── Sección 1: Estado de acciones previas ─── -->
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <span class="rd-section-num">1</span>
+        Estado de acciones de revisiones anteriores
       </div>
-      <div class="iso-input-controls">
-        <div class="rating-btns">
-          <button type="button" class="rating-btn ${r === 'SATISFACTORIO' ? 'active-satisfactorio' : ''}"
-            onclick="setInputRating('${inp.key}', 'SATISFACTORIO')">
-            🟢 Satisfactorio
-          </button>
-          <button type="button" class="rating-btn ${r === 'MEJORA' ? 'active-mejora' : ''}"
-            onclick="setInputRating('${inp.key}', 'MEJORA')">
-            🟡 Requiere mejora
-          </button>
-          <button type="button" class="rating-btn ${r === 'CRITICO' ? 'active-critico' : ''}"
-            onclick="setInputRating('${inp.key}', 'CRITICO')">
-            🔴 Crítico
-          </button>
+      <div id="prev-actions-list">${renderPrevActions()}</div>
+      <button class="btn-secondary" style="margin-top:10px" onclick="addPrevAction()">
+        <i class="fa-solid fa-plus"></i> Agregar acción
+      </button>
+    </div>
+
+    <!-- ─── Sección 2: Cambios ─── -->
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <span class="rd-section-num">2</span>
+        Cambios en cuestiones externas e internas pertinentes al SGC
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Cambios internos (personal, procesos, estructura)</label>
+          <textarea id="fd-changes-internal" rows="4"
+            placeholder="Cambios en recursos humanos, procesos, estructura organizacional…">${esc(fd.changes_internal||'')}</textarea>
         </div>
-        ${showNotes ? `
-        <textarea class="iso-notes" id="inp-notes-${idx}" rows="2"
-          placeholder="Agregue notas u observaciones…">${esc(inp.notes || '')}</textarea>` : `
-        <textarea class="iso-notes" id="inp-notes-${idx}" rows="2"
-          placeholder="Notas opcionales…" style="display:none">${esc(inp.notes || '')}</textarea>`}
+        <div class="field">
+          <label>Cambios externos (regulaciones, contexto, partes interesadas)</label>
+          <textarea id="fd-changes-external" rows="4"
+            placeholder="Cambios normativos, mercado, tecnología, requerimientos de partes interesadas…">${esc(fd.changes_external||'')}</textarea>
+        </div>
       </div>
-    </div>`
-  }).join('')
+    </div>
+
+    <!-- ─── Sección 3: Desempeño ─── -->
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <span class="rd-section-num">3</span>
+        Desempeño y eficacia del SGC
+      </div>
+
+      <div class="rd-subsection">
+        <div class="rd-subsection-title">
+          <i class="fa-solid fa-face-smile"></i> 3a — Satisfacción del usuario
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Resultados obtenidos</label>
+            <textarea id="fd-3a-results" rows="4"
+              placeholder="Resultados de encuestas, quejas, indicadores de satisfacción…">${esc(fd.desemp_3a_results||'')}</textarea>
+          </div>
+          <div class="field">
+            <label>Plan de seguimiento / mejora</label>
+            <textarea id="fd-3a-plan" rows="4"
+              placeholder="Acciones de seguimiento derivadas de los resultados…">${esc(fd.desemp_3a_plan||'')}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="rd-subsection">
+        <div class="rd-subsection-title">
+          <i class="fa-solid fa-comments"></i> 3b — Retroalimentación de partes interesadas (interna y externa)
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Resultados de retroalimentación</label>
+            <textarea id="fd-3b-results" rows="4"
+              placeholder="Retroalimentación recibida de partes interesadas internas y externas…">${esc(fd.desemp_3b_results||'')}</textarea>
+          </div>
+          <div class="field">
+            <label>Plan de seguimiento</label>
+            <textarea id="fd-3b-plan" rows="4"
+              placeholder="Acciones de seguimiento…">${esc(fd.desemp_3b_plan||'')}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="rd-subsection">
+        <div class="rd-subsection-title">
+          <i class="fa-solid fa-bullseye"></i> 3c — Cumplimiento de objetivos de calidad
+        </div>
+        <div id="desemp-3c-list">${renderDesem3c()}</div>
+        <button class="btn-secondary" style="margin-top:10px" onclick="addDesem3c()">
+          <i class="fa-solid fa-plus"></i> Agregar objetivo
+        </button>
+      </div>
+
+      <div class="rd-subsection">
+        <div class="rd-subsection-title">
+          <i class="fa-solid fa-magnifying-glass"></i> 3d — Seguimiento de Auditorías y No Conformidades
+        </div>
+        <div id="desemp-3d-list">${renderDesem3d()}</div>
+        <button class="btn-secondary" style="margin-top:10px" onclick="addDesem3d()">
+          <i class="fa-solid fa-plus"></i> Agregar hallazgo / NC
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Sección 4: Recursos ─── -->
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <span class="rd-section-num">4</span>
+        Adecuación de recursos
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Situación actual de recursos</label>
+          <textarea id="fd-recursos-current" rows="4"
+            placeholder="Estado de recursos humanos, infraestructura, ambiente de trabajo, tecnología…">${esc(fd.recursos_current||'')}</textarea>
+        </div>
+        <div class="field">
+          <label>Necesidades e inversiones para el siguiente período</label>
+          <textarea id="fd-recursos-future" rows="4"
+            placeholder="Recursos requeridos, inversiones planificadas, capacitaciones…">${esc(fd.recursos_future||'')}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Sección 5: Riesgos ─── -->
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <span class="rd-section-num">5</span>
+        Eficacia de acciones para riesgos y oportunidades
+      </div>
+      <div class="rd-risk-row">
+        <div class="rd-risk-item rd-risk-low">
+          <div class="rd-risk-label"><i class="fa-solid fa-circle" style="color:#16a34a;font-size:10px"></i> Riesgo Bajo</div>
+          <input type="number" id="fd-riesgo-bajo" min="0" max="100" step="0.1"
+            value="${esc(fd.riesgos_bajo||'')}" placeholder="0"> <span class="rd-risk-unit">%</span>
+        </div>
+        <div class="rd-risk-item rd-risk-mid">
+          <div class="rd-risk-label"><i class="fa-solid fa-circle" style="color:#d97706;font-size:10px"></i> Riesgo Medio</div>
+          <input type="number" id="fd-riesgo-medio" min="0" max="100" step="0.1"
+            value="${esc(fd.riesgos_medio||'')}" placeholder="0"> <span class="rd-risk-unit">%</span>
+        </div>
+        <div class="rd-risk-item rd-risk-high">
+          <div class="rd-risk-label"><i class="fa-solid fa-circle" style="color:#dc2626;font-size:10px"></i> Riesgo Alto</div>
+          <input type="number" id="fd-riesgo-alto" min="0" max="100" step="0.1"
+            value="${esc(fd.riesgos_alto||'')}" placeholder="0"> <span class="rd-risk-unit">%</span>
+        </div>
+      </div>
+      <div class="form-row one" style="margin-top:12px">
+        <div class="field">
+          <label>Medidas adoptadas para la gestión de riesgos</label>
+          <textarea id="fd-riesgos-measures" rows="3"
+            placeholder="Acciones implementadas para mitigar o controlar riesgos…">${esc(fd.riesgos_measures||'')}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:right;margin-top:8px">
+      <button class="btn-primary" onclick="saveInputs()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Entradas
+      </button>
+    </div>
+  `
 }
 
-function setInputRating(key, rating) {
-  _collectInputNotes()
-  const inp = _editInputs.find(i => i.key === key)
-  if (!inp) return
-  // Toggle off if already selected
-  inp.rating = inp.rating === rating ? null : rating
-  renderInputsTab()
+// ── Prev Actions sub-table ─────────────────────────────────────────────────────
+function renderPrevActions() {
+  const rows = _editFormData.prev_actions
+  if (!rows || rows.length === 0)
+    return '<div class="rd-empty-hint">Sin acciones previas registradas. Utilice el botón para agregar.</div>'
+
+  return `<div class="rd-mini-table">
+    <div class="rd-mini-head">
+      <span style="flex:3">Descripción de la acción</span>
+      <span style="flex:2">Responsable</span>
+      <span style="flex:1.5">Fecha compromiso</span>
+      <span style="flex:1.5">Estado</span>
+      <span style="width:32px"></span>
+    </div>` +
+    rows.map((row, idx) => `
+    <div class="rd-mini-row">
+      <div style="flex:3"><input type="text" class="rd-mini-input" id="pa-desc-${idx}"
+        value="${esc(row.description||'')}" placeholder="Descripción de la acción anterior…"></div>
+      <div style="flex:2"><input type="text" class="rd-mini-input" id="pa-resp-${idx}"
+        value="${esc(row.responsible||'')}" placeholder="Responsable"></div>
+      <div style="flex:1.5"><input type="date" class="rd-mini-input" id="pa-dead-${idx}"
+        value="${esc(row.deadline||'')}"></div>
+      <div style="flex:1.5">
+        <select class="rd-mini-select" id="pa-stat-${idx}">
+          <option value="completado" ${row.status==='completado'?'selected':''}>✅ Completado</option>
+          <option value="en_proceso" ${row.status==='en_proceso'?'selected':''}>🔄 En proceso</option>
+          <option value="pendiente"  ${row.status==='pendiente' ?'selected':''}>⏳ Pendiente</option>
+          <option value="cancelado"  ${row.status==='cancelado' ?'selected':''}>❌ Cancelado</option>
+        </select>
+      </div>
+      <div><button class="btn-icon-remove" onclick="removePrevAction(${idx})" title="Quitar">
+        <i class="fa-solid fa-xmark"></i>
+      </button></div>
+    </div>`).join('') +
+  '</div>'
 }
 
-// ── Outputs tab ───────────────────────────────────────────────
+function addPrevAction() {
+  _collectFormData()
+  _editFormData.prev_actions.push({ description:'', responsible:'', deadline:'', status:'pendiente' })
+  document.getElementById('prev-actions-list').innerHTML = renderPrevActions()
+}
+
+function removePrevAction(idx) {
+  _collectFormData()
+  _editFormData.prev_actions.splice(idx, 1)
+  document.getElementById('prev-actions-list').innerHTML = renderPrevActions()
+}
+
+// ── Desempeño 3c — Objetivos de calidad ───────────────────────────────────────
+function renderDesem3c() {
+  const rows = _editFormData.desemp_3c
+  if (!rows || rows.length === 0)
+    return '<div class="rd-empty-hint">Sin objetivos registrados. Utilice el botón para agregar.</div>'
+
+  return `<div class="rd-mini-table">
+    <div class="rd-mini-head">
+      <span style="flex:3">Objetivo de calidad</span>
+      <span style="flex:2">Indicador</span>
+      <span style="flex:1.5">Meta</span>
+      <span style="flex:1.5">Resultado</span>
+      <span style="flex:1.5">Cumplimiento</span>
+      <span style="width:32px"></span>
+    </div>` +
+    rows.map((row, idx) => `
+    <div class="rd-mini-row">
+      <div style="flex:3"><input type="text" class="rd-mini-input" id="c3c-obj-${idx}"
+        value="${esc(row.objective||'')}" placeholder="Objetivo…"></div>
+      <div style="flex:2"><input type="text" class="rd-mini-input" id="c3c-ind-${idx}"
+        value="${esc(row.indicator||'')}" placeholder="Indicador…"></div>
+      <div style="flex:1.5"><input type="text" class="rd-mini-input" id="c3c-goal-${idx}"
+        value="${esc(row.goal||'')}" placeholder="Meta…"></div>
+      <div style="flex:1.5"><input type="text" class="rd-mini-input" id="c3c-res-${idx}"
+        value="${esc(row.result||'')}" placeholder="Resultado…"></div>
+      <div style="flex:1.5">
+        <select class="rd-mini-select" id="c3c-comp-${idx}">
+          <option value="cumplido"     ${row.compliance==='cumplido'    ?'selected':''}>✅ Cumplido</option>
+          <option value="parcial"      ${row.compliance==='parcial'     ?'selected':''}>⚠️ Parcial</option>
+          <option value="no_cumplido"  ${row.compliance==='no_cumplido' ?'selected':''}>❌ No cumplido</option>
+        </select>
+      </div>
+      <div><button class="btn-icon-remove" onclick="removeDesem3c(${idx})" title="Quitar">
+        <i class="fa-solid fa-xmark"></i>
+      </button></div>
+    </div>`).join('') +
+  '</div>'
+}
+
+function addDesem3c() {
+  _collectFormData()
+  _editFormData.desemp_3c.push({ objective:'', indicator:'', goal:'', result:'', compliance:'cumplido' })
+  document.getElementById('desemp-3c-list').innerHTML = renderDesem3c()
+}
+
+function removeDesem3c(idx) {
+  _collectFormData()
+  _editFormData.desemp_3c.splice(idx, 1)
+  document.getElementById('desemp-3c-list').innerHTML = renderDesem3c()
+}
+
+// ── Desempeño 3d — Auditorías / NC ────────────────────────────────────────────
+function renderDesem3d() {
+  const rows = _editFormData.desemp_3d
+  if (!rows || rows.length === 0)
+    return '<div class="rd-empty-hint">Sin hallazgos / NCs registrados. Utilice el botón para agregar.</div>'
+
+  return `<div class="rd-mini-table">
+    <div class="rd-mini-head">
+      <span style="flex:2">Área / Departamento</span>
+      <span style="flex:1.5">Tipo</span>
+      <span style="flex:3">Descripción</span>
+      <span style="flex:1.5">N° AC</span>
+      <span style="flex:1.5">Estado</span>
+      <span style="width:32px"></span>
+    </div>` +
+    rows.map((row, idx) => `
+    <div class="rd-mini-row">
+      <div style="flex:2"><input type="text" class="rd-mini-input" id="c3d-area-${idx}"
+        value="${esc(row.area||'')}" placeholder="Área…"></div>
+      <div style="flex:1.5">
+        <select class="rd-mini-select" id="c3d-type-${idx}">
+          <option value="nc_mayor"     ${row.type==='nc_mayor'    ?'selected':''}>NC Mayor</option>
+          <option value="nc_menor"     ${row.type==='nc_menor'    ?'selected':''}>NC Menor</option>
+          <option value="observacion"  ${row.type==='observacion' ?'selected':''}>Observación</option>
+          <option value="oportunidad"  ${row.type==='oportunidad' ?'selected':''}>Oportunidad</option>
+          <option value="punto_fuerte" ${row.type==='punto_fuerte'?'selected':''}>Punto Fuerte</option>
+        </select>
+      </div>
+      <div style="flex:3"><input type="text" class="rd-mini-input" id="c3d-desc-${idx}"
+        value="${esc(row.description||'')}" placeholder="Descripción del hallazgo…"></div>
+      <div style="flex:1.5"><input type="text" class="rd-mini-input" id="c3d-ac-${idx}"
+        value="${esc(row.ac_number||'')}" placeholder="AC-YYYY-NNN"></div>
+      <div style="flex:1.5">
+        <select class="rd-mini-select" id="c3d-stat-${idx}">
+          <option value="abierto"    ${row.status==='abierto'   ?'selected':''}>🔴 Abierto</option>
+          <option value="en_proceso" ${row.status==='en_proceso'?'selected':''}>🔄 En proceso</option>
+          <option value="cerrado"    ${row.status==='cerrado'   ?'selected':''}>✅ Cerrado</option>
+        </select>
+      </div>
+      <div><button class="btn-icon-remove" onclick="removeDesem3d(${idx})" title="Quitar">
+        <i class="fa-solid fa-xmark"></i>
+      </button></div>
+    </div>`).join('') +
+  '</div>'
+}
+
+function addDesem3d() {
+  _collectFormData()
+  _editFormData.desemp_3d.push({ area:'', type:'observacion', description:'', ac_number:'', status:'abierto' })
+  document.getElementById('desemp-3d-list').innerHTML = renderDesem3d()
+}
+
+function removeDesem3d(idx) {
+  _collectFormData()
+  _editFormData.desemp_3d.splice(idx, 1)
+  document.getElementById('desemp-3d-list').innerHTML = renderDesem3d()
+}
+
+// ── TAB: Salidas ───────────────────────────────────────────────────────────────
 function _saveOutputTexts() {
   _editOutputs.forEach((out, idx) => {
-    const typeEl  = document.getElementById(`out-type-${idx}`)
-    const descEl  = document.getElementById(`out-desc-${idx}`)
-    const respEl  = document.getElementById(`out-resp-${idx}`)
-    const dueEl   = document.getElementById(`out-due-${idx}`)
-    const stEl    = document.getElementById(`out-status-${idx}`)
-    if (typeEl)  out.type        = typeEl.value
-    if (descEl)  out.description = descEl.value
-    if (respEl)  out.responsible = respEl.value
-    if (dueEl)   out.due_date    = dueEl.value || null
-    if (stEl)    out.status      = stEl.value
+    const typeEl = document.getElementById(`out-type-${idx}`)
+    const descEl = document.getElementById(`out-desc-${idx}`)
+    const respEl = document.getElementById(`out-resp-${idx}`)
+    const dueEl  = document.getElementById(`out-due-${idx}`)
+    const stEl   = document.getElementById(`out-status-${idx}`)
+    if (typeEl) out.type        = typeEl.value
+    if (descEl) out.description = descEl.value
+    if (respEl) out.responsible = respEl.value
+    if (dueEl)  out.due_date    = dueEl.value || null
+    if (stEl)   out.status      = stEl.value
   })
 }
 
 function renderOutputsTab() {
   const container = document.getElementById('outputs-list')
   if (!container) return
-
   if (_editOutputs.length === 0) {
     container.innerHTML = `<div class="outputs-empty">
       <i class="fa-solid fa-inbox"></i>
@@ -570,7 +864,6 @@ function renderOutputsTab() {
     </div>`
     return
   }
-
   container.innerHTML = _editOutputs.map((out, idx) => `
     <div class="output-card" id="out-card-${idx}">
       <div class="output-card-head">
@@ -584,17 +877,17 @@ function renderOutputsTab() {
           <div>
             <div class="output-field-label">Tipo</div>
             <select class="output-select" id="out-type-${idx}">
-              <option value="MEJORA"      ${out.type==='MEJORA'      ?'selected':''}>Oportunidad de mejora</option>
-              <option value="CAMBIO_SGC"  ${out.type==='CAMBIO_SGC'  ?'selected':''}>Cambio en SGC</option>
-              <option value="RECURSOS"    ${out.type==='RECURSOS'    ?'selected':''}>Necesidad de recursos</option>
+              <option value="MEJORA"     ${out.type==='MEJORA'    ?'selected':''}>Oportunidad de mejora</option>
+              <option value="CAMBIO_SGC" ${out.type==='CAMBIO_SGC'?'selected':''}>Cambio en SGC</option>
+              <option value="RECURSOS"   ${out.type==='RECURSOS'  ?'selected':''}>Necesidad de recursos</option>
             </select>
           </div>
           <div>
             <div class="output-field-label">Estado</div>
             <select class="output-select" id="out-status-${idx}">
-              <option value="PENDIENTE"  ${out.status==='PENDIENTE'  ?'selected':''}>Pendiente</option>
-              <option value="EN_PROCESO" ${out.status==='EN_PROCESO' ?'selected':''}>En proceso</option>
-              <option value="COMPLETADO" ${out.status==='COMPLETADO' ?'selected':''}>Completado</option>
+              <option value="PENDIENTE"  ${out.status==='PENDIENTE' ?'selected':''}>Pendiente</option>
+              <option value="EN_PROCESO" ${out.status==='EN_PROCESO'?'selected':''}>En proceso</option>
+              <option value="COMPLETADO" ${out.status==='COMPLETADO'?'selected':''}>Completado</option>
             </select>
           </div>
         </div>
@@ -622,19 +915,12 @@ function renderOutputsTab() {
 
 function addOutput() {
   _saveOutputTexts()
-  _editOutputs.push({
-    id:          Math.random().toString(36).substring(2, 10),
-    type:        'MEJORA',
-    description: '',
-    responsible: '',
-    due_date:    null,
-    status:      'PENDIENTE'
-  })
+  _editOutputs.push({ id: Math.random().toString(36).substring(2,10), type:'MEJORA',
+    description:'', responsible:'', due_date:null, status:'PENDIENTE' })
   renderOutputsTab()
-  // Scroll to new card
   setTimeout(() => {
     const last = document.getElementById(`out-card-${_editOutputs.length - 1}`)
-    last?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    last?.scrollIntoView({ behavior:'smooth', block:'nearest' })
     document.getElementById(`out-desc-${_editOutputs.length - 1}`)?.focus()
   }, 50)
 }
@@ -645,81 +931,133 @@ function removeOutput(idx) {
   renderOutputsTab()
 }
 
-function setOutputStatus(idx, status) {
-  _saveOutputTexts()
-  if (_editOutputs[idx]) _editOutputs[idx].status = status
-  renderOutputsTab()
+// ── TAB: Acuerdos ──────────────────────────────────────────────────────────────
+function renderAcuerdosTab() {
+  const container = document.getElementById('acuerdos-body')
+  if (!container) return
+  const fd = _editFormData
+
+  const sigRows = fd.signatories.length === 0
+    ? '<div class="rd-empty-hint">Sin firmantes registrados. Agregue con el botón de abajo.</div>'
+    : `<div class="rd-mini-table">
+        <div class="rd-mini-head">
+          <span style="flex:3">Nombre completo</span>
+          <span style="flex:3">Cargo / Área</span>
+          <span style="flex:1;text-align:center">Firmó</span>
+          <span style="width:32px"></span>
+        </div>` +
+        fd.signatories.map((sig, idx) => `
+        <div class="rd-mini-row">
+          <div style="flex:3"><input type="text" class="rd-mini-input" id="sig-name-${idx}"
+            value="${esc(sig.name||'')}" placeholder="Nombre completo"></div>
+          <div style="flex:3"><input type="text" class="rd-mini-input" id="sig-pos-${idx}"
+            value="${esc(sig.position||'')}" placeholder="Cargo / Área"></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center">
+            <input type="checkbox" id="sig-check-${idx}" ${sig.signed?'checked':''} style="width:18px;height:18px;accent-color:var(--green)">
+          </div>
+          <div><button class="btn-icon-remove" onclick="removeSignatory(${idx})" title="Quitar">
+            <i class="fa-solid fa-xmark"></i>
+          </button></div>
+        </div>`).join('') +
+      '</div>'
+
+  container.innerHTML = `
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <i class="fa-solid fa-lightbulb"></i>
+        Oportunidades de mejora identificadas
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <textarea id="fd-oportunidades" rows="4"
+            placeholder="Registre las oportunidades de mejora identificadas durante la revisión…">${esc(fd.oportunidades||'')}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="rd-section">
+      <div class="rd-section-title">
+        <i class="fa-solid fa-file-signature"></i>
+        Firmantes de la revisión
+      </div>
+      <p style="font-size:.786rem;color:var(--txt3);margin-bottom:12px">
+        Registre los participantes que firman de conformidad la Revisión por la Dirección (FT-CA-32 Ver 2).
+      </p>
+      <div id="signatories-list">${sigRows}</div>
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:space-between;align-items:center">
+        <button class="btn-secondary" onclick="addSignatory()">
+          <i class="fa-solid fa-user-plus"></i> Agregar firmante
+        </button>
+        <button class="btn-primary" onclick="saveAcuerdos()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar Acuerdos
+        </button>
+      </div>
+    </div>
+  `
 }
 
-// ── Pagination ────────────────────────────────────────────────
+function addSignatory() {
+  _collectFormData()
+  _editFormData.signatories.push({ name:'', position:'', signed:false })
+  renderAcuerdosTab()
+  const last = _editFormData.signatories.length - 1
+  setTimeout(() => document.getElementById(`sig-name-${last}`)?.focus(), 50)
+}
+
+function removeSignatory(idx) {
+  _collectFormData()
+  _editFormData.signatories.splice(idx, 1)
+  renderAcuerdosTab()
+}
+
+// ── Pagination ─────────────────────────────────────────────────────────────────
 function renderPagination() {
-  const pag   = document.getElementById('pagination')
+  const pag = document.getElementById('pagination')
   if (!pag) return
   const pages = Math.ceil(_filtered.length / PAGE_SIZE)
   if (pages <= 1) { pag.innerHTML = ''; return }
-
   let html = ''
   if (_page > 1)
     html += `<button class="page-btn" onclick="goPage(${_page - 1})"><i class="fa-solid fa-chevron-left"></i></button>`
-
-  const start = Math.max(1, _page - 2)
-  const end   = Math.min(pages, _page + 2)
-
+  const start = Math.max(1, _page - 2), end = Math.min(pages, _page + 2)
   if (start > 1)
     html += `<button class="page-btn" onclick="goPage(1)">1</button>${start > 2 ? '<span style="padding:0 4px;color:var(--txt3)">…</span>' : ''}`
-
   for (let i = start; i <= end; i++)
     html += `<button class="page-btn${i === _page ? ' active' : ''}" onclick="goPage(${i})">${i}</button>`
-
   if (end < pages)
     html += `${end < pages - 1 ? '<span style="padding:0 4px;color:var(--txt3)">…</span>' : ''}<button class="page-btn" onclick="goPage(${pages})">${pages}</button>`
-
   if (_page < pages)
     html += `<button class="page-btn" onclick="goPage(${_page + 1})"><i class="fa-solid fa-chevron-right"></i></button>`
-
   pag.innerHTML = html
 }
 
-function goPage(p) {
-  _page = p
-  renderTable()
-  window.scrollTo(0, 0)
-}
+function goPage(p) { _page = p; renderTable(); window.scrollTo(0, 0) }
 
-// ── Badge helpers ─────────────────────────────────────────────
+// ── Badge / formatting helpers ─────────────────────────────────────────────────
 function statusBadge(status) {
   if (!status) return '<span style="color:var(--txt3)">—</span>'
   const map = {
-    PLANIFICADA: { cls: 'status-planificada', icon: 'fa-calendar', label: 'Planificada' },
-    EN_PROCESO:  { cls: 'status-en_proceso',  icon: 'fa-gears',    label: 'En Proceso' },
-    COMPLETADA:  { cls: 'status-completada',  icon: 'fa-check',    label: 'Completada' },
+    PLANIFICADA: { cls:'status-planificada', icon:'fa-calendar', label:'Planificada' },
+    EN_PROCESO:  { cls:'status-en_proceso',  icon:'fa-gears',    label:'En Proceso'  },
+    COMPLETADA:  { cls:'status-completada',  icon:'fa-check',    label:'Completada'  },
   }
-  const m = map[status] || { cls: '', icon: 'fa-circle', label: status }
+  const m = map[status] || { cls:'', icon:'fa-circle', label:status }
   return `<span class="status-badge ${m.cls}"><i class="fa-solid ${m.icon}"></i>${m.label}</span>`
 }
 
-function fmtPeriod(status) {
-  return statusBadge(status)
-}
-
-// ── Loading / error states ────────────────────────────────────
 function showTableLoading() {
   const tbody = document.getElementById('rd-tbody')
-  if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="table-empty">
-    <i class="fa-solid fa-spinner fa-spin"></i>
-    <strong>Cargando…</strong>
-  </td></tr>`
+  if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="table-empty">
+    <i class="fa-solid fa-spinner fa-spin"></i><strong>Cargando…</strong></td></tr>`
 }
 
 function showTableError(msg) {
   const tbody = document.getElementById('rd-tbody')
-  if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="table-empty">
+  if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="table-empty">
     <i class="fa-solid fa-triangle-exclamation"></i>
-    <strong>Error al cargar</strong>${esc(msg)}
-  </td></tr>`
+    <strong>Error al cargar</strong>${esc(msg)}</td></tr>`
 }
 
-// ── Shared helpers (same pattern as satisfaccion.js) ──────────
 function openModal(id)  { document.getElementById(id)?.classList.add('open') }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open') }
 
@@ -734,7 +1072,7 @@ function switchTab(panelId, btn) {
 function fmtDate(d) {
   if (!d) return '—'
   return new Date(d + 'T12:00:00').toLocaleDateString('es-MX',
-    { day: '2-digit', month: 'short', year: 'numeric' })
+    { day:'2-digit', month:'short', year:'numeric' })
 }
 
 function setText(id, val) {
@@ -745,16 +1083,13 @@ function setText(id, val) {
 function esc(s) {
   if (!s) return ''
   return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 
 function showToast(msg, color = 'green') {
   const old = document.getElementById('sgc-toast')
   if (old) old.remove()
-  const bg = color === 'green' ? '#16a34a' : color === 'red' ? '#dc2626' : '#2563eb'
+  const bg = color==='green' ? '#16a34a' : color==='red' ? '#dc2626' : '#2563eb'
   const t  = document.createElement('div')
   t.id = 'sgc-toast'
   t.style.cssText = `position:fixed;bottom:28px;right:28px;z-index:9999;background:${bg};color:#fff;
@@ -765,12 +1100,11 @@ function showToast(msg, color = 'green') {
   setTimeout(() => t.remove(), 3800)
 }
 
-// Close modals on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', e => {
     if (e.target === overlay) overlay.classList.remove('open')
   })
 })
 
-// ── Bootstrap ─────────────────────────────────────────────────
+// ── Bootstrap ──────────────────────────────────────────────────────────────────
 initRD()
