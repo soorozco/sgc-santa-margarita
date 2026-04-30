@@ -256,6 +256,8 @@ async function openDetail(id) {
   renderFindings()
   renderFindingsSummary()
   renderReportFile()
+  renderMeetingFile()
+  renderMeetingUploadBtn()
   updateFindingsBadge()
 
   switchTab('tab-plan', document.querySelector('.tab-btn'))
@@ -610,6 +612,117 @@ async function deleteReport() {
   showToast('Informe eliminado.', 'green')
 }
 
+// ── Meeting record ─────────────────────────────────────────────
+async function uploadMeetingRecord(input) {
+  const file = input.files?.[0]
+  if (!file || !_currentAE) return
+
+  if (file.size > 20 * 1024 * 1024) {
+    showToast('El archivo supera 20 MB.', 'red')
+    input.value = ''
+    return
+  }
+
+  const wrap = document.getElementById('meeting-upload-wrap')
+  if (wrap) wrap.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:.857rem;color:var(--blue)"><i class="fa-solid fa-spinner fa-spin"></i> Subiendo registro…</div>'
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._\-]/g, '_')
+  const path = `auditorias/${_currentAE.id}/reunion_${Date.now()}_${safeName}`
+
+  if (_currentAE.meeting_path) {
+    await db.storage.from(BUCKET).remove([_currentAE.meeting_path])
+  }
+
+  const { error } = await db.storage.from(BUCKET).upload(path, file, { upsert: true })
+  if (error) {
+    showToast('Error al subir el registro: ' + error.message, 'red')
+    renderMeetingUploadBtn()
+    return
+  }
+
+  const { data: urlData } = db.storage.from(BUCKET).getPublicUrl(path)
+  const publicUrl = urlData?.publicUrl || ''
+
+  const payload = buildPayload(_currentAE, {
+    meeting_path: path,
+    meeting_url:  publicUrl,
+    meeting_name: file.name
+  })
+  const { error: saveErr } = await db.rpc('save_auditoria_externa', { p_row: payload })
+  if (saveErr) { showToast('Subido pero no guardado: ' + saveErr.message, 'red'); return }
+
+  Object.assign(_currentAE, { meeting_path: path, meeting_url: publicUrl, meeting_name: file.name })
+  syncToList()
+
+  renderMeetingFile()
+  renderMeetingUploadBtn()
+  input.value = ''
+  showToast('Registro de reunión subido correctamente.', 'green')
+}
+
+function renderMeetingFile() {
+  const el = document.getElementById('meeting-file-area')
+  if (!el) return
+  const ae = _currentAE
+  if (!ae?.meeting_url) { el.innerHTML = ''; return }
+
+  const canWrite = ['administrador','responsable_calidad','auditor'].includes(_role)
+  const isImage  = /\.(jpg|jpeg|png|webp)$/i.test(ae.meeting_name || '')
+  const icon     = isImage
+    ? `<i class="fa-solid fa-file-image report-file-icon" style="color:#0369a1"></i>`
+    : `<i class="fa-solid fa-file-pdf report-file-icon"></i>`
+
+  el.innerHTML = `
+  <div class="report-file-card">
+    ${icon}
+    <div class="report-file-info">
+      <div class="report-file-name">${esc(ae.meeting_name || 'Registro de reunión final')}</div>
+      <div class="report-file-meta">Registro de reunión final de auditoría</div>
+    </div>
+    <div class="report-file-actions">
+      <a href="${ae.meeting_url}" target="_blank" rel="noopener" class="btn-secondary" style="text-decoration:none">
+        <i class="fa-solid fa-eye"></i> Ver
+      </a>
+      <a href="${ae.meeting_url}" download class="btn-secondary" style="text-decoration:none">
+        <i class="fa-solid fa-download"></i>
+      </a>
+      ${canWrite ? `<button class="btn-remove" onclick="deleteMeetingRecord()" title="Eliminar">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>` : ''}
+    </div>
+  </div>`
+}
+
+function renderMeetingUploadBtn() {
+  const wrap = document.getElementById('meeting-upload-wrap')
+  if (!wrap) return
+  const ae    = _currentAE
+  const label = ae?.meeting_url ? 'Reemplazar registro' : 'Subir registro de reunión'
+  wrap.innerHTML = `
+  <label class="btn-attach-report">
+    <i class="fa-solid fa-cloud-arrow-up"></i> ${label}
+    <input type="file" id="meeting-file-input" accept=".pdf,.jpg,.jpeg,.png"
+      onchange="uploadMeetingRecord(this)" style="display:none">
+  </label>
+  <span class="upload-hint">PDF o imagen · máx. 20 MB</span>`
+}
+
+async function deleteMeetingRecord() {
+  if (!_currentAE?.meeting_path) return
+  if (!confirm('¿Eliminar el registro de reunión? Esta acción no se puede deshacer.')) return
+
+  await db.storage.from(BUCKET).remove([_currentAE.meeting_path])
+
+  const payload = buildPayload(_currentAE, { meeting_path: null, meeting_url: null, meeting_name: null })
+  await db.rpc('save_auditoria_externa', { p_row: payload })
+
+  Object.assign(_currentAE, { meeting_path: null, meeting_url: null, meeting_name: null })
+  syncToList()
+  renderMeetingFile()
+  renderMeetingUploadBtn()
+  showToast('Registro eliminado.', 'green')
+}
+
 // ── Helpers ───────────────────────────────────────────────────────
 function buildPayload(ae, overrides = {}) {
   return {
@@ -632,6 +745,9 @@ function buildPayload(ae, overrides = {}) {
     report_path:          ae.report_path          || null,
     report_url:           ae.report_url           || null,
     report_name:          ae.report_name          || null,
+    meeting_path:         ae.meeting_path         || null,
+    meeting_url:          ae.meeting_url          || null,
+    meeting_name:         ae.meeting_name         || null,
     created_by:           ae.created_by,
     ...overrides
   }

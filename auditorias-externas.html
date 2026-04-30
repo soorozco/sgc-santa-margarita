@@ -407,6 +407,24 @@
           <span class="upload-hint">Solo PDF · máx. 20 MB</span>
         </div>
 
+        <!-- Registro de reunión final -->
+        <div class="section-sep" style="margin-top:20px">
+          <i class="fa-solid fa-people-group"></i> Registro de Reunión Final de la Auditoría
+        </div>
+
+        <div id="meeting-file-area">
+          <!-- rendered by JS -->
+        </div>
+
+        <div id="meeting-upload-wrap" style="margin-top:12px">
+          <label class="btn-attach-report">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Subir registro de reunión
+            <input type="file" id="meeting-file-input" accept=".pdf,.jpg,.jpeg,.png"
+              onchange="uploadMeetingRecord(this)" style="display:none">
+          </label>
+          <span class="upload-hint">PDF o imagen · máx. 20 MB</span>
+        </div>
+
         <div style="text-align:right;margin-top:20px">
           <button class="btn-primary" onclick="saveReport()">
             <i class="fa-solid fa-floppy-disk"></i> Guardar Informe
