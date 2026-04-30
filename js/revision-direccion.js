@@ -149,11 +149,11 @@ function renderKPIs() {
   const thisYear = String(new Date().getFullYear())
   setText('kpi-total', _reviews.length)
   const completadasYear = _reviews.filter(r =>
-    r.status === 'COMPLETADA' && (r.review_date || '').startsWith(thisYear)
+    r.status === 'aprobado' && (r.review_date || '').startsWith(thisYear)
   ).length
   setText('kpi-completadas', completadasYear)
   setText('kpi-year', thisYear)
-  setText('kpi-en-proceso', _reviews.filter(r => r.status === 'EN_PROCESO').length)
+  setText('kpi-en-proceso', _reviews.filter(r => r.status === 'en_revision').length)
 
   let pending = 0
   _reviews.forEach(r => {
@@ -313,7 +313,7 @@ async function openDetail(id) {
   setText('d-created-by',  rev.prepared_by || '—')
 
   const statusSel = document.getElementById('d-status-sel')
-  if (statusSel) statusSel.value = rev.status || 'PLANIFICADA'
+  if (statusSel) statusSel.value = rev.status || 'borrador'
 
   const locEl = document.getElementById('d-location')
   if (locEl) locEl.value = rev.location || ''
@@ -340,7 +340,7 @@ async function openDetail(id) {
 // ── Collect helpers ────────────────────────────────────────────────────────────
 function _collectGeneralValues() {
   return {
-    status:      document.getElementById('d-status-sel')?.value  || _currentRev.status,
+    status:      document.getElementById('d-status-sel')?.value  || _currentRev.status || 'borrador',
     location:    document.getElementById('d-location')?.value    || _currentRev.location,
     next_date:   document.getElementById('d-next-date')?.value   || _currentRev.next_review_date,
     conclusions: document.getElementById('d-conclusions')?.value || _currentRev.improvement_opportunities || ''
@@ -1069,9 +1069,9 @@ function goPage(p) { _page = p; renderTable(); window.scrollTo(0, 0) }
 function statusBadge(status) {
   if (!status) return '<span style="color:var(--txt3)">—</span>'
   const map = {
-    PLANIFICADA: { cls:'status-planificada', icon:'fa-calendar', label:'Planificada' },
-    EN_PROCESO:  { cls:'status-en_proceso',  icon:'fa-gears',    label:'En Proceso'  },
-    COMPLETADA:  { cls:'status-completada',  icon:'fa-check',    label:'Completada'  },
+    borrador:    { cls:'status-planificada', icon:'fa-pencil',   label:'Borrador'    },
+    en_revision: { cls:'status-en_proceso',  icon:'fa-gears',    label:'En Revisión' },
+    aprobado:    { cls:'status-completada',  icon:'fa-check',    label:'Aprobada'    },
   }
   const m = map[status] || { cls:'', icon:'fa-circle', label:status }
   return `<span class="status-badge ${m.cls}"><i class="fa-solid ${m.icon}"></i>${m.label}</span>`
