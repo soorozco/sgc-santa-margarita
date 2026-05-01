@@ -1,0 +1,241 @@
+/* ============================================================
+   MÓDULO — Gestión de Riesgos y Oportunidades (Cláusula 6.1)
+   ============================================================ */
+
+/* ── Toolbar ─────────────────────────────────────────────────── */
+.toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+.search-wrap { position:relative; flex:1; min-width:220px; }
+.search-wrap i { position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  color:var(--txt3); font-size:13px; pointer-events:none; }
+.search-input { width:100%; padding:9px 14px 9px 34px; border:1.5px solid var(--border);
+  border-radius:var(--rsm); font-size:.857rem; font-family:var(--font);
+  color:var(--txt); background:var(--white); transition:var(--ease); }
+.search-input:focus { outline:none; border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+.filter-sel { padding:9px 32px 9px 12px; border:1.5px solid var(--border);
+  border-radius:var(--rsm); font-size:.857rem; font-family:var(--font);
+  color:var(--txt); background:var(--white); cursor:pointer; appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; transition:var(--ease); }
+.filter-sel:focus { outline:none; border-color:var(--blue); }
+
+/* ── Buttons ─────────────────────────────────────────────────── */
+.btn-primary { display:inline-flex; align-items:center; gap:7px; padding:9px 18px;
+  background:linear-gradient(135deg,#1a3554,#2563eb); color:white;
+  font-size:.857rem; font-weight:600; border-radius:var(--rsm);
+  box-shadow:0 2px 8px rgba(37,99,235,.3); transition:var(--ease); white-space:nowrap; cursor:pointer; }
+.btn-primary:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 4px 14px rgba(37,99,235,.4); }
+.btn-primary:disabled { opacity:.6; cursor:not-allowed; }
+.btn-secondary { display:inline-flex; align-items:center; gap:7px; padding:9px 16px;
+  background:var(--white); color:var(--txt2); font-size:.857rem; font-weight:500;
+  border:1.5px solid var(--border); border-radius:var(--rsm); transition:var(--ease); cursor:pointer; }
+.btn-secondary:hover { border-color:var(--blue); color:var(--blue); }
+.btn-icon-remove { width:28px; height:28px; border-radius:6px; border:1px solid var(--border);
+  background:var(--white); color:var(--txt3); font-size:12px;
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--ease); flex-shrink:0; }
+.btn-icon-remove:hover { background:var(--red-lt); border-color:var(--red); color:var(--red); }
+.btn-action { width:30px; height:30px; border-radius:var(--rxs); border:1px solid var(--border);
+  background:var(--white); color:var(--txt2); font-size:12px;
+  display:inline-flex; align-items:center; justify-content:center; transition:var(--ease); cursor:pointer; }
+.btn-action:hover { background:var(--blue-lt); border-color:var(--blue); color:var(--blue); }
+
+/* ── KPI Cards ───────────────────────────────────────────────── */
+.kpi-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:14px; margin-bottom:22px; }
+.kpi-card { background:var(--white); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:16px 18px; border-left:4px solid var(--border); }
+.kpi-card.blue    { border-left-color:var(--blue); }
+.kpi-card.green   { border-left-color:var(--green); }
+.kpi-card.yellow  { border-left-color:#d97706; }
+.kpi-card.orange  { border-left-color:#ea580c; }
+.kpi-card.red     { border-left-color:var(--red); }
+.kpi-card.purple  { border-left-color:#7c3aed; }
+.kpi-lbl { font-size:.714rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--txt3); margin-bottom:6px; }
+.kpi-val { font-size:1.75rem; font-weight:700; color:var(--txt); line-height:1; }
+.kpi-sub { font-size:.75rem; color:var(--txt3); margin-top:4px; }
+
+/* ── Type filter tabs ─────────────────────────────────────────── */
+.type-tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+.type-tab { padding:7px 16px; border:1.5px solid var(--border); border-radius:20px;
+  font-size:.786rem; font-weight:600; cursor:pointer; transition:var(--ease);
+  background:var(--white); color:var(--txt2); }
+.type-tab:hover { border-color:var(--blue); color:var(--blue); }
+.type-tab.active { background:var(--blue); border-color:var(--blue); color:white; }
+.type-tab.estrategico.active { background:#1e40af; border-color:#1e40af; }
+.type-tab.misional.active    { background:#15803d; border-color:#15803d; }
+.type-tab.apoyo.active       { background:#b45309; border-color:#b45309; }
+
+/* ── Process grid ─────────────────────────────────────────────── */
+.process-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:16px; }
+
+.process-card { background:var(--white); border-radius:var(--r); box-shadow:var(--shadow);
+  border:1.5px solid var(--border); overflow:hidden; transition:var(--ease);
+  cursor:pointer; display:flex; flex-direction:column; }
+.process-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.1);
+  border-color:var(--blue); }
+
+.process-card-head { padding:14px 16px 10px; display:flex; align-items:flex-start; gap:10px; }
+.process-type-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.type-dot-estrategico { background:#2563eb; }
+.type-dot-misional    { background:#16a34a; }
+.type-dot-apoyo       { background:#d97706; }
+
+.process-name { font-size:.929rem; font-weight:700; color:var(--txt); line-height:1.3; }
+.process-owner { font-size:.75rem; color:var(--txt3); margin-top:2px; }
+
+.process-type-badge { margin-left:auto; flex-shrink:0; font-size:.643rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.05em; padding:2px 8px; border-radius:10px; }
+.badge-estrategico { background:#dbeafe; color:#1e40af; }
+.badge-misional    { background:#dcfce7; color:#15803d; }
+.badge-apoyo       { background:#fef3c7; color:#92400e; }
+
+.process-card-body { padding:0 16px 14px; flex:1; }
+.process-description { font-size:.786rem; color:var(--txt3); line-height:1.5;
+  margin-bottom:12px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+
+.risk-summary { display:flex; gap:6px; flex-wrap:wrap; }
+.risk-pill { display:inline-flex; align-items:center; gap:4px;
+  padding:3px 9px; border-radius:10px; font-size:.714rem; font-weight:700; }
+.pill-critico { background:#fee2e2; color:#991b1b; }
+.pill-alto    { background:#ffedd5; color:#9a3412; }
+.pill-medio   { background:#fef9c3; color:#854d0e; }
+.pill-bajo    { background:#dcfce7; color:#15803d; }
+.pill-oport   { background:#dbeafe; color:#1e40af; }
+
+.process-card-foot { padding:10px 16px; border-top:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; background:#fafbfd; }
+.process-risk-count { font-size:.75rem; color:var(--txt3); }
+.process-risk-count strong { color:var(--txt); }
+
+/* ── Risk level colors ───────────────────────────────────────── */
+.level-bajo    { background:#dcfce7; color:#15803d; }
+.level-medio   { background:#fef9c3; color:#854d0e; }
+.level-alto    { background:#ffedd5; color:#9a3412; }
+.level-critico { background:#fee2e2; color:#991b1b; }
+.level-badge { display:inline-flex; align-items:center; gap:4px;
+  font-size:.714rem; font-weight:700; padding:3px 10px; border-radius:10px; white-space:nowrap; }
+
+/* ── Risk type badge ─────────────────────────────────────────── */
+.rtype-riesgo      { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+.rtype-oportunidad { background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe; }
+.rtype-badge { font-size:.643rem; font-weight:700; padding:2px 7px; border-radius:8px; white-space:nowrap; }
+
+/* ── Modal ───────────────────────────────────────────────────── */
+.modal-overlay { display:none; position:fixed; inset:0;
+  background:rgba(10,28,50,.6); backdrop-filter:blur(4px);
+  z-index:300; align-items:center; justify-content:center; padding:20px; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--white); border-radius:16px; width:100%; max-width:700px;
+  max-height:92vh; display:flex; flex-direction:column;
+  box-shadow:0 30px 70px rgba(0,0,0,.28); animation:mIn .2s ease; }
+.modal-xl { max-width:1050px; }
+@keyframes mIn { from{opacity:0;transform:scale(.95) translateY(12px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.modal-head { display:flex; align-items:center; justify-content:space-between;
+  padding:20px 24px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+.modal-ttl { font-size:1rem; font-weight:700; color:var(--txt); }
+.modal-ttl small { display:block; font-size:.786rem; font-weight:400; color:var(--txt3); margin-top:2px; }
+.modal-x { width:32px; height:32px; border-radius:8px; color:var(--txt3); font-size:18px;
+  display:flex; align-items:center; justify-content:center; transition:var(--ease); cursor:pointer; }
+.modal-x:hover { background:#f1f5f9; color:var(--txt); }
+.modal-body { padding:20px 24px; overflow-y:auto; flex:1; }
+.modal-foot { display:flex; align-items:center; justify-content:flex-end; gap:10px;
+  padding:16px 24px; border-top:1px solid var(--border); flex-shrink:0; }
+
+/* ── Form ────────────────────────────────────────────────────── */
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.form-row.one { grid-template-columns:1fr; }
+.field label { display:block; font-size:.75rem; font-weight:700; color:var(--txt2);
+  margin-bottom:5px; text-transform:uppercase; letter-spacing:.04em; }
+.field input,.field textarea,.field select {
+  width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:var(--rsm);
+  font-size:.857rem; font-family:var(--font); color:var(--txt); background:#f8fafc;
+  transition:var(--ease); appearance:none; }
+.field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center; padding-right:32px; }
+.field input:focus,.field textarea:focus,.field select:focus {
+  outline:none; border-color:var(--blue); background:var(--white);
+  box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+.field textarea { resize:vertical; min-height:70px; line-height:1.5; }
+.section-sep { font-size:.786rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--txt3); padding:10px 0 8px; border-bottom:1px solid var(--border); margin-bottom:14px;
+  display:flex; align-items:center; gap:8px; }
+
+/* ── Risk item cards in modal ────────────────────────────────── */
+.risk-item-card { border:1.5px solid var(--border); border-radius:var(--rsm);
+  padding:14px 16px; margin-bottom:12px; background:#fafbfd; }
+.risk-item-card.type-oportunidad { border-left:4px solid #2563eb; }
+.risk-item-card.type-riesgo      { border-left:4px solid #dc2626; }
+.risk-item-head { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.risk-item-num  { font-size:.714rem; font-weight:700; color:var(--txt3); }
+.risk-score-badge { display:inline-flex; align-items:center; gap:4px;
+  font-size:.786rem; font-weight:700; padding:3px 10px; border-radius:10px;
+  margin-left:auto; }
+
+.risk-fields { display:flex; flex-direction:column; gap:10px; }
+.risk-row    { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.risk-row.three { grid-template-columns:1fr 1fr 1fr; }
+.risk-row.four  { grid-template-columns:1fr 1fr 1fr 1fr; }
+.risk-field-label { font-size:.714rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.04em; color:var(--txt2); margin-bottom:4px; }
+.risk-input,.risk-select,.risk-textarea {
+  width:100%; padding:7px 10px; border:1.5px solid var(--border); border-radius:var(--rsm);
+  font-size:.857rem; font-family:var(--font); color:var(--txt); background:#f8fafc; transition:var(--ease); }
+.risk-select { appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 8px center; padding-right:28px; }
+.risk-textarea { resize:vertical; min-height:56px; }
+.risk-input:focus,.risk-select:focus,.risk-textarea:focus {
+  outline:none; border-color:var(--blue); background:var(--white);
+  box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+.risk-score-display { padding:7px 10px; background:#f1f5f9; border-radius:var(--rsm);
+  font-size:.929rem; font-weight:700; text-align:center; }
+
+/* ── Risk matrix legend ──────────────────────────────────────── */
+.matrix-legend { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; align-items:center; }
+.matrix-legend-item { display:flex; align-items:center; gap:5px; font-size:.75rem; color:var(--txt2); }
+.matrix-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+
+/* ── Empty states ────────────────────────────────────────────── */
+.risks-empty { text-align:center; padding:30px; color:var(--txt3); font-size:.857rem;
+  border:1.5px dashed var(--border); border-radius:var(--rsm); }
+.risks-empty i { display:block; font-size:2rem; margin-bottom:10px; color:var(--border); }
+
+/* ── Tab bar ─────────────────────────────────────────────────── */
+.tab-bar { display:flex; border-bottom:1px solid var(--border); padding:0 24px;
+  background:#f8fafc; flex-shrink:0; overflow-x:auto; }
+.tab-btn { padding:12px 16px; font-size:.857rem; font-weight:500; color:var(--txt2);
+  border-bottom:2px solid transparent; cursor:pointer; transition:var(--ease); white-space:nowrap; }
+.tab-btn:hover { color:var(--txt); }
+.tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+
+/* ── Info grid ───────────────────────────────────────────────── */
+.info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
+.info-item label { font-size:.714rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.05em; color:var(--txt3); display:block; margin-bottom:3px; }
+.info-item span { font-size:.857rem; color:var(--txt); font-weight:500; }
+
+/* ── Status badges ───────────────────────────────────────────── */
+.st-badge { display:inline-flex; align-items:center; gap:4px;
+  font-size:.686rem; font-weight:700; padding:2px 9px; border-radius:10px; }
+.st-identificado { background:#f1f5f9;    color:var(--txt2); }
+.st-en_control   { background:#dbeafe;    color:#1e40af; }
+.st-aceptado     { background:#fef9c3;    color:#854d0e; }
+.st-cerrado      { background:#dcfce7;    color:#15803d; }
+
+/* ── Table count bar ─────────────────────────────────────────── */
+.list-head-bar { display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; }
+.list-count { font-size:.857rem; color:var(--txt2); }
+
+/* ── Pagination ──────────────────────────────────────────────── */
+.pagination { display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:16px; border-top:1px solid var(--border); }
+.page-btn { width:32px; height:32px; border-radius:var(--rxs); border:1px solid var(--border);
+  background:var(--white); color:var(--txt2); font-size:.857rem; font-weight:500;
+  display:inline-flex; align-items:center; justify-content:center; cursor:pointer; transition:var(--ease); }
+.page-btn:hover { border-color:var(--blue); color:var(--blue); }
+.page-btn.active { background:var(--blue); color:white; border-color:var(--blue); }
