@@ -10,6 +10,7 @@ let _currentAE    = null
 let _editTeam     = []
 let _editAreas    = []
 let _editFindings = []
+let _findingsEditMode = false
 
 // ── Init ────────────────────────────────────────────────────────
 async function initAE() {
@@ -40,8 +41,8 @@ function applyRoleUI() {
   const canWrite = ['administrador','responsable_calidad','auditor'].includes(_role)
   const btn = document.getElementById('btn-new-ae')
   if (btn) btn.style.display = canWrite ? 'inline-flex' : 'none'
-  const btnF = document.getElementById('btn-add-finding')
-  if (btnF) btnF.style.display = canWrite ? 'inline-flex' : 'none'
+  const btnEdit = document.getElementById('btn-findings-edit')
+  if (btnEdit) btnEdit.style.display = canWrite ? 'inline-flex' : 'none'
 }
 
 // ── Load ─────────────────────────────────────────────────────────
@@ -251,6 +252,16 @@ async function openDetail(id) {
   _editAreas    = JSON.parse(JSON.stringify(ae.areas    || []))
   _editFindings = JSON.parse(JSON.stringify(ae.findings || []))
 
+  // Always open in view mode
+  _findingsEditMode = false
+  const btnEdit = document.getElementById('btn-findings-edit')
+  if (btnEdit) {
+    btnEdit.innerHTML = '<i class="fa-solid fa-pen"></i> Editar'
+    btnEdit.classList.remove('editing')
+  }
+  const actions = document.getElementById('findings-actions')
+  if (actions) actions.style.display = 'none'
+
   renderTeam()
   renderAreas()
   renderFindings()
@@ -362,11 +373,59 @@ function renderFindings() {
     el.innerHTML = `<div class="no-findings">
       <i class="fa-solid fa-flag"></i>
       Sin hallazgos registrados aún.
-      ${canWrite ? 'Usa "Agregar hallazgo" para registrar los resultados de la auditoría.' : ''}
+      ${canWrite ? 'Usa "Editar" para registrar los hallazgos de la auditoría.' : ''}
     </div>`
     return
   }
 
+  if (!_findingsEditMode) {
+    // ── Vista: tarjetas de solo lectura ──
+    const typeConf = {
+      nc_mayor:    { label:'NC Mayor',            cls:'fv-nc-mayor', icon:'fa-circle-xmark' },
+      nc_menor:    { label:'NC Menor',            cls:'fv-nc-menor', icon:'fa-triangle-exclamation' },
+      observacion: { label:'Observación',          cls:'fv-obs',      icon:'fa-eye' },
+      oportunidad: { label:'Oportunidad de Mejora',cls:'fv-oport',   icon:'fa-lightbulb' },
+      punto_fuerte:{ label:'Punto Fuerte',         cls:'fv-pf',       icon:'fa-star' },
+    }
+    const stConf = {
+      abierto:    { label:'Abierto',    cls:'fvst-abierto' },
+      en_proceso: { label:'En Proceso', cls:'fvst-proceso' },
+      cerrado:    { label:'Cerrado',    cls:'fvst-cerrado' },
+    }
+
+    el.innerHTML = _editFindings.map((f, i) => {
+      const tc = typeConf[f.type] || typeConf.observacion
+      const sc = stConf[f.status] || stConf.abierto
+      return `
+      <div class="fv-card ${tc.cls}">
+        <div class="fv-header">
+          <span class="fv-num">#${String(i+1).padStart(2,'0')}</span>
+          <span class="fv-type-badge ${tc.cls}">
+            <i class="fa-solid ${tc.icon}"></i> ${tc.label}
+          </span>
+          ${f.clause  ? `<span class="fv-pill fv-clause-pill"><i class="fa-solid fa-hashtag" style="font-size:9px"></i> Cláusula ${esc(f.clause)}</span>` : ''}
+          ${f.process ? `<span class="fv-pill fv-process-pill"><i class="fa-solid fa-sitemap" style="font-size:9px"></i> ${esc(f.process)}</span>` : ''}
+          <span style="flex:1"></span>
+          <span class="fv-status-badge ${sc.cls}">${sc.label}</span>
+        </div>
+        <div class="fv-body">
+          ${f.description ? `
+          <div class="fv-section">
+            <div class="fv-label"><i class="fa-solid fa-align-left"></i> Descripción del Hallazgo</div>
+            <div class="fv-text">${esc(f.description)}</div>
+          </div>` : ''}
+          ${f.evidence ? `
+          <div class="fv-section">
+            <div class="fv-label"><i class="fa-solid fa-paperclip"></i> Evidencia Objetiva</div>
+            <div class="fv-text fv-text-ev">${esc(f.evidence)}</div>
+          </div>` : ''}
+        </div>
+      </div>`
+    }).join('')
+    return
+  }
+
+  // ── Edición: formularios ──
   el.innerHTML = _editFindings.map((f, i) => `
     <div class="finding-card type-${f.type || 'observacion'}" id="fcard-${i}">
       <div class="finding-header">
@@ -421,6 +480,17 @@ function onFindingTypeChange(idx, type) {
 }
 
 function addFinding() {
+  // Auto-switch to edit mode if not already
+  if (!_findingsEditMode) {
+    _findingsEditMode = true
+    const btnEdit = document.getElementById('btn-findings-edit')
+    if (btnEdit) {
+      btnEdit.innerHTML = '<i class="fa-solid fa-eye"></i> Ver hallazgos'
+      btnEdit.classList.add('editing')
+    }
+    const actions = document.getElementById('findings-actions')
+    if (actions) actions.style.display = 'flex'
+  }
   _editFindings.push({ type:'observacion', clause:'', process:'', description:'', evidence:'', status:'abierto' })
   renderFindings()
   renderFindingsSummary()
@@ -478,6 +548,23 @@ function updateFindingsBadge() {
     badge.textContent = n
     badge.style.display = n ? 'inline-block' : 'none'
   }
+}
+
+function toggleFindingsEdit() {
+  _findingsEditMode = !_findingsEditMode
+  const btnEdit = document.getElementById('btn-findings-edit')
+  if (btnEdit) {
+    if (_findingsEditMode) {
+      btnEdit.innerHTML = '<i class="fa-solid fa-eye"></i> Ver hallazgos'
+      btnEdit.classList.add('editing')
+    } else {
+      btnEdit.innerHTML = '<i class="fa-solid fa-pen"></i> Editar'
+      btnEdit.classList.remove('editing')
+    }
+  }
+  const actions = document.getElementById('findings-actions')
+  if (actions) actions.style.display = _findingsEditMode ? 'flex' : 'none'
+  renderFindings()
 }
 
 // ── Report ────────────────────────────────────────────────────────
