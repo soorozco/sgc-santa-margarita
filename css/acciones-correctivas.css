@@ -39,26 +39,23 @@
 .btn-remove:hover { background:var(--red-lt); border-color:var(--red); color:var(--red); }
 
 /* ── KPI Cards ───────────────────────────────────────────────── */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 14px;
-  margin-bottom: 22px;
-}
-.kpi-card {
-  background: var(--white); border-radius: var(--r);
-  box-shadow: var(--shadow); padding: 16px 18px;
-  border-left: 4px solid var(--border);
-}
-.kpi-card.blue   { border-left-color: var(--blue); }
-.kpi-card.red    { border-left-color: var(--red); }
-.kpi-card.orange { border-left-color: var(--orange, #f59e0b); }
-.kpi-card.green  { border-left-color: var(--green); }
-.kpi-card.purple { border-left-color: #7c3aed; }
-.kpi-lbl { font-size:.714rem; font-weight:700; text-transform:uppercase;
-  letter-spacing:.04em; color:var(--txt2); margin-bottom:6px; }
-.kpi-val { font-size:2rem; font-weight:800; color:var(--txt); line-height:1; margin-bottom:4px; }
-.kpi-sub { font-size:.75rem; color:var(--txt3); }
+.kpi-grid { display:grid; grid-template-columns:repeat(5, minmax(0,1fr));
+  gap:12px; margin-bottom:22px; }
+@media (max-width:1000px) { .kpi-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media (max-width:560px)  { .kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+.kpi-card { background:var(--white); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:14px 12px; border-left:4px solid var(--border); min-width:0;
+  display:flex; align-items:center; gap:10px; }
+.kpi-card.blue   { border-left-color:var(--blue); }
+.kpi-card.red    { border-left-color:var(--red); }
+.kpi-card.orange { border-left-color:#ea580c; }
+.kpi-card.green  { border-left-color:var(--green); }
+.kpi-card.purple { border-left-color:#7c3aed; }
+.kpi-val { font-size:1.75rem; font-weight:700; color:var(--txt); line-height:1; flex-shrink:0; }
+.kpi-info { flex:1; min-width:0; }
+.kpi-lbl { font-size:.65rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.04em; color:var(--txt3); line-height:1.3; margin-bottom:2px; }
+.kpi-sub { font-size:.67rem; color:var(--txt3); line-height:1.3; }
 
 /* ── Table Wrap ─────────────────────────────────────────────── */
 .table-wrap { background:var(--white); border-radius:var(--r);
