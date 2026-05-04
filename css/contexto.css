@@ -35,9 +35,9 @@
 .btn-edit:hover { border-color:var(--blue); color:var(--blue); }
 .btn-edit.active { border-color:var(--blue); color:var(--blue); background:var(--blue-lt); }
 .btn-primary { display:inline-flex; align-items:center; gap:7px; padding:8px 16px;
-  background:linear-gradient(135deg,#1a3554,#2563eb); color:white;
+  background:linear-gradient(135deg,#0d3d38,#009688); color:white;
   font-size:.857rem; font-weight:600; border-radius:var(--rsm);
-  box-shadow:0 2px 8px rgba(37,99,235,.3); transition:var(--ease); cursor:pointer; }
+  box-shadow:0 2px 8px rgba(0,150,136,.3); transition:var(--ease); cursor:pointer; }
 .btn-primary:hover:not(:disabled) { transform:translateY(-1px); }
 .btn-primary:disabled { opacity:.6; cursor:not-allowed; }
 .btn-secondary { display:inline-flex; align-items:center; gap:7px; padding:8px 14px;
@@ -58,14 +58,14 @@
 /* ── Alcance / Scope ────────────────────────────────────────── */
 .scope-text {
   font-size: .929rem; color: var(--txt); line-height: 1.8;
-  background: linear-gradient(135deg, #eff6ff, #f0fdf4);
-  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #e0f7f4, #f0fdf4);
+  border: 1px solid #b2dfdb;
   border-radius: var(--rsm); padding: 18px 20px;
   margin-bottom: 16px; position: relative;
 }
 .scope-text::before {
   content: '"'; position: absolute; top: 6px; left: 10px;
-  font-size: 3rem; color: #bfdbfe; line-height: 1; font-family: Georgia, serif;
+  font-size: 3rem; color: #b2dfdb; line-height: 1; font-family: Georgia, serif;
 }
 .scope-empty { font-size: .857rem; color: var(--txt3); font-style: italic; padding: 16px 0; }
 
@@ -96,7 +96,7 @@
 }
 .foda-quad.fortalezas  { background: #f0fdf4; border-color: #bbf7d0; }
 .foda-quad.debilidades { background: #fff7ed; border-color: #fed7aa; }
-.foda-quad.oportunidades{ background: #eff6ff; border-color: #bfdbfe; }
+.foda-quad.oportunidades{ background: #e0f7f4; border-color: #b2dfdb; }
 .foda-quad.amenazas    { background: #fef2f2; border-color: #fecaca; }
 
 .foda-quad-title {
@@ -162,7 +162,7 @@
 
 /* ── Add party form ─────────────────────────────────────────── */
 .add-party-form {
-  display: none; background: var(--blue-lt); border: 1.5px dashed rgba(37,99,235,.3);
+  display: none; background: var(--blue-lt); border: 1.5px dashed rgba(0,150,136,.3);
   border-radius: var(--rsm); padding: 16px; margin-top: 14px;
 }
 .add-party-form.show { display: block; }
@@ -180,7 +180,7 @@
 .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 8px center; padding-right: 28px; }
 .field input:focus, .field textarea:focus, .field select:focus {
-  outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,.1); }
+  outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,150,136,.1); }
 .field textarea { resize: vertical; min-height: 60px; line-height: 1.4; }
 
 /* ── Scope edit area ────────────────────────────────────────── */
@@ -192,7 +192,7 @@
 /* ── Info banner ────────────────────────────────────────────── */
 .ctx-banner {
   display: flex; gap: 16px; align-items: flex-start;
-  background: linear-gradient(135deg, #1a3554, #2563eb);
+  background: linear-gradient(135deg, #0d3d38, #009688);
   border-radius: var(--r); padding: 22px 26px; margin-bottom: 20px; color: white;
 }
 .ctx-banner-icon { font-size: 2.2rem; opacity: .85; flex-shrink: 0; margin-top: 2px; }
