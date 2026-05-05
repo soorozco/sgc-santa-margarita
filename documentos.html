@@ -496,6 +496,111 @@
 </div>
 
 
+<!-- ═══════════════ MODAL — Editar Documento ═══════════════ -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Editar Documento
+        <small id="edit-doc-code">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-edit')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Tipo de documento</label>
+          <select id="edit-type"></select>
+        </div>
+        <div class="field">
+          <label>Departamento</label>
+          <select id="edit-dept"></select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Código del documento</label>
+          <input type="text" id="edit-code" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="field">
+          <label>Versión actual</label>
+          <input type="text" id="edit-version" placeholder="1.0">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del documento <span class="req">*</span></label>
+          <input type="text" id="edit-name">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Custodio responsable</label>
+          <input type="text" id="edit-custodian" placeholder="Nombre del responsable">
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="edit-status">
+            <option value="borrador">Borrador</option>
+            <option value="en_revision">En Revisión</option>
+            <option value="en_aprobacion">En Aprobación</option>
+            <option value="vigente">Vigente</option>
+            <option value="obsoleto">Obsoleto</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Vigencia (años)</label>
+          <input type="number" id="edit-vigencia" min="1" max="10">
+        </div>
+        <div class="field">
+          <label>Fecha de elaboración</label>
+          <input type="date" id="edit-elab-date">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Elaborado por</label>
+          <input type="text" id="edit-elaborated-by" placeholder="Nombre">
+        </div>
+        <div class="field">
+          <label>Revisado por</label>
+          <input type="text" id="edit-reviewed-by" placeholder="Nombre">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción / Alcance</label>
+          <textarea id="edit-desc" rows="3"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-edit" onclick="submitEdit()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar Cambios
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>

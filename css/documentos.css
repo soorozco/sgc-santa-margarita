@@ -82,6 +82,7 @@
   transition: var(--ease); cursor: pointer;
 }
 .btn-action:hover         { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
+.btn-action.blue:hover    { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
 .btn-action.red:hover     { background: var(--red-lt);  border-color: var(--red);  color: var(--red); }
 .btn-action.green:hover   { background: var(--green-lt);border-color: var(--green);color: var(--green); }
 .action-btns { display: flex; gap: 6px; }

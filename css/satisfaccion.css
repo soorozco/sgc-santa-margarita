@@ -48,12 +48,12 @@
 .kpi-card.orange { border-left-color:#ea580c; }
 .kpi-card.red    { border-left-color:var(--red); }
 .kpi-card.cyan   { border-left-color:var(--cyan); }
-.kpi-val { font-size:1.75rem; font-weight:700; color:var(--txt); line-height:1; flex-shrink:0; }
+.kpi-val { font-size:1.75rem; font-weight:700; color:var(--txt); line-height:1; flex-shrink:0; margin-bottom:0; }
 .kpi-val .kpi-unit { font-size:1rem; font-weight:500; }
 .kpi-info { flex:1; min-width:0; }
 .kpi-lbl { font-size:.65rem; font-weight:700; text-transform:uppercase;
   letter-spacing:.04em; color:var(--txt3); line-height:1.3; margin-bottom:2px; }
-.kpi-sub { font-size:.67rem; color:var(--txt3); line-height:1.3; }
+.kpi-sub { font-size:.67rem; color:var(--txt3); line-height:1.3; margin-top:0; }
 
 /* ── Two-column layout ───────────────────────────────────────── */
 .sat-layout {

@@ -148,6 +148,9 @@ function renderTable(docs) {
             <i class="fa-solid fa-eye"></i>
           </button>
           ${canWrite ? `
+          <button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar documento">
+            <i class="fa-solid fa-pencil"></i>
+          </button>
           <button onclick="openUpload('${doc.id}')" class="btn-action green" title="Subir versión">
             <i class="fa-solid fa-upload"></i>
           </button>` : ''}
@@ -286,6 +289,92 @@ async function submitNewDoc() {
   showToast(`Documento ${code} creado correctamente.`, 'green')
   closeModal('modal-new')
   resetBtn(btn, '<i class="fa-solid fa-floppy-disk"></i> Guardar Documento')
+  await loadDocuments()
+}
+
+// ── Modal: EDITAR DOCUMENTO ──────────────────────────────────────
+function openEdit(docId) {
+  _currentDocId = docId
+  const doc = _allDocs.find(d => d.id === docId)
+  if (!doc) return
+
+  setText('edit-doc-code', doc.code)
+
+  // Poblar selects con las mismas opciones que el modal de nuevo doc
+  const deptOpts = _depts.map(d =>
+    `<option value="${d.id}" ${d.id === doc.department_id ? 'selected' : ''}>${d.name}</option>`
+  ).join('')
+  const typeOpts = _types.map(t =>
+    `<option value="${t.id}" ${t.id === doc.document_type_id ? 'selected' : ''}>${t.code_prefix} — ${t.name}</option>`
+  ).join('')
+
+  const eDept = document.getElementById('edit-dept')
+  const eType = document.getElementById('edit-type')
+  if (eDept) eDept.innerHTML = `<option value="">— Seleccionar —</option>${deptOpts}`
+  if (eType) eType.innerHTML = `<option value="">— Seleccionar —</option>${typeOpts}`
+
+  // Rellenar campos
+  setVal('edit-code',         doc.code)
+  setVal('edit-name',         doc.name)
+  setVal('edit-version',      doc.current_version || '1.0')
+  setVal('edit-custodian',    doc.custodian_position || '')
+  setVal('edit-vigencia',     doc.retention_years || 2)
+  setVal('edit-elab-date',    doc.elaboration_date || '')
+  setVal('edit-elaborated-by',doc.elaborated_by || '')
+  setVal('edit-reviewed-by',  doc.reviewed_by || '')
+  setVal('edit-desc',         doc.description || '')
+  setVal('edit-status',       doc.status || 'borrador')
+
+  openModal('modal-edit')
+}
+
+async function submitEdit() {
+  const btn  = document.getElementById('btn-save-edit')
+  const name = document.getElementById('edit-name')?.value.trim()
+  const code = document.getElementById('edit-code')?.value.trim().toUpperCase()
+
+  if (!name) { showToast('El nombre del documento es obligatorio.', 'red'); return }
+  if (!code) { showToast('El código del documento es obligatorio.', 'red'); return }
+
+  // Verificar código único (excluyendo el documento actual)
+  const duplicate = _allDocs.find(d => d.code === code && d.id !== _currentDocId)
+  if (duplicate) {
+    showToast(`El código "${code}" ya está en uso por otro documento.`, 'red')
+    return
+  }
+
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…'
+
+  const payload = {
+    code,
+    name,
+    document_type_id:  document.getElementById('edit-type')?.value      || null,
+    department_id:     document.getElementById('edit-dept')?.value       || null,
+    custodian_position:document.getElementById('edit-custodian')?.value.trim() || null,
+    current_version:   document.getElementById('edit-version')?.value.trim()   || '1.0',
+    status:            document.getElementById('edit-status')?.value     || 'borrador',
+    retention_years:   parseInt(document.getElementById('edit-vigencia')?.value) || 2,
+    elaboration_date:  document.getElementById('edit-elab-date')?.value  || null,
+    elaborated_by:     document.getElementById('edit-elaborated-by')?.value.trim() || null,
+    reviewed_by:       document.getElementById('edit-reviewed-by')?.value.trim()   || null,
+    description:       document.getElementById('edit-desc')?.value.trim() || null,
+    updated_at:        new Date().toISOString()
+  }
+
+  const { error } = await db.from('documents')
+    .update(payload)
+    .eq('id', _currentDocId)
+
+  if (error) {
+    showToast('Error al guardar: ' + error.message, 'red')
+    resetBtn(btn, '<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios')
+    return
+  }
+
+  showToast(`Documento ${code} actualizado correctamente.`, 'green')
+  closeModal('modal-edit')
+  resetBtn(btn, '<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios')
   await loadDocuments()
 }
 
