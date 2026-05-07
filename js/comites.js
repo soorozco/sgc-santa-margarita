@@ -25,12 +25,11 @@ async function initComites() {
 
   await loadCommittee()
   if (!_committee) {
-    // Diagnóstico: verificar si la tabla existe
     const { error: tblErr } = await db.from('committees').select('id').limit(1)
     if (tblErr) {
-      showToast('La tabla "committees" no existe. Ejecuta sql/comites_reset.sql en Supabase.', 'red')
+      showToast('DB Error ' + (tblErr.code || '') + ': ' + tblErr.message, 'red')
     } else {
-      showToast('La tabla existe pero no tiene datos. Ejecuta sql/comites_reset.sql en Supabase.', 'red')
+      showToast('Tabla vacía — ejecuta sql/comites_reset.sql en Supabase.', 'red')
     }
     return
   }
