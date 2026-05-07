@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comités — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/comites.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link active" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Comités</div>
+        <div class="topbar-sub" id="committee-subtitle">COCASEP — Comité de Calidad y Seguridad del Paciente</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- ── KPI Cards ──────────────────────────────────────── -->
+      <div class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-val" id="kpi-sesiones">—</div>
+          <div class="kpi-info">
+            <div class="kpi-lbl">Sesiones Realizadas</div>
+            <div class="kpi-sub" id="kpi-sesiones-sub">de — programadas este año</div>
+          </div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-val" id="kpi-asistencia">—</div>
+          <div class="kpi-info">
+            <div class="kpi-lbl">Asistencia Promedio</div>
+            <div class="kpi-sub">de sesiones realizadas</div>
+          </div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-val" id="kpi-pendientes">—</div>
+          <div class="kpi-info">
+            <div class="kpi-lbl">Acuerdos Pendientes</div>
+            <div class="kpi-sub">requieren seguimiento</div>
+          </div>
+        </div>
+        <div class="kpi-card teal">
+          <div class="kpi-val" id="kpi-proxima">—</div>
+          <div class="kpi-info">
+            <div class="kpi-lbl">Próxima Sesión</div>
+            <div class="kpi-sub" id="kpi-proxima-fecha">Sin sesión programada</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tabs ───────────────────────────────────────────── -->
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('sesiones')">
+          <i class="fa-solid fa-calendar-days" style="margin-right:6px"></i>Sesiones
+        </button>
+        <button class="tab-btn" onclick="showTab('acuerdos')">
+          <i class="fa-solid fa-handshake" style="margin-right:6px"></i>Acuerdos
+        </button>
+        <button class="tab-btn" onclick="showTab('integrantes')">
+          <i class="fa-solid fa-id-badge" style="margin-right:6px"></i>Integrantes
+        </button>
+      </div>
+
+      <!-- ══ TAB: Sesiones ══════════════════════════════════ -->
+      <div class="tab-panel active" id="panel-sesiones">
+        <div class="toolbar">
+          <select class="filter-sel" id="f-session-year" onchange="applySessionFilters()">
+            <option value="">Todos los años</option>
+          </select>
+          <select class="filter-sel" id="f-session-type" onchange="applySessionFilters()">
+            <option value="">Todos los tipos</option>
+            <option value="ordinaria">Ordinaria</option>
+            <option value="extraordinaria">Extraordinaria</option>
+          </select>
+          <select class="filter-sel" id="f-session-status" onchange="applySessionFilters()">
+            <option value="">Todos los estados</option>
+            <option value="programada">Programada</option>
+            <option value="realizada">Realizada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+          <div style="flex:1"></div>
+          <button class="btn-primary" id="btn-new-session" onclick="openNewSession()" style="display:none">
+            <i class="fa-solid fa-plus"></i> Nueva Sesión
+          </button>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head-bar">
+            <span class="table-count" id="sessions-count">Cargando…</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th class="center">#</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Lugar</th>
+                <th class="center">Estado</th>
+                <th class="center">Asistencia</th>
+                <th class="center">Acuerdos</th>
+                <th class="center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="sessions-tbody">
+              <tr><td colspan="9" class="table-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <strong>Cargando sesiones…</strong>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB: Acuerdos ══════════════════════════════════ -->
+      <div class="tab-panel" id="panel-acuerdos">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="search-input" id="search-agr"
+                   placeholder="Buscar acuerdo o responsable…" oninput="applyAgreementFilters()">
+          </div>
+          <select class="filter-sel" id="f-agr-status" onchange="applyAgreementFilters()">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En Proceso</option>
+            <option value="cumplido">Cumplido</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head-bar">
+            <span class="table-count" id="agreements-count">Cargando…</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sesión</th>
+                <th>Descripción del Acuerdo</th>
+                <th>Responsable</th>
+                <th class="center">Fecha Límite</th>
+                <th class="center">Estado</th>
+                <th class="center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="agreements-tbody">
+              <tr><td colspan="6" class="table-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <strong>Cargando acuerdos…</strong>
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ TAB: Integrantes ═══════════════════════════════ -->
+      <div class="tab-panel" id="panel-integrantes">
+        <div class="toolbar">
+          <div style="flex:1"></div>
+          <button class="btn-primary" id="btn-new-member" onclick="openNewMember()" style="display:none">
+            <i class="fa-solid fa-user-plus"></i> Agregar Integrante
+          </button>
+        </div>
+        <div class="members-grid" id="members-grid">
+          <div style="grid-column:1/-1; text-align:center; padding:48px; color:var(--txt3)">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem"></i>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div><!-- /layout -->
+
+
+<!-- ═══════════ MODAL — Nueva Sesión ═══════════ -->
+<div class="modal-overlay" id="modal-new-session">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Nueva Sesión<small>COCASEP</small></div>
+      <button class="modal-x" onclick="closeModal('modal-new-session')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field">
+          <label>Tipo de sesión <span class="req">*</span></label>
+          <select id="ns-type">
+            <option value="ordinaria">Ordinaria</option>
+            <option value="extraordinaria">Extraordinaria</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Número de sesión</label>
+          <input type="number" id="ns-number" min="1" placeholder="Auto">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha <span class="req">*</span></label>
+          <input type="date" id="ns-date">
+        </div>
+        <div class="field">
+          <label>Hora</label>
+          <input type="time" id="ns-time">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Lugar</label>
+          <input type="text" id="ns-location" placeholder="Ej. Sala de Juntas Dirección">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Orden del día</label>
+          <textarea id="ns-agenda" rows="4" placeholder="Puntos a tratar en la sesión…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new-session')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-session" onclick="submitNewSession()">
+        <i class="fa-solid fa-calendar-plus"></i> Programar Sesión
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Detalle de Sesión ═══════════ -->
+<div class="modal-overlay" id="modal-session">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="sd-title">Sesión</span>
+        <small id="sd-subtitle">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-session')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Info bar -->
+      <div class="session-info-bar" id="sd-info-bar">
+        <span><strong id="sd-type">—</strong></span>
+        <span>·</span>
+        <span id="sd-location-txt">—</span>
+        <span>·</span>
+        <span id="sd-status-pill"></span>
+      </div>
+
+      <!-- Agenda (collapsible) -->
+      <div id="sd-agenda-wrap" style="margin-bottom:14px;display:none">
+        <div style="font-size:.764rem;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Orden del día</div>
+        <div id="sd-agenda-txt" style="font-size:.857rem;color:var(--txt2);line-height:1.6;white-space:pre-line;background:var(--bg);padding:10px 14px;border-radius:var(--rsm)"></div>
+      </div>
+
+      <!-- Inner tabs -->
+      <div class="inner-tabs">
+        <button class="inner-tab-btn active" onclick="showInnerTab('asistencia')">
+          <i class="fa-solid fa-user-check" style="margin-right:5px"></i>Asistencia
+        </button>
+        <button class="inner-tab-btn" onclick="showInnerTab('acuerdos')">
+          <i class="fa-solid fa-handshake" style="margin-right:5px"></i>Acuerdos
+        </button>
+      </div>
+
+      <!-- Panel: Asistencia -->
+      <div class="inner-panel active" id="inner-asistencia">
+        <div class="attendance-list" id="attendance-list"></div>
+        <div class="att-summary" id="att-summary"></div>
+        <div style="margin-top:12px; text-align:right" id="save-att-wrap">
+          <button class="btn-primary" onclick="saveAttendance()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Asistencia
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel: Acuerdos -->
+      <div class="inner-panel" id="inner-acuerdos">
+        <div class="agr-list" id="session-agr-list"></div>
+        <!-- Formulario inline para agregar acuerdo -->
+        <div class="new-agr-form" id="new-agr-form" style="display:none">
+          <p><i class="fa-solid fa-plus" style="margin-right:5px"></i>Nuevo Acuerdo</p>
+          <div class="form-row one">
+            <div class="field">
+              <label>Descripción <span class="req">*</span></label>
+              <textarea id="agr-desc" rows="2" placeholder="Describe el acuerdo tomado…"></textarea>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label>Responsable</label>
+              <input type="text" id="agr-responsible" placeholder="Nombre o área">
+            </div>
+            <div class="field">
+              <label>Fecha límite</label>
+              <input type="date" id="agr-due">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button class="btn-secondary" onclick="hideAgrForm()">Cancelar</button>
+            <button class="btn-primary" onclick="submitAgreement()">
+              <i class="fa-solid fa-plus"></i> Agregar
+            </button>
+          </div>
+        </div>
+        <div style="margin-top:10px" id="add-agr-btn-wrap">
+          <button class="btn-secondary" onclick="showAgrForm()">
+            <i class="fa-solid fa-plus"></i> Agregar Acuerdo
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot" id="sd-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-session')">Cerrar</button>
+      <button class="btn-secondary" id="btn-cancel-session" style="display:none;color:var(--red);border-color:var(--red)"
+              onclick="doCancelSession()">
+        <i class="fa-solid fa-ban"></i> Cancelar Sesión
+      </button>
+      <button class="btn-primary" id="btn-mark-done" style="display:none"
+              onclick="markSessionDone()">
+        <i class="fa-solid fa-circle-check"></i> Marcar como Realizada
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Editar Acuerdo ═══════════ -->
+<div class="modal-overlay" id="modal-edit-agr">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">Editar Acuerdo<small id="ea-session-label">—</small></div>
+      <button class="modal-x" onclick="closeModal('modal-edit-agr')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción <span class="req">*</span></label>
+          <textarea id="ea-desc" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Responsable</label>
+          <input type="text" id="ea-responsible">
+        </div>
+        <div class="field">
+          <label>Fecha límite</label>
+          <input type="date" id="ea-due">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Estado</label>
+          <select id="ea-status">
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En Proceso</option>
+            <option value="cumplido">Cumplido</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Notas de seguimiento</label>
+          <textarea id="ea-notes" rows="2" placeholder="Avances, observaciones…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-edit-agr')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-agr" onclick="submitEditAgreement()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════ MODAL — Integrante ═══════════ -->
+<div class="modal-overlay" id="modal-member">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl" id="member-modal-title">Agregar Integrante<small>COCASEP</small></div>
+      <button class="modal-x" onclick="closeModal('modal-member')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="mb-name" placeholder="Nombre del integrante">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Rol en el comité <span class="req">*</span></label>
+          <select id="mb-role">
+            <option value="presidenta">Presidenta / Presidente</option>
+            <option value="secretaria">Secretaria / Secretario Técnico</option>
+            <option value="vocal" selected>Vocal</option>
+            <option value="invitado">Invitado(a)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Departamento</label>
+          <input type="text" id="mb-dept" placeholder="Área o departamento">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Cargo / Puesto</label>
+          <input type="text" id="mb-position" placeholder="Ej. Jefa de Enfermería">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-member')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-member" onclick="submitMember()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/comites.js"></script>
+</body>
+</html>
