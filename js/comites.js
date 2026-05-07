@@ -25,7 +25,13 @@ async function initComites() {
 
   await loadCommittee()
   if (!_committee) {
-    showToast('No se encontró el COCASEP. Ejecuta el SQL de configuración.', 'red')
+    // Diagnóstico: verificar si la tabla existe
+    const { error: tblErr } = await db.from('committees').select('id').limit(1)
+    if (tblErr) {
+      showToast('La tabla "committees" no existe. Ejecuta sql/comites_reset.sql en Supabase.', 'red')
+    } else {
+      showToast('La tabla existe pero no tiene datos. Ejecuta sql/comites_reset.sql en Supabase.', 'red')
+    }
     return
   }
 
@@ -51,8 +57,15 @@ function applyRoleUI() {
 
 // ── Cargar datos ─────────────────────────────────────────────────
 async function loadCommittee() {
-  const { data } = await db.from('committees').select('*').eq('code','COCASEP').single()
-  _committee = data || null
+  const { data, error } = await db.from('committees')
+    .select('*').eq('code','COCASEP').limit(1)
+
+  if (error) {
+    console.error('Error cargando comité:', error)
+    showToast('Error de base de datos: ' + error.message, 'red')
+    return
+  }
+  _committee = (data && data.length > 0) ? data[0] : null
 }
 
 async function loadMembers() {
