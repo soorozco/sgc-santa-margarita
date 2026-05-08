@@ -147,6 +147,9 @@ function renderTable(docs) {
           <button onclick="openDetail('${doc.id}')" class="btn-action" title="Ver detalle">
             <i class="fa-solid fa-eye"></i>
           </button>
+          <button onclick="openContent('${doc.id}')" class="btn-action teal" title="Ver contenido digital">
+            <i class="fa-solid fa-book-open"></i>
+          </button>
           ${canWrite ? `
           <button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar documento">
             <i class="fa-solid fa-pencil"></i>
@@ -735,6 +738,213 @@ async function downloadFile(filePath, fileName) {
   a.download = fileName
   a.target   = '_blank'
   a.click()
+}
+
+// ── Modal: CONTENIDO DIGITAL ─────────────────────────────────────
+async function openContent(docId) {
+  _currentDocId = docId
+  const doc = _allDocs.find(d => d.id === docId)
+  if (!doc) return
+
+  setText('mc-code', doc.code)
+  setText('mc-name', doc.name)
+
+  const mcBody = document.getElementById('mc-body')
+  const mcAuth = document.getElementById('mc-auth-strip')
+  if (mcBody) mcBody.innerHTML =
+    `<p style="text-align:center;padding:48px;color:var(--txt3)">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem"></i>
+    </p>`
+  if (mcAuth) mcAuth.innerHTML = ''
+
+  openModal('modal-content')
+
+  const { data, error } = await db
+    .from('document_content')
+    .select('*')
+    .eq('document_id', docId)
+    .limit(1)
+
+  if (error || !data || data.length === 0) {
+    if (mcBody) mcBody.innerHTML = `
+      <div style="text-align:center;padding:64px 20px;color:var(--txt3)">
+        <i class="fa-solid fa-book-open" style="font-size:2.8rem;display:block;margin-bottom:16px;color:var(--border)"></i>
+        <strong style="display:block;color:var(--txt2);margin-bottom:8px;font-size:1rem">
+          Contenido digital no disponible
+        </strong>
+        Este documento aún no tiene vista digital registrada.<br>
+        Consulta la copia física firmada en las carpetas del SGC.
+      </div>`
+    return
+  }
+
+  renderContentModal(doc, data[0])
+}
+
+function renderContentModal(doc, c) {
+  const typePrefix = doc.document_types?.code_prefix || ''
+  const isIT = typePrefix === 'IT'
+
+  // ── Auth strip ────────────────────────────────────────────────
+  const mcAuth = document.getElementById('mc-auth-strip')
+  if (mcAuth) {
+    mcAuth.innerHTML = `
+      <div class="doc-auth-item">
+        <span class="doc-auth-lbl">Versión</span>
+        <span class="doc-auth-val">${esc(doc.current_version || '—')}</span>
+      </div>
+      <div class="doc-auth-item">
+        <span class="doc-auth-lbl">Elaboró</span>
+        <span class="doc-auth-val">${esc(c.elaborado_por || doc.elaborated_by || '—')}</span>
+        <span class="doc-auth-sub">${esc(c.cargo_elaboro || '—')}</span>
+      </div>
+      <div class="doc-auth-item">
+        <span class="doc-auth-lbl">Revisó</span>
+        <span class="doc-auth-val">${esc(c.revisado_por || doc.reviewed_by || '—')}</span>
+        <span class="doc-auth-sub">${esc(c.cargo_reviso || '—')}</span>
+      </div>
+      <div class="doc-auth-item">
+        <span class="doc-auth-lbl">Autorizó</span>
+        <span class="doc-auth-val">${esc(c.autorizado_por || '—')}</span>
+        <span class="doc-auth-sub">${esc(c.cargo_autorizo || '—')}</span>
+      </div>`
+  }
+
+  // ── Sections ──────────────────────────────────────────────────
+  let html = ''
+
+  // 1 · Objetivo (solo PR)
+  if (!isIT && c.objetivo) {
+    html += docSection('fa-bullseye', '1. Objetivo',
+      `<p>${esc(c.objetivo)}</p>`)
+  }
+
+  // Alcance
+  if (c.alcance) {
+    const n = isIT ? '1' : '2'
+    html += docSection('fa-expand', `${n}. Alcance`,
+      `<p style="white-space:pre-line">${esc(c.alcance)}</p>`)
+  }
+
+  // 3 · Definiciones (solo PR)
+  if (!isIT && c.definiciones?.length) {
+    const rows = c.definiciones.map(d => `
+      <tr>
+        <td><strong>${esc(d.termino)}</strong></td>
+        <td>${esc(d.definicion)}</td>
+      </tr>`).join('')
+    html += docSection('fa-book', '3. Definiciones', `
+      <table class="doc-table">
+        <thead><tr><th>Término</th><th>Definición</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  // 4 · Responsabilidades (solo PR)
+  if (!isIT && c.responsabilidades?.length) {
+    const rows = c.responsabilidades.map(r => `
+      <tr>
+        <td style="white-space:nowrap"><strong>${esc(r.tipo)}</strong></td>
+        <td>${esc(r.descripcion)}</td>
+      </tr>`).join('')
+    html += docSection('fa-users', '4. Responsabilidades', `
+      <table class="doc-table">
+        <thead><tr><th>Tipo</th><th>Descripción</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  // 2 · Material y Equipo (solo IT)
+  if (isIT && c.material_equipo?.length) {
+    const items = c.material_equipo.map(m => `<li>${esc(m.item)}</li>`).join('')
+    html += docSection('fa-toolbox', '2. Material y Equipo',
+      `<ul class="doc-list">${items}</ul>`)
+  }
+
+  // Desarrollo
+  if (c.desarrollo?.length) {
+    const n = isIT ? '3' : '5'
+    const rows = c.desarrollo.map(s => `
+      <tr>
+        <td class="center doc-step-no">${esc(s.no)}</td>
+        <td style="white-space:nowrap"><strong>${esc(s.responsable)}</strong></td>
+        <td>${esc(s.actividad)}</td>
+      </tr>`).join('')
+    html += docSection('fa-list-ol', `${n}. Desarrollo`, `
+      <table class="doc-table">
+        <thead><tr><th class="center" style="width:46px">No.</th><th>Responsable</th><th>Actividad</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  // Gestión de Riesgos
+  if (c.gestion_riesgos?.length) {
+    const n = isIT ? '4' : '6'
+    const rows = c.gestion_riesgos.map(r => `
+      <tr>
+        <td>${esc(r.riesgo)}</td>
+        <td>${esc(r.barrera)}</td>
+      </tr>`).join('')
+    html += docSection('fa-shield-halved', `${n}. Gestión de Riesgos`, `
+      <table class="doc-table">
+        <thead><tr><th>Riesgo</th><th>Barrera / Control</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  // Referencias
+  if (c.referencias?.length && c.referencias[0]?.nombre !== 'No Aplica') {
+    const n = isIT ? '5' : '7'
+    const rows = c.referencias.map(r => `
+      <tr>
+        <td>${esc(r.nombre)}</td>
+        <td>${esc(r.codigo)}</td>
+      </tr>`).join('')
+    html += docSection('fa-link', `${n}. Referencias`, `
+      <table class="doc-table">
+        <thead><tr><th>Nombre</th><th>Código</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  // Control de Cambios
+  if (c.control_cambios?.length) {
+    const n = isIT ? '6' : '8'
+    const rows = c.control_cambios.map(cc => `
+      <tr>
+        <td class="center"><strong>${esc(cc.version)}</strong></td>
+        <td style="white-space:nowrap">${esc(cc.fecha)}</td>
+        <td>${esc(cc.descripcion)}</td>
+        <td>${esc(cc.realizado)}</td>
+        <td>${esc(cc.aprobado)}</td>
+      </tr>`).join('')
+    html += docSection('fa-clock-rotate-left', `${n}. Control de Cambios`, `
+      <table class="doc-table">
+        <thead><tr>
+          <th class="center">Ver.</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Realizó</th>
+          <th>Aprobó</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`)
+  }
+
+  const mcBody = document.getElementById('mc-body')
+  if (mcBody) mcBody.innerHTML = html ||
+    `<p style="text-align:center;padding:40px;color:var(--txt3)">Sin secciones disponibles.</p>`
+}
+
+function docSection(icon, title, bodyHtml) {
+  return `
+    <div class="doc-section">
+      <div class="doc-section-hdr">
+        <i class="fa-solid ${icon}"></i>
+        <span>${title}</span>
+      </div>
+      <div class="doc-section-body">${bodyHtml}</div>
+    </div>`
 }
 
 // ── Exportar CSV ─────────────────────────────────────────────────

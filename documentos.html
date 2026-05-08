@@ -96,7 +96,7 @@
         <span>Satisfacción y Quejas</span>
       </a>
 
-      <a class="nav-link" href="#">
+      <a class="nav-link" href="comites.html">
         <i class="fa-solid fa-users"></i>
         <span>Comités</span>
       </a>
@@ -596,6 +596,42 @@
         <i class="fa-solid fa-floppy-disk"></i>
         Guardar Cambios
       </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Contenido Digital ═══════════════ -->
+<div class="modal-overlay" id="modal-content">
+  <div class="modal modal-xl">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="mc-code">—</span>
+        <small id="mc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-content')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Franja de autorización -->
+      <div class="doc-auth-strip" id="mc-auth-strip"></div>
+
+      <!-- Secciones del documento -->
+      <div id="mc-body">
+        <p style="text-align:center;padding:48px;color:var(--txt3)">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem"></i>
+        </p>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-content')">Cerrar</button>
     </div>
 
   </div>
