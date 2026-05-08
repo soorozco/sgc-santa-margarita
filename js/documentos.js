@@ -379,21 +379,35 @@ async function submitEdit() {
 }
 
 // ── Modal: SUBIR VERSIÓN ─────────────────────────────────────────
-function openUpload(docId) {
+async function openUpload(docId) {
   _currentDocId = docId
   const doc = _allDocs.find(d => d.id === docId)
   if (!doc) return
 
   setText('upload-doc-name', `${doc.code} — ${doc.name}`)
-
-  // Suggest next version
-  const curVer = doc.current_version || '1'
-  const nextVer = isNaN(Number(curVer))
-    ? curVer
-    : String(Math.floor(Number(curVer)) + 1) + '.0'
-  setVal('upload-version', nextVer)
   setVal('upload-date', new Date().toISOString().split('T')[0])
   setVal('upload-changes', '')
+
+  // Verificar si ya hay versiones subidas para este documento
+  const { data: versions } = await db.from('document_versions')
+    .select('id, version').eq('document_id', docId).limit(1)
+
+  const hint = document.getElementById('upload-version-hint')
+  const curVer = doc.current_version || '1.0'
+
+  if (!versions || versions.length === 0) {
+    // Primera vez — mostrar versión actual para que la confirme o corrija
+    setVal('upload-version', curVer)
+    if (hint) hint.textContent =
+      '⚑ Primera subida. Confirma o corrige la versión real del documento físico.'
+  } else {
+    // Ya hay versiones — auto-incrementar
+    const nextVer = isNaN(Number(curVer))
+      ? curVer
+      : (Math.floor(Number(curVer)) + 1) + '.0'
+    setVal('upload-version', nextVer)
+    if (hint) hint.textContent = 'Versión sugerida. Puedes cambiarla si es necesario.'
+  }
 
   clearFile()
   openModal('modal-upload')
