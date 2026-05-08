@@ -496,7 +496,7 @@ async function submitUpload() {
   const { error: verErr } = await db.from('document_versions').insert({
     document_id:     _currentDocId,
     version,
-    change_summary:  changes || null,
+    change_summary:  changes || 'Versión inicial',
     change_date:     chDate  || new Date().toISOString().split('T')[0],
     file_path:       filePath,
     file_name:       file.name,
