@@ -4,9 +4,7 @@
 --  Ejecutar en Supabase → SQL Editor
 --
 --  ⚠ VERIFICAR ANTES DE EJECUTAR:
---  SELECT code, name FROM departments
---    WHERE name ILIKE '%capital%' OR name ILIKE '%humano%' OR code = 'RH';
---  Si el code no es 'RH', cambia la subquery de department_id abajo.
+--  Departamento confirmado: code = 'CH' (Capital Humano)
 --
 --  DESPUÉS de ejecutar ambos archivos:
 --  GRANT ALL ON documents        TO anon, authenticated;
@@ -21,7 +19,7 @@ INSERT INTO documents (
 SELECT
   d.code, d.name,
   (SELECT id FROM document_types WHERE code_prefix = 'PR'),
-  (SELECT id FROM departments WHERE code = 'RH'),  -- ⚠ ajusta si tu código es distinto
+  (SELECT id FROM departments WHERE code = 'CH'),
   d.ver, 'vigente', d.fecha::date,
   'Lic. Jorge Octavio Ramírez Chávez',
   'Dra. Giselle Ivette De la Torre García',
@@ -50,7 +48,7 @@ ON CONFLICT (code) DO UPDATE SET
 -- ── Verificación ──────────────────────────────────────────────────────────────
 SELECT d.code, d.name, d.current_version AS ver,
        CASE WHEN d.department_id IS NOT NULL THEN 'Dept OK ✓'
-            ELSE '⚠ Dept NULL — verificar code RH' END AS dept
+            ELSE '⚠ Dept NULL — verificar code CH' END AS dept
 FROM documents d
 WHERE d.code LIKE 'PR-CH-%'
 ORDER BY d.code;
