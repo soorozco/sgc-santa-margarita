@@ -74,8 +74,6 @@ function applyRoleUI() {
   const canWrite = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
   const btn = document.getElementById('btn-new-doc')
   if (btn) btn.style.display = canWrite ? 'inline-flex' : 'none'
-  const btnImport = document.getElementById('btn-import-json')
-  if (btnImport) btnImport.style.display = canWrite ? 'inline-flex' : 'none'
 }
 
 // ── Load documents ──────────────────────────────────────────────

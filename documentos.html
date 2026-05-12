@@ -176,14 +176,6 @@
           Nuevo Documento
         </button>
 
-        <!-- Importar JSON — solo para admins/calidad -->
-        <button class="btn-secondary" id="btn-import-json" onclick="openImportJSON()" style="display:none" title="Importar procedimientos desde archivo JSON">
-          <i class="fa-solid fa-file-import"></i>
-          Importar JSON
-        </button>
-        <input type="file" id="json-import-input" accept=".json" multiple
-               style="display:none" onchange="handleImportFiles(event)">
-
       </div>
 
       <!-- ── Tabla de documentos ──────────────────── -->
@@ -646,33 +638,10 @@
 </div>
 
 
-<!-- ═══════════════ MODAL — Importar JSON ═══════════════ -->
-<div class="modal-overlay" id="modal-import">
-  <div class="modal-box" style="max-width:520px">
-    <div class="modal-head">
-      <h2 class="modal-title"><i class="fa-solid fa-file-import"></i> Importar procedimientos</h2>
-      <button class="modal-x" onclick="closeModal('modal-import')">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div id="import-result" style="min-height:80px"></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeModal('modal-import')">Cerrar</button>
-      <button class="btn-primary" onclick="openImportJSON()">
-        <i class="fa-solid fa-folder-open"></i> Cargar otro archivo
-      </button>
-    </div>
-  </div>
-</div>
-
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/documentos.js"></script>
-<script src="js/json-import.js"></script>
 </body>
 </html>
