@@ -604,5 +604,5 @@ SELECT
   CASE WHEN dc.id IS NOT NULL THEN 'Con contenido ✓' ELSE 'Sin contenido' END AS contenido
 FROM documents d
 LEFT JOIN document_content dc ON dc.document_id = d.id
-WHERE d.department_id = (SELECT id FROM departments WHERE code = 'BSG')
+WHERE d.department_id = (SELECT id FROM departments WHERE code = 'BS')
 ORDER BY d.code;

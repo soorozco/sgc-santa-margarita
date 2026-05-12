@@ -16,7 +16,7 @@ INSERT INTO documents (
 SELECT
   d.code, d.name,
   (SELECT id FROM document_types WHERE code_prefix = 'IT'),
-  (SELECT id FROM departments WHERE code = 'BSG'),
+  (SELECT id FROM departments WHERE code = 'BS'),
   d.ver, 'vigente', '2026-01-30'::date,
   'Dra. Viridiana Valdez Toral',
   'Dra. Giselle Ivette De la Torre García',
