@@ -46,7 +46,12 @@ ON CONFLICT (code) DO UPDATE SET
   reviewed_by        = EXCLUDED.reviewed_by,
   custodian_position = EXCLUDED.custodian_position;
 
--- ── 3. Verificación ───────────────────────────────────────────
+-- ── 3. Forzar department_id por UPDATE directo ────────────────
+UPDATE documents
+SET department_id = (SELECT id FROM departments WHERE code = 'JE' LIMIT 1)
+WHERE code IN ('IT-JE-21','IT-JE-33','IT-JE-40','IT-JE-42','IT-JE-43','IT-JE-44','IT-JE-45');
+
+-- ── 4. Verificación ───────────────────────────────────────────
 SELECT d.code, d.name, d.current_version AS ver,
        CASE WHEN d.department_id IS NOT NULL THEN 'Dept OK ✓'
             ELSE '⚠ Dept NULL — verificar code JE' END AS dept
