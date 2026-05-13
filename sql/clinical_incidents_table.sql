@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS clinical_incidents (
   patient_name        text,
   patient_dob         date,
   patient_sex         text,
-  incident_date       date        NOT NULL,
+  incident_date       date,
   incident_time       text,
   location            text,
   incident_type       text        NOT NULL,  -- Cuasi Falla, Evento Adverso, etc.
