@@ -60,14 +60,21 @@ function updateKPIs() {
   const total   = _all.length
   const cuasi   = _all.filter(r => r.incident_type === 'Cuasi Falla').length
   const adverso = _all.filter(r => r.incident_type === 'Evento Adverso').length
-  const dano    = _all.filter(r => ['Leve','Moderado','Grave','Muerte'].includes(r.damage_level)).length
-  const grave   = _all.filter(r => ['Grave','Muerte'].includes(r.damage_level)).length
+  const leve    = _all.filter(r => r.damage_level === 'Leve').length
+  const moderado= _all.filter(r => r.damage_level === 'Moderado').length
+  const grave   = _all.filter(r => r.damage_level === 'Grave').length
+  const muerte  = _all.filter(r => r.damage_level === 'Muerte').length
+  const dano    = leve + moderado + grave + muerte
 
   setText('kpi-total',   total)
   setText('kpi-cuasi',   cuasi)
   setText('kpi-adverso', adverso)
   setText('kpi-dano',    dano)
   setText('kpi-grave',   grave)
+  setText('kpi-muerte',  muerte)
+
+  const sub = document.getElementById('kpi-dano-sub')
+  if (sub) sub.textContent = `${leve} leve · ${moderado} moderado · ${grave} grave · ${muerte} muerte`
 }
 
 function populateSubtypes() {
