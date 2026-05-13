@@ -126,9 +126,9 @@
   white-space: nowrap;
 }
 .doc-name {
-  font-weight: 500; max-width: 260px;
-  display: block; white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis;
+  font-weight: 500;
+  display: block;
+  line-height: 1.45;
 }
 .doc-type-tag {
   font-size: 0.714rem; font-weight: 600;
