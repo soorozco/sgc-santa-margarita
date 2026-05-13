@@ -8,7 +8,7 @@
 CREATE TABLE IF NOT EXISTS clinical_incidents (
   id                  uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   reported_at         timestamptz NOT NULL,
-  patient_name        text        NOT NULL,
+  patient_name        text,
   patient_dob         date,
   patient_sex         text,
   incident_date       date        NOT NULL,
