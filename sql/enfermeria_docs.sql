@@ -38,6 +38,7 @@ FROM (VALUES
 ) AS d(code, name)
 ON CONFLICT (code) DO UPDATE SET
   name               = EXCLUDED.name,
+  department_id      = EXCLUDED.department_id,
   current_version    = EXCLUDED.current_version,
   status             = EXCLUDED.status,
   elaboration_date   = EXCLUDED.elaboration_date,
