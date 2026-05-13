@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventos Adversos — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/eventos-adversos.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción y Quejas</span></a>
+      <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+      <a class="nav-link active" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Eventos Adversos e Incidentes Clínicos</div>
+        <div class="topbar-sub">Notificación y seguimiento de incidentes de la atención clínica</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <a class="btn-report" href="https://forms.gle/4wYL7ecYw8kGefmn7" target="_blank" rel="noopener">
+          <i class="fa-solid fa-plus"></i> Reportar incidente
+        </a>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ── KPI Cards ── -->
+      <div class="kpi-grid">
+        <div class="kpi-card blue">
+          <div class="kpi-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-total">—</div>
+            <div class="kpi-lbl">Total de reportes</div>
+          </div>
+        </div>
+        <div class="kpi-card yellow">
+          <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-cuasi">—</div>
+            <div class="kpi-lbl">Cuasi Fallas</div>
+          </div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-adverso">—</div>
+            <div class="kpi-lbl">Eventos Adversos</div>
+          </div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-dano">—</div>
+            <div class="kpi-lbl">Con daño al paciente</div>
+          </div>
+        </div>
+        <div class="kpi-card dark">
+          <div class="kpi-icon"><i class="fa-solid fa-skull-crossbones"></i></div>
+          <div class="kpi-body">
+            <div class="kpi-val" id="kpi-grave">—</div>
+            <div class="kpi-lbl">Grave / Muerte</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Filtros ── -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="f-type" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Cuasi Falla</option>
+            <option>Evento Adverso</option>
+            <option>Consulta</option>
+            <option>No es un evento Adverso</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Nivel de daño</label>
+          <select id="f-damage" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Sin Daño</option>
+            <option>Leve</option>
+            <option>Moderado</option>
+            <option>Grave</option>
+            <option>Muerte</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Subtipo</label>
+          <select id="f-subtype" onchange="applyFilters()">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="filter-group filter-search">
+          <label>Buscar</label>
+          <input type="text" id="f-search" placeholder="Paciente, descripción…" oninput="applyFilters()">
+        </div>
+        <button class="btn-clear-filters" onclick="clearFilters()">
+          <i class="fa-solid fa-xmark"></i> Limpiar
+        </button>
+      </div>
+
+      <!-- ── Tabla ── -->
+      <div class="table-wrap">
+        <div class="table-header-row">
+          <span class="table-count" id="table-count">0 registros</span>
+        </div>
+        <div id="state-loading" class="state-msg">
+          <i class="fa-solid fa-spinner fa-spin"></i> Cargando incidentes…
+        </div>
+        <div id="state-empty" class="state-msg" style="display:none">
+          <i class="fa-solid fa-inbox"></i> No se encontraron incidentes con los filtros seleccionados.
+        </div>
+        <table class="data-table" id="incidents-table" style="display:none">
+          <thead>
+            <tr>
+              <th>Fecha incidente</th>
+              <th>Paciente</th>
+              <th>Tipo</th>
+              <th>Subtipo</th>
+              <th>Daño</th>
+              <th>Ubicación</th>
+              <th>Reportado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="incidents-body"></tbody>
+        </table>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<!-- ═══════════ MODAL — Detalle de Incidente ═══════════ -->
+<div class="modal-overlay" id="modal-detail" onclick="closeDetail(event)">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-hospital-user"></i>
+        Detalle del Incidente
+        <small id="detail-type-badge"></small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" id="modal-detail-body">
+      <!-- Contenido dinámico -->
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/eventos-adversos.js"></script>
+</body>
+</html>
