@@ -8,12 +8,12 @@
 --  Todos versión 03 · 30 SEP 2025
 -- ============================================================
 
--- ── Alta del departamento JE si no existe ─────────────────────
+-- ── 1. Alta del departamento JE si no existe ──────────────────
 INSERT INTO departments (code, name)
-VALUES ('JE', 'Jefatura de Enfermería')
-ON CONFLICT (code) DO NOTHING;
+SELECT 'JE', 'Jefatura de Enfermería'
+WHERE NOT EXISTS (SELECT 1 FROM departments WHERE code = 'JE');
 
--- ── Alta de documentos ────────────────────────────────────────
+-- ── 2. Alta / actualización de los 7 documentos ───────────────
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, elaboration_date,
@@ -22,7 +22,7 @@ INSERT INTO documents (
 SELECT
   d.code, d.name,
   (SELECT id FROM document_types WHERE code_prefix = 'IT'),
-  (SELECT id FROM departments WHERE code = 'JE'),
+  (SELECT id FROM departments WHERE code = 'JE' LIMIT 1),
   '03', 'vigente', '2025-09-30'::date,
   'Lic. Juan Carlos Vanegas Reyes',
   'Dra. Giselle Ivette De la Torre García',
@@ -46,7 +46,7 @@ ON CONFLICT (code) DO UPDATE SET
   reviewed_by        = EXCLUDED.reviewed_by,
   custodian_position = EXCLUDED.custodian_position;
 
--- ── Verificación ──────────────────────────────────────────────
+-- ── 3. Verificación ───────────────────────────────────────────
 SELECT d.code, d.name, d.current_version AS ver,
        CASE WHEN d.department_id IS NOT NULL THEN 'Dept OK ✓'
             ELSE '⚠ Dept NULL — verificar code JE' END AS dept
