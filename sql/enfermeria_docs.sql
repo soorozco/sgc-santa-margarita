@@ -16,7 +16,7 @@ INSERT INTO documents (
 SELECT
   d.code, d.name,
   (SELECT id FROM document_types WHERE code_prefix = 'IT'),
-  (SELECT id FROM departments WHERE code = 'JE'),
+  (SELECT id FROM departments WHERE code = 'ENF'),
   '03', 'vigente', '2025-09-30'::date,
   'Lic. Juan Carlos Vanegas Reyes',
   'Dra. Giselle Ivette De la Torre García',
@@ -42,7 +42,7 @@ ON CONFLICT (code) DO UPDATE SET
 -- ── Verificación ──────────────────────────────────────────────
 SELECT d.code, d.name, d.current_version AS ver,
        CASE WHEN d.department_id IS NOT NULL THEN 'Dept OK ✓'
-            ELSE '⚠ Dept NULL — verificar code JE' END AS dept
+            ELSE '⚠ Dept NULL — verificar code ENF' END AS dept
 FROM documents d
 WHERE d.code IN ('IT-JE-21','IT-JE-33','IT-JE-40','IT-JE-42','IT-JE-43','IT-JE-44','IT-JE-45')
 ORDER BY d.code;
