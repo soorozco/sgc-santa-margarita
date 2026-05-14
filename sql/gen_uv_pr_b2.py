@@ -1,0 +1,334 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Lote 2 — PR-UV-08, 09, 10, 11, 12
+Genera uv_pr_b2.sql
+"""
+import json, pathlib
+
+def esc(s):
+    return str(s).replace("'", "''") if s else ''
+
+def j(obj):
+    return json.dumps(obj, ensure_ascii=False)
+
+# ── PR-UV-08 ──────────────────────────────────────────────────────────────────
+PR_UV_08 = {
+    "codigo": "PR-UV-08",
+    "objetivo": (
+        "Capacitar al personal clínico, no clínico, en formación, subrogado, voluntariado y "
+        "visitantes, sobre la Higiene de Manos, con el fin de prevenir Infecciones Asociadas "
+        "con la Atención de Salud."
+    ),
+    "alcance": (
+        "Este proceso inicia con la planeación del cronograma de capacitación de higiene de "
+        "manos y termina cuando vigilancia epidemiológica vigila el cumplimiento de ello."
+    ),
+    "definiciones": [],
+    "responsabilidades": [
+        {"tipo":"Actualización","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+        {"tipo":"Ejecución","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH), Departamento de enseñanza."},
+        {"tipo":"Supervisión","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+    ],
+    "desarrollo": [
+        {"num":"5.1","responsable":"UVEH","actividad":"Realiza cronograma de capacitaciones anuales fechas y horarios establecidos por servicio (Valorando la necesidad de capacitación del personal en general de acuerdo con sus actividades)."},
+        {"num":"5.2","responsable":"UVEH","actividad":"Crea material de apoyo acorde al tema Higiene Manos (IT-UV-01). Apegado a los lineamientos otorgados por la OMS."},
+        {"num":"5.3","responsable":"UVEH","actividad":"Determina el método con el cual se impartirá la capacitación."},
+        {"num":"5.4","responsable":"UVEH","actividad":"Se envía memorándum con anticipación a jefatura de cada área el cronograma de capacitaciones."},
+        {"num":"5.5","responsable":"UVEH / Jefatura de Enseñanza Enfermería","actividad":"Se asiste puntualmente en la hora y fecha acordada para la impartición de la capacitación. Nota: En el caso específicamente de enfermería, se realiza capacitación en conjunto con la Jefatura de Enseñanza de Enfermería, con el fin de estar en la misma sintonía. PR-JE-07"},
+        {"num":"5.6","responsable":"UVEH","actividad":"Se evidenciará por medio de listas de asistencia, así como el contenido del tema."},
+        {"num":"5.7","responsable":"UVEH","actividad":"Se realizará periódicamente la monitorización, la evaluación del tema y el cumplimiento del proceso."},
+        {"num":"5.8","responsable":"UVEH","actividad":"Aplicando un estudio de sombra, y registrando en el formato de evaluación IT-UV-15."},
+    ],
+    "gestion_riesgos": [
+        {"riesgo":"Disponer de poco tiempo para asistir a la capacitación por un aumento en la demanda de los servicios hospitalarios.","barrera":"Valorar los tiempos adecuados para lograr la asistencia a la capacitación."},
+        {"riesgo":"Desinterés y apatía del personal en la asistencia a capacitaciones continuas.","barrera":"Fomentar y crear conciencia de la importancia de mantenerse actualizado en los procesos de atención al paciente."},
+        {"riesgo":"No realizar seguimiento a la realización del proceso de lavado de manos.","barrera":"Programar fechas específicas de capacitación y de evaluación de seguimiento del proceso de lavado de manos."},
+    ],
+    "referencias": [
+        {"nombre":"Proceso de Capacitación de lavado de manos","codigo":"PR-JE-07"},
+        {"nombre":"Instrucción de trabajo Higiene de manos de la unidad de epidemiología","codigo":"IT-UV-01"},
+    ],
+    "control_cambios": [
+        {"version":"01","fecha":"03/06/2021","descripcion":"Alta de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+        {"version":"02","fecha":"08/02/2024","descripcion":"Modificación de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+        {"version":"03","fecha":"26/09/2025","descripcion":"Actualización de formato","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+    ],
+}
+
+# ── PR-UV-09 ──────────────────────────────────────────────────────────────────
+PR_UV_09 = {
+    "codigo": "PR-UV-09",
+    "objetivo": (
+        "Establecer un mecanismo seguro para la atención inmediata en caso de que un "
+        "colaborador sufra un accidente laboral por riesgos biológicos."
+    ),
+    "alcance": (
+        "Este procedimiento inicia cuando el colaborador tiene el accidente y finaliza cuando el "
+        "Comité de Seguridad de Higiene sesiona para presentar los casos y tomar medidas de prevención."
+    ),
+    "definiciones": [
+        {"termino":"Riesgo biológico","definicion":"El riesgo biológico es la probabilidad de que un trabajador pueda sufrir algún daño en el ámbito laboral, después de haber estado expuesto a algún agente biológico mientras realizaba sus funciones."},
+    ],
+    "responsabilidades": [
+        {"tipo":"Actualización","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+        {"tipo":"Ejecución","descripcion":"Colaborador, Medico urgenciólogo, Laboratorio, Recursos Humanos, Unidad de Vigilancia Epidemiológica Hospitalaria (UVEH), Seguridad e Higiene."},
+        {"tipo":"Supervisión","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+    ],
+    "desarrollo": [
+        {"num":"5.1","responsable":"Colaborador","actividad":"Una vez que ocurre el accidente, el colaborador debe suspender inmediatamente la actividad."},
+        {"num":"5.2","responsable":"Colaborador","actividad":"Notifica inmediatamente del incidente a su jefe directo."},
+        {"num":"5.3","responsable":"Colaborador","actividad":"Actuar de acuerdo con el anexo 1. Según el tipo de exposición."},
+        {"num":"5.4","responsable":"Jefe Directo del colaborador","actividad":"Envía al colaborador al área de urgencias, para recibir atención."},
+        {"num":"5.5","responsable":"Jefe Directo del colaborador","actividad":"Avisa al departamento de epidemiología del accidente."},
+        {"num":"5.6","responsable":"Medico Urgenciólogo","actividad":"Brinda atención al colaborador."},
+        {"num":"5.7","responsable":"Medico Urgenciólogo","actividad":"Solicita exámenes basales para VIH, VHB y VHC."},
+        {"num":"5.8","responsable":"Medico Urgenciólogo","actividad":"Revisa clínicamente al colaborador y realiza nota médica de ingreso a urgencias (Nombre completo, firma y sello del médico urgenciólogo) y envía a su clínica IMSS para seguimiento. Nota: En caso de que el paciente con el que se tuvo el accidente es sospechoso o confirmado de HIV y/o Hepatitis B o C. Hacer Referencia a su Clínica IMSS al servicio de Infectología para valorar el inicio de profilaxis 4 horas post-exposición."},
+        {"num":"5.9","responsable":"UVEH","actividad":"Se comunica con el médico tratante para solicitar autorización y consentimiento de tomar serología de HIV del paciente con el que se tuvo accidente. Nota: La prueba no tendrá ningún costo, se enviará por el laboratorio Estatal de Salud Pública. En caso de que el laboratorio no reciba muestra, el costo de la serología será solventado por hospital."},
+        {"num":"5.10","responsable":"Recursos Humanos","actividad":"Inicia proceso de riesgo de trabajo dentro de la empresa código: PR-CH-03. Nota: En caso de que no se encuentre laborando personal de recursos humanos, acudir con su nota de urgencias a su clínica del IMSS."},
+        {"num":"5.11","responsable":"Colaborador","actividad":"Acude a su clínica para seguimiento y entrega copia de la nota médica a UVEH."},
+        {"num":"5.12","responsable":"UVEH","actividad":"Recibe notas médicas emitidas por Urgencias y clínicas del IMSS, así como resultados de los exámenes de HIV y Hepatitis B y C. Realiza retroalimentación al colaborador y pide el llenado de la encuesta por Accidentes laborales con riesgos Biológicos (FT-UV-11)."},
+    ],
+    "gestion_riesgos": [
+        {"riesgo":"Omisión del protocolo de seguimiento en caso de accidente laboral por riesgos biológicos.","barrera":"Capacitación a todo el personal clínico/no clínico del proceso a seguir."},
+        {"riesgo":"Notificar de forma extemporánea el accidente e infectarse.","barrera":"Comunicación efectiva con jefaturas involucradas en el proceso."},
+    ],
+    "referencias": [
+        {"nombre":"NORMA OFICIAL MEXICANA NOM-087-ECOL-SSA1-2002, PROTECCIÓN AMBIENTAL - SALUD AMBIENTAL - RESIDUOS PELIGROSOS BIOLÓGICOINFECCIOSOS - CLASIFICACIÓN Y ESPECIFICACIONES DE MANEJO","codigo":"NA"},
+    ],
+    "control_cambios": [
+        {"version":"01","fecha":"03/06/2021","descripcion":"Alta documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"02","fecha":"23/01/2023","descripcion":"Modificación de documento y cambio de nombre","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"03","fecha":"26/09/2025","descripcion":"Actualización de procedimiento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+    ],
+}
+
+# ── PR-UV-10 ──────────────────────────────────────────────────────────────────
+PR_UV_10 = {
+    "codigo": "PR-UV-10",
+    "objetivo": (
+        "Detectar oportunamente riesgos, eventos o situaciones de emergencia epidemiológica, "
+        "con el propósito de implementar las acciones de prevención y control correspondientes, "
+        "a fin de reducir su impacto en la salud de la población."
+    ),
+    "alcance": (
+        "Este proceso inicia cuando el departamento de epidemiología identifica riesgos, eventos "
+        "o situaciones epidemiológicas hasta que se realiza comunicado de término de alerta."
+    ),
+    "definiciones": [
+        {"termino":"Alerta epidemiológica","definicion":"Comunicado sobre un evento epidemiológico que representa un daño inminente a la salud de la población y/o de trascendencia social, frente al cual es necesario ejecutar acciones de salud inmediatas y eficaces con el fin de minimizar o contener su ocurrencia. Para las entidades federativas se denomina alerta epidemiológica estatal."},
+    ],
+    "responsabilidades": [
+        {"tipo":"Actualización","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+        {"tipo":"Ejecución","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH), Comité para la Detección y control de las infecciones asociadas a la atención de salud (CODECIAAS) y Dirección Médica."},
+        {"tipo":"Supervisión","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+    ],
+    "desarrollo": [
+        {"num":"5.1","responsable":"UVEH","actividad":"Monitorea alertas epidemiológicas a través de fuentes oficiales las alertas epidemiológicas: Instituciones del Sector Salud a través del CONAVE y de los CEVE."},
+        {"num":"5.2","responsable":"UVEH","actividad":"Convoca de manera extraordinaria al comité para la Detección y control de las infecciones asociadas a la atención de salud (CODECIAAS)."},
+        {"num":"5.3","responsable":"CODECIAAS","actividad":"Se realiza sesión y se da conocer la alerta epidemiológica, se llegan acuerdos, compromisos y estrategias."},
+        {"num":"5.4","responsable":"UVEH","actividad":"Emite circular de alerta, con las siguientes características: Título del aviso o alerta; Numeración consecutiva para avisos o alertas; Fecha de emisión; Destinatarios. Situación epidemiológica: Antecedentes del evento; Situación epidemiológica; Acciones de vigilancia epidemiológica. Medidas de prevención y control: Personal de salud; Población en general. Nota: En caso de que el evento se trate de una enfermedad que amerite una alerta epidemiológica se deberán incluir: Definiciones operacionales de caso; Especificaciones para el diagnóstico por laboratorio."},
+        {"num":"5.5","responsable":"UVEH","actividad":"Programación de capacitaciones en caso de implementarse nuevos procesos."},
+        {"num":"5.6","responsable":"UVEH","actividad":"Realización de informes con datos estadísticos y epidemiológicos."},
+        {"num":"5.7","responsable":"Dirección Médica","actividad":"Realiza los informes a la Asociación de Hospitales Particulares."},
+        {"num":"5.8","responsable":"UVEH","actividad":"Elaborará comunicado de término alerta epidemiológica."},
+    ],
+    "gestion_riesgos": [
+        {"riesgo":"Omisión de las indicaciones emitidas por el comité.","barrera":"Apego estricto por parte de las jefaturas para el cumplimiento de los objetivos establecidos."},
+        {"riesgo":"Desconocimiento de la alerta epidemiológica y nuevos procesos.","barrera":"Capacitaciones de nuevos procesos y supervisión."},
+    ],
+    "referencias": [
+        {"nombre":"Norma Oficial Mexicana NOM-017-SSA2-2012, Para la vigilancia epidemiológica.","codigo":"NA"},
+    ],
+    "control_cambios": [
+        {"version":"01","fecha":"03/06/2021","descripcion":"Alta de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"02","fecha":"08/09/2023","descripcion":"Modificación de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"03","fecha":"26/09/2025","descripcion":"Actualización de procedimiento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+    ],
+}
+
+# ── PR-UV-11 ──────────────────────────────────────────────────────────────────
+PR_UV_11 = {
+    "codigo": "PR-UV-11",
+    "objetivo": (
+        "Interrumpir la cadena de transmisión de una enfermedad infecciosa, a fin de prevenir "
+        "el contagio entre los pacientes, y el personal hospitalario; así como el personal en "
+        "contacto con el entorno del paciente y a familiares o visitantes."
+    ),
+    "alcance": (
+        "Este proceso inicia desde que el médico tratante sospecha paciente con diagnóstico de "
+        "enfermedad infectocontagiosa, y termina cuando el médico realiza la suspensión del "
+        "aislamiento ya sea el motivo de ingreso o ésta sea detectada durante el período de "
+        "hospitalización y se le da el debido proceso de aislamiento de acuerdo con la patología identificada."
+    ),
+    "definiciones": [
+        {"termino":"IAAS","definicion":"Las Infecciones Asociadas a la Atención de la Salud (IAAS), se definen de acuerdo con la Organización Mundial de la Salud (OMS), como aquellas infecciones que afectan a un paciente durante el proceso de asistencia en un hospital o Centro Sanitario, que no estaba presente, ni en período de incubación al momento de su ingreso y que pueden inclusive llegar a manifestarse después del alta del paciente."},
+    ],
+    "responsabilidades": [
+        {"tipo":"Actualización","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+        {"tipo":"Ejecución","descripcion":"Médico tratante, admisión, supervisión de enfermería, médico de guardia, enfermería, personal clínico/no clínico, laboratorio e intendencia y UVEH."},
+        {"tipo":"Supervisión","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+    ],
+    "desarrollo": [
+        {"num":"5.1","responsable":"Médico Tratante","actividad":"Indica el ingreso de paciente, con su diagnóstico establecido."},
+        {"num":"5.2","responsable":"Admisión","actividad":"Realiza el trámite de ingreso administrativo y avisa a supervisión de enfermería. PR-CS-01"},
+        {"num":"5.3","responsable":"Supervisión Enfermería","actividad":"Revisa indicaciones y detecta paciente infeccioso o con sospecha de infección."},
+        {"num":"5.4","responsable":"Supervisión Enfermería","actividad":"Determina habitación de aislamiento y medida precautoria a implementar (Contacto, Gota, aérea, MDRO). (FT-UV-05). Nota: En caso de tener duda avisa al departamento de UVEH."},
+        {"num":"5.5","responsable":"Médico de Guardia","actividad":"Realiza visita e identifica paciente con sospecha clínica o con diagnóstico certero de paciente infeccioso y avisa al departamento de UVEH, Supervisión de enfermería y determina la media precautoria a implementar. (FT-UV-05)"},
+        {"num":"5.6","responsable":"Médico de Guardia","actividad":"Notifica al médico tratante del aislamiento en caso de no conocerlo."},
+        {"num":"5.7","responsable":"Enfermería","actividad":"Coloca en la habitación mediada precautoria correspondiente al ingreso de la habitación. (FT-UV-05)"},
+        {"num":"5.8","responsable":"Enfermería","actividad":"Realizar higiene de manos durante los 5 momentos (IT-UV-01) y (IT-UV-04)"},
+        {"num":"5.9","responsable":"Enfermería","actividad":"Colocar adecuadamente el equipo de protección correspondiente: Usar bata de manga larga (IT-UV-05); Colocación correcta del cubrebocas (IT-UV-06)."},
+        {"num":"5.10","responsable":"Enfermería","actividad":"Manejo adecuado de los Residuos Peligrosos Biológicos e Infecciosos, así como desecho adecuado de punzocortantes."},
+        {"num":"5.11","responsable":"Enfermería","actividad":"Se deberá explicar al paciente y a sus familiares o visitantes la razón del aislamiento, así como la importancia de utilizar el equipo de protección, donde solicitarlo y el manejo posterior a su uso, ejemplo: cubre boca, guantes. Nota: el personal deberá explicar al familiar cómo se coloca el equipo de protección."},
+        {"num":"5.12","responsable":"Enfermería","actividad":"Los dispositivos médicos que estén en contacto con el paciente deberán desinfectarse con frecuencia. (IT-JE-45)"},
+        {"num":"5.13","responsable":"Enfermería","actividad":"Los equipos biomédicos serán desinfectados o esterilizados una vez que el paciente egrese del hospital. Nota: en caso de que requiera quedar en 'cultivo', UVEH los determinará."},
+        {"num":"5.14","responsable":"Todo Personal Clínico y No Clínico","actividad":"Todo personal que requiera ingresar a la habitación deberá respetar las medidas precautorias establecidas."},
+        {"num":"5.15","responsable":"Laboratorio","actividad":"Informar inmediatamente al departamento de UVEH si detecta y/o aísla gérmenes multirresistentes en cultivos del paciente. Nota: si el resultado del cultivo corresponde a una IAAS (caso nuevo) se avisa a los departamentos involucrados y se inicia el aislamiento."},
+        {"num":"5.16","responsable":"UVEH","actividad":"Avisa a los supervisores de enfermería y médicos de guardia y modifica tipo de aseo para habitación."},
+        {"num":"5.17","responsable":"Intendencia","actividad":"En las habitaciones con paciente en aislamiento deberá realizarse el aseo rutinario y aseo 'Exhaustivo Supervisado + Nebulizado' cuando éste sea dado de alta. Nota: En dado caso que epidemiología detecte algunos gérmenes multirresistentes, se hará como aseo 'Cultivo'."},
+        {"num":"5.18","responsable":"Médico Tratante","actividad":"Registrar en las indicaciones la suspensión de aislamiento del paciente, cuando haya desaparecido la condición o patología que así lo requería."},
+        {"num":"5.19","responsable":"UVEH","actividad":"Si existiese alguna duda o controversia en cuanto al manejo del paciente con enfermedad infectocontagiosa se comunicarán con los responsables de la Unidad Vigilancia Epidemiológica Hospitalaria."},
+    ],
+    "gestion_riesgos": [
+        {"riesgo":"Omisión del proceso por parte del personal clínico.","barrera":"Capacitaciones al personal clínico de las medidas precautoria Inversa."},
+        {"riesgo":"Brotes de infecciones por mal manejo del paciente infeccioso.","barrera":"Asignación estratégica de habitaciones para pacientes y supervisión continua."},
+    ],
+    "referencias": [
+        {"nombre":"Medidas precautorias","codigo":"FT-UV-05"},
+        {"nombre":"Instrucción de trabajo para la higiene de manos con agua y jabón.","codigo":"IT-UV-01"},
+        {"nombre":"Instrucción de trabajo para la higiene de manos con gel alcoholado.","codigo":"IT-UV-04"},
+        {"nombre":"Colocación correcta de bata","codigo":"IT-UV-05"},
+        {"nombre":"Colocación correcta del cubrebocas","codigo":"IT-UV-06"},
+        {"nombre":"Proceso para el abastecimiento de insumos para la higiene de manos","codigo":"PR-UV-01"},
+        {"nombre":"Desmontaje y sanitización de material","codigo":"IT-JE-45"},
+        {"nombre":"Limpieza y desinfección de habitaciones","codigo":"IT-IN-01"},
+        {"nombre":"Guía De Aplicación De La Estrategia Multimodal De La OMS, Para La Mejora De La Higiene De Manos (2010).","codigo":"NA"},
+        {"nombre":"Norma Oficial Mexicana Nom-045-Ssa2-2015, Para La Vigilancia Epidemiológica, Prevención Y Control De Las Infecciones Nosocomiales.","codigo":"NA"},
+    ],
+    "control_cambios": [
+        {"version":"01","fecha":"03/06/2021","descripcion":"Alta de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"02","fecha":"08/09/2023","descripcion":"Modificación de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"03","fecha":"26/09/2025","descripcion":"Actualización de procedimiento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+    ],
+}
+
+# ── PR-UV-12 ──────────────────────────────────────────────────────────────────
+PR_UV_12 = {
+    "codigo": "PR-UV-12",
+    "objetivo": (
+        "Unificar criterios para la adecuada aplicación del protocolo sobre aislamiento inverso, "
+        "con el fin de prevenir Infecciones Asociadas a la atención de Salud (IAAS)."
+    ),
+    "alcance": (
+        "Este proceso inicia cuando el médico tratante indica el ingreso y finaliza cuando el "
+        "personal de salud ingresa a la habitación con la medida precautoria correspondiente "
+        "(Inversa) y aplica las funciones asistenciales."
+    ),
+    "definiciones": [
+        {"termino":"IAAS","definicion":"Las Infecciones Asociadas a la Atención de la Salud (IAAS), se definen de acuerdo con la Organización Mundial de la Salud (OMS), como aquellas infecciones que afectan a un paciente durante el proceso de asistencia en un hospital o Centro Sanitario, que no estaba presente, ni en período de incubación al momento de su ingreso y que pueden inclusive llegar a manifestarse después del alta del paciente."},
+        {"termino":"Medida precautoria inversa","definicion":"Medida diseñada para evitar el acceso de microorganismos en pacientes con alta vulnerabilidad a las infecciones y son para proteger pacientes severamente inmunodeprimidos y no infectados."},
+    ],
+    "responsabilidades": [
+        {"tipo":"Actualización","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+        {"tipo":"Ejecución","descripcion":"Médico tratante, admisión, supervisión de enfermería, médico de guardia, enfermería, personal clínico/no clínico, laboratorio e intendencia, UVEH."},
+        {"tipo":"Supervisión","descripcion":"Unidad de vigilancia epidemiológica hospitalaria (UVEH)."},
+    ],
+    "desarrollo": [
+        {"num":"5.1","responsable":"Médico Tratante","actividad":"Indica el ingreso del paciente, con su diagnóstico establecido."},
+        {"num":"5.2","responsable":"Admisión","actividad":"Realiza el trámite de ingreso administrativo y avisa a supervisión de enfermería. (PR-CS-01)"},
+        {"num":"5.3","responsable":"Supervisión Enfermería","actividad":"Revisa indicaciones y detecta paciente inmunodeprimido."},
+        {"num":"5.4","responsable":"Supervisión Enfermería","actividad":"Determina habitación de aislamiento y medida precautoria a implementar (Inversa-Lila). (FT-UV-05). Nota: En caso de tener duda avisa al departamento de UVEH."},
+        {"num":"5.5","responsable":"Médico de Guardia","actividad":"Realiza visita e identifica paciente con sospecha clínica o con diagnóstico certero de paciente inmunodeprimido y avisa al departamento de UVEH, Supervisión de enfermería y determina la medida precautoria a implementar. (FT-UV-05)"},
+        {"num":"5.6","responsable":"Médico de Guardia","actividad":"Notifica al médico tratante del aislamiento en caso de no conocerlo."},
+        {"num":"5.7","responsable":"Enfermería","actividad":"Coloca en la habitación medida precautoria correspondiente al ingreso de la habitación (inversa). (IT-UV-14). Nota: El tarjetón de colocarse en un lugar visible, esta será en la puerta de entrada y si el personal tiene alguna duda si se trata de un paciente inmunodeprimido o de que medida precautoria le corresponde, se puede basar en el formato FT-UV-05."},
+        {"num":"5.8","responsable":"Enfermería","actividad":"Realizar higiene de manos durante los 5 momentos (IT-UV-01) y (IT-UV-04)"},
+        {"num":"5.9","responsable":"Enfermería","actividad":"Colocar adecuadamente el equipo de protección correspondiente: Usar bata de manga larga (IT-UV-05); Colocación correcta del cubrebocas (IT-UV-06)."},
+        {"num":"5.10","responsable":"Enfermería","actividad":"Manejo adecuado de los Residuos Peligros Biológicos e Infecciosos, así como desecho adecuado de punzocortantes."},
+        {"num":"5.11","responsable":"Enfermería","actividad":"Se deberá explicar al paciente y a sus familiares o visitantes la razón del aislamiento, así como la importancia de utilizar el equipo de protección, donde solicitarlo, ejemplo: cubre boca y bata. Nota: el personal deberá explicar al familiar cómo se coloca el equipo de protección."},
+        {"num":"5.12","responsable":"Enfermería","actividad":"Los dispositivos médicos y biomédicos que está en contacto con el paciente deberán desinfectarse antes y después de usarse. (IT-JE-45)"},
+        {"num":"5.13","responsable":"Todo Personal Clínico y No Clínico","actividad":"Todo personal que requiera ingresar a la habitación deberá respetar las medidas precautorias establecidas."},
+        {"num":"5.14","responsable":"Laboratorio","actividad":"Informar inmediatamente al departamento de UVEH si detecta y/o aísla gérmenes multirresistentes en cultivos del paciente. Nota: si es el resultado del cultivo corresponde a una IAAS (caso nuevo) se avisa a los departamentos involucrados y se inicia el aislamiento infeccioso (PR-UV-11)."},
+        {"num":"5.16","responsable":"UVEH","actividad":"Avisa a los supervisores de enfermería y médicos de guardia y modifica el tipo de aseo para habitación."},
+        {"num":"5.17","responsable":"Intendencia","actividad":"En las habitaciones con paciente en aislamiento deberá realizarse el aseo rutinario y aseo 'Exhaustivo'."},
+    ],
+    "gestion_riesgos": [
+        {"riesgo":"Omisión del proceso por parte del personal clínico.","barrera":"Capacitaciones al personal clínico de las medidas precautorias."},
+        {"riesgo":"Adquirir Infección Asociada a la atención de salud.","barrera":"Asignación estratégica de habitaciones para pacientes inmunodeprimidos y supervisión continua."},
+    ],
+    "referencias": [
+        {"nombre":"Medidas precautorias","codigo":"FT-UV-05"},
+        {"nombre":"Precauciones inversa tarjeta lila","codigo":"IT-UV-14"},
+        {"nombre":"Instrucción de trabajo para la higiene de manos con agua y jabón.","codigo":"IT-UV-01"},
+        {"nombre":"Instrucción de trabajo para la higiene de manos con gel alcoholado.","codigo":"IT-UV-04"},
+        {"nombre":"Colocación correcta de bata","codigo":"IT-UV-05"},
+        {"nombre":"Colocación correcta del cubrebocas","codigo":"IT-UV-06"},
+        {"nombre":"Proceso para el abastecimiento de insumos para la higiene de manos","codigo":"PR-UV-01"},
+        {"nombre":"Desmontaje y sanitización de material","codigo":"IT-JE-45"},
+        {"nombre":"Limpieza y desinfección de habitaciones","codigo":"IT-IN-01"},
+        {"nombre":"Procedimiento para el ingreso de pacientes a hospitalización.","codigo":"PR-CS-01"},
+        {"nombre":"Guía De Aplicación De La Estrategia Multimodal De La OMS, Para La Mejora De La Higiene De Manos (2010).","codigo":"NA"},
+        {"nombre":"Norma Oficial Mexicana Nom-045-Ssa2-2015, Para La Vigilancia Epidemiológica, Prevención Y Control De Las Infecciones Nosocomiales.","codigo":"NA"},
+    ],
+    "control_cambios": [
+        {"version":"01","fecha":"03/06/2021","descripcion":"Alta de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"02","fecha":"08/09/2023","descripcion":"Modificación de documento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Mtra. Ana Cecilia Zarate Bautista"},
+        {"version":"03","fecha":"26/09/2025","descripcion":"Actualización de procedimiento","realizado":"Lic. Viridiana López Fajardo","aprobado":"Dr. Estebán González Díaz"},
+    ],
+}
+
+# ── Generador ─────────────────────────────────────────────────────────────────
+DOCS = [PR_UV_08, PR_UV_09, PR_UV_10, PR_UV_11, PR_UV_12]
+
+HEADER = """\
+-- ============================================================
+--  UV PR Lote 2 — PR-UV-08, 09, 10, 11, 12
+--  Hospital Santa Margarita · SGC ISO 9001:2015
+-- ============================================================
+"""
+
+def build(doc):
+    code  = doc['codigo']
+    alc   = esc(doc['alcance'])
+    obj   = esc(doc['objetivo'])
+    des   = esc(j(doc['desarrollo']))
+    gr    = esc(j(doc['gestion_riesgos']))
+    refs  = esc(j(doc['referencias']))
+    cc    = esc(j(doc['control_cambios']))
+    defs  = esc(j(doc['definiciones']))
+    resps = esc(j(doc['responsabilidades']))
+    return f"""
+-- {code}
+INSERT INTO document_content (
+  document_id, alcance, objetivo,
+  material_equipo, desarrollo, gestion_riesgos,
+  referencias, control_cambios,
+  definiciones, responsabilidades)
+SELECT
+  (SELECT id FROM documents WHERE code = '{code}'),
+  '{alc}',
+  '{obj}',
+  '[]'::jsonb,
+  '{des}'::jsonb,
+  '{gr}'::jsonb,
+  '{refs}'::jsonb,
+  '{cc}'::jsonb,
+  '{defs}'::jsonb,
+  '{resps}'::jsonb
+ON CONFLICT (document_id) DO UPDATE SET
+  alcance              = EXCLUDED.alcance,
+  objetivo             = EXCLUDED.objetivo,
+  material_equipo      = EXCLUDED.material_equipo,
+  desarrollo           = EXCLUDED.desarrollo,
+  gestion_riesgos      = EXCLUDED.gestion_riesgos,
+  referencias          = EXCLUDED.referencias,
+  control_cambios      = EXCLUDED.control_cambios,
+  definiciones         = EXCLUDED.definiciones,
+  responsabilidades    = EXCLUDED.responsabilidades;
+"""
+
+out = HEADER + '\n'.join(build(d) for d in DOCS)
+pathlib.Path('uv_pr_b2.sql').write_text(out, encoding='utf-8')
+print(f'PR docs lote 2: {len(DOCS)}')
+for d in DOCS:
+    print(f"  {d['codigo']} — {len(d['desarrollo'])} pasos")
