@@ -1,12 +1,14 @@
 -- ============================================================
 --  Limpieza de departamentos — Hospital Santa Margarita
---  SGC ISO 9001:2015  (versión 2 — resuelve FK quality_indicators)
+--  SGC ISO 9001:2015  (versión 3 — resuelve FK profiles y quality_indicators)
 --
 --  Ejecutar completo de una vez en Supabase SQL Editor
 -- ============================================================
 
--- PASO 1: Quitar referencias en quality_indicators hacia
---         departamentos que serán eliminados (0 documentos)
+-- Subquery reutilizable: IDs de departamentos sin documentos
+-- (se repite en cada paso para evitar CTEs que algunos clientes no soportan)
+
+-- PASO 1: Quitar referencias en quality_indicators
 UPDATE quality_indicators
 SET responsible_department_id = NULL
 WHERE responsible_department_id IN (
@@ -17,9 +19,16 @@ WHERE responsible_department_id IN (
   HAVING COUNT(doc.id) = 0
 );
 
--- PASO 2: Quitar referencias en cualquier otra tabla que
---         pueda apuntar a esos departamentos (preventivo)
--- Si hay más tablas con FK a departments, agregar aquí.
+-- PASO 2: Quitar referencias en profiles
+UPDATE profiles
+SET department_id = NULL
+WHERE department_id IN (
+  SELECT d.id
+  FROM departments d
+  LEFT JOIN documents doc ON doc.department_id = d.id
+  GROUP BY d.id
+  HAVING COUNT(doc.id) = 0
+);
 
 -- PASO 3: Eliminar departamentos vacíos
 DELETE FROM departments
