@@ -114,3 +114,51 @@ SELECT tablename, policyname, cmd, roles
 FROM pg_policies
 WHERE tablename IN ('departments', 'document_types')
 ORDER BY tablename, cmd;
+
+-- ── Permisos para limpiar FKs antes de borrar departamento ─────
+
+-- GRANT update en quality_indicators y profiles para authenticated
+GRANT UPDATE ON quality_indicators TO authenticated;
+GRANT UPDATE ON profiles TO authenticated;
+
+-- Política UPDATE en quality_indicators (admins pueden nulificar dept FK)
+DROP POLICY IF EXISTS "cfg_update_quality_indicators_dept" ON quality_indicators;
+CREATE POLICY "cfg_update_quality_indicators_dept" ON quality_indicators
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM profiles p
+    JOIN roles r ON r.id = p.role_id
+    WHERE p.id = auth.uid()
+      AND r.name IN ('administrador', 'responsable_calidad')
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM profiles p
+    JOIN roles r ON r.id = p.role_id
+    WHERE p.id = auth.uid()
+      AND r.name IN ('administrador', 'responsable_calidad')
+  )
+);
+
+-- Política UPDATE en profiles (admins pueden nulificar department_id)
+DROP POLICY IF EXISTS "cfg_update_profiles_dept" ON profiles;
+CREATE POLICY "cfg_update_profiles_dept" ON profiles
+FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM profiles p2
+    JOIN roles r ON r.id = p2.role_id
+    WHERE p2.id = auth.uid()
+      AND r.name IN ('administrador', 'responsable_calidad')
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM profiles p2
+    JOIN roles r ON r.id = p2.role_id
+    WHERE p2.id = auth.uid()
+      AND r.name IN ('administrador', 'responsable_calidad')
+  )
+);

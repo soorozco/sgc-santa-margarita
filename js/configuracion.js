@@ -236,14 +236,40 @@ async function executeDeleteDept() {
 
   const btn = document.getElementById('btn-confirm-delete-dept')
   btn.disabled = true
+  const id = _pendingDeleteDeptId
 
-  const { error } = await db
+  // 1) Liberar FK en quality_indicators
+  const { error: e1 } = await db
+    .from('quality_indicators')
+    .update({ responsible_department_id: null })
+    .eq('responsible_department_id', id)
+
+  if (e1) {
+    showToast('Error al limpiar indicadores: ' + e1.message, 'red')
+    btn.disabled = false
+    return
+  }
+
+  // 2) Liberar FK en profiles
+  const { error: e2 } = await db
+    .from('profiles')
+    .update({ department_id: null })
+    .eq('department_id', id)
+
+  if (e2) {
+    showToast('Error al limpiar perfiles: ' + e2.message, 'red')
+    btn.disabled = false
+    return
+  }
+
+  // 3) Borrar el departamento
+  const { error: e3 } = await db
     .from('departments')
     .delete()
-    .eq('id', _pendingDeleteDeptId)
+    .eq('id', id)
 
-  if (error) {
-    showToast('Error al eliminar: ' + error.message, 'red')
+  if (e3) {
+    showToast('Error al eliminar: ' + e3.message, 'red')
     btn.disabled = false
     return
   }
