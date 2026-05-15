@@ -17,69 +17,84 @@ def j(obj):
 # ══════════════════════════════════════════════════════════════
 DOCS_META = [
     {
-        "code":               "IT-AL-01",
-        "name":               "Instrucción de Trabajo para Limpieza de Áreas, Mobiliario e Insumos",
-        "type_prefix":        "IT",
-        "dept_code":          "AL",
-        "version":            "3",
-        "status":             "vigente",
-        "custodian":          "Jefe del Área",
-        "elab_date":          "2022-03-02",
-        "elaborated_by":      "LAE. Ismael Omar Rodríguez Vázquez",
-        "reviewed_by":        "Dra. Giselle Ivette De la Torre García",
-        "vigencia":           2,
+        "code":           "IT-AL-01",
+        "name":           "Instrucción de Trabajo para Limpieza de Áreas, Mobiliario e Insumos",
+        "type_prefix":    "IT",
+        "dept_code":      "AL",
+        "version":        "3",
+        "status":         "vigente",
+        "custodian":      "Jefe del Área",
+        "issue_date":     "2022-03-02",
+        "elab_nombre":    "LAE. Ismael Omar Rodríguez Vázquez",
+        "elab_cargo":     "Coordinador de Almacén",
+        "rev_nombre":     "Dra. Giselle Ivette De la Torre García",
+        "rev_cargo":      "Jefatura de Calidad",
+        "aut_nombre":     "Mtra. Ana Cecilia Zarate Bautista",
+        "aut_cargo":      "Dirección General",
     },
     {
-        "code":               "PR-AL-01",
-        "name":               "Procedimiento para la Adquisición y Recepción de Insumos en General",
-        "type_prefix":        "PR",
-        "dept_code":          "AL",
-        "version":            "3",
-        "status":             "vigente",
-        "custodian":          "Coordinador de Almacén",
-        "elab_date":          "2022-07-05",
-        "elaborated_by":      "LAE. Ismael Omar Rodríguez Vázquez",
-        "reviewed_by":        "Dra. Giselle Ivette De la Torre García",
-        "vigencia":           2,
+        "code":           "PR-AL-01",
+        "name":           "Procedimiento para la Adquisición y Recepción de Insumos en General",
+        "type_prefix":    "PR",
+        "dept_code":      "AL",
+        "version":        "3",
+        "status":         "vigente",
+        "custodian":      "Coordinador de Almacén",
+        "issue_date":     "2022-07-05",
+        "elab_nombre":    "LAE. Ismael Omar Rodríguez Vázquez",
+        "elab_cargo":     "Coordinador de Almacén",
+        "rev_nombre":     "Dra. Giselle Ivette De la Torre García",
+        "rev_cargo":      "Jefatura de Calidad",
+        "aut_nombre":     "Mtra. Ana Cecilia Zarate Bautista",
+        "aut_cargo":      "Dirección General",
     },
     {
-        "code":               "PR-AL-02",
-        "name":               "Procedimiento para la Adquisición y Recepción de Insumos en Remisión y Consigna",
-        "type_prefix":        "PR",
-        "dept_code":          "AL",
-        "version":            "4",
-        "status":             "vigente",
-        "custodian":          "Coordinador de Almacén",
-        "elab_date":          "2022-07-05",
-        "elaborated_by":      "LAE. Ismael Omar Rodríguez Vázquez",
-        "reviewed_by":        "Dra. Giselle Ivette De la Torre García",
-        "vigencia":           2,
+        "code":           "PR-AL-02",
+        "name":           "Procedimiento para la Adquisición y Recepción de Insumos en Remisión y Consigna",
+        "type_prefix":    "PR",
+        "dept_code":      "AL",
+        "version":        "4",
+        "status":         "vigente",
+        "custodian":      "Coordinador de Almacén",
+        "issue_date":     "2022-07-05",
+        "elab_nombre":    "LAE. Ismael Omar Rodríguez Vázquez",
+        "elab_cargo":     "Coordinador de Almacén",
+        "rev_nombre":     "Dra. Giselle Ivette De la Torre García",
+        "rev_cargo":      "Jefatura de Calidad",
+        "aut_nombre":     "Mtra. Ana Cecilia Zarate Bautista",
+        "aut_cargo":      "Dirección General",
     },
     {
-        "code":               "PR-AL-03",
-        "name":               "Procedimiento para el Manejo y Almacenamiento de Insumos en General",
-        "type_prefix":        "PR",
-        "dept_code":          "AL",
-        "version":            "3",
-        "status":             "vigente",
-        "custodian":          "Jefatura de Almacén",
-        "elab_date":          "2022-07-28",
-        "elaborated_by":      "LAE. Ismael Omar Rodríguez Vázquez",
-        "reviewed_by":        "Dra. Giselle Ivette De la Torre García",
-        "vigencia":           2,
+        "code":           "PR-AL-03",
+        "name":           "Procedimiento para el Manejo y Almacenamiento de Insumos en General",
+        "type_prefix":    "PR",
+        "dept_code":      "AL",
+        "version":        "3",
+        "status":         "vigente",
+        "custodian":      "Jefatura de Almacén",
+        "issue_date":     "2022-07-28",
+        "elab_nombre":    "LAE. Ismael Omar Rodríguez Vázquez",
+        "elab_cargo":     "Coordinador de Almacén",
+        "rev_nombre":     "Dra. Giselle Ivette De la Torre García",
+        "rev_cargo":      "Jefatura de Calidad",
+        "aut_nombre":     "Mtra. Ana Cecilia Zarate Bautista",
+        "aut_cargo":      "Dirección General",
     },
     {
-        "code":               "PR-AL-04",
-        "name":               "Procedimiento para la Devolución a Proveedores",
-        "type_prefix":        "PR",
-        "dept_code":          "AL",
-        "version":            "3",
-        "status":             "vigente",
-        "custodian":          "Coordinador de Almacén",
-        "elab_date":          "2023-09-13",
-        "elaborated_by":      "LAE. Ismael Omar Rodríguez Vázquez",
-        "reviewed_by":        "Dra. Giselle Ivette De la Torre García",
-        "vigencia":           2,
+        "code":           "PR-AL-04",
+        "name":           "Procedimiento para la Devolución a Proveedores",
+        "type_prefix":    "PR",
+        "dept_code":      "AL",
+        "version":        "3",
+        "status":         "vigente",
+        "custodian":      "Coordinador de Almacén",
+        "issue_date":     "2023-09-13",
+        "elab_nombre":    "LAE. Ismael Omar Rodríguez Vázquez",
+        "elab_cargo":     "Coordinador de Almacén",
+        "rev_nombre":     "Dra. Giselle Ivette De la Torre García",
+        "rev_cargo":      "Jefatura de Calidad",
+        "aut_nombre":     "Mtra. Ana Cecilia Zarate Bautista",
+        "aut_cargo":      "Dirección General",
     },
 ]
 
@@ -298,38 +313,51 @@ PR_AL_04 = {
 # ══════════════════════════════════════════════════════════════
 
 def build_doc_insert(m):
-    code      = esc(m['code'])
-    name      = esc(m['name'])
-    tprefix   = esc(m['type_prefix'])
-    dcode     = esc(m['dept_code'])
-    version   = esc(m['version'])
-    status    = esc(m['status'])
-    custodian = esc(m['custodian'])
-    elab      = m['elab_date']
-    elaborated= esc(m['elaborated_by'])
-    reviewed  = esc(m['reviewed_by'])
-    vigencia  = m['vigencia']
+    code        = esc(m['code'])
+    name        = esc(m['name'])
+    tprefix     = esc(m['type_prefix'])
+    dcode       = esc(m['dept_code'])
+    version     = esc(m['version'])
+    status      = esc(m['status'])
+    custodian   = esc(m['custodian'])
+    issue_date  = m['issue_date']
+    elab_nombre = esc(m['elab_nombre'])
+    elab_cargo  = esc(m['elab_cargo'])
+    rev_nombre  = esc(m['rev_nombre'])
+    rev_cargo   = esc(m['rev_cargo'])
+    aut_nombre  = esc(m['aut_nombre'])
+    aut_cargo   = esc(m['aut_cargo'])
     return f"""
 -- Documento: {m['code']}
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   '{code}',
   '{name}',
   (SELECT id FROM document_types WHERE code_prefix = '{tprefix}'),
   (SELECT id FROM departments     WHERE code = '{dcode}'),
   '{version}', '{status}', '{custodian}',
-  '{elab}', '{elaborated}', '{reviewed}', {vigencia}
+  '{issue_date}',
+  '{elab_nombre}', '{elab_cargo}',
+  '{rev_nombre}',  '{rev_cargo}',
+  '{aut_nombre}',  '{aut_cargo}'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = '{dcode}')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;"""
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;"""
 
 def build_it_content(doc):
     code = doc['codigo']

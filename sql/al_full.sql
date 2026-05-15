@@ -22,102 +22,152 @@ ON CONFLICT (code) DO NOTHING;
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   'IT-AL-01',
   'Instrucción de Trabajo para Limpieza de Áreas, Mobiliario e Insumos',
   (SELECT id FROM document_types WHERE code_prefix = 'IT'),
   (SELECT id FROM departments     WHERE code = 'AL'),
   '3', 'vigente', 'Jefe del Área',
-  '2022-03-02', 'LAE. Ismael Omar Rodríguez Vázquez', 'Dra. Giselle Ivette De la Torre García', 2
+  '2022-03-02',
+  'LAE. Ismael Omar Rodríguez Vázquez', 'Coordinador de Almacén',
+  'Dra. Giselle Ivette De la Torre García',  'Jefatura de Calidad',
+  'Mtra. Ana Cecilia Zarate Bautista',  'Dirección General'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = 'AL')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;
 -- Documento: PR-AL-01
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   'PR-AL-01',
   'Procedimiento para la Adquisición y Recepción de Insumos en General',
   (SELECT id FROM document_types WHERE code_prefix = 'PR'),
   (SELECT id FROM departments     WHERE code = 'AL'),
   '3', 'vigente', 'Coordinador de Almacén',
-  '2022-07-05', 'LAE. Ismael Omar Rodríguez Vázquez', 'Dra. Giselle Ivette De la Torre García', 2
+  '2022-07-05',
+  'LAE. Ismael Omar Rodríguez Vázquez', 'Coordinador de Almacén',
+  'Dra. Giselle Ivette De la Torre García',  'Jefatura de Calidad',
+  'Mtra. Ana Cecilia Zarate Bautista',  'Dirección General'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = 'AL')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;
 -- Documento: PR-AL-02
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   'PR-AL-02',
   'Procedimiento para la Adquisición y Recepción de Insumos en Remisión y Consigna',
   (SELECT id FROM document_types WHERE code_prefix = 'PR'),
   (SELECT id FROM departments     WHERE code = 'AL'),
   '4', 'vigente', 'Coordinador de Almacén',
-  '2022-07-05', 'LAE. Ismael Omar Rodríguez Vázquez', 'Dra. Giselle Ivette De la Torre García', 2
+  '2022-07-05',
+  'LAE. Ismael Omar Rodríguez Vázquez', 'Coordinador de Almacén',
+  'Dra. Giselle Ivette De la Torre García',  'Jefatura de Calidad',
+  'Mtra. Ana Cecilia Zarate Bautista',  'Dirección General'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = 'AL')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;
 -- Documento: PR-AL-03
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   'PR-AL-03',
   'Procedimiento para el Manejo y Almacenamiento de Insumos en General',
   (SELECT id FROM document_types WHERE code_prefix = 'PR'),
   (SELECT id FROM departments     WHERE code = 'AL'),
   '3', 'vigente', 'Jefatura de Almacén',
-  '2022-07-28', 'LAE. Ismael Omar Rodríguez Vázquez', 'Dra. Giselle Ivette De la Torre García', 2
+  '2022-07-28',
+  'LAE. Ismael Omar Rodríguez Vázquez', 'Coordinador de Almacén',
+  'Dra. Giselle Ivette De la Torre García',  'Jefatura de Calidad',
+  'Mtra. Ana Cecilia Zarate Bautista',  'Dirección General'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = 'AL')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;
 -- Documento: PR-AL-04
 INSERT INTO documents (
   code, name, document_type_id, department_id,
   current_version, status, custodian_position,
-  elab_date, elaborated_by, reviewed_by, vigencia)
+  issue_date,
+  elaboro_nombre, elaboro_cargo,
+  reviso_nombre,  reviso_cargo,
+  autorizo_nombre, autorizo_cargo)
 SELECT
   'PR-AL-04',
   'Procedimiento para la Devolución a Proveedores',
   (SELECT id FROM document_types WHERE code_prefix = 'PR'),
   (SELECT id FROM departments     WHERE code = 'AL'),
   '3', 'vigente', 'Coordinador de Almacén',
-  '2023-09-13', 'LAE. Ismael Omar Rodríguez Vázquez', 'Dra. Giselle Ivette De la Torre García', 2
+  '2023-09-13',
+  'LAE. Ismael Omar Rodríguez Vázquez', 'Coordinador de Almacén',
+  'Dra. Giselle Ivette De la Torre García',  'Jefatura de Calidad',
+  'Mtra. Ana Cecilia Zarate Bautista',  'Dirección General'
 WHERE EXISTS (SELECT 1 FROM departments WHERE code = 'AL')
 ON CONFLICT (code) DO UPDATE SET
   name              = EXCLUDED.name,
   current_version   = EXCLUDED.current_version,
   status            = EXCLUDED.status,
   custodian_position= EXCLUDED.custodian_position,
-  elaborated_by     = EXCLUDED.elaborated_by,
-  reviewed_by       = EXCLUDED.reviewed_by;
+  elaboro_nombre    = EXCLUDED.elaboro_nombre,
+  elaboro_cargo     = EXCLUDED.elaboro_cargo,
+  reviso_nombre     = EXCLUDED.reviso_nombre,
+  reviso_cargo      = EXCLUDED.reviso_cargo,
+  autorizo_nombre   = EXCLUDED.autorizo_nombre,
+  autorizo_cargo    = EXCLUDED.autorizo_cargo;
 
 -- ═══ CARGAR CONTENIDO DIGITAL ═══
 
