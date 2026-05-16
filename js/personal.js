@@ -136,11 +136,5 @@ function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('open')
 }
 
-// ── Logout ───────────────────────────────────────────────────────
-async function logout() {
-  await db.auth.signOut()
-  window.location.href = 'index.html'
-}
-
 // ── Arranque ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initPersonal)
