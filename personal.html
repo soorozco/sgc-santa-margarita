@@ -169,6 +169,13 @@
           </div>
         </div>
         <div class="kpi-card">
+          <div class="kpi-icon kpi-icon--puesto"><i class="fa-solid fa-briefcase"></i></div>
+          <div class="kpi-info">
+            <div class="kpi-value" id="kpi-puestos">—</div>
+            <div class="kpi-label">Puestos distintos</div>
+          </div>
+        </div>
+        <div class="kpi-card">
           <div class="kpi-icon kpi-icon--filter"><i class="fa-solid fa-filter"></i></div>
           <div class="kpi-info">
             <div class="kpi-value" id="kpi-filtered">—</div>
@@ -177,16 +184,49 @@
         </div>
       </div>
 
+      <!-- Dashboard estadísticas -->
+      <div class="dash-grid">
+
+        <!-- Gráfica por departamento -->
+        <div class="dash-card dash-card--wide">
+          <div class="dash-card-header">
+            <i class="fa-solid fa-chart-bar"></i>
+            <span>Empleados por departamento</span>
+          </div>
+          <div class="dept-chart" id="dept-chart">
+            <div class="chart-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          </div>
+        </div>
+
+        <!-- Top puestos -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <i class="fa-solid fa-ranking-star"></i>
+            <span>Puestos más frecuentes</span>
+          </div>
+          <div class="top-puestos" id="top-puestos">
+            <div class="chart-loading"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- Filtros -->
       <div class="personal-filters">
         <div class="filter-search">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="input-search" placeholder="Buscar por nombre o puesto…" oninput="applyFilters()">
+          <input type="text" id="input-search" placeholder="Buscar por nombre…" oninput="applyFilters()">
         </div>
         <div class="filter-select-wrap">
           <i class="fa-solid fa-sitemap"></i>
           <select id="select-dept" onchange="applyFilters()">
             <option value="">Todos los departamentos</option>
+          </select>
+        </div>
+        <div class="filter-select-wrap">
+          <i class="fa-solid fa-briefcase"></i>
+          <select id="select-puesto" onchange="applyFilters()">
+            <option value="">Todos los puestos</option>
           </select>
         </div>
         <button class="btn-clear" id="btn-clear" onclick="clearFilters()" style="display:none">
