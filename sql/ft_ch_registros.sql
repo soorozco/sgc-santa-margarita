@@ -32,7 +32,7 @@ SELECT
   (SELECT id FROM document_types WHERE code_prefix = 'FT'),
   (SELECT id FROM departments     WHERE code = 'CH'),
   d.ver, 'vigente', 'Jefe de Capital Humano',
-  d.ret,
+  d.ret::integer,
   'Lic. Jorge Octavio Ramírez Chávez', 'Jefe de Capital Humano',
   'Dra. Giselle Ivette De la Torre García', 'Jefatura de Calidad',
   'Hna. Maria de Jesus Garcia Castro', 'Dirección General'
