@@ -425,6 +425,15 @@ HEADER = """\
 --  Hospital Santa Margarita · SGC ISO 9001:2015
 -- ============================================================
 
+-- ── Asegurar columnas extendidas en documents ────────────────
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS issue_date      date;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS elaboro_nombre  text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS elaboro_cargo   text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS reviso_nombre   text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS reviso_cargo    text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS autorizo_nombre text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS autorizo_cargo  text;
+
 -- Asegurarse que el departamento Laboratorio exista
 INSERT INTO departments (code, name, is_active)
 VALUES ('LA', 'Laboratorio', true)

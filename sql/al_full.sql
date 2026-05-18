@@ -8,6 +8,15 @@
 --    2. Ejecutar este SQL completo en Supabase SQL Editor
 -- ============================================================
 
+-- ── Asegurar columnas extendidas en documents ────────────────
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS issue_date      date;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS elaboro_nombre  text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS elaboro_cargo   text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS reviso_nombre   text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS reviso_cargo    text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS autorizo_nombre text;
+ALTER TABLE documents ADD COLUMN IF NOT EXISTS autorizo_cargo  text;
+
 -- Actualizar código del departamento Almacén de ALM → AL
 UPDATE departments SET code = 'AL' WHERE code = 'ALM' AND name = 'Almacén';
 -- Si el departamento no existe, crearlo:
