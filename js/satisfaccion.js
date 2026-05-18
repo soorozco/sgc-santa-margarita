@@ -113,6 +113,31 @@ async function loadSurveys() {
   updateChart()
 }
 
+// ── Tipo helpers (normaliza legacy QUEJA/SUGERENCIA/FELICITACION) ──
+function ctypeNorm(ct) {
+  const t = (ct || '').toUpperCase()
+  if (t === 'QUEJA')       return 'NEGATIVO'
+  if (t === 'FELICITACION') return 'POSITIVO'
+  if (t === 'SUGERENCIA')  return 'POSITIVO'
+  return t  // POSITIVO / NEGATIVO ya normalizados
+}
+function ctypeClass(ct) {
+  const t = ctypeNorm(ct)
+  return t === 'NEGATIVO' ? 'negativo' : t === 'POSITIVO' ? 'positivo' : ''
+}
+function ctypeBadge(ct) {
+  const t = ctypeNorm(ct)
+  return t === 'NEGATIVO' ? 'badge-negativo' : t === 'POSITIVO' ? 'badge-positivo' : 'badge-categoria'
+}
+function ctypeIcon(ct) {
+  const t = ctypeNorm(ct)
+  return t === 'NEGATIVO' ? '🔴' : t === 'POSITIVO' ? '🟢' : '💬'
+}
+function ctypeLabel(ct) {
+  const t = ctypeNorm(ct)
+  return t === 'NEGATIVO' ? 'Negativo' : t === 'POSITIVO' ? 'Positivo' : (t || '')
+}
+
 // ── Comment helpers ───────────────────────────────────────────
 // Returns array of {type, category, text} for a survey
 function getCommentsList(s) {
@@ -186,11 +211,13 @@ function renderKPIs() {
     recPct + '<span class="kpi-unit">%</span>'
   document.getElementById('kpi-rec-sub').textContent = recYes + ' de ' + n + ' pacientes'
 
-  // Count surveys that have at least one queja / sugerencia
-  const quejas = _surveys.filter(s => getSurveyCommentTypes(s).includes('QUEJA')).length
-  const sugs   = _surveys.filter(s => getSurveyCommentTypes(s).includes('SUGERENCIA')).length
-  document.getElementById('kpi-quejas').textContent = quejas
-  document.getElementById('kpi-sug').textContent    = sugs
+  // Contar comentarios negativos y positivos (incluyendo valores legacy)
+  const negativos = _surveys.filter(s =>
+    getSurveyCommentTypes(s).some(t => ctypeNorm(t) === 'NEGATIVO')).length
+  const positivos = _surveys.filter(s =>
+    getSurveyCommentTypes(s).some(t => ctypeNorm(t) === 'POSITIVO')).length
+  document.getElementById('kpi-quejas').textContent = negativos
+  document.getElementById('kpi-sug').textContent    = positivos
 }
 
 // ── Scores panel (dimension bars) ────────────────────────────
@@ -301,7 +328,7 @@ function renderComments() {
   _surveys.forEach(s => {
     getCommentsList(s).forEach(c => {
       if (!c.text || !c.text.trim()) return
-      const ct = (c.type || '').toUpperCase()
+      const ct = ctypeNorm(c.type)
       if (ctype && ct !== ctype) return
       pool.push({ survey: s, comment: c })
     })
@@ -317,14 +344,14 @@ function renderComments() {
   }
 
   list.innerHTML = pool.map(({ survey: s, comment: c }) => {
-    const ct   = (c.type || '').toUpperCase()
-    const cls  = ct==='QUEJA'?'queja': ct==='SUGERENCIA'?'sugerencia': ct==='FELICITACION'?'felicitacion':''
-    const bcls = ct==='QUEJA'?'badge-queja': ct==='SUGERENCIA'?'badge-sugerencia': ct==='FELICITACION'?'badge-felicitacion':'badge-categoria'
-    const icon = ct==='QUEJA'?'🔴': ct==='SUGERENCIA'?'🟡': ct==='FELICITACION'?'🟢':'💬'
+    const ct   = ctypeNorm(c.type)
+    const cls  = ctypeClass(ct)
+    const bcls = ctypeBadge(ct)
+    const icon = ctypeIcon(ct)
     return `
     <div class="comment-card ${cls}">
       <div class="comment-head">
-        ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ct}</span>` : ''}
+        ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ctypeLabel(ct)}</span>` : ''}
         ${c.category ? `<span class="badge-categoria">${esc(c.category)}</span>` : ''}
         <span class="comment-patient">${esc(s.patient_name||'Anónimo')}</span>
         ${s.room_number ? `<span class="comment-room">· ${esc(s.room_number)}</span>` : ''}
@@ -358,8 +385,8 @@ function renderTable() {
     const types = getSurveyCommentTypes(s)
     const typeBadges = types.length
       ? types.map(ct => {
-          const cls = ct==='QUEJA'?'badge-queja':ct==='SUGERENCIA'?'badge-sugerencia':'badge-felicitacion'
-          return `<span class="comment-badge ${cls}">${ct}</span>`
+          const norm = ctypeNorm(ct)
+          return `<span class="comment-badge ${ctypeBadge(norm)}">${ctypeIcon(norm)} ${ctypeLabel(norm)}</span>`
         }).join(' ')
       : '—'
     return `
@@ -454,14 +481,14 @@ function openDetail(id) {
     cb.innerHTML =
       `<div class="section-sep"><i class="fa-solid fa-comments"></i> Comentario${plural?'s':''}</div>` +
       comments.map(c => {
-        const ct   = (c.type || '').toUpperCase()
-        const cls  = ct==='QUEJA'?'queja': ct==='SUGERENCIA'?'sugerencia': ct==='FELICITACION'?'felicitacion':''
-        const bcls = ct==='QUEJA'?'badge-queja': ct==='SUGERENCIA'?'badge-sugerencia': ct==='FELICITACION'?'badge-felicitacion':''
-        const icon = ct==='QUEJA'?'🔴': ct==='SUGERENCIA'?'🟡': ct==='FELICITACION'?'🟢':'💬'
+        const ct   = ctypeNorm(c.type)
+        const cls  = ctypeClass(ct)
+        const bcls = ctypeBadge(ct)
+        const icon = ctypeIcon(ct)
         return `
         <div class="comment-card ${cls}" style="margin-bottom:8px">
           <div class="comment-head">
-            ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ct}</span>` : ''}
+            ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ctypeLabel(ct)}</span>` : ''}
             ${c.category ? `<span class="badge-categoria">${esc(c.category)}</span>` : ''}
           </div>
           <div class="comment-txt">${esc(c.text)}</div>
@@ -517,7 +544,7 @@ function _saveCommentTexts() {
 
 function addCommentBlock() {
   _saveCommentTexts()
-  _comments.push({ type: 'QUEJA', category: '', text: '' })
+  _comments.push({ type: 'NEGATIVO', category: '', text: '' })
   renderCommentBlocks()
 }
 
@@ -546,9 +573,9 @@ function renderCommentBlocks() {
   if (noMsg) noMsg.style.display = 'none'
 
   container.innerHTML = _comments.map((c, idx) => {
-    const types = ['QUEJA','SUGERENCIA','FELICITACION']
-    const icons  = { QUEJA:'🔴', SUGERENCIA:'🟡', FELICITACION:'🟢' }
-    const labels = { QUEJA:'Queja', SUGERENCIA:'Sugerencia', FELICITACION:'Felicitación' }
+    const types  = ['POSITIVO','NEGATIVO']
+    const icons  = { POSITIVO:'🟢', NEGATIVO:'🔴' }
+    const labels = { POSITIVO:'Positivo', NEGATIVO:'Negativo' }
     const typeBtns = types.map(t => {
       const active = c.type === t ? 'active-' + t.toLowerCase() : ''
       return `<button type="button" class="ctype-btn ${active}"

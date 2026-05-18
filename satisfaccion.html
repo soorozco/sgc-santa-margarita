@@ -90,11 +90,11 @@
         </div>
         <div class="kpi-card red">
           <div class="kpi-val" id="kpi-quejas">—</div>
-          <div class="kpi-info"><div class="kpi-lbl">Quejas</div><div class="kpi-sub" id="kpi-quejas-sub">en el período</div></div>
+          <div class="kpi-info"><div class="kpi-lbl">Negativos</div><div class="kpi-sub" id="kpi-quejas-sub">en el período</div></div>
         </div>
-        <div class="kpi-card orange">
+        <div class="kpi-card green-lt">
           <div class="kpi-val" id="kpi-sug">—</div>
-          <div class="kpi-info"><div class="kpi-lbl">Sugerencias</div><div class="kpi-sub">en el período</div></div>
+          <div class="kpi-info"><div class="kpi-lbl">Positivos</div><div class="kpi-sub">en el período</div></div>
         </div>
       </div>
 
@@ -135,9 +135,8 @@
           <div style="display:flex;gap:8px;align-items:center">
             <select class="filter-sel" id="f-ctype" onchange="applyFilters()" style="font-size:.786rem;padding:5px 28px 5px 10px">
               <option value="">Todos los tipos</option>
-              <option value="QUEJA">Quejas</option>
-              <option value="SUGERENCIA">Sugerencias</option>
-              <option value="FELICITACION">Felicitaciones</option>
+              <option value="NEGATIVO">Negativos</option>
+              <option value="POSITIVO">Positivos</option>
             </select>
           </div>
         </div>
@@ -294,7 +293,7 @@
       </div>
       <div id="comments-container"><!-- bloques generados por JS --></div>
       <div class="no-comments-msg" id="no-comments-msg">
-        Sin comentarios. Haz clic en <strong>Agregar comentario</strong> para añadir quejas, sugerencias o felicitaciones.
+        Sin comentarios. Haz clic en <strong>Agregar comentario</strong> para añadir comentarios positivos o negativos.
       </div>
 
     </div>

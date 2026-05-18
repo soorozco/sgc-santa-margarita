@@ -43,11 +43,12 @@
 .kpi-card { background:var(--white); border-radius:var(--r); box-shadow:var(--shadow);
   padding:14px 12px; border-left:4px solid var(--border); min-width:0;
   display:flex; align-items:center; gap:10px; }
-.kpi-card.blue   { border-left-color:var(--blue); }
-.kpi-card.green  { border-left-color:var(--green); }
-.kpi-card.orange { border-left-color:#ea580c; }
-.kpi-card.red    { border-left-color:var(--red); }
-.kpi-card.cyan   { border-left-color:var(--cyan); }
+.kpi-card.blue     { border-left-color:var(--blue); }
+.kpi-card.green    { border-left-color:var(--green); }
+.kpi-card.green-lt { border-left-color:var(--green); }
+.kpi-card.orange   { border-left-color:#ea580c; }
+.kpi-card.red      { border-left-color:var(--red); }
+.kpi-card.cyan     { border-left-color:var(--cyan); }
 .kpi-val { font-size:1.75rem; font-weight:700; color:var(--txt); line-height:1; flex-shrink:0; margin-bottom:0; }
 .kpi-val .kpi-unit { font-size:1rem; font-weight:500; }
 .kpi-info { flex:1; min-width:0; }
@@ -104,16 +105,14 @@
   padding:12px 14px;
   border-left:4px solid var(--border);
 }
-.comment-card.queja       { border-left-color:var(--red); }
-.comment-card.sugerencia  { border-left-color:var(--orange); }
-.comment-card.felicitacion{ border-left-color:var(--green); }
+.comment-card.negativo { border-left-color:var(--red); }
+.comment-card.positivo { border-left-color:var(--green); }
 .comment-head { display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
 .comment-badge {
   font-size:.686rem; font-weight:700; padding:2px 9px; border-radius:10px;
 }
-.badge-queja       { background:var(--red-lt);   color:var(--red); }
-.badge-sugerencia  { background:var(--orange-lt); color:#92400e; }
-.badge-felicitacion{ background:var(--green-lt);  color:var(--green); }
+.badge-negativo { background:var(--red-lt);   color:var(--red); }
+.badge-positivo { background:var(--green-lt);  color:var(--green); }
 .badge-categoria { font-size:.686rem; font-weight:600; background:#f1f5f9; color:var(--txt2);
   padding:2px 8px; border-radius:10px; }
 .comment-meta { font-size:.714rem; color:var(--txt3); margin-left:auto; }
@@ -238,9 +237,8 @@
 .ctype-row { display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
 .ctype-btn { padding:7px 16px; border:1.5px solid var(--border); border-radius:var(--rsm);
   font-size:.786rem; font-weight:600; cursor:pointer; transition:var(--ease); background:var(--white); }
-.ctype-btn.active-queja       { border-color:var(--red);    background:var(--red-lt);    color:var(--red); }
-.ctype-btn.active-sugerencia  { border-color:var(--orange);  background:var(--orange-lt); color:#92400e; }
-.ctype-btn.active-felicitacion{ border-color:var(--green);   background:var(--green-lt);  color:var(--green); }
+.ctype-btn.active-negativo { border-color:var(--red);   background:var(--red-lt);   color:var(--red); }
+.ctype-btn.active-positivo { border-color:var(--green); background:var(--green-lt); color:var(--green); }
 .ctype-btn:not([class*=active]):hover { border-color:var(--blue); color:var(--blue); }
 
 /* ── Detail modal ────────────────────────────────────────────── */
