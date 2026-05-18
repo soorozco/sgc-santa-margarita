@@ -113,12 +113,63 @@ function applyFilters() {
   renderTable(filtered)
 }
 
+// ── Stats bar ────────────────────────────────────────────────────
+function renderStats(docs) {
+  const bar = document.getElementById('stats-bar')
+  if (!bar) return
+
+  // Ocultar si no hay docs o no hay filtro activo
+  const q      = (document.getElementById('search-input')?.value || '').trim()
+  const dept   = document.getElementById('f-dept')?.value   || ''
+  const type   = document.getElementById('f-type')?.value   || ''
+  const status = document.getElementById('f-status')?.value || ''
+  const hasFilter = q || dept || type || status
+
+  if (!hasFilter || docs.length === 0) {
+    bar.style.display = 'none'
+    return
+  }
+  bar.style.display = 'flex'
+
+  // Conteo por estado
+  const byStatus = {}
+  docs.forEach(d => { byStatus[d.status] = (byStatus[d.status] || 0) + 1 })
+  const statusLabel = {
+    vigente:'Vigente', borrador:'Borrador',
+    en_revision:'En revisión', en_aprobacion:'En aprobación', obsoleto:'Obsoleto'
+  }
+  document.getElementById('stats-status').innerHTML =
+    Object.entries(byStatus)
+      .sort((a, b) => b[1] - a[1])
+      .map(([s, n]) =>
+        `<span class="stat-chip stat-chip--${s}">
+          ${statusLabel[s] || s} <span class="stat-n">${n}</span>
+        </span>`
+      ).join('')
+
+  // Conteo por tipo
+  const byType = {}
+  docs.forEach(d => {
+    const prefix = d.document_types?.code_prefix || '?'
+    byType[prefix] = (byType[prefix] || 0) + 1
+  })
+  document.getElementById('stats-type').innerHTML =
+    Object.entries(byType)
+      .sort((a, b) => b[1] - a[1])
+      .map(([t, n]) =>
+        `<span class="stat-chip stat-chip--tipo">
+          ${t} <span class="stat-n">${n}</span>
+        </span>`
+      ).join('')
+}
+
 // ── Render table ─────────────────────────────────────────────────
 function renderTable(docs) {
   const tbody = document.getElementById('docs-tbody')
   const count = document.getElementById('doc-count')
   if (count) count.textContent =
     `${docs.length} documento${docs.length !== 1 ? 's' : ''}`
+  renderStats(docs)
   if (!tbody) return
 
   if (docs.length === 0) {
