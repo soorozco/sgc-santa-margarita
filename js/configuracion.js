@@ -529,13 +529,29 @@ let _currentPerms   = {}
 async function loadUsers() {
   const { data, error } = await db
     .from('profiles')
-    .select('id, full_name, email, permissions, roles(name, display_name), departments(name)')
+    .select('id, full_name, email, role_id, permissions, departments(name)')
     .order('full_name')
 
   if (error) {
     showToast('Error al cargar usuarios: ' + error.message, 'red')
     return
   }
+
+  // Cargar roles por separado (evita ambigüedad de FK en PostgREST)
+  if (data && data.length > 0) {
+    const roleIds = [...new Set(data.filter(u => u.role_id).map(u => u.role_id))]
+    if (roleIds.length > 0) {
+      const { data: rolesData } = await db
+        .from('roles')
+        .select('id, name, display_name')
+        .in('id', roleIds)
+      if (rolesData) {
+        const rolesMap = Object.fromEntries(rolesData.map(r => [r.id, r]))
+        data.forEach(u => { u.roles = rolesMap[u.role_id] || null })
+      }
+    }
+  }
+
   _users = data || []
   renderUsersTable()
 }
