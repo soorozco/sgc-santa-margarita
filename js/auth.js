@@ -10,11 +10,23 @@ async function requireAuth() {
 async function getProfile(userId) {
   const { data, error } = await db
     .from('profiles')
-    .select('*, roles!profiles_role_id_fkey(name, display_name), departments(name)')
+    .select('*, departments(name)')
     .eq('id', userId)
     .single()
-  if (error) console.error('[SGC] getProfile error:', error.message, '| userId:', userId)
-  if (data)  console.log('[SGC] perfil cargado:', data.full_name, '| rol:', data.roles?.name)
+  if (error) {
+    console.error('[SGC] getProfile error:', error.message, '| userId:', userId)
+    return null
+  }
+  // Cargar rol por separado para evitar ambigüedad de FK en PostgREST
+  if (data?.role_id) {
+    const { data: roleData } = await db
+      .from('roles')
+      .select('name, display_name')
+      .eq('id', data.role_id)
+      .single()
+    if (roleData) data.roles = roleData
+  }
+  console.log('[SGC] perfil cargado:', data?.full_name, '| rol:', data?.roles?.name)
   return data
 }
 
