@@ -4,6 +4,7 @@ let _user         = null
 let _profile      = null
 let _role         = null
 let _allDocs      = []
+let _filteredDocs = []
 let _depts        = []
 let _types        = []
 let _currentDocId = null
@@ -86,6 +87,7 @@ async function loadDocuments() {
 
   if (error) { showError(error.message); return }
   _allDocs = data || []
+  _filteredDocs = _allDocs
   renderTable(_allDocs)
 }
 
@@ -103,14 +105,14 @@ function applyFilters() {
   const type   = document.getElementById('f-type')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
 
-  const filtered = _allDocs.filter(d => {
+  _filteredDocs = _allDocs.filter(d => {
     const txt = `${d.code} ${d.name} ${d.custodian_position || ''}`.toLowerCase()
     return (!q || txt.includes(q))
         && (!dept   || d.department_id    === dept)
         && (!type   || d.document_type_id === type)
         && (!status || d.status           === status)
   })
-  renderTable(filtered)
+  renderTable(_filteredDocs)
 }
 
 // ── Stats bar ────────────────────────────────────────────────────
@@ -1000,12 +1002,13 @@ function docSection(icon, title, bodyHtml) {
 
 // ── Exportar CSV ─────────────────────────────────────────────────
 function exportCSV() {
-  if (_allDocs.length === 0) { showToast('No hay documentos para exportar.', 'red'); return }
+  const docs = _filteredDocs.length > 0 ? _filteredDocs : _allDocs
+  if (docs.length === 0) { showToast('No hay documentos para exportar.', 'red'); return }
 
   const rows = [
     ['Código','Nombre','Tipo','Versión','Departamento','Custodio','Estado']
   ]
-  _allDocs.forEach(d => rows.push([
+  docs.forEach(d => rows.push([
     d.code,
     d.name,
     d.document_types?.code_prefix || '',
