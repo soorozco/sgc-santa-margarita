@@ -28,3 +28,26 @@ async function logout() {
   await db.auth.signOut()
   window.location.href = 'index.html'
 }
+
+// ── Control de permisos por módulo ──────────────────────────────
+// Roles con acceso total que nunca se restringen
+const _FULL_ACCESS_ROLES = ['administrador', 'responsable_calidad']
+
+function hasPermission(profile, module) {
+  const role = profile?.roles?.name || ''
+  // administrador y responsable_calidad siempre tienen acceso
+  if (_FULL_ACCESS_ROLES.includes(role)) return true
+  const perms = profile?.permissions
+  // sin configuración → acceso completo (retrocompat)
+  if (!perms || Object.keys(perms).length === 0) return true
+  // clave ausente → acceso por defecto
+  if (!(module in perms)) return true
+  return perms[module] !== false
+}
+
+// Redirige al dashboard si el usuario no tiene permiso para el módulo actual
+function requirePermission(profile, module) {
+  if (!hasPermission(profile, module)) {
+    window.location.href = 'dashboard.html?blocked=' + module
+  }
+}

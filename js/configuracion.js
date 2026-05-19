@@ -22,6 +22,12 @@ async function initConfig() {
 
   renderUserInfo()
 
+  // Mostrar pestaña de usuarios solo al administrador
+  if (_role === 'administrador') {
+    const tabBtn = document.getElementById('tab-btn-usuarios')
+    if (tabBtn) tabBtn.style.display = ''
+  }
+
   const allowed = ['administrador', 'responsable_calidad']
   if (!allowed.includes(_role)) {
     document.getElementById('cfg-content').innerHTML = `
@@ -33,7 +39,9 @@ async function initConfig() {
     return
   }
 
-  await Promise.all([loadDepartments(), loadDocTypes()])
+  const tasks = [loadDepartments(), loadDocTypes()]
+  if (_role === 'administrador') tasks.push(loadUsers())
+  await Promise.all(tasks)
   setupTabs()
 }
 
@@ -487,6 +495,247 @@ function showToast(msg, type) {
   el.textContent = msg
   document.body.appendChild(el)
   setTimeout(() => el.remove(), 3500)
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USUARIOS Y PERMISOS  (solo administrador)
+// ═══════════════════════════════════════════════════════════════
+
+const MODULES = [
+  { key: 'dashboard',            label: 'Dashboard',                  icon: 'fa-gauge-high',     group: 'Principal' },
+  { key: 'contexto',             label: 'Contexto del SGC',           icon: 'fa-building',        group: 'ISO 9001' },
+  { key: 'documentos',           label: 'Control de Documentos',      icon: 'fa-file-lines',      group: 'ISO 9001' },
+  { key: 'registros',            label: 'Control de Registros',       icon: 'fa-table-list',      group: 'ISO 9001' },
+  { key: 'riesgos',              label: 'Gestión de Riesgos',         icon: 'fa-shield-halved',   group: 'ISO 9001' },
+  { key: 'noconformidades',      label: 'No Conformidades',           icon: 'fa-circle-xmark',    group: 'ISO 9001' },
+  { key: 'acciones_correctivas', label: 'Acciones Correctivas',       icon: 'fa-list-check',      group: 'ISO 9001' },
+  { key: 'indicadores',          label: 'Indicadores',                icon: 'fa-chart-line',      group: 'ISO 9001' },
+  { key: 'auditorias',           label: 'Auditorías Externas',        icon: 'fa-award',           group: 'ISO 9001' },
+  { key: 'revision_direccion',   label: 'Revisión por Dirección',     icon: 'fa-clipboard-list',  group: 'ISO 9001' },
+  { key: 'personal',             label: 'Personal',                   icon: 'fa-id-card',         group: 'Otros' },
+  { key: 'satisfaccion',         label: 'Satisfacción y Comentarios', icon: 'fa-face-smile',      group: 'Otros' },
+  { key: 'comites',              label: 'Comités',                    icon: 'fa-users',           group: 'Otros' },
+  { key: 'eventos_adversos',     label: 'Eventos Adversos',           icon: 'fa-hospital-user',   group: 'Otros' },
+]
+
+// Roles con acceso total (no se pueden restringir)
+const FULL_ACCESS_ROLES = ['administrador', 'responsable_calidad']
+
+let _users = []
+let _editingUserId  = null
+let _currentPerms   = {}
+
+// ── Carga lista de usuarios ─────────────────────────────────────
+async function loadUsers() {
+  const { data, error } = await db
+    .from('profiles')
+    .select('id, full_name, email, permissions, roles(name, display_name), departments(name)')
+    .order('full_name')
+
+  if (error) {
+    showToast('Error al cargar usuarios: ' + error.message, 'red')
+    return
+  }
+  _users = data || []
+  renderUsersTable()
+}
+
+// ── Render tabla de usuarios ────────────────────────────────────
+function renderUsersTable() {
+  const tbody = document.getElementById('users-tbody')
+  const count = document.getElementById('users-count')
+  if (!tbody) return
+
+  if (count) count.textContent = `${_users.length} usuario${_users.length !== 1 ? 's' : ''}`
+
+  if (_users.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="table-empty">
+          <i class="fa-solid fa-users-slash"></i>
+          <strong>Sin usuarios</strong>
+        </td>
+      </tr>`
+    return
+  }
+
+  tbody.innerHTML = _users.map(u => {
+    const roleName    = u.roles?.name || ''
+    const roleLabel   = u.roles?.display_name || 'Sin rol'
+    const isFullAccess = FULL_ACCESS_ROLES.includes(roleName)
+    const deptLabel   = u.departments?.name || '—'
+    const perms       = u.permissions || {}
+    const blocked     = Object.values(perms).filter(v => v === false).length
+    const initial     = (u.full_name || u.email || 'U')[0].toUpperCase()
+
+    const roleClass = roleName === 'administrador' ? 'role-admin'
+                    : roleName === 'responsable_calidad' ? 'role-rq'
+                    : 'role-user'
+
+    const accessBadge = isFullAccess
+      ? `<span class="perm-badge perm-full"><i class="fa-solid fa-infinity"></i> Acceso total</span>`
+      : blocked > 0
+        ? `<span class="perm-badge perm-restricted"><i class="fa-solid fa-ban"></i> ${blocked} bloqueada${blocked !== 1 ? 's' : ''}</span>`
+        : `<span class="perm-badge perm-ok"><i class="fa-solid fa-check"></i> Todas activas</span>`
+
+    return `
+      <tr>
+        <td>
+          <div class="user-cell">
+            <div class="user-avatar-sm">${escHtml(initial)}</div>
+            <span class="user-name-cell">${escHtml(u.full_name || '—')}</span>
+          </div>
+        </td>
+        <td class="user-email-cell">${escHtml(u.email || '—')}</td>
+        <td><span class="role-badge ${roleClass}">${escHtml(roleLabel)}</span></td>
+        <td>${escHtml(deptLabel)}</td>
+        <td class="center">${accessBadge}</td>
+        <td class="center">
+          <button class="btn-perm-edit" onclick="openPermPanel('${u.id}')" ${isFullAccess ? 'disabled title="Acceso total, no requiere configuración"' : ''}>
+            <i class="fa-solid fa-sliders"></i>
+            Editar
+          </button>
+        </td>
+      </tr>`
+  }).join('')
+}
+
+// ── Abrir panel de permisos ─────────────────────────────────────
+function openPermPanel(userId) {
+  const user = _users.find(u => u.id === userId)
+  if (!user) return
+
+  _editingUserId = userId
+  _currentPerms  = { ...(user.permissions || {}) }
+
+  const initial = (user.full_name || user.email || 'U')[0].toUpperCase()
+  const roleName  = user.roles?.name || ''
+  const roleLabel = user.roles?.display_name || 'Sin rol'
+  const isFullAccess = FULL_ACCESS_ROLES.includes(roleName)
+
+  document.getElementById('perm-avatar').textContent  = initial
+  document.getElementById('perm-user-name').textContent = user.full_name || user.email || '—'
+  document.getElementById('perm-user-meta').textContent = `${roleLabel}${user.departments?.name ? ' · ' + user.departments.name : ''}`
+
+  const body   = document.getElementById('perm-body')
+  const footer = document.getElementById('perm-footer')
+
+  if (isFullAccess) {
+    body.innerHTML = `
+      <div class="perm-full-notice">
+        <i class="fa-solid fa-shield-check"></i>
+        <div>
+          <strong>Acceso completo garantizado</strong>
+          <p>Los usuarios con rol <em>${escHtml(roleLabel)}</em> siempre tienen acceso a todas las secciones. Sus permisos no se pueden restringir.</p>
+        </div>
+      </div>`
+    footer.style.display = 'none'
+  } else {
+    footer.style.display = ''
+
+    // Agrupar módulos
+    const groups = {}
+    MODULES.forEach(m => {
+      if (!groups[m.group]) groups[m.group] = []
+      groups[m.group].push(m)
+    })
+
+    const html = Object.entries(groups).map(([groupName, mods]) => `
+      <div class="perm-group">
+        <div class="perm-group-label">${escHtml(groupName)}</div>
+        <div class="perm-module-grid">
+          ${mods.map(m => {
+            const isOn = _currentPerms[m.key] !== false
+            return `
+              <label class="perm-toggle-row" for="perm-${m.key}">
+                <div class="perm-module-info">
+                  <i class="fa-solid ${m.icon} perm-mod-icon"></i>
+                  <span class="perm-mod-label">${escHtml(m.label)}</span>
+                </div>
+                <div class="toggle-wrap">
+                  <input type="checkbox" id="perm-${m.key}"
+                         class="toggle-input"
+                         ${isOn ? 'checked' : ''}
+                         onchange="togglePerm('${m.key}', this.checked)">
+                  <span class="toggle-slider"></span>
+                </div>
+              </label>`
+          }).join('')}
+        </div>
+      </div>`
+    ).join('')
+
+    body.innerHTML = `
+      <div class="perm-actions-bar">
+        <button class="btn-perm-all" onclick="setAllPerms(true)">
+          <i class="fa-solid fa-check-double"></i> Activar todas
+        </button>
+        <button class="btn-perm-none" onclick="setAllPerms(false)">
+          <i class="fa-solid fa-ban"></i> Bloquear todas
+        </button>
+      </div>
+      ${html}`
+  }
+
+  document.getElementById('perm-panel').classList.add('open')
+}
+
+// ── Toggle individual ───────────────────────────────────────────
+function togglePerm(key, value) {
+  if (value) {
+    // Si es true, eliminar la clave (default = acceso)
+    delete _currentPerms[key]
+  } else {
+    _currentPerms[key] = false
+  }
+}
+
+// ── Activar / bloquear todas ────────────────────────────────────
+function setAllPerms(value) {
+  _currentPerms = {}
+  if (!value) {
+    MODULES.forEach(m => { _currentPerms[m.key] = false })
+  }
+  // Re-renderizar los checkboxes
+  MODULES.forEach(m => {
+    const cb = document.getElementById('perm-' + m.key)
+    if (cb) cb.checked = value
+  })
+}
+
+// ── Guardar permisos ────────────────────────────────────────────
+async function savePermissions() {
+  if (!_editingUserId) return
+
+  const btn = document.getElementById('btn-save-perms')
+  btn.disabled = true
+
+  const { error } = await db
+    .from('profiles')
+    .update({ permissions: _currentPerms })
+    .eq('id', _editingUserId)
+
+  btn.disabled = false
+
+  if (error) {
+    showToast('Error al guardar: ' + error.message, 'red')
+    return
+  }
+
+  showToast('Permisos actualizados correctamente.', 'green')
+  closePermPanel()
+  await loadUsers()
+}
+
+// ── Cerrar panel ────────────────────────────────────────────────
+function closePermPanel() {
+  document.getElementById('perm-panel').classList.remove('open')
+  _editingUserId = null
+  _currentPerms  = {}
+}
+
+function closePanelOutside(e) {
+  if (e.target.id === 'perm-panel') closePermPanel()
 }
 
 // ── Arrancar ─────────────────────────────────────────────────────

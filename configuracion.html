@@ -145,7 +145,7 @@
     <div class="topbar">
       <div>
         <div class="topbar-page-title">Configuración</div>
-        <div class="topbar-sub">Departamentos y tipos de documento</div>
+        <div class="topbar-sub" id="cfg-topbar-sub">Departamentos y tipos de documento</div>
       </div>
       <div class="topbar-right">
         <span class="iso-badge">
@@ -166,6 +166,10 @@
         <button class="tab-btn" data-tab="tipos">
           <i class="fa-solid fa-tags"></i>
           Tipos de Documento
+        </button>
+        <button class="tab-btn tab-admin-only" data-tab="usuarios" id="tab-btn-usuarios" style="display:none">
+          <i class="fa-solid fa-users-gear"></i>
+          Usuarios y Permisos
         </button>
       </div>
 
@@ -250,6 +254,49 @@
         </div>
 
       </div><!-- /tab-tipos -->
+
+      <!-- ── TAB: Usuarios y Permisos ──────────────────────── -->
+      <div class="tab-content" id="tab-usuarios">
+
+        <div class="cfg-section-header">
+          <div class="cfg-section-title">
+            Usuarios y Permisos
+            <small>Controla el acceso de cada usuario a las secciones del sistema</small>
+          </div>
+        </div>
+
+        <div class="users-info-banner">
+          <i class="fa-solid fa-circle-info"></i>
+          Los usuarios con rol <strong>Administrador</strong> y <strong>Responsable de Calidad</strong> siempre tienen acceso completo al sistema. Los demás roles respetan los permisos configurados aquí.
+        </div>
+
+        <div class="table-wrap">
+          <div class="table-head-bar">
+            <span class="table-count" id="users-count">Cargando…</span>
+          </div>
+          <table class="cfg-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Departamento</th>
+                <th class="center">Secciones</th>
+                <th class="center">Permisos</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <tr>
+                <td colspan="6" class="table-empty">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  <strong>Cargando…</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /tab-usuarios -->
 
     </div><!-- /page-content -->
   </main>
@@ -412,6 +459,39 @@
               style="background:linear-gradient(135deg,#7f1d1d,#dc2626); box-shadow:0 2px 8px rgba(220,38,38,0.3)">
         <i class="fa-solid fa-trash"></i>
         Eliminar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ PANEL — Permisos de Usuario ═══════════════ -->
+<div class="perm-overlay" id="perm-panel" onclick="closePanelOutside(event)">
+  <div class="perm-drawer">
+
+    <div class="perm-header">
+      <div class="perm-user-info">
+        <div class="perm-avatar" id="perm-avatar">U</div>
+        <div>
+          <div class="perm-user-name" id="perm-user-name">—</div>
+          <div class="perm-user-meta" id="perm-user-meta">—</div>
+        </div>
+      </div>
+      <button class="modal-x" onclick="closePermPanel()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="perm-body" id="perm-body">
+      <!-- Contenido dinámico -->
+    </div>
+
+    <div class="perm-footer" id="perm-footer">
+      <button class="btn-secondary" onclick="closePermPanel()">Cancelar</button>
+      <button class="btn-primary" id="btn-save-perms" onclick="savePermissions()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar permisos
       </button>
     </div>
 
