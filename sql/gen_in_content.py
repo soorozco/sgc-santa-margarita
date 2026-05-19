@@ -30,9 +30,9 @@ _EC8 = "Jefatura de Intendencia"
 _R8  = "Doc. Manuel Cortés Gutiérrez"
 _RC8 = "Jefatura de Epidemiología"
 
-def _meta(code, name, ver, dt, en, ec, rn, rc, an, ac):
+def _meta(code, name, ver, dt, en, ec, rn, rc, an, ac, status="vigente"):
     return {"code": code, "name": name, "type_prefix": "IT", "dept_code": "IN",
-            "version": ver, "status": "vigente",
+            "version": ver, "status": status,
             "custodian": "Jefatura de Intendencia",
             "issue_date": dt,
             "elab_nombre": en, "elab_cargo": ec,
@@ -53,11 +53,11 @@ DOCS_META = [
     _meta("IT-IN-06","Instrucción de Trabajo para la Limpieza Rutinaria en Habitaciones",
           "2","2024-06-17", _EA,_ECA, _RA,_RCA, _AA,_ACA),
     _meta("IT-IN-07","Instrucción de Trabajo para la Limpieza y Desinfección de Refrigeradores de Medicamentos",
-          "2","2024-02-14", _EB,_ECB, _EB,_ECB, _EB,_ECB),
+          "2","2024-02-14", _EB,_ECB, _EB,_ECB, _EB,_ECB, "obsoleto"),
     _meta("IT-IN-08","Instrucción de Trabajo para la Supervisión de Limpieza de Áreas",
-          "1","2022-04-08", _EA,_EC8, _R8,_RC8, _EB,_ACA),
+          "1","2022-04-08", _EA,_EC8, _R8,_RC8, _EB,_ACA, "obsoleto"),
     _meta("IT-IN-09","Instrucción de Trabajo para Limpieza y Desinfección de Áreas (Ordinaria)",
-          "3","2024-02-14", _EB,_ECB, _EB,_ECB, _EB,_ECB),
+          "3","2024-02-14", _EB,_ECB, _EB,_ECB, _EB,_ECB, "obsoleto"),
 ]
 
 # ── Control de cambios ────────────────────────────────────────────
