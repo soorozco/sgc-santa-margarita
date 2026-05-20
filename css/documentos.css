@@ -264,6 +264,8 @@
 .info-item label { font-size: 0.714rem; font-weight: 700; text-transform: uppercase;
                    letter-spacing: 0.05em; color: var(--txt3); display: block; margin-bottom: 3px; }
 .info-item span  { font-size: 0.857rem; color: var(--txt); font-weight: 500; }
+.info-sub        { display: block; font-size: 0.714rem; color: var(--txt3); margin-top: 1px; }
+.field-cargo     { display: block; font-size: 0.75rem; color: var(--txt3); margin-top: 3px; min-height: 1em; }
 
 .section-sep { font-size: 0.786rem; font-weight: 700; text-transform: uppercase;
                letter-spacing: 0.06em; color: var(--txt3);

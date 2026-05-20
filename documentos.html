@@ -454,12 +454,19 @@
           <span id="d-custodian">—</span>
         </div>
         <div class="info-item">
-          <label>Elaborado por</label>
+          <label>Elaboró</label>
           <span id="d-elaborated">—</span>
+          <small id="d-elaborated-cargo" class="info-sub"></small>
         </div>
         <div class="info-item">
-          <label>Revisado por</label>
+          <label>Revisó</label>
           <span id="d-reviewed">—</span>
+          <small id="d-reviewed-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item">
+          <label>Autorizó</label>
+          <span id="d-authorized">—</span>
+          <small id="d-authorized-cargo" class="info-sub"></small>
         </div>
         <div class="info-item">
           <label>Fecha elaboración</label>
@@ -590,13 +597,30 @@
 
       <div class="form-row">
         <div class="field">
-          <label>Elaborado por</label>
-          <input type="text" id="edit-elaborated-by" placeholder="Nombre">
+          <label>Elaboró</label>
+          <select id="edit-elaborated-by" onchange="updateCargo(this,'edit-elaboro-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-elaboro-cargo" class="field-cargo"></small>
         </div>
         <div class="field">
-          <label>Revisado por</label>
-          <input type="text" id="edit-reviewed-by" placeholder="Nombre">
+          <label>Revisó</label>
+          <select id="edit-reviewed-by" onchange="updateCargo(this,'edit-reviso-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-reviso-cargo" class="field-cargo"></small>
         </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Autorizó</label>
+          <select id="edit-authorized-by" onchange="updateCargo(this,'edit-autorizo-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-autorizo-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field"></div>
       </div>
 
       <div class="form-row one">

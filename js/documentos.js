@@ -7,6 +7,7 @@ let _allDocs      = []
 let _filteredDocs = []
 let _depts        = []
 let _types        = []
+let _personal     = []
 let _currentDocId = null
 
 // ── Init ────────────────────────────────────────────────────────
@@ -19,7 +20,7 @@ async function initDocuments() {
 
   renderUserInfo()
   setCurrentDate()
-  await Promise.all([loadDepts(), loadDocTypes()])
+  await Promise.all([loadDepts(), loadDocTypes(), loadPersonal()])
   populateFilters()
   await loadDocuments()
   setupSearchFilter()
@@ -52,6 +53,14 @@ async function loadDocTypes() {
   _types = data || []
 }
 
+async function loadPersonal() {
+  const { data } = await db.from('personal')
+    .select('codigo, nombre, puesto, departamento')
+    .eq('activo', true)
+    .order('nombre')
+  _personal = data || []
+}
+
 function populateFilters() {
   const deptOpts = _depts.map(d =>
     `<option value="${d.id}">${d.name}</option>`).join('')
@@ -69,6 +78,29 @@ function populateFilters() {
   const nType = document.getElementById('new-type')
   if (nDept) nDept.innerHTML = `<option value="">— Seleccionar —</option>${deptOpts}`
   if (nType) nType.innerHTML = `<option value="">— Seleccionar —</option>${typeOpts}`
+
+  // Personal selects (edit & new modals)
+  populatePersonalSelects()
+}
+
+function populatePersonalSelects() {
+  const blankOpt = '<option value="">— Sin asignar —</option>'
+  const opts = blankOpt + _personal.map(p =>
+    `<option value="${esc(p.nombre)}">${esc(p.nombre)}${p.puesto ? ' — ' + esc(p.puesto) : ''}</option>`
+  ).join('')
+
+  ;['edit-elaborated-by','edit-reviewed-by','edit-authorized-by',
+    'new-elaborated-by','new-reviewed-by','new-authorized-by'].forEach(id => {
+    const sel = document.getElementById(id)
+    if (sel) sel.innerHTML = opts
+  })
+}
+
+function updateCargo(selectEl, cargoId) {
+  const name   = selectEl.value
+  const person = _personal.find(p => p.nombre === name)
+  const el     = document.getElementById(cargoId)
+  if (el) el.textContent = person?.puesto || ''
 }
 
 function applyRoleUI() {
@@ -375,10 +407,29 @@ function openEdit(docId) {
   setVal('edit-custodian',    doc.custodian_position || '')
   setVal('edit-vigencia',     doc.retention_years || 2)
   setVal('edit-elab-date',    doc.elaboration_date || '')
-  setVal('edit-elaborated-by',doc.elaborated_by || '')
-  setVal('edit-reviewed-by',  doc.reviewed_by || '')
   setVal('edit-desc',         doc.description || '')
   setVal('edit-status',       doc.status || 'borrador')
+
+  // Personal selects — re-poblar y seleccionar
+  populatePersonalSelects()
+  setVal('edit-elaborated-by', doc.elaborated_by  || '')
+  setVal('edit-reviewed-by',   doc.reviewed_by    || '')
+  setVal('edit-authorized-by', doc.authorized_by  || '')
+
+  // Mostrar cargo al abrir
+  const _cargoMap = {
+    'edit-elaborated-by': 'edit-elaboro-cargo',
+    'edit-reviewed-by':   'edit-reviso-cargo',
+    'edit-authorized-by': 'edit-autorizo-cargo'
+  }
+  Object.entries(_cargoMap).forEach(([selId, cargoId]) => {
+    const sel    = document.getElementById(selId)
+    const cargoEl= document.getElementById(cargoId)
+    if (sel && cargoEl) {
+      const person = _personal.find(p => p.nombre === sel.value)
+      cargoEl.textContent = person?.puesto || ''
+    }
+  })
 
   openModal('modal-edit')
 }
@@ -411,15 +462,25 @@ async function submitEdit() {
     status:            document.getElementById('edit-status')?.value     || 'borrador',
     retention_years:   parseInt(document.getElementById('edit-vigencia')?.value) || 2,
     elaboration_date:  document.getElementById('edit-elab-date')?.value  || null,
-    elaborated_by:     document.getElementById('edit-elaborated-by')?.value.trim() || null,
-    reviewed_by:       document.getElementById('edit-reviewed-by')?.value.trim()   || null,
+    elaborated_by:     document.getElementById('edit-elaborated-by')?.value || null,
+    reviewed_by:       document.getElementById('edit-reviewed-by')?.value   || null,
+    authorized_by:     document.getElementById('edit-authorized-by')?.value || null,
     description:       document.getElementById('edit-desc')?.value.trim() || null,
     updated_at:        new Date().toISOString()
   }
 
-  const { error } = await db.from('documents')
+  let { error } = await db.from('documents')
     .update(payload)
     .eq('id', _currentDocId)
+
+  // Si authorized_by no existe aún en la tabla, reintentar sin ese campo
+  if (error && (error.message.includes('authorized_by') || error.code === '42703')) {
+    const { authorized_by: _, ...payloadFallback } = payload
+    const { error: err2 } = await db.from('documents')
+      .update(payloadFallback)
+      .eq('id', _currentDocId)
+    error = err2
+  }
 
   if (error) {
     showToast('Error al guardar: ' + error.message, 'red')
@@ -619,11 +680,20 @@ async function openDetail(docId) {
   setText('d-status',    sLabel(doc.status))
   setText('d-dept',      doc.departments?.name    || '—')
   setText('d-custodian', doc.custodian_position   || '—')
-  setText('d-elaborated',doc.elaborated_by        || '—')
-  setText('d-reviewed',  doc.reviewed_by          || '—')
   setText('d-elab-date', doc.elaboration_date ? fmtDate(doc.elaboration_date) : '—')
   setText('d-vigencia',  doc.retention_years ? `${doc.retention_years} año(s)` : '—')
   setText('d-desc',      doc.description          || '—')
+
+  // Elaboró / Revisó / Autorizó con cargo desde personal
+  const elaboroPerson   = _personal.find(p => p.nombre === doc.elaborated_by)
+  const revisoPerson    = _personal.find(p => p.nombre === doc.reviewed_by)
+  const autorizoPerson  = _personal.find(p => p.nombre === doc.authorized_by)
+  setText('d-elaborated',       doc.elaborated_by  || '—')
+  setText('d-elaborated-cargo', elaboroPerson?.puesto  || '')
+  setText('d-reviewed',         doc.reviewed_by    || '—')
+  setText('d-reviewed-cargo',   revisoPerson?.puesto   || '')
+  setText('d-authorized',       doc.authorized_by  || '—')
+  setText('d-authorized-cargo', autorizoPerson?.puesto || '')
 
   // Workflow bar
   renderWorkflow(doc.status)
