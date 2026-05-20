@@ -24,6 +24,7 @@ async function initEA() {
   setCurrentDate()
   await loadIncidents()
   populateSubtypes()
+  populateYears()
   applyFilters()
   subscribeRealtime()
 }
@@ -36,6 +37,7 @@ function subscribeRealtime() {
       async () => {
         await loadIncidents()
         populateSubtypes()
+        populateYears()
         applyFilters()
         showRefreshBadge()
       }
@@ -104,12 +106,30 @@ function populateSubtypes() {
   const subtypes = [...new Set(_all.map(r => r.incident_subtype).filter(Boolean))].sort()
   const sel = document.getElementById('f-subtype')
   if (!sel) return
+  const current = sel.value
+  sel.innerHTML = '<option value="">Todos</option>'
   subtypes.forEach(s => {
     const opt = document.createElement('option')
     opt.value = s
     opt.textContent = s
     sel.appendChild(opt)
   })
+  sel.value = current
+}
+
+function populateYears() {
+  const years = [...new Set(_all.map(r => r.incident_date?.slice(0, 4)).filter(Boolean))].sort((a,b) => b-a)
+  const sel = document.getElementById('f-year')
+  if (!sel) return
+  const current = sel.value
+  sel.innerHTML = '<option value="">Todos</option>'
+  years.forEach(y => {
+    const opt = document.createElement('option')
+    opt.value = y
+    opt.textContent = y
+    sel.appendChild(opt)
+  })
+  if (current) sel.value = current
 }
 
 // ── Filtros ─────────────────────────────────────────────────────
@@ -117,12 +137,16 @@ function applyFilters() {
   const fType    = document.getElementById('f-type')?.value    || ''
   const fDamage  = document.getElementById('f-damage')?.value  || ''
   const fSubtype = document.getElementById('f-subtype')?.value || ''
+  const fMonth   = document.getElementById('f-month')?.value   || ''
+  const fYear    = document.getElementById('f-year')?.value    || ''
   const fSearch  = (document.getElementById('f-search')?.value || '').toLowerCase()
 
   _filtered = _all.filter(r => {
     if (fType    && r.incident_type    !== fType)    return false
     if (fDamage  && r.damage_level     !== fDamage)  return false
     if (fSubtype && r.incident_subtype !== fSubtype) return false
+    if (fYear    && r.incident_date?.slice(0, 4)     !== fYear)          return false
+    if (fMonth   && String(parseInt(r.incident_date?.slice(5, 7))) !== fMonth) return false
     if (fSearch) {
       const haystack = [r.patient_name, r.description, r.causes,
                         r.immediate_actions, r.incident_subtype].join(' ').toLowerCase()
@@ -135,7 +159,7 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  ;['f-type','f-damage','f-subtype'].forEach(id => {
+  ;['f-type','f-damage','f-subtype','f-month','f-year'].forEach(id => {
     const el = document.getElementById(id)
     if (el) el.value = ''
   })
