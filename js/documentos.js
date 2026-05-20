@@ -87,8 +87,7 @@ async function loadDocuments() {
 
   if (error) { showError(error.message); return }
   _allDocs = data || []
-  _filteredDocs = _allDocs
-  renderTable(_allDocs)
+  applyFilters()
 }
 
 // ── Filters ─────────────────────────────────────────────────────
