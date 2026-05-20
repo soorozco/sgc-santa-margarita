@@ -25,6 +25,29 @@ async function initEA() {
   await loadIncidents()
   populateSubtypes()
   applyFilters()
+  subscribeRealtime()
+}
+
+// ── Realtime — auto-refresh al recibir nuevos incidentes ─────────
+function subscribeRealtime() {
+  db.channel('clinical_incidents_changes')
+    .on('postgres_changes',
+      { event: '*', schema: 'public', table: 'clinical_incidents' },
+      async () => {
+        await loadIncidents()
+        populateSubtypes()
+        applyFilters()
+        showRefreshBadge()
+      }
+    )
+    .subscribe()
+}
+
+function showRefreshBadge() {
+  const badge = document.getElementById('realtime-badge')
+  if (!badge) return
+  badge.style.display = 'inline-flex'
+  setTimeout(() => { badge.style.display = 'none' }, 4000)
 }
 
 function renderUserInfo() {
