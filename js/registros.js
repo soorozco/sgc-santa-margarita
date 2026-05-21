@@ -311,6 +311,16 @@ async function openDetail(regId) {
   setText('d-authorized',       reg.authorized_by  || '—')
   setText('d-authorized-cargo', autorizoPerson?.puesto || '')
 
+  // Enlace al archivo editable
+  const tplWrap = document.getElementById('d-template-wrap')
+  const tplLink = document.getElementById('d-template-url')
+  if (reg.template_url) {
+    if (tplWrap) tplWrap.style.display = 'block'
+    if (tplLink) { tplLink.href = reg.template_url; tplLink.textContent = reg.template_url }
+  } else {
+    if (tplWrap) tplWrap.style.display = 'none'
+  }
+
   // Botones en footer del modal
   const canWrite = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
   const btnUp = document.getElementById('btn-upload-ver')
@@ -406,8 +416,9 @@ function openEdit(regId) {
   setVal('edit-version',   reg.current_version || '1')
   setVal('edit-name',      reg.name)
   setVal('edit-status',    reg.status || 'vigente')
-  setVal('edit-retention', reg.retention_years || '')
-  setVal('edit-elab-date', reg.elaboration_date || '')
+  setVal('edit-retention',     reg.retention_years   || '')
+  setVal('edit-elab-date',     reg.elaboration_date  || '')
+  setVal('edit-template-url',  reg.template_url      || '')
 
   // Personal selects
   populatePersonalSelects()
@@ -458,6 +469,7 @@ async function submitEdit() {
     elaborated_by:   document.getElementById('edit-elaborated-by')?.value   || null,
     reviewed_by:     document.getElementById('edit-reviewed-by')?.value     || null,
     authorized_by:   document.getElementById('edit-authorized-by')?.value   || null,
+    template_url:    document.getElementById('edit-template-url')?.value.trim() || null,
     updated_at:      new Date().toISOString()
   }
 

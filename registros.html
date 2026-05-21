@@ -411,6 +411,20 @@
         </div>
       </div>
 
+      <!-- Enlace editable -->
+      <div id="d-template-wrap" style="display:none;margin-bottom:14px">
+        <div class="template-link-bar">
+          <i class="fa-solid fa-file-pen"></i>
+          <div>
+            <div style="font-size:.75rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px">
+              Archivo editable
+            </div>
+            <a id="d-template-url" href="#" target="_blank" rel="noopener"
+               style="font-size:.875rem;color:#0d6efd;word-break:break-all">—</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Historial de versiones / PDFs -->
       <div class="section-sep">
         <i class="fa-solid fa-clock-rotate-left" style="margin-right:6px"></i>
@@ -502,6 +516,20 @@
         <div class="field">
           <label>Fecha de elaboración</label>
           <input type="date" id="edit-elab-date">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>
+            <i class="fa-solid fa-link" style="margin-right:4px;color:#6b7280"></i>
+            Enlace al archivo editable
+          </label>
+          <input type="url" id="edit-template-url"
+                 placeholder="https://docs.google.com/… o enlace a SharePoint, OneDrive, etc.">
+          <small style="display:block;margin-top:4px;font-size:.73rem;color:#9ca3af">
+            Pega el link del documento editable (Google Docs, Word en línea, etc.)
+          </small>
         </div>
       </div>
 
