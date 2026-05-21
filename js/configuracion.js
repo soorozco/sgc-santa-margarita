@@ -821,7 +821,11 @@ async function submitNewUser() {
     auth: { persistSession: false, autoRefreshToken: false }
   })
 
-  const { data, error } = await tmpClient.auth.signUp({ email, password })
+  const { data, error } = await tmpClient.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: name } }
+  })
 
   if (error) {
     showToast('Error al crear usuario: ' + error.message, 'red')
