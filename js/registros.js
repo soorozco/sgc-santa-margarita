@@ -1,13 +1,15 @@
 // ─── Control de Registros (Formatos FT) — Cláusula 7.5 ──────────
 
-let _user         = null
-let _profile      = null
-let _role         = null
-let _allRegs      = []
-let _filteredRegs = []
-let _depts        = []
-let _personal     = []
-let _currentId    = null
+let _user            = null
+let _profile         = null
+let _role            = null
+let _allRegs         = []
+let _filteredRegs    = []
+let _depts           = []
+let _personal        = []
+let _currentId       = null
+let _currentPdfUrl   = null
+let _currentPdfName  = null
 
 // ── Helpers ─────────────────────────────────────────────────────
 function setText(id, val) {
@@ -236,7 +238,7 @@ function renderTable() {
       : `<span class="badge-ret badge-ret--sin">Sin definir</span>`
 
     return `
-      <tr onclick="openDetail('${r.id}')" style="cursor:pointer">
+      <tr onclick="openPdfViewer('${r.id}')" style="cursor:pointer" title="Ver PDF">
         <td><span class="doc-code">${esc(r.code)}</span></td>
         <td><span class="doc-name" title="${esc(r.name)}">${esc(r.name)}</span></td>
         <td>${esc(r.departments?.name || '—')}</td>
@@ -245,6 +247,9 @@ function renderTable() {
         <td class="center"><span class="pill ${sPill(r.status)}">${sLabel(r.status)}</span></td>
         <td class="center" onclick="event.stopPropagation()">
           <div class="action-btns">
+            <button onclick="openPdfViewer('${r.id}')" class="btn-action teal" title="Ver PDF">
+              <i class="fa-solid fa-file-pdf"></i>
+            </button>
             <button onclick="openDetail('${r.id}')" class="btn-action" title="Ver detalle">
               <i class="fa-solid fa-eye"></i>
             </button>
@@ -692,6 +697,87 @@ async function submitUpload() {
     clearFile()
     await loadRegistros()
   }, 400)
+}
+
+// ── Modal: VISOR DE PDF ──────────────────────────────────────────
+async function openPdfViewer(regId) {
+  _currentId  = regId
+  _currentPdfUrl  = null
+  _currentPdfName = null
+  const reg = _allRegs.find(r => r.id === regId)
+  if (!reg) return
+
+  setText('pdf-code-ttl', reg.code)
+  setText('pdf-name-ttl', reg.name)
+
+  const iframe  = document.getElementById('pdf-iframe')
+  const loading = document.getElementById('pdf-loading')
+  const empty   = document.getElementById('pdf-empty')
+  const btnDl   = document.getElementById('btn-pdf-download')
+  const btnPr   = document.getElementById('btn-pdf-print')
+
+  // Reset
+  if (iframe)  { iframe.src = ''; iframe.style.display = 'none' }
+  if (loading) loading.style.display = 'flex'
+  if (empty)   empty.style.display   = 'none'
+  if (btnDl)   btnDl.style.display   = 'none'
+  if (btnPr)   btnPr.style.display   = 'none'
+
+  openModal('modal-pdf')
+
+  // Buscar la versión más reciente con archivo
+  const { data: versions } = await db
+    .from('document_versions')
+    .select('file_path,file_name,version')
+    .eq('document_id', regId)
+    .not('file_path', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  if (!versions || versions.length === 0) {
+    if (loading) loading.style.display = 'none'
+    if (empty)   empty.style.display   = 'flex'
+    return
+  }
+
+  const latest = versions[0]
+  const { data, error } = await db.storage
+    .from('sgc-documents')
+    .createSignedUrl(latest.file_path, 3600)
+
+  if (error || !data?.signedUrl) {
+    if (loading) loading.style.display = 'none'
+    if (empty)   empty.style.display   = 'flex'
+    return
+  }
+
+  _currentPdfUrl  = data.signedUrl
+  _currentPdfName = latest.file_name || `${reg.code}_v${latest.version}.pdf`
+
+  if (loading) loading.style.display = 'none'
+  if (iframe)  { iframe.src = _currentPdfUrl; iframe.style.display = 'block' }
+  if (btnDl)   btnDl.style.display = 'inline-flex'
+  if (btnPr)   btnPr.style.display = 'inline-flex'
+}
+
+function downloadCurrentPdf() {
+  if (!_currentPdfUrl) return
+  const a = document.createElement('a')
+  a.href     = _currentPdfUrl
+  a.download = _currentPdfName || 'formato.pdf'
+  a.target   = '_blank'
+  a.click()
+}
+
+function printCurrentPdf() {
+  const iframe = document.getElementById('pdf-iframe')
+  if (!iframe || !_currentPdfUrl) return
+  try {
+    iframe.contentWindow.print()
+  } catch (e) {
+    // Fallback: abre en nueva pestaña para imprimir desde ahí
+    window.open(_currentPdfUrl, '_blank')
+  }
 }
 
 // ── Exportar CSV ─────────────────────────────────────────────────
