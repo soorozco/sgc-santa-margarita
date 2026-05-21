@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/documentos.css">
   <link rel="stylesheet" href="css/registros.css">
 </head>
 <body>
@@ -132,22 +133,63 @@
     <div class="topbar">
       <div>
         <div class="topbar-page-title">Control de Registros</div>
-        <div class="topbar-breadcrumb">ISO 9001:2015 › Cláusula 7.5 — Información Documentada</div>
+        <div class="topbar-sub">Cláusula 7.5 — Lista Maestra de Formatos</div>
       </div>
-      <button class="btn-menu" onclick="toggleSidebar()">
-        <i class="fa-solid fa-bars"></i>
-      </button>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge">
+          <i class="fa-solid fa-certificate"></i>
+          ISO 9001:2015
+        </span>
+      </div>
     </div>
 
-    <div id="content-area" style="display:none">
+    <div class="page-content" id="content-area" style="display:none">
 
-      <!-- KPIs -->
+      <!-- ── Toolbar ──────────────────────────────── -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por código o nombre…" oninput="applyFilters()">
+        </div>
+
+        <select class="filter-sel" id="f-dept" onchange="applyFilters()">
+          <option value="">Todos los departamentos</option>
+        </select>
+
+        <select class="filter-sel" id="f-status" onchange="applyFilters()">
+          <option value="">Todos los estados</option>
+          <option value="borrador">Borrador</option>
+          <option value="en_revision">En Revisión</option>
+          <option value="vigente">Vigente</option>
+          <option value="obsoleto">Obsoleto</option>
+        </select>
+
+        <select class="filter-sel" id="f-ret" onchange="applyFilters()">
+          <option value="">Toda retención</option>
+          <option value="sin">Sin definir</option>
+          <option value="con">Con retención</option>
+        </select>
+
+        <button class="btn-secondary" onclick="exportCSV()">
+          <i class="fa-solid fa-download"></i>
+          Exportar CSV
+        </button>
+
+        <button class="btn-primary" id="btn-new-reg" onclick="openNewReg()" style="display:none">
+          <i class="fa-solid fa-plus"></i>
+          Nuevo Formato
+        </button>
+      </div>
+
+      <!-- ── KPIs ──────────────────────────────────── -->
       <div class="reg-kpis">
         <div class="kpi-card">
           <div class="kpi-icon"><i class="fa-solid fa-table-list"></i></div>
           <div class="kpi-info">
             <div class="kpi-value" id="kpi-total">—</div>
-            <div class="kpi-label">Total de registros</div>
+            <div class="kpi-label">Total de formatos</div>
           </div>
         </div>
         <div class="kpi-card">
@@ -173,56 +215,37 @@
         </div>
       </div>
 
-      <!-- Filtros -->
-      <div class="reg-filters">
-        <div class="filter-search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="input-search" placeholder="Buscar por nombre o código…" oninput="applyFilters()">
+      <!-- ── Tabla ──────────────────────────────────── -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="reg-count">Cargando formatos…</span>
         </div>
-        <div class="filter-select-wrap">
-          <i class="fa-solid fa-sitemap"></i>
-          <select id="select-dept" onchange="applyFilters()">
-            <option value="">Todos los departamentos</option>
-          </select>
-        </div>
-        <div class="filter-select-wrap">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <select id="select-ret" onchange="applyFilters()">
-            <option value="">Toda retención</option>
-            <option value="sin">Sin definir</option>
-            <option value="con">Con retención</option>
-          </select>
-        </div>
-        <button class="btn-clear" id="btn-clear" onclick="clearFilters()" style="display:none">
-          <i class="fa-solid fa-xmark"></i> Limpiar
-        </button>
-      </div>
-
-      <!-- Tabla -->
-      <div class="reg-table-wrap">
-        <table class="reg-table" id="reg-table">
+        <table class="data-table">
           <thead>
             <tr>
-              <th class="col-codigo">Código</th>
-              <th class="col-nombre">Nombre del Registro</th>
-              <th class="col-dept">Departamento</th>
-              <th class="col-ver">Versión</th>
-              <th class="col-ret">Retención</th>
-              <th class="col-estado">Estado</th>
+              <th>Código</th>
+              <th>Nombre del Formato</th>
+              <th>Departamento</th>
+              <th class="center">Versión</th>
+              <th>Retención</th>
+              <th class="center">Estado</th>
+              <th class="center">Acciones</th>
             </tr>
           </thead>
           <tbody id="reg-tbody">
-            <tr><td colspan="6" class="table-loading">
-              <i class="fa-solid fa-spinner fa-spin"></i> Cargando registros…
-            </td></tr>
+            <tr>
+              <td colspan="7" class="table-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <strong>Cargando…</strong>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Sin resultados -->
       <div class="empty-state" id="empty-state" style="display:none">
         <i class="fa-solid fa-folder-open"></i>
-        <p>No se encontraron registros para tu búsqueda.</p>
+        <p>No se encontraron formatos para tu búsqueda.</p>
         <button onclick="clearFilters()">Limpiar filtros</button>
       </div>
 
@@ -235,6 +258,359 @@
 
   </main>
 </div>
+
+
+<!-- ═══════════════ MODAL — Nuevo Formato ═══════════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Nuevo Formato
+        <small>Registra un nuevo formato en el sistema</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Código <span class="req">*</span></label>
+          <input type="text" id="new-code" placeholder="FT-XX-00"
+                 oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="field">
+          <label>Versión <span class="req">*</span></label>
+          <input type="text" id="new-version" placeholder="1">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del formato <span class="req">*</span></label>
+          <input type="text" id="new-name" placeholder="Nombre completo del formato">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento</label>
+          <select id="new-dept"><option value="">— Sin asignar —</option></select>
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="new-status">
+            <option value="vigente">Vigente</option>
+            <option value="borrador">Borrador</option>
+            <option value="en_revision">En Revisión</option>
+            <option value="obsoleto">Obsoleto</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Retención (años)</label>
+          <input type="number" id="new-retention" min="1" max="20" placeholder="ej. 5">
+        </div>
+        <div class="field">
+          <label>Fecha de elaboración</label>
+          <input type="date" id="new-elab-date">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Elaboró</label>
+          <select id="new-elaborated-by" onchange="updateCargo(this,'new-elaboro-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="new-elaboro-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field">
+          <label>Revisó</label>
+          <select id="new-reviewed-by" onchange="updateCargo(this,'new-reviso-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="new-reviso-cargo" class="field-cargo"></small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Autorizó</label>
+          <select id="new-authorized-by" onchange="updateCargo(this,'new-autorizo-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="new-autorizo-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNew()">
+        <i class="fa-solid fa-plus"></i> Crear Formato
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Ver Detalle ═══════════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="d-code-ttl">—</span>
+        <small id="d-name-ttl">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Código</label>
+          <span id="d-code">—</span>
+        </div>
+        <div class="info-item">
+          <label>Versión actual</label>
+          <span id="d-version">—</span>
+        </div>
+        <div class="info-item">
+          <label>Estado</label>
+          <span id="d-status">—</span>
+        </div>
+        <div class="info-item">
+          <label>Departamento</label>
+          <span id="d-dept">—</span>
+        </div>
+        <div class="info-item">
+          <label>Retención</label>
+          <span id="d-retention">—</span>
+        </div>
+        <div class="info-item">
+          <label>Fecha de elaboración</label>
+          <span id="d-elab-date">—</span>
+        </div>
+        <div class="info-item">
+          <label>Elaboró</label>
+          <span id="d-elaborated">—</span>
+          <small id="d-elaborated-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item">
+          <label>Revisó</label>
+          <span id="d-reviewed">—</span>
+          <small id="d-reviewed-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item">
+          <label>Autorizó</label>
+          <span id="d-authorized">—</span>
+          <small id="d-authorized-cargo" class="info-sub"></small>
+        </div>
+      </div>
+
+      <!-- Historial de versiones / PDFs -->
+      <div class="section-sep">
+        <i class="fa-solid fa-clock-rotate-left" style="margin-right:6px"></i>
+        Historial de Versiones
+      </div>
+      <div id="versions-wrap">
+        <table class="ver-table">
+          <thead>
+            <tr>
+              <th>Versión</th>
+              <th>Fecha</th>
+              <th>Subido por</th>
+              <th>Cambios</th>
+              <th class="center">Archivo</th>
+            </tr>
+          </thead>
+          <tbody id="versions-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--txt3)">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+      <button class="btn-secondary" id="btn-upload-ver" onclick="openUploadFromDetail()" style="display:none">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Subir PDF
+      </button>
+      <button class="btn-primary" id="btn-edit-from-detail" onclick="openEditFromDetail()" style="display:none">
+        <i class="fa-solid fa-pen"></i> Editar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Editar Formato ═══════════════ -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Editar Formato
+        <small id="edit-reg-code">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-edit')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Código</label>
+          <input type="text" id="edit-code" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="field">
+          <label>Versión actual</label>
+          <input type="text" id="edit-version" placeholder="1">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del formato <span class="req">*</span></label>
+          <input type="text" id="edit-name">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento</label>
+          <select id="edit-dept"></select>
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="edit-status">
+            <option value="borrador">Borrador</option>
+            <option value="en_revision">En Revisión</option>
+            <option value="en_aprobacion">En Aprobación</option>
+            <option value="vigente">Vigente</option>
+            <option value="obsoleto">Obsoleto</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Retención (años)</label>
+          <input type="number" id="edit-retention" min="1" max="20">
+        </div>
+        <div class="field">
+          <label>Fecha de elaboración</label>
+          <input type="date" id="edit-elab-date">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Elaboró</label>
+          <select id="edit-elaborated-by" onchange="updateCargo(this,'edit-elaboro-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-elaboro-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field">
+          <label>Revisó</label>
+          <select id="edit-reviewed-by" onchange="updateCargo(this,'edit-reviso-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-reviso-cargo" class="field-cargo"></small>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Autorizó</label>
+          <select id="edit-authorized-by" onchange="updateCargo(this,'edit-autorizo-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-autorizo-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field"></div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-edit" onclick="submitEdit()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Subir PDF ═══════════════ -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Subir PDF del Formato
+        <small id="upload-doc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-upload')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Número de versión <span class="req">*</span></label>
+          <input type="text" id="upload-version" placeholder="Ej. 3.0">
+          <small id="upload-version-hint" style="display:block;margin-top:4px;font-size:.75rem;color:var(--txt3)"></small>
+        </div>
+        <div class="field">
+          <label>Fecha de versión</label>
+          <input type="date" id="upload-date">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Cambios realizados</label>
+          <textarea id="upload-changes" rows="3"
+                    placeholder="Describa brevemente los cambios respecto a la versión anterior…"></textarea>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:14px">
+        <label>Archivo PDF <span class="req">*</span></label>
+        <div class="file-drop" id="file-drop"
+             ondragover="fileDragOver(event)" ondragleave="fileDragLeave(event)" ondrop="fileDrop(event)">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <p>Arrastra el archivo aquí o <strong>haz clic para seleccionar</strong></p>
+          <small>PDF, DOC, DOCX — máximo 20 MB</small>
+          <input type="file" id="upload-file" accept=".pdf,.doc,.docx" onchange="fileSelected(this)">
+        </div>
+        <div class="file-selected" id="file-selected-info">
+          <i class="fa-solid fa-file-circle-check"></i>
+          <span id="file-selected-name">—</span>
+          <button class="btn-action red" onclick="clearFile()" title="Quitar archivo">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="progress-bar" id="upload-progress">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-upload')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-upload" onclick="submitUpload()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Subir PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div id="toast" class="toast"></div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
