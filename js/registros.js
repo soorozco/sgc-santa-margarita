@@ -136,28 +136,35 @@ function updateCargo(selectEl, cargoId) {
 // ── Cobertura (qué documentos referencian cada FT) ──────────────
 async function loadCoverage() {
   const { data, error } = await db.rpc('get_ft_coverage')
-  if (error || !data) return
-  _coverage = {}
+  _coverage = {}   // inicializar siempre, aunque sea vacío
+  if (error || !data) {
+    console.warn('loadCoverage error:', error)
+    // Marcar todos los registros con null para mostrar "N/D" en lugar de "Calculando…"
+    _allRegs.forEach(r => { if (!(_coverage[r.code])) _coverage[r.code] = null })
+    renderTable()
+    return
+  }
   data.forEach(row => {
     _coverage[row.ft_code] = {
       count: Number(row.ref_count),
       refs:  Array.isArray(row.refs) ? row.refs : []
     }
   })
-  // Re-renderizar para mostrar los badges
   renderTable()
 }
 
 function covBadge(code) {
   const cov = _coverage[code]
   if (cov === undefined) {
-    // Todavía cargando
     return `<span class="badge-cov badge-cov--loading" title="Calculando…">—</span>`
+  }
+  if (cov === null) {
+    return `<span class="badge-cov badge-cov--loading" title="No disponible">N/D</span>`
   }
   if (cov.count === 0) {
     return `<span class="badge-cov badge-cov--none" title="No aparece en ningún PR o IT">Sin ref.</span>`
   }
-  const tip = cov.refs.map(r => `${r.type}-${r.code?.split('-').slice(1).join('-') || ''}: ${r.name}`).join('\n')
+  const tip = cov.refs.map(r => `${r.code}`).join(' · ')
   return `<span class="badge-cov badge-cov--ok" title="${esc(tip)}">
     <i class="fa-solid fa-check"></i> ${cov.count}
   </span>`
@@ -357,8 +364,8 @@ async function openDetail(regId) {
     } else {
       covList.innerHTML = cov.refs.map(r => `
         <div class="cov-ref-item">
-          <span class="doc-code" style="font-size:.72rem">${esc(r.code)}</span>
-          <span style="font-size:.82rem;color:var(--txt2)">${esc(r.name)}</span>
+          <span class="doc-code">${esc(r.code)}</span>
+          <span class="cov-ref-name">${esc(r.name)}</span>
         </div>`).join('')
     }
   }
