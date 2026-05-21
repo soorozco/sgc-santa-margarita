@@ -17,6 +17,16 @@ async function initComites() {
   if (!auth) return
   _user = auth.user
   _role = auth.profile?.roles?.name || 'lector'
+  // Mostrar nav de solicitudes solo para admin/responsable
+  if (['administrador','responsable_calidad'].includes(_role)) {
+    const navSol = document.getElementById('nav-solicitudes')
+    if (navSol) navSol.style.display = 'flex'
+    db.from('document_deactivation_requests').select('id').eq('status','pending').then(({data}) => {
+      const count = data?.length || 0
+      const badge = document.getElementById('badge-sol')
+      if (badge && count > 0) { badge.textContent = count; badge.style.display = 'inline-flex' }
+    })
+  }
 
   setText('sb-user-name', auth.profile?.full_name || _user.email.split('@')[0])
   setText('sb-user-role', auth.profile?.roles?.display_name || 'Usuario')

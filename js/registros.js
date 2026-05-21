@@ -11,6 +11,7 @@ let _currentId       = null
 let _currentPdfUrl   = null
 let _currentPdfName  = null
 let _coverage        = {}   // { 'FT-CH-02': { count: 2, refs: [{code,name,type}] } }
+let _pendingReqs     = new Set() // IDs de docs con solicitud pendiente
 
 // ── Helpers ─────────────────────────────────────────────────────
 function setText(id, val) {
@@ -74,8 +75,20 @@ async function initRegistros() {
   await Promise.all([loadDepts(), loadPersonal()])
   populateFilters()
   await loadRegistros()
-  loadCoverage()   // carga en segundo plano, sin bloquear
+  loadCoverage()        // carga en segundo plano, sin bloquear
+  loadPendingReqs()     // carga en segundo plano, sin bloquear
   applyRoleUI()
+
+  // Mostrar nav de solicitudes solo para admin/responsable
+  if (['administrador','responsable_calidad'].includes(_role)) {
+    const navSol = document.getElementById('nav-solicitudes')
+    if (navSol) navSol.style.display = 'flex'
+    db.from('document_deactivation_requests').select('id').eq('status','pending').then(({data}) => {
+      const count = data?.length || 0
+      const badge = document.getElementById('badge-sol')
+      if (badge && count > 0) { badge.textContent = count; badge.style.display = 'inline-flex' }
+    })
+  }
 }
 
 // ── Catálogos ────────────────────────────────────────────────────
@@ -131,6 +144,14 @@ function updateCargo(selectEl, cargoId) {
   const person = _personal.find(p => p.nombre === name)
   const el     = document.getElementById(cargoId)
   if (el) el.textContent = person?.puesto || ''
+}
+
+// ── Solicitudes de baja pendientes ──────────────────────────────
+async function loadPendingReqs() {
+  const { data } = await db.from('document_deactivation_requests')
+    .select('document_id').eq('status', 'pending')
+  _pendingReqs = new Set((data || []).map(r => r.document_id))
+  renderTable()
 }
 
 // ── Cobertura (qué documentos referencian cada FT) ──────────────
@@ -274,6 +295,11 @@ function renderTable() {
       ? `<span class="badge-ret">${r.retention_years} año${r.retention_years !== 1 ? 's' : ''}</span>`
       : `<span class="badge-ret badge-ret--sin">Sin definir</span>`
 
+    const canRequest = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
+      && r.status === 'vigente'
+      && !_pendingReqs.has(r.id)
+      && (_role === 'administrador' || _profile?.department_id === r.department_id)
+
     return `
       <tr onclick="openPdfViewer('${r.id}')" style="cursor:pointer" title="Ver PDF">
         <td><span class="doc-code">${esc(r.code)}</span></td>
@@ -298,6 +324,8 @@ function renderTable() {
             <button onclick="openUpload('${r.id}')" class="btn-action green" title="Subir PDF">
               <i class="fa-solid fa-upload"></i>
             </button>` : ''}
+            ${canRequest ? `<button onclick="openSolBaja('${r.id}')" class="btn-action orange" title="Solicitar Baja"><i class="fa-solid fa-arrow-down-to-line"></i></button>` : ''}
+            ${_pendingReqs.has(r.id) ? `<span class="btn-action" title="Solicitud pendiente" style="color:#f59e0b;cursor:default"><i class="fa-solid fa-clock"></i></span>` : ''}
           </div>
         </td>
       </tr>`
@@ -874,6 +902,36 @@ function exportCSV() {
   a.download = `registros_${new Date().toISOString().split('T')[0]}.csv`
   a.click()
   URL.revokeObjectURL(url)
+}
+
+// ── Modal: SOLICITAR BAJA ────────────────────────────────────────
+function openSolBaja(id) {
+  _currentId = id
+  const reg = _allRegs.find(r => r.id === id)
+  if (!reg) return
+  setText('sb-doc-name', reg.name)
+  setVal('sb-reason', '')
+  openModal('modal-sol-baja')
+}
+
+async function submitSolBaja() {
+  const reason = document.getElementById('sb-reason')?.value.trim() || null
+  if (!reason) { showToast('Escribe el motivo de la solicitud.', 'red'); return }
+  const btn = document.getElementById('btn-sb-submit')
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
+  const { error } = await db.from('document_deactivation_requests').insert({
+    document_id:  _currentId,
+    requested_by: _user.id,
+    reason
+  })
+  btn.disabled = false
+  btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Solicitud'
+  if (error) { showToast('Error al enviar solicitud.', 'red'); return }
+  showToast('Solicitud enviada correctamente.', 'green')
+  closeModal('modal-sol-baja')
+  _pendingReqs.add(_currentId)
+  renderTable()
 }
 
 // ── Sidebar ──────────────────────────────────────────────────────

@@ -1,0 +1,100 @@
+/* ── Solicitudes de Baja ────────────────────────────────────────── */
+
+/* KPI card de pendientes */
+.sol-kpi {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem 1.4rem;
+  margin-bottom: 1.5rem;
+  max-width: 320px;
+}
+.sol-kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #fef3c7;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+.sol-kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+.sol-kpi-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 3px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 1.25rem;
+}
+.tab-btn {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.tab-btn:hover { color: #374151; }
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+.tab-btn .tab-badge {
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  min-width: 20px;
+  text-align: center;
+  display: none;
+}
+.tab-btn .tab-badge.visible {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tab panels */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Pill overrides for history */
+.pill--vigente  { background: #dcfce7; color: #15803d; }
+.pill--obsoleto { background: #fee2e2; color: #b91c1c; }
+
+/* Action buttons orange */
+.btn-action.orange {
+  background: #fff7ed;
+  color: #ea580c;
+  border: 1px solid #fed7aa;
+}
+.btn-action.orange:hover {
+  background: #ffedd5;
+  border-color: #fb923c;
+}

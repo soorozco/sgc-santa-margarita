@@ -19,6 +19,19 @@ async function initPersonal() {
 
   setText('sb-user-name', auth.profile?.full_name || auth.user.email.split('@')[0])
   setText('sb-user-role', auth.profile?.roles?.display_name || 'Usuario')
+  // Mostrar nav de solicitudes solo para admin/responsable
+  {
+    const _navRole = auth.profile?.roles?.name || 'lector'
+    if (['administrador','responsable_calidad'].includes(_navRole)) {
+      const navSol = document.getElementById('nav-solicitudes')
+      if (navSol) navSol.style.display = 'flex'
+      db.from('document_deactivation_requests').select('id').eq('status','pending').then(({data}) => {
+        const count = data?.length || 0
+        const badge = document.getElementById('badge-sol')
+        if (badge && count > 0) { badge.textContent = count; badge.style.display = 'inline-flex' }
+      })
+    }
+  }
 
   document.getElementById('content-area').style.display = 'block'
   await loadPersonal()

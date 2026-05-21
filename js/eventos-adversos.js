@@ -13,6 +13,16 @@ async function initEA() {
   _user    = auth.user
   _profile = auth.profile
   _role    = auth.profile?.roles?.name || 'lector'
+  // Mostrar nav de solicitudes solo para admin/responsable
+  if (['administrador','responsable_calidad'].includes(_role)) {
+    const navSol = document.getElementById('nav-solicitudes')
+    if (navSol) navSol.style.display = 'flex'
+    db.from('document_deactivation_requests').select('id').eq('status','pending').then(({data}) => {
+      const count = data?.length || 0
+      const badge = document.getElementById('badge-sol')
+      if (badge && count > 0) { badge.textContent = count; badge.style.display = 'inline-flex' }
+    })
+  }
 
   // Solo administrador y responsable_calidad pueden ver datos clínicos
   if (!['administrador','responsable_calidad'].includes(_role)) {

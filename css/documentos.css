@@ -86,6 +86,7 @@
 .btn-action.red:hover     { background: var(--red-lt);  border-color: var(--red);  color: var(--red); }
 .btn-action.green:hover   { background: var(--green-lt);border-color: var(--green);color: var(--green); }
 .btn-action.teal:hover    { background: #e0f2f1; border-color: #009688; color: #009688; }
+.btn-action.orange:hover  { background: #fff7ed; border-color: #f97316; color: #ea580c; }
 .action-btns { display: flex; gap: 6px; }
 
 /* ── Table ──────────────────────────────────────────────────── */
