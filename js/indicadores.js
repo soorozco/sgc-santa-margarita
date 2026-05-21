@@ -5,6 +5,7 @@ let _profile     = null
 let _role        = null
 let _allInd      = []
 let _depts       = []
+let _personal    = []
 let _currentInd  = null
 let _measurements= []
 let _miniChart   = null
@@ -21,10 +22,12 @@ async function initIndicadores() {
     renderUserInfo()
     setCurrentDate()
     await loadDepts()
+    await loadPersonalCat()
     populateDeptFilter()
     await loadIndicadores()
     setupFilters()
     applyRoleUI()
+    attachAutocomplete('new-responsible')
   } catch (err) {
     console.error('[SGC] initIndicadores error:', err)
   }
@@ -41,6 +44,14 @@ function setCurrentDate() {
 }
 
 // ── Catálogos ───────────────────────────────────────────────────
+async function loadPersonalCat() {
+  const { data } = await db.from('personal')
+    .select('codigo,nombre,puesto,departamento')
+    .eq('activo', true)
+    .order('nombre')
+  _personal = data || []
+}
+
 async function loadDepts() {
   const { data } = await db.from('departments')
     .select('id,code,name').eq('is_active', true).order('name')
@@ -53,6 +64,55 @@ function populateDeptFilter() {
   if (fDept)   fDept.innerHTML   = '<option value="">Todos los procesos</option>' + opts
   if (newDept) newDept.innerHTML = '<option value="">— General —</option>' + opts
 }
+// ── Autocomplete personal ────────────────────────────────────────
+function attachAutocomplete(inputId) {
+  const input = document.getElementById(inputId)
+  if (!input || input.dataset.ac) return
+  input.dataset.ac = '1'
+  input.setAttribute('autocomplete', 'off')
+
+  const wrap = input.parentElement
+  wrap.style.position = 'relative'
+
+  const drop = document.createElement('ul')
+  drop.className = 'ac-drop'
+  wrap.appendChild(drop)
+
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '' }
+  function capAll(s) { return s ? s.split(' ').map(cap).join(' ') : '' }
+
+  function showDrop(matches) {
+    if (!matches.length) { drop.style.display = 'none'; return }
+    drop.innerHTML = matches.slice(0, 8).map(p =>
+      `<li data-val="${esc(capAll(p.nombre))}">
+        <span class="ac-nombre">${esc(capAll(p.nombre))}</span>
+        ${p.puesto ? `<span class="ac-puesto">${esc(p.puesto)}</span>` : ''}
+      </li>`
+    ).join('')
+    drop.style.display = 'block'
+    drop.querySelectorAll('li').forEach(li => {
+      li.addEventListener('mousedown', e => {
+        e.preventDefault()
+        input.value = li.dataset.val
+        drop.style.display = 'none'
+      })
+    })
+  }
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase()
+    if (!q) { drop.style.display = 'none'; return }
+    showDrop(_personal.filter(p => p.nombre.toLowerCase().includes(q)))
+  })
+  input.addEventListener('focus', () => {
+    const q = input.value.trim().toLowerCase()
+    if (q) showDrop(_personal.filter(p => p.nombre.toLowerCase().includes(q)))
+  })
+  input.addEventListener('blur', () => {
+    setTimeout(() => { drop.style.display = 'none' }, 160)
+  })
+}
+
 function applyRoleUI() {
   const canWrite = ['administrador','responsable_calidad'].includes(_role)
   const btn = document.getElementById('btn-new-ind')
@@ -649,6 +709,8 @@ function renderConfigForm(ind) {
       '<button class="btn-primary" onclick="saveConfig()">' +
         '<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios</button>' +
     '</div>'
+
+  attachAutocomplete('cfg-resp')
 }
 
 async function saveConfig() {

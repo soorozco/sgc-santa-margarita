@@ -323,3 +323,32 @@
 }
 .dl-val { display:block; }
 
+/* ── Autocomplete personal ──────────────────────────────────── */
+.ac-drop {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.1);
+  z-index: 300;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+.ac-drop li {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+.ac-drop li:hover { background: #eff6ff; }
+.ac-nombre { font-size: .875rem; color: #111827; font-weight: 500; }
+.ac-puesto { font-size: .73rem; color: #6b7280; }
+
