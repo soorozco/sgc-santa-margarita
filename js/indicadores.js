@@ -121,19 +121,21 @@ function applyRoleUI() {
 
 // ── Auto-código ──────────────────────────────────────────────────
 async function autoGenerateCode() {
+  // Trae TODOS los códigos HSM-ID-* sin límite para encontrar el número más alto
   const { data } = await db.from('quality_indicators')
     .select('code').like('code', 'HSM-ID-%')
-    .order('code', { ascending: false }).limit(50)
   let maxNum = 0
   if (data) {
     data.forEach(row => {
-      if (row.code) {
-        const m = row.code.match(/HSM-ID-(\d+)/)
-        if (m) maxNum = Math.max(maxNum, parseInt(m[1]))
-      }
+      const m = row.code?.match(/HSM-ID-(\d+)/)
+      if (m) maxNum = Math.max(maxNum, parseInt(m[1]))
     })
   }
-  return 'HSM-ID-' + (maxNum + 1)
+  // Avanza hasta encontrar un código que no exista
+  let candidate = maxNum + 1
+  const existing = new Set((data || []).map(r => r.code))
+  while (existing.has('HSM-ID-' + candidate)) candidate++
+  return 'HSM-ID-' + candidate
 }
 
 // ── Load indicadores ────────────────────────────────────────────
