@@ -816,61 +816,77 @@ async function submitNewUser() {
   const btn = document.getElementById('btn-save-new-user')
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creando…' }
 
-  // Cliente temporal para no cerrar la sesión del administrador
-  const tmpClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    auth: { persistSession: false, autoRefreshToken: false }
-  })
-
-  const { data, error } = await tmpClient.auth.signUp({
-    email,
-    password,
-    options: { data: { full_name: name } }
-  })
-
-  if (error) {
-    showToast('Error al crear usuario: ' + error.message, 'red')
+  const resetBtn = () => {
     if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Usuario' }
-    return
   }
 
-  const userId = data?.user?.id
-  if (!userId) {
-    showToast('No se pudo obtener el ID del usuario creado.', 'red')
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Usuario' }
-    return
+  try {
+    // Llamar directamente a la API REST — sin cliente secundario,
+    // sin tocar la sesión del administrador
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        data: { full_name: name }
+      })
+    })
+
+    const result = await resp.json()
+
+    if (!resp.ok) {
+      const msg = result.msg || result.error_description || result.message || JSON.stringify(result)
+      throw new Error(msg)
+    }
+
+    // El ID puede venir en distintos lugares según la configuración de Supabase
+    const userId = result.id || result.user?.id
+    if (!userId) {
+      throw new Error('No se obtuvo ID del usuario. ¿El correo ya está registrado?')
+    }
+
+    // Pausa para que el trigger cree el perfil en profiles
+    await new Promise(r => setTimeout(r, 800))
+
+    // Asignar rol, departamento y nombre al perfil
+    const { error: profErr } = await db.from('profiles').upsert({
+      id:            userId,
+      email,
+      full_name:     name,
+      role_id:       roleId,
+      department_id: deptId || null,
+      permissions:   {}
+    }, { onConflict: 'id' })
+
+    if (profErr) {
+      showToast('Usuario creado, pero error al asignar perfil: ' + profErr.message, 'orange')
+    }
+
+    // Aviso de éxito con credenciales
+    const notice    = document.getElementById('nu-notice')
+    const noticeMsg = document.getElementById('nu-notice-msg')
+    if (notice && noticeMsg) {
+      const tieneSession = !!(result.access_token || result.session)
+      noticeMsg.textContent =
+        `Correo: ${email}  ·  Contraseña temporal: ${password}.  ` +
+        (tieneSession
+          ? 'El usuario ya puede iniciar sesión.'
+          : 'Recibirá un correo de confirmación antes de poder acceder.')
+      notice.style.display = 'flex'
+    }
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Creado' }
+    showToast(`Usuario ${email} creado correctamente.`, 'green')
+    await loadUsers()
+
+  } catch (e) {
+    showToast('Error al crear usuario: ' + e.message, 'red')
+    resetBtn()
   }
-
-  // Pequeña pausa para que el trigger de Supabase cree el perfil
-  await new Promise(r => setTimeout(r, 600))
-
-  // Actualizar / insertar perfil con rol y departamento
-  const { error: profErr } = await db.from('profiles').upsert({
-    id:            userId,
-    email,
-    full_name:     name,
-    role_id:       roleId,
-    department_id: deptId || null
-  }, { onConflict: 'id' })
-
-  if (profErr) {
-    showToast('Usuario creado pero error al asignar perfil: ' + profErr.message, 'orange')
-  }
-
-  // Mostrar aviso de éxito dentro del modal con las credenciales
-  const notice = document.getElementById('nu-notice')
-  const noticeMsg = document.getElementById('nu-notice-msg')
-  if (notice && noticeMsg) {
-    noticeMsg.textContent =
-      `Correo: ${email} · Contraseña temporal: ${password}. ` +
-      (data.session ? 'El usuario ya puede iniciar sesión.' :
-       'El usuario recibirá un correo de confirmación antes de poder acceder.')
-    notice.style.display = 'flex'
-  }
-
-  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Creado' }
-
-  showToast(`Usuario ${email} creado correctamente.`, 'green')
-  await loadUsers()
 }
 
 // ═══════════════════════════════════════════════════════════════
