@@ -164,11 +164,9 @@ async function loadRegistros() {
 
   // Filtrar solo FT por si acaso el filtro de join no es suficiente
   _allRegs = (data || []).filter(d => d.document_types?.code_prefix === 'FT')
-  _filteredRegs = _allRegs
 
   document.getElementById('content-area').style.display = 'block'
-  updateKPIs()
-  renderTable()
+  applyFilters()  // respeta los filtros activos en vez de resetear la vista
 }
 
 // ── Filtros ──────────────────────────────────────────────────────
