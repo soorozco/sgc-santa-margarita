@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════
 -- RPC: get_ft_coverage
 -- Devuelve para cada formato FT cuántos documentos lo referencian
--- Busca el código FT en los campos: referencias, desarrollo, alcance
+-- Busca el código FT en los campos de document_content (tipo JSONB/TEXT)
 -- Ejecutar en Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════════
 
@@ -34,10 +34,10 @@ AS $$
    AND ft_dt.code_prefix = 'FT'
   LEFT JOIN document_content dc
     ON (
-         COALESCE(dc.referencias,   '') ILIKE ('%' || ft.code || '%')
-      OR COALESCE(dc.desarrollo,    '') ILIKE ('%' || ft.code || '%')
-      OR COALESCE(dc.alcance,       '') ILIKE ('%' || ft.code || '%')
-      OR COALESCE(dc.responsabilidades, '') ILIKE ('%' || ft.code || '%')
+         COALESCE(dc.referencias::TEXT,       '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.desarrollo::TEXT,        '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.alcance::TEXT,           '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.responsabilidades::TEXT, '') ILIKE ('%' || ft.code || '%')
     )
   LEFT JOIN documents rd
     ON rd.id = dc.document_id
