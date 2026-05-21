@@ -548,3 +548,78 @@
   background: var(--bg);
   flex-shrink: 0;
 }
+
+/* ── Modal Nuevo / Editar Usuario ───────────────────────────── */
+.pass-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.pass-wrap input {
+  flex: 1;
+  padding-right: 38px;
+}
+.btn-eye {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  transition: color .15s;
+}
+.btn-eye:hover { color: #374151; }
+
+.nu-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-top: 10px;
+}
+.nu-notice i { font-size: 1.2rem; color: #16a34a; flex-shrink: 0; margin-top: 1px; }
+.nu-notice strong { display: block; font-size: 0.875rem; color: #166534; margin-bottom: 3px; }
+.nu-notice p { font-size: 0.8rem; color: #166534; margin: 0; word-break: break-all; }
+
+/* Form rows y fields reutilizados del modal */
+.modal-box .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.modal-box .field label {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: 5px;
+}
+.modal-box .field .req { color: #dc2626; }
+.modal-box .field input,
+.modal-box .field select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.857rem;
+  font-family: inherit;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: border-color .15s;
+  box-sizing: border-box;
+}
+.modal-box .field input:focus,
+.modal-box .field select:focus {
+  border-color: #009688;
+}

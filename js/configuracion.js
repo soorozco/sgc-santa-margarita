@@ -40,7 +40,7 @@ async function initConfig() {
   }
 
   const tasks = [loadDepartments(), loadDocTypes()]
-  if (_role === 'administrador') tasks.push(loadUsers())
+  if (_role === 'administrador') tasks.push(loadUsers(), loadRoles())
   await Promise.all(tasks)
   setupTabs()
 }
@@ -522,8 +522,28 @@ const MODULES = [
 const FULL_ACCESS_ROLES = ['administrador', 'responsable_calidad']
 
 let _users = []
+let _roles  = []
 let _editingUserId  = null
+let _editingUserPId = null   // profile id for edit modal
 let _currentPerms   = {}
+
+// ── Carga roles disponibles ─────────────────────────────────────
+async function loadRoles() {
+  const { data } = await db.from('roles').select('id,name,display_name').order('display_name')
+  _roles = data || []
+}
+
+function rolesOpts(selectedId = '') {
+  return _roles.map(r =>
+    `<option value="${r.id}" ${r.id === selectedId ? 'selected' : ''}>${escHtml(r.display_name)}</option>`
+  ).join('')
+}
+
+function deptsOpts(selectedId = '') {
+  return _departments.map(d =>
+    `<option value="${d.id}" ${d.id === selectedId ? 'selected' : ''}>${escHtml(d.name)}</option>`
+  ).join('')
+}
 
 // ── Carga lista de usuarios ─────────────────────────────────────
 async function loadUsers() {
@@ -607,10 +627,15 @@ function renderUsersTable() {
         <td>${escHtml(deptLabel)}</td>
         <td class="center">${accessBadge}</td>
         <td class="center">
-          <button class="btn-perm-edit" onclick="openPermPanel('${u.id}')" ${isFullAccess ? 'disabled title="Acceso total, no requiere configuración"' : ''}>
-            <i class="fa-solid fa-sliders"></i>
-            Editar
-          </button>
+          <div class="action-btns" style="justify-content:center;gap:6px">
+            <button class="btn-action blue" onclick="openEditUser('${u.id}')" title="Editar rol y departamento">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn-perm-edit" onclick="openPermPanel('${u.id}')" ${isFullAccess ? 'disabled title="Acceso total"' : 'title="Editar secciones"'}>
+              <i class="fa-solid fa-sliders"></i>
+              Secciones
+            </button>
+          </div>
         </td>
       </tr>`
   }).join('')
@@ -740,6 +765,160 @@ async function savePermissions() {
 
   showToast('Permisos actualizados correctamente.', 'green')
   closePermPanel()
+  await loadUsers()
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NUEVO USUARIO
+// ═══════════════════════════════════════════════════════════════
+
+function openNewUser() {
+  // Reset campos
+  ;['nu-email','nu-name','nu-password'].forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.value = ''
+  })
+  document.getElementById('nu-notice').style.display = 'none'
+
+  // Poblar selects
+  document.getElementById('nu-role').innerHTML =
+    `<option value="">— Seleccionar —</option>${rolesOpts()}`
+  document.getElementById('nu-dept').innerHTML =
+    `<option value="">— Sin asignar —</option>${deptsOpts()}`
+
+  const btn = document.getElementById('btn-save-new-user')
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Usuario' }
+
+  openModal('modal-new-user')
+}
+
+function togglePassVis(inputId, btn) {
+  const inp = document.getElementById(inputId)
+  if (!inp) return
+  const show = inp.type === 'password'
+  inp.type = show ? 'text' : 'password'
+  btn.querySelector('i').className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'
+}
+
+async function submitNewUser() {
+  const email    = (document.getElementById('nu-email')?.value    || '').trim().toLowerCase()
+  const name     = (document.getElementById('nu-name')?.value     || '').trim()
+  const password = (document.getElementById('nu-password')?.value || '').trim()
+  const roleId   = document.getElementById('nu-role')?.value  || ''
+  const deptId   = document.getElementById('nu-dept')?.value  || ''
+
+  if (!email)    { showToast('El correo electrónico es obligatorio.', 'orange'); return }
+  if (!name)     { showToast('El nombre completo es obligatorio.',    'orange'); return }
+  if (!password) { showToast('La contraseña temporal es obligatoria.','orange'); return }
+  if (password.length < 6) { showToast('La contraseña debe tener al menos 6 caracteres.','orange'); return }
+  if (!roleId)   { showToast('Selecciona un rol para el usuario.',    'orange'); return }
+
+  const btn = document.getElementById('btn-save-new-user')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creando…' }
+
+  // Cliente temporal para no cerrar la sesión del administrador
+  const tmpClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: false, autoRefreshToken: false }
+  })
+
+  const { data, error } = await tmpClient.auth.signUp({ email, password })
+
+  if (error) {
+    showToast('Error al crear usuario: ' + error.message, 'red')
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Usuario' }
+    return
+  }
+
+  const userId = data?.user?.id
+  if (!userId) {
+    showToast('No se pudo obtener el ID del usuario creado.', 'red')
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Crear Usuario' }
+    return
+  }
+
+  // Pequeña pausa para que el trigger de Supabase cree el perfil
+  await new Promise(r => setTimeout(r, 600))
+
+  // Actualizar / insertar perfil con rol y departamento
+  const { error: profErr } = await db.from('profiles').upsert({
+    id:            userId,
+    email,
+    full_name:     name,
+    role_id:       roleId,
+    department_id: deptId || null
+  }, { onConflict: 'id' })
+
+  if (profErr) {
+    showToast('Usuario creado pero error al asignar perfil: ' + profErr.message, 'orange')
+  }
+
+  // Mostrar aviso de éxito dentro del modal con las credenciales
+  const notice = document.getElementById('nu-notice')
+  const noticeMsg = document.getElementById('nu-notice-msg')
+  if (notice && noticeMsg) {
+    noticeMsg.textContent =
+      `Correo: ${email} · Contraseña temporal: ${password}. ` +
+      (data.session ? 'El usuario ya puede iniciar sesión.' :
+       'El usuario recibirá un correo de confirmación antes de poder acceder.')
+    notice.style.display = 'flex'
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Creado' }
+
+  showToast(`Usuario ${email} creado correctamente.`, 'green')
+  await loadUsers()
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDITAR ROL / DEPARTAMENTO DE USUARIO EXISTENTE
+// ═══════════════════════════════════════════════════════════════
+
+function openEditUser(userId) {
+  const u = _users.find(u => u.id === userId)
+  if (!u) return
+  _editingUserPId = userId
+
+  document.getElementById('eu-email-sub').textContent = u.email || '—'
+  document.getElementById('eu-name').value = u.full_name || ''
+
+  document.getElementById('eu-role').innerHTML =
+    `<option value="">— Seleccionar —</option>${rolesOpts(u.role_id || '')}`
+  document.getElementById('eu-dept').innerHTML =
+    `<option value="">— Sin asignar —</option>${deptsOpts(u.departments?.id || '')}`
+
+  const btn = document.getElementById('btn-save-edit-user')
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar' }
+
+  openModal('modal-edit-user')
+}
+
+async function submitEditUser() {
+  if (!_editingUserPId) return
+
+  const name   = (document.getElementById('eu-name')?.value  || '').trim()
+  const roleId = document.getElementById('eu-role')?.value   || ''
+  const deptId = document.getElementById('eu-dept')?.value   || ''
+
+  if (!roleId) { showToast('Selecciona un rol.', 'orange'); return }
+
+  const btn = document.getElementById('btn-save-edit-user')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…' }
+
+  const { error } = await db.from('profiles').update({
+    full_name:     name     || null,
+    role_id:       roleId,
+    department_id: deptId   || null
+  }).eq('id', _editingUserPId)
+
+  if (error) {
+    showToast('Error al guardar: ' + error.message, 'red')
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar' }
+    return
+  }
+
+  showToast('Perfil actualizado correctamente.', 'green')
+  closeModal('modal-edit-user')
+  _editingUserPId = null
   await loadUsers()
 }
 

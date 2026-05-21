@@ -263,6 +263,10 @@
             Usuarios y Permisos
             <small>Controla el acceso de cada usuario a las secciones del sistema</small>
           </div>
+          <button class="btn-primary" onclick="openNewUser()">
+            <i class="fa-solid fa-user-plus"></i>
+            Nuevo Usuario
+          </button>
         </div>
 
         <div class="users-info-banner">
@@ -282,7 +286,7 @@
                 <th>Rol</th>
                 <th>Departamento</th>
                 <th class="center">Secciones</th>
-                <th class="center">Permisos</th>
+                <th class="center">Acciones</th>
               </tr>
             </thead>
             <tbody id="users-tbody">
@@ -459,6 +463,136 @@
               style="background:linear-gradient(135deg,#7f1d1d,#dc2626); box-shadow:0 2px 8px rgba(220,38,38,0.3)">
         <i class="fa-solid fa-trash"></i>
         Eliminar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Nuevo Usuario ═══════════════ -->
+<div class="modal-overlay" id="modal-new-user">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-ttl">Nuevo Usuario</div>
+      <button class="modal-x" onclick="closeModal('modal-new-user')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Correo electrónico <span class="req">*</span></label>
+          <input type="email" id="nu-email" placeholder="usuario@hospital.com">
+        </div>
+        <div class="field">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="nu-name" placeholder="Nombre y apellidos">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Contraseña temporal <span class="req">*</span></label>
+          <div class="pass-wrap">
+            <input type="password" id="nu-password" placeholder="Mínimo 6 caracteres">
+            <button type="button" class="btn-eye" onclick="togglePassVis('nu-password', this)" title="Mostrar contraseña">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+          <small style="color:var(--txt3,#9ca3af);font-size:.73rem;margin-top:3px;display:block">
+            El usuario deberá cambiarla al iniciar sesión por primera vez.
+          </small>
+        </div>
+        <div class="field">
+          <label>Rol <span class="req">*</span></label>
+          <select id="nu-role">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento</label>
+          <select id="nu-dept">
+            <option value="">— Sin asignar —</option>
+          </select>
+        </div>
+        <div class="field"></div>
+      </div>
+
+      <div class="nu-notice" id="nu-notice" style="display:none">
+        <i class="fa-solid fa-circle-check"></i>
+        <div>
+          <strong>Usuario creado correctamente</strong>
+          <p id="nu-notice-msg"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new-user')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new-user" onclick="submitNewUser()">
+        <i class="fa-solid fa-user-plus"></i>
+        Crear Usuario
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Editar Rol / Depto ═══════════════ -->
+<div class="modal-overlay" id="modal-edit-user">
+  <div class="modal-box">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Editar usuario
+        <small id="eu-email-sub">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-edit-user')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Nombre completo</label>
+          <input type="text" id="eu-name" placeholder="Nombre y apellidos">
+        </div>
+        <div class="field">
+          <label>Rol <span class="req">*</span></label>
+          <select id="eu-role">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento</label>
+          <select id="eu-dept">
+            <option value="">— Sin asignar —</option>
+          </select>
+        </div>
+        <div class="field"></div>
+      </div>
+
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-edit-user')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-edit-user" onclick="submitEditUser()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar
       </button>
     </div>
 
