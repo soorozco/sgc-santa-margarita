@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════
 -- RPC: get_ft_coverage
 -- Devuelve para cada formato FT cuántos documentos lo referencian
--- y cuáles son (buscando el código en el contenido digital)
+-- Busca el código FT en los campos: referencias, desarrollo, alcance
 -- Ejecutar en Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════════
 
@@ -33,7 +33,12 @@ AS $$
     ON ft_dt.id = ft.document_type_id
    AND ft_dt.code_prefix = 'FT'
   LEFT JOIN document_content dc
-    ON dc.content ILIKE ('%' || ft.code || '%')
+    ON (
+         COALESCE(dc.referencias,   '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.desarrollo,    '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.alcance,       '') ILIKE ('%' || ft.code || '%')
+      OR COALESCE(dc.responsabilidades, '') ILIKE ('%' || ft.code || '%')
+    )
   LEFT JOIN documents rd
     ON rd.id = dc.document_id
    AND rd.id <> ft.id
