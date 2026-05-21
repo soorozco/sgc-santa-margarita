@@ -10,6 +10,7 @@ let _personal        = []
 let _currentId       = null
 let _currentPdfUrl   = null
 let _currentPdfName  = null
+let _coverage        = {}   // { 'FT-CH-02': { count: 2, refs: [{code,name,type}] } }
 
 // ── Helpers ─────────────────────────────────────────────────────
 function setText(id, val) {
@@ -73,6 +74,7 @@ async function initRegistros() {
   await Promise.all([loadDepts(), loadPersonal()])
   populateFilters()
   await loadRegistros()
+  loadCoverage()   // carga en segundo plano, sin bloquear
   applyRoleUI()
 }
 
@@ -129,6 +131,36 @@ function updateCargo(selectEl, cargoId) {
   const person = _personal.find(p => p.nombre === name)
   const el     = document.getElementById(cargoId)
   if (el) el.textContent = person?.puesto || ''
+}
+
+// ── Cobertura (qué documentos referencian cada FT) ──────────────
+async function loadCoverage() {
+  const { data, error } = await db.rpc('get_ft_coverage')
+  if (error || !data) return
+  _coverage = {}
+  data.forEach(row => {
+    _coverage[row.ft_code] = {
+      count: Number(row.ref_count),
+      refs:  Array.isArray(row.refs) ? row.refs : []
+    }
+  })
+  // Re-renderizar para mostrar los badges
+  renderTable()
+}
+
+function covBadge(code) {
+  const cov = _coverage[code]
+  if (cov === undefined) {
+    // Todavía cargando
+    return `<span class="badge-cov badge-cov--loading" title="Calculando…">—</span>`
+  }
+  if (cov.count === 0) {
+    return `<span class="badge-cov badge-cov--none" title="No aparece en ningún PR o IT">Sin ref.</span>`
+  }
+  const tip = cov.refs.map(r => `${r.type}-${r.code?.split('-').slice(1).join('-') || ''}: ${r.name}`).join('\n')
+  return `<span class="badge-cov badge-cov--ok" title="${esc(tip)}">
+    <i class="fa-solid fa-check"></i> ${cov.count}
+  </span>`
 }
 
 function applyRoleUI() {
@@ -242,6 +274,7 @@ function renderTable() {
         <td>${esc(r.departments?.name || '—')}</td>
         <td class="center"><strong>v${esc(r.current_version || '1')}</strong></td>
         <td>${retLabel}</td>
+        <td class="center">${covBadge(r.code)}</td>
         <td class="center"><span class="pill ${sPill(r.status)}">${sLabel(r.status)}</span></td>
         <td class="center" onclick="event.stopPropagation()">
           <div class="action-btns">
@@ -308,6 +341,27 @@ async function openDetail(regId) {
   setText('d-reviewed-cargo',   revisoPerson?.puesto   || '')
   setText('d-authorized',       reg.authorized_by  || '—')
   setText('d-authorized-cargo', autorizoPerson?.puesto || '')
+
+  // Cobertura en el modal de detalle
+  const covList = document.getElementById('d-coverage-list')
+  if (covList) {
+    const cov = _coverage[reg.code]
+    if (!cov) {
+      covList.innerHTML = `<p style="font-size:.82rem;color:var(--txt3)">Calculando…</p>`
+    } else if (cov.count === 0) {
+      covList.innerHTML = `
+        <div class="cov-empty">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Este formato no aparece referenciado en ningún procedimiento o instrucción de trabajo con contenido digital.
+        </div>`
+    } else {
+      covList.innerHTML = cov.refs.map(r => `
+        <div class="cov-ref-item">
+          <span class="doc-code" style="font-size:.72rem">${esc(r.code)}</span>
+          <span style="font-size:.82rem;color:var(--txt2)">${esc(r.name)}</span>
+        </div>`).join('')
+    }
+  }
 
   // Enlace al archivo editable
   const tplWrap = document.getElementById('d-template-wrap')

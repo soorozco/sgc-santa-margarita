@@ -228,13 +228,14 @@
               <th>Departamento</th>
               <th class="center">Versión</th>
               <th>Retención</th>
+              <th class="center">Cobertura</th>
               <th class="center">Estado</th>
               <th class="center">Acciones</th>
             </tr>
           </thead>
           <tbody id="reg-tbody">
             <tr>
-              <td colspan="7" class="table-empty">
+              <td colspan="8" class="table-empty">
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 <strong>Cargando…</strong>
               </td>
@@ -409,6 +410,15 @@
           <span id="d-authorized">—</span>
           <small id="d-authorized-cargo" class="info-sub"></small>
         </div>
+      </div>
+
+      <!-- Cobertura: documentos que referencian este formato -->
+      <div id="d-coverage-wrap" style="margin-bottom:14px">
+        <div class="section-sep" style="margin-bottom:10px">
+          <i class="fa-solid fa-diagram-project" style="margin-right:6px"></i>
+          Referenciado en
+        </div>
+        <div id="d-coverage-list"></div>
       </div>
 
       <!-- Enlace editable -->
