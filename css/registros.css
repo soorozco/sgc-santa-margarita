@@ -288,10 +288,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 0;
+  padding: 7px 0;
   border-bottom: 1px solid var(--border);
 }
 .cov-ref-item:last-child { border-bottom: none; }
+.cov-ref-name {
+  font-size: .82rem;
+  color: var(--txt2);
+}
 
 /* ── Enlace archivo editable ────────────────────────────────── */
 .template-link-bar {
@@ -367,6 +371,48 @@
 .pdf-empty i      { font-size: 3rem; color: #d1d5db; }
 .pdf-empty strong { color: #6b7280; font-size: 1rem; }
 .pdf-empty span   { font-size: 0.85rem; }
+
+/* ── Solicitud de Baja ──────────────────────────────────────── */
+.btn-sol-baja {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.32rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9a3412;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.btn-sol-baja:hover {
+  background: #ea580c;
+  border-color: #ea580c;
+  color: #fff;
+}
+
+.badge-sol-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #92400e;
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.sol-na {
+  color: #d1d5db;
+  font-size: 0.85rem;
+}
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {

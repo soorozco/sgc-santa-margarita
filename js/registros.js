@@ -310,6 +310,16 @@ function renderTable() {
         <td class="center">${covBadge(r.code)}</td>
         <td class="center"><span class="pill ${sPill(r.status)}">${sLabel(r.status)}</span></td>
         <td class="center" onclick="event.stopPropagation()">
+          ${canRequest
+            ? `<button onclick="openSolBaja('${r.id}')" class="btn-sol-baja">
+                <i class="fa-solid fa-arrow-down-to-line"></i> Solicitar baja
+               </button>`
+            : _pendingReqs.has(r.id)
+              ? `<span class="badge-sol-pending"><i class="fa-solid fa-clock"></i> Pendiente</span>`
+              : `<span class="sol-na">—</span>`
+          }
+        </td>
+        <td class="center" onclick="event.stopPropagation()">
           <div class="action-btns">
             <button onclick="openPdfViewer('${r.id}')" class="btn-action teal" title="Ver PDF">
               <i class="fa-solid fa-file-pdf"></i>
@@ -324,8 +334,6 @@ function renderTable() {
             <button onclick="openUpload('${r.id}')" class="btn-action green" title="Subir PDF">
               <i class="fa-solid fa-upload"></i>
             </button>` : ''}
-            ${canRequest ? `<button onclick="openSolBaja('${r.id}')" class="btn-action orange" title="Solicitar Baja"><i class="fa-solid fa-arrow-down-to-line"></i></button>` : ''}
-            ${_pendingReqs.has(r.id) ? `<span class="btn-action" title="Solicitud pendiente" style="color:#f59e0b;cursor:default"><i class="fa-solid fa-clock"></i></span>` : ''}
           </div>
         </td>
       </tr>`

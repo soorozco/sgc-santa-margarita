@@ -253,6 +253,16 @@ function renderTable(docs) {
       <td>${esc(doc.departments?.name || '—')}</td>
       <td>${esc(doc.custodian_position || '—')}</td>
       <td class="center"><span class="pill ${sPill(doc.status)}">${sLabel(doc.status)}</span></td>
+      <td class="center">
+        ${canRequest
+          ? `<button onclick="openSolBaja('${doc.id}')" class="btn-sol-baja">
+              <i class="fa-solid fa-arrow-down-to-line"></i> Solicitar baja
+             </button>`
+          : _pendingReqs.has(doc.id)
+            ? `<span class="badge-sol-pending"><i class="fa-solid fa-clock"></i> Pendiente</span>`
+            : `<span class="sol-na">—</span>`
+        }
+      </td>
       <td>
         <div class="action-btns">
           <button onclick="openDetail('${doc.id}')" class="btn-action" title="Ver detalle">
@@ -268,8 +278,6 @@ function renderTable(docs) {
           <button onclick="openUpload('${doc.id}')" class="btn-action green" title="Subir versión">
             <i class="fa-solid fa-upload"></i>
           </button>` : ''}
-          ${canRequest ? `<button onclick="openSolBaja('${doc.id}')" class="btn-action orange" title="Solicitar Baja"><i class="fa-solid fa-arrow-down-to-line"></i></button>` : ''}
-          ${_pendingReqs.has(doc.id) ? `<span class="btn-action" title="Solicitud pendiente" style="color:#f59e0b;cursor:default"><i class="fa-solid fa-clock"></i></span>` : ''}
         </div>
       </td>
     </tr>`
