@@ -35,12 +35,25 @@ async function loadRequests() {
     .from('document_deactivation_requests')
     .select(`
       id, reason, status, created_at, reviewer_comment, reviewed_at,
-      document:document_id(id, code, name, department_id, departments(name)),
+      document:document_id(id, code, name, departments(name)),
       requester:requested_by(full_name),
       reviewer:reviewed_by(full_name)
     `)
     .order('created_at', { ascending: false })
-  if (error) { console.error(error); return }
+
+  if (error) {
+    console.error('[Solicitudes] error:', error)
+    const msg = error.code === '42P01'
+      ? 'La tabla de solicitudes no existe aún. Ejecuta el SQL en Supabase primero.'
+      : 'Error al cargar solicitudes: ' + error.message
+    const errRow = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444">${msg}</td></tr>`
+    const tp = document.getElementById('tbody-pending')
+    const th = document.getElementById('tbody-history')
+    if (tp) tp.innerHTML = errRow
+    if (th) th.innerHTML = errRow
+    return
+  }
+
   _requests = data || []
   renderPending()
   renderHistory()
