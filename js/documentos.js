@@ -1302,7 +1302,7 @@ async function updateClavePreview() {
   const { count } = await db.from('documents')
     .select('id', { count: 'exact', head: true })
     .like('code', `${type.code_prefix}-${dept.code}-%`)
-  const nextNum = String((count ?? 0) + 1).padStart(3, '0')
+  const nextNum = String((count ?? 0) + 1).padStart(2, '0')
   preview.textContent = `${type.code_prefix}-${dept.code}-${nextNum}`
 }
 
