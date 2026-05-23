@@ -166,24 +166,32 @@ async function openNewQJ() {
   _editMode    = false
   _currentQJId = null
 
-  // Generar folio sugerido
-  const { count } = await db.from('quejas').select('id', { count: 'exact', head: true })
-  const year = new Date().getFullYear()
-  const num  = String((count || 0) + 1).padStart(2, '0')
-
+  // Limpiar campos
   const fields = ['nq-nombre','nq-habitacion','nq-telefono','nq-personal',
                   'nq-descripcion','nq-presenta','nq-recibe','nq-calidad']
   fields.forEach(id => setVal(id, ''))
   setVal('nq-tipo', '')
   setVal('nq-departamento', '')
   setVal('nq-fecha', new Date().toISOString().split('T')[0])
-  setVal('nq-folio', `QJ-${year}-${num}`)
+  setVal('nq-folio', 'Auto-generado')
 
-  setText('modal-new-ttl', 'Registrar Solicitud')
-  document.querySelector('#modal-new-ttl small').textContent =
-    'Recepción de felicitaciones, sugerencias o quejas — FT-CA-24'
+  // Título del modal
+  const ttl = document.getElementById('modal-new-ttl')
+  if (ttl) ttl.innerHTML = 'Registrar Solicitud <small>Recepción de felicitaciones, sugerencias o quejas — FT-CA-24</small>'
 
+  // Abrir modal de inmediato
   openModal('modal-new-qj')
+
+  // Generar folio sugerido en segundo plano (no bloqueante)
+  try {
+    const { count } = await db.from('quejas').select('id', { count: 'exact', head: true })
+    const year = new Date().getFullYear()
+    const num  = String((count || 0) + 1).padStart(2, '0')
+    setVal('nq-folio', `QJ-${year}-${num}`)
+  } catch (e) {
+    // El trigger de Supabase generará el folio automáticamente al guardar
+    setVal('nq-folio', 'Auto-generado')
+  }
 }
 
 function openEditQJFromTable(id) {
@@ -205,8 +213,8 @@ function openEditQJFromTable(id) {
   setVal('nq-recibe',       r.nombre_recibe || '')
   setVal('nq-calidad',      r.nombre_calidad || '')
 
-  setText('modal-new-ttl', `Editar — ${r.folio}`)
-  document.querySelector('#modal-new-ttl small').textContent = tipoLabel(r.tipo)
+  const ttlEdit = document.getElementById('modal-new-ttl')
+  if (ttlEdit) ttlEdit.innerHTML = `Editar — ${esc(r.folio)} <small>${tipoLabel(r.tipo)}</small>`
 
   openModal('modal-new-qj')
 }
