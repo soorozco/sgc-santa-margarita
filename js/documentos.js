@@ -117,9 +117,15 @@ function updateCargo(selectEl, cargoId) {
 }
 
 function applyRoleUI() {
-  const canWrite = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
-  const btn = document.getElementById('btn-new-doc')
-  if (btn) btn.style.display = canWrite ? 'inline-flex' : 'none'
+  const canWrite  = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
+  const canReview = ['administrador','responsable_calidad'].includes(_role)
+
+  const btnNew   = document.getElementById('btn-new-doc')
+  const btnClave = document.getElementById('btn-sol-clave')
+  if (btnNew)   btnNew.style.display   = canWrite  ? 'inline-flex' : 'none'
+  if (btnClave) btnClave.style.display = canWrite  ? 'inline-flex' : 'none'
+
+  if (canReview) loadCodeRequests()
 }
 
 // ── Solicitudes de baja pendientes ──────────────────────────────
@@ -1251,6 +1257,245 @@ async function submitSolBaja() {
   closeModal('modal-sol-baja')
   _pendingReqs.add(_currentDocId)
   applyFilters()
+}
+
+// ── SOLICITAR CLAVE NUEVA ────────────────────────────────────────
+
+let _currentClaveReqId = null
+
+function openSolClave() {
+  setVal('sc-type', '')
+  setVal('sc-dept', '')
+  setVal('sc-name', '')
+  setVal('sc-justification', '')
+  setText('sc-code-preview', '—')
+
+  // Poblar selects
+  const blankOpt = '<option value="">— Seleccionar —</option>'
+  const scType = document.getElementById('sc-type')
+  const scDept = document.getElementById('sc-dept')
+  if (scType) scType.innerHTML = blankOpt + _types.map(t =>
+    `<option value="${t.id}">${t.code_prefix} — ${t.name}</option>`).join('')
+  if (scDept) scDept.innerHTML = blankOpt + _depts.map(d =>
+    `<option value="${d.id}">${d.name}</option>`).join('')
+
+  // Pre-seleccionar departamento del usuario si tiene uno
+  if (_profile?.department_id && scDept) scDept.value = _profile.department_id
+
+  updateClavePreview()
+  openModal('modal-sol-clave')
+}
+
+async function updateClavePreview() {
+  const typeId = document.getElementById('sc-type')?.value
+  const deptId = document.getElementById('sc-dept')?.value
+  const preview = document.getElementById('sc-code-preview')
+  if (!preview) return
+
+  if (!typeId || !deptId) { preview.textContent = '—'; return }
+
+  const type = _types.find(t => t.id === typeId)
+  const dept = _depts.find(d => d.id === deptId)
+  if (!type || !dept) return
+
+  // Contar cuántos documentos de este tipo/depto existen para sugerir el siguiente número
+  const { count } = await db.from('documents')
+    .select('id', { count: 'exact', head: true })
+    .like('code', `${type.code_prefix}-${dept.code}-%`)
+  const nextNum = String((count ?? 0) + 1).padStart(3, '0')
+  preview.textContent = `${type.code_prefix}-${dept.code}-${nextNum}`
+}
+
+async function submitSolClave() {
+  const btn          = document.getElementById('btn-sc-submit')
+  const typeId       = document.getElementById('sc-type')?.value
+  const deptId       = document.getElementById('sc-dept')?.value
+  const name         = document.getElementById('sc-name')?.value.trim()
+  const justification= document.getElementById('sc-justification')?.value.trim()
+  const suggestedCode= document.getElementById('sc-code-preview')?.textContent.trim()
+
+  if (!typeId)   { showToast('Selecciona el tipo de documento.', 'red'); return }
+  if (!deptId)   { showToast('Selecciona el departamento.', 'red'); return }
+  if (!name)     { showToast('Escribe el nombre propuesto.', 'red'); return }
+  if (!justification) { showToast('Escribe la justificación.', 'red'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
+
+  const { error } = await db.from('document_code_requests').insert({
+    requested_by:    _user.id,
+    document_type_id:typeId,
+    department_id:   deptId,
+    suggested_code:  suggestedCode !== '—' ? suggestedCode : null,
+    proposed_name:   name,
+    justification
+  })
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Solicitud'
+
+  if (error) { showToast('Error al enviar solicitud: ' + error.message, 'red'); return }
+
+  showToast('Solicitud enviada. El área de Calidad la revisará pronto.', 'green')
+  closeModal('modal-sol-clave')
+  if (['administrador','responsable_calidad'].includes(_role)) loadCodeRequests()
+}
+
+// ── Panel de solicitudes de clave (admin) ────────────────────────
+
+async function loadCodeRequests() {
+  const panel = document.getElementById('clave-requests-panel')
+  const list  = document.getElementById('clave-requests-list')
+  if (!panel || !list) return
+
+  const { data, error } = await db
+    .from('document_code_requests')
+    .select(`
+      id, suggested_code, proposed_name, justification, created_at,
+      document_types(code_prefix, name),
+      departments(name),
+      requester:requested_by(full_name)
+    `)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+
+  if (error || !data || data.length === 0) {
+    panel.style.display = 'none'
+    return
+  }
+
+  panel.style.display = 'block'
+  const badge = document.getElementById('clave-panel-badge')
+  if (badge) badge.textContent = data.length
+
+  list.innerHTML = data.map(r => `
+    <div class="clave-req-row">
+      <div class="clave-req-info">
+        <div>
+          <span class="clave-req-code">${esc(r.suggested_code || '—')}</span>
+          <span class="clave-req-name">${esc(r.proposed_name)}</span>
+        </div>
+        <div class="clave-req-meta">
+          ${esc(r.document_types?.code_prefix || '—')} ·
+          ${esc(r.departments?.name || '—')} ·
+          Solicitado por <strong>${esc(r.requester?.full_name || '—')}</strong> ·
+          ${fmtDate(r.created_at.split('T')[0])}
+        </div>
+        ${r.justification ? `<div class="clave-req-meta" style="margin-top:3px;font-style:italic">"${esc(r.justification)}"</div>` : ''}
+      </div>
+      <button class="btn-review-clave" onclick="openReviewClave('${r.id}')">
+        <i class="fa-solid fa-clipboard-check"></i> Revisar
+      </button>
+    </div>
+  `).join('')
+}
+
+function openReviewClave(reqId) {
+  _currentClaveReqId = reqId
+  const list = document.getElementById('clave-requests-list')
+  // Encontrar los datos del row en el DOM o re-obtenerlos
+  db.from('document_code_requests')
+    .select(`
+      id, suggested_code, proposed_name, justification,
+      document_types(code_prefix, name),
+      departments(name),
+      requester:requested_by(full_name)
+    `)
+    .eq('id', reqId)
+    .single()
+    .then(({ data: r }) => {
+      if (!r) return
+      const info = document.getElementById('rc-info-box')
+      if (info) info.innerHTML = `
+        <div class="rc-info-row">
+          <span class="rc-info-lbl">Solicitante</span>
+          <span class="rc-info-val">${esc(r.requester?.full_name || '—')}</span>
+        </div>
+        <div class="rc-info-row">
+          <span class="rc-info-lbl">Tipo</span>
+          <span class="rc-info-val">${esc(r.document_types?.code_prefix || '—')} — ${esc(r.document_types?.name || '—')}</span>
+        </div>
+        <div class="rc-info-row">
+          <span class="rc-info-lbl">Departamento</span>
+          <span class="rc-info-val">${esc(r.departments?.name || '—')}</span>
+        </div>
+        <div class="rc-info-row">
+          <span class="rc-info-lbl">Nombre</span>
+          <span class="rc-info-val">${esc(r.proposed_name)}</span>
+        </div>
+        ${r.justification ? `
+        <div class="rc-info-row">
+          <span class="rc-info-lbl">Justificación</span>
+          <span class="rc-info-val" style="font-style:italic">${esc(r.justification)}</span>
+        </div>` : ''}
+      `
+      setText('rc-requester-info', `Código sugerido: ${r.suggested_code || '—'}`)
+      setVal('rc-code', r.suggested_code || '')
+      setVal('rc-notes', '')
+      openModal('modal-review-clave')
+    })
+}
+
+async function submitReviewClave(action) {
+  const btnApprove = document.getElementById('btn-rc-approve')
+  const btnReject  = document.getElementById('btn-rc-reject')
+  const code       = document.getElementById('rc-code')?.value.trim().toUpperCase()
+  const notes      = document.getElementById('rc-notes')?.value.trim()
+
+  if (action === 'approved' && !code) {
+    showToast('Escribe el código a asignar antes de aprobar.', 'red'); return
+  }
+  if (action === 'approved' && _allDocs.find(d => d.code === code)) {
+    showToast(`El código "${code}" ya existe en la lista maestra.`, 'red'); return
+  }
+
+  btnApprove.disabled = true
+  btnReject.disabled  = true
+  btnApprove.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
+
+  // Obtener datos completos de la solicitud
+  const { data: req } = await db.from('document_code_requests')
+    .select('*').eq('id', _currentClaveReqId).single()
+
+  let createdDocId = null
+
+  if (action === 'approved' && req) {
+    // Crear el documento en borrador con el código asignado
+    const { data: newDoc } = await db.from('documents').insert({
+      code:              code,
+      name:              req.proposed_name,
+      document_type_id:  req.document_type_id || null,
+      department_id:     req.department_id    || null,
+      current_version:   '1.0',
+      status:            'borrador',
+      created_by:        _user.id
+    }).select().single()
+    createdDocId = newDoc?.id || null
+  }
+
+  // Actualizar la solicitud
+  const { error } = await db.from('document_code_requests').update({
+    status:              action,
+    assigned_code:       action === 'approved' ? code : null,
+    reviewed_by:         _user.id,
+    reviewed_at:         new Date().toISOString(),
+    review_notes:        notes || null,
+    created_document_id: createdDocId,
+    updated_at:          new Date().toISOString()
+  }).eq('id', _currentClaveReqId)
+
+  btnApprove.disabled = false
+  btnReject.disabled  = false
+  btnApprove.innerHTML = '<i class="fa-solid fa-check"></i> Aprobar y Crear Documento'
+
+  if (error) { showToast('Error al guardar revisión: ' + error.message, 'red'); return }
+
+  const msg = action === 'approved'
+    ? `Clave ${code} asignada. Documento creado en borrador.`
+    : 'Solicitud rechazada.'
+  showToast(msg, action === 'approved' ? 'green' : 'red')
+  closeModal('modal-review-clave')
+  await Promise.all([loadCodeRequests(), loadDocuments()])
 }
 
 // ── Arrancar ──────────────────────────────────────────────────────

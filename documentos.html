@@ -192,6 +192,22 @@
           Nuevo Documento
         </button>
 
+        <button class="btn-sol-clave" id="btn-sol-clave" onclick="openSolClave()" style="display:none">
+          <i class="fa-solid fa-key"></i>
+          Solicitar Clave Nueva
+        </button>
+
+      </div>
+
+      <!-- ── Panel solicitudes de clave (solo admin) ─────── -->
+      <div class="clave-requests-panel" id="clave-requests-panel" style="display:none">
+        <div class="clave-panel-hdr">
+          <span><i class="fa-solid fa-key"></i> Solicitudes de Clave Nueva</span>
+          <span class="clave-panel-badge" id="clave-panel-badge">0</span>
+        </div>
+        <div id="clave-requests-list">
+          <p style="text-align:center;padding:18px;color:var(--txt3);font-size:.857rem">Cargando…</p>
+        </div>
       </div>
 
       <!-- ── Estadísticas rápidas ───────────────────── -->
@@ -708,6 +724,114 @@
       <button class="btn-secondary" onclick="closeModal('modal-sol-baja')">Cancelar</button>
       <button class="btn-primary" id="btn-sb-submit" onclick="submitSolBaja()">
         <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Solicitar Clave Nueva ═══════════════ -->
+<div class="modal-overlay" id="modal-sol-clave">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-key" style="color:#009688;margin-right:6px"></i>
+        Solicitar Clave Nueva
+        <small>El área de Calidad asignará el código oficial</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-sol-clave')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Tipo de documento <span class="req">*</span></label>
+          <select id="sc-type" onchange="updateClavePreview()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Departamento <span class="req">*</span></label>
+          <select id="sc-dept" onchange="updateClavePreview()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Código sugerido</label>
+          <div class="clave-preview" id="sc-code-preview">—</div>
+          <small style="font-size:.75rem;color:var(--txt3);margin-top:4px;display:block">
+            Generado automáticamente · Calidad podrá ajustarlo al aprobar
+          </small>
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre propuesto del documento <span class="req">*</span></label>
+          <input type="text" id="sc-name" placeholder="Ej. Procedimiento de Admisión de Pacientes">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Justificación / Propósito <span class="req">*</span></label>
+          <textarea id="sc-justification" rows="3"
+            placeholder="¿Por qué se necesita este documento? ¿Qué proceso cubre?"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-sol-clave')">Cancelar</button>
+      <button class="btn-primary" id="btn-sc-submit" onclick="submitSolClave()">
+        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Revisar Solicitud de Clave ═══════════════ -->
+<div class="modal-overlay" id="modal-review-clave">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-clipboard-check" style="color:#009688;margin-right:6px"></i>
+        Revisar Solicitud de Clave
+        <small id="rc-requester-info">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-review-clave')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="rc-info-box" id="rc-info-box"></div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Código a asignar <span class="req">*</span></label>
+          <input type="text" id="rc-code" oninput="this.value=this.value.toUpperCase()"
+                 placeholder="Ej. PT-ADM-012">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Notas / Comentarios</label>
+          <textarea id="rc-notes" rows="2" placeholder="Observaciones para el solicitante…"></textarea>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-review-clave')">Cancelar</button>
+      <button class="btn-reject-clave" id="btn-rc-reject" onclick="submitReviewClave('rejected')">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+      <button class="btn-primary" id="btn-rc-approve" onclick="submitReviewClave('approved')">
+        <i class="fa-solid fa-check"></i> Aprobar y Crear Documento
       </button>
     </div>
   </div>

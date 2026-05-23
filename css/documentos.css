@@ -473,3 +473,165 @@
   color: #d1d5db;
   font-size: 0.85rem;
 }
+
+/* ── Botón Solicitar Clave ──────────────────────────────────── */
+.btn-sol-clave {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: 0.857rem;
+  font-weight: 600;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1.5px solid #6ee7b7;
+  border-radius: var(--rsm);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.btn-sol-clave:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
+}
+
+/* ── Vista previa de clave ──────────────────────────────────── */
+.clave-preview {
+  font-family: 'SF Mono','Fira Mono',monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--blue);
+  background: var(--blue-lt);
+  border: 1.5px dashed rgba(0,150,136,.35);
+  border-radius: var(--rsm);
+  padding: 10px 16px;
+  letter-spacing: .06em;
+}
+
+/* ── Panel de solicitudes de clave (admin) ──────────────────── */
+.clave-requests-panel {
+  background: #fff;
+  border: 1.5px solid #6ee7b7;
+  border-radius: var(--r);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+.clave-panel-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: #f0fdf4;
+  border-bottom: 1px solid #d1fae5;
+  font-size: .857rem;
+  font-weight: 700;
+  color: #065f46;
+}
+.clave-panel-hdr i { margin-right: 6px; }
+.clave-panel-badge {
+  background: #059669;
+  color: #fff;
+  font-size: .714rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.clave-req-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+.clave-req-row:last-child { border-bottom: none; }
+.clave-req-info { flex: 1; }
+.clave-req-code {
+  font-family: 'SF Mono','Fira Mono',monospace;
+  font-size: .786rem;
+  font-weight: 700;
+  background: var(--blue-lt);
+  color: var(--blue);
+  padding: 2px 7px;
+  border-radius: var(--rxs);
+  margin-right: 6px;
+}
+.clave-req-name {
+  font-size: .857rem;
+  font-weight: 600;
+  color: var(--txt);
+}
+.clave-req-meta {
+  font-size: .75rem;
+  color: var(--txt3);
+  margin-top: 3px;
+}
+.btn-review-clave {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: .32rem .8rem;
+  font-size: .786rem;
+  font-weight: 600;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.btn-review-clave:hover {
+  background: #059669;
+  border-color: #059669;
+  color: #fff;
+}
+
+/* ── Modal revisar clave ────────────────────────────────────── */
+.rc-info-box {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: var(--rsm);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: .857rem;
+}
+.rc-info-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.rc-info-row:last-child { margin-bottom: 0; }
+.rc-info-lbl {
+  font-size: .714rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--txt3);
+  width: 90px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+.rc-info-val { color: var(--txt); line-height: 1.5; }
+
+.btn-reject-clave {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  font-size: .857rem;
+  font-weight: 600;
+  color: #991b1b;
+  background: #fff;
+  border: 1.5px solid #fca5a5;
+  border-radius: var(--rsm);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all .15s;
+}
+.btn-reject-clave:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
