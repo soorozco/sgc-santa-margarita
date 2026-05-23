@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quejas y Sugerencias — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/quejas.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="registros.html"><i class="fa-solid fa-table-list"></i><span>Control de Registros</span></a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
+      <a class="nav-link active" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span></a>
+      <a class="nav-link" href="solicitudes.html" id="nav-solicitudes" style="display:none">
+        <i class="fa-solid fa-inbox"></i>
+        <span>Solicitudes de Baja</span>
+        <span class="nav-badge" id="badge-sol" style="display:none">0</span>
+      </a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="personal.html"><i class="fa-solid fa-id-card"></i><span>Personal</span></a>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span></a>
+      <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+      <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+      <a class="nav-link" href="configuracion.html" id="nav-config"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Quejas, Sugerencias y Felicitaciones</div>
+        <div class="topbar-sub">Cláusula 9.1.2 — Formato FT-CA-24</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Resumen rápido -->
+      <div class="qj-summary" id="qj-summary" style="display:none">
+        <div class="qj-sum-card qj-sum-queja">
+          <i class="fa-solid fa-face-angry"></i>
+          <div>
+            <span id="cnt-queja">0</span>
+            <small>Quejas</small>
+          </div>
+        </div>
+        <div class="qj-sum-card qj-sum-sugerencia">
+          <i class="fa-solid fa-lightbulb"></i>
+          <div>
+            <span id="cnt-sugerencia">0</span>
+            <small>Sugerencias</small>
+          </div>
+        </div>
+        <div class="qj-sum-card qj-sum-felicitacion">
+          <i class="fa-solid fa-star"></i>
+          <div>
+            <span id="cnt-felicitacion">0</span>
+            <small>Felicitaciones</small>
+          </div>
+        </div>
+        <div class="qj-sum-card qj-sum-pendiente">
+          <i class="fa-solid fa-clock"></i>
+          <div>
+            <span id="cnt-pendiente">0</span>
+            <small>Pendientes</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por folio, nombre o descripción…">
+        </div>
+        <select class="filter-sel" id="f-tipo">
+          <option value="">Todos los tipos</option>
+          <option value="queja">Queja</option>
+          <option value="sugerencia">Sugerencia</option>
+          <option value="felicitacion">Felicitación</option>
+        </select>
+        <select class="filter-sel" id="f-status">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="en_proceso">En Proceso</option>
+          <option value="resuelto">Resuelto</option>
+          <option value="cerrado">Cerrado</option>
+        </select>
+        <button class="btn-secondary" onclick="exportCSV()">
+          <i class="fa-solid fa-download"></i> Exportar CSV
+        </button>
+        <button class="btn-primary" id="btn-new-qj" onclick="openNewQJ()" style="display:none">
+          <i class="fa-solid fa-plus"></i> Registrar
+        </button>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="qj-count">Cargando…</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Fecha</th>
+              <th class="center">Tipo</th>
+              <th>Nombre</th>
+              <th>Departamento</th>
+              <th>Descripción</th>
+              <th class="center">Estado</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="qj-tbody">
+            <tr>
+              <td colspan="8" class="table-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <strong>Cargando…</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+
+<!-- ═══ MODAL — Nueva / Editar ═══ -->
+<div class="modal-overlay" id="modal-new-qj">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-ttl" id="modal-new-ttl">
+        Registrar Solicitud
+        <small>Recepción de felicitaciones, sugerencias o quejas — FT-CA-24</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new-qj')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Fecha <span class="req">*</span></label>
+          <input type="date" id="nq-fecha">
+        </div>
+        <div class="field">
+          <label>Folio</label>
+          <input type="text" id="nq-folio" placeholder="Auto-generado" readonly
+                 style="background:#f1f5f9;color:var(--txt3)">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Nombre del paciente / cliente</label>
+          <input type="text" id="nq-nombre" placeholder="Nombre completo">
+        </div>
+        <div class="field">
+          <label>Tipo de solicitud <span class="req">*</span></label>
+          <select id="nq-tipo">
+            <option value="">— Seleccionar —</option>
+            <option value="queja">Queja</option>
+            <option value="sugerencia">Sugerencia</option>
+            <option value="felicitacion">Felicitación</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Habitación / Área</label>
+          <input type="text" id="nq-habitacion" placeholder="Ej. 203, Urgencias">
+        </div>
+        <div class="field">
+          <label>Número de teléfono</label>
+          <input type="tel" id="nq-telefono" placeholder="Opcional">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Departamento o área involucrada</label>
+          <select id="nq-departamento">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Personal involucrado</label>
+          <input type="text" id="nq-personal" placeholder="Nombre(s) del personal">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción del evento <span class="req">*</span></label>
+          <textarea id="nq-descripcion" rows="4"
+            placeholder="Describa con detalle la felicitación, sugerencia o queja…"></textarea>
+        </div>
+      </div>
+
+      <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Nombre de quien presenta</label>
+          <input type="text" id="nq-presenta" placeholder="Nombre">
+        </div>
+        <div class="field">
+          <label>Nombre de quien recibe</label>
+          <input type="text" id="nq-recibe" placeholder="Nombre">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre de recepción Calidad</label>
+          <input type="text" id="nq-calidad" placeholder="Nombre del responsable de Calidad">
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new-qj')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-qj" onclick="submitNewQJ()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ MODAL — Detalle ═══ -->
+<div class="modal-overlay" id="modal-detail-qj">
+  <div class="modal modal-lg">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="dq-folio-ttl">—</span>
+        <small id="dq-tipo-ttl">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail-qj')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Barra de estado -->
+      <div id="dq-status-bar"></div>
+
+      <div class="info-grid">
+        <div class="info-item"><label>Folio</label><span id="dq-folio">—</span></div>
+        <div class="info-item"><label>Fecha</label><span id="dq-fecha">—</span></div>
+        <div class="info-item"><label>Tipo</label><span id="dq-tipo">—</span></div>
+        <div class="info-item"><label>Estado</label><span id="dq-status">—</span></div>
+        <div class="info-item"><label>Nombre</label><span id="dq-nombre">—</span></div>
+        <div class="info-item"><label>Habitación / Área</label><span id="dq-habitacion">—</span></div>
+        <div class="info-item"><label>Teléfono</label><span id="dq-telefono">—</span></div>
+        <div class="info-item"><label>Departamento</label><span id="dq-departamento">—</span></div>
+        <div class="info-item info-item-full"><label>Personal involucrado</label><span id="dq-personal">—</span></div>
+      </div>
+
+      <div class="info-item" style="margin-bottom:18px">
+        <label>Descripción del evento</label>
+        <span id="dq-descripcion" style="display:block;line-height:1.7;color:var(--txt2);margin-top:4px">—</span>
+      </div>
+
+      <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
+      <div class="conformidad-grid">
+        <div class="conf-item">
+          <label>Presentó</label>
+          <span id="dq-presenta">—</span>
+        </div>
+        <div class="conf-item">
+          <label>Recibió</label>
+          <span id="dq-recibe">—</span>
+        </div>
+        <div class="conf-item">
+          <label>Recepción Calidad</label>
+          <span id="dq-calidad">—</span>
+        </div>
+      </div>
+
+      <!-- Seguimiento -->
+      <div id="dq-seguimiento-wrap" style="display:none">
+        <div class="qj-sep"><i class="fa-solid fa-comments"></i> Seguimiento</div>
+        <div id="dq-seguimiento-list"></div>
+      </div>
+
+      <!-- Agregar nota de seguimiento (admin) -->
+      <div id="dq-nota-wrap" style="display:none;margin-top:12px">
+        <div class="field">
+          <label>Agregar nota de seguimiento</label>
+          <textarea id="dq-nota-text" rows="2" placeholder="Escribe una nota o acción tomada…"></textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+          <select id="dq-new-status" class="filter-sel" style="flex:1">
+            <option value="">Sin cambiar estado</option>
+            <option value="en_proceso">Cambiar a: En Proceso</option>
+            <option value="resuelto">Cambiar a: Resuelto</option>
+            <option value="cerrado">Cambiar a: Cerrado</option>
+          </select>
+          <button class="btn-primary" onclick="submitNota()" id="btn-nota">
+            <i class="fa-solid fa-paper-plane"></i> Guardar nota
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-detail-qj')">Cerrar</button>
+      <button class="btn-secondary" id="btn-edit-qj" onclick="openEditQJ()" style="display:none">
+        <i class="fa-solid fa-pencil"></i> Editar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/quejas.js"></script>
+</body>
+</html>
