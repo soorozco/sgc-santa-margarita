@@ -1,9 +1,12 @@
-// ─── Solicitudes de Baja de Documentos ──────────────────────────
+// ─── Solicitudes de Alta y Baja de Documentos ────────────────────
 
 let _user = null, _profile = null, _role = null
-let _requests = []
-let _currentReqId = null
+let _altaReqs  = []   // document_code_requests
+let _bajaReqs  = []   // document_deactivation_requests
+let _currentAltaId = null
+let _currentBajaId = null
 
+// ── Init ─────────────────────────────────────────────────────────
 async function initSolicitudes() {
   const auth = await requireAuth()
   if (!auth) return
@@ -13,24 +16,221 @@ async function initSolicitudes() {
 
   renderUserInfo()
 
-  if (_role !== 'administrador' && _role !== 'responsable_calidad') {
+  if (!['administrador','responsable_calidad'].includes(_role)) {
     document.getElementById('main-content').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
+      <div style="display:flex;flex-direction:column;align-items:center;
+                  justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
         <i class="fa-solid fa-lock" style="font-size:3rem"></i>
         <p>No tienes acceso a esta sección.</p>
       </div>`
     return
   }
 
-  await loadRequests()
-  setupTabs()
-
-  // Mostrar nav de solicitudes (active)
   const navSol = document.getElementById('nav-solicitudes')
   if (navSol) navSol.style.display = 'flex'
+
+  setupTabs()
+  await Promise.all([loadAltaReqs(), loadBajaReqs()])
 }
 
-async function loadRequests() {
+// ── Tabs ─────────────────────────────────────────────────────────
+function setupTabs() {
+  // Tabs principales (Alta / Baja)
+  document.querySelectorAll('.sol-tabs-main .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sol-tabs-main .tab-btn').forEach(b => b.classList.remove('active'))
+      document.querySelectorAll('.sol-section').forEach(s => s.classList.remove('active'))
+      btn.classList.add('active')
+      document.getElementById('section-' + btn.dataset.section)?.classList.add('active')
+    })
+  })
+
+  // Sub-tabs dentro de cada sección
+  document.querySelectorAll('.sol-tabs-sub .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const section = btn.closest('.sol-section')
+      section.querySelectorAll('.sol-tabs-sub .tab-btn').forEach(b => b.classList.remove('active'))
+      section.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+      btn.classList.add('active')
+      document.getElementById(btn.dataset.tab)?.classList.add('active')
+    })
+  })
+}
+
+// ── SOLICITUDES DE ALTA ───────────────────────────────────────────
+async function loadAltaReqs() {
+  const { data, error } = await db
+    .from('document_code_requests')
+    .select(`
+      id, suggested_code, proposed_name, justification, status,
+      assigned_code, review_notes, created_at,
+      document_types(code_prefix, name),
+      departments(name),
+      requester:requested_by(full_name),
+      reviewer:reviewed_by(full_name)
+    `)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    const msg = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#ef4444">
+      Error: ${esc(error.message)}</td></tr>`
+    document.getElementById('tbody-alta-pending').innerHTML = msg
+    document.getElementById('tbody-alta-history').innerHTML = msg
+    return
+  }
+
+  _altaReqs = data || []
+  renderAltaPending()
+  renderAltaHistory()
+  updateKPIs()
+}
+
+function renderAltaPending() {
+  const tbody = document.getElementById('tbody-alta-pending')
+  if (!tbody) return
+  const pending = _altaReqs.filter(r => r.status === 'pending')
+
+  const badge = document.getElementById('badge-alta-pending')
+  if (badge) { badge.textContent = pending.length; badge.style.display = pending.length ? 'inline-flex' : 'none' }
+
+  if (!pending.length) {
+    tbody.innerHTML = emptyRow(8, 'Sin solicitudes de alta pendientes')
+    return
+  }
+
+  tbody.innerHTML = pending.map(r => `
+    <tr>
+      <td><span class="doc-code">${esc(r.suggested_code || '—')}</span></td>
+      <td style="font-weight:500">${esc(r.proposed_name)}</td>
+      <td><span class="doc-type-tag">${esc(r.document_types?.code_prefix || '—')}</span></td>
+      <td>${esc(r.departments?.name || '—')}</td>
+      <td>${esc(r.requester?.full_name || '—')}</td>
+      <td style="white-space:nowrap">${fmtDate(r.created_at)}</td>
+      <td style="max-width:200px;font-size:.82rem;color:#6b7280">${esc(r.justification || '—')}</td>
+      <td class="center">
+        <div class="action-btns">
+          <button onclick="openAltaReview('${r.id}')" class="btn-action green"
+                  title="Revisar solicitud">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </button>
+        </div>
+      </td>
+    </tr>`).join('')
+}
+
+function renderAltaHistory() {
+  const tbody = document.getElementById('tbody-alta-history')
+  if (!tbody) return
+  const done = _altaReqs.filter(r => r.status !== 'pending')
+
+  if (!done.length) {
+    tbody.innerHTML = emptyRow(7, 'Sin historial')
+    return
+  }
+
+  tbody.innerHTML = done.map(r => {
+    const approved = r.status === 'approved'
+    return `
+    <tr>
+      <td>${approved
+        ? `<span class="doc-code">${esc(r.assigned_code || r.suggested_code || '—')}</span>`
+        : `<span style="color:#9ca3af">${esc(r.suggested_code || '—')}</span>`}
+      </td>
+      <td>${esc(r.proposed_name)}</td>
+      <td>${esc(r.departments?.name || '—')}</td>
+      <td>${esc(r.requester?.full_name || '—')}</td>
+      <td style="white-space:nowrap">${fmtDate(r.created_at)}</td>
+      <td class="center">
+        <span class="pill ${approved ? 'pill--vigente' : 'pill--obsoleto'}">
+          ${approved ? 'Aprobada' : 'Rechazada'}
+        </span>
+      </td>
+      <td style="font-size:.82rem;color:#6b7280">${esc(r.review_notes || '—')}</td>
+    </tr>`
+  }).join('')
+}
+
+// Abre el modal de revisión de alta
+function openAltaReview(reqId) {
+  _currentAltaId = reqId
+  const r = _altaReqs.find(x => x.id === reqId)
+  if (!r) return
+
+  // Subtítulo
+  setText('ma-subtitle', `Código sugerido: ${r.suggested_code || '—'}`)
+
+  // Info box
+  const box = document.getElementById('ma-info-box')
+  if (box) box.innerHTML = `
+    <div class="sol-info-row"><span class="sol-info-lbl">Solicitante</span><span>${esc(r.requester?.full_name || '—')}</span></div>
+    <div class="sol-info-row"><span class="sol-info-lbl">Tipo</span><span>${esc(r.document_types?.code_prefix || '—')} — ${esc(r.document_types?.name || '—')}</span></div>
+    <div class="sol-info-row"><span class="sol-info-lbl">Departamento</span><span>${esc(r.departments?.name || '—')}</span></div>
+    <div class="sol-info-row"><span class="sol-info-lbl">Nombre</span><span style="font-weight:600">${esc(r.proposed_name)}</span></div>
+    ${r.justification ? `<div class="sol-info-row"><span class="sol-info-lbl">Justificación</span><span style="font-style:italic">${esc(r.justification)}</span></div>` : ''}
+    <div class="sol-info-row"><span class="sol-info-lbl">Fecha</span><span>${fmtDate(r.created_at)}</span></div>`
+
+  setVal('ma-code', r.suggested_code || '')
+  setVal('ma-notes', '')
+  openModal('modal-approve-alta')
+}
+
+async function submitAltaReview(action) {
+  const btnApprove = document.getElementById('btn-ma-approve')
+  const btnReject  = document.getElementById('btn-ma-reject')
+  const code  = document.getElementById('ma-code')?.value.trim().toUpperCase()
+  const notes = document.getElementById('ma-notes')?.value.trim()
+
+  if (action === 'approved' && !code) {
+    showToast('Escribe el código a asignar antes de aprobar.', 'red'); return
+  }
+
+  btnApprove.disabled = true
+  btnReject.disabled  = true
+  btnApprove.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
+
+  const req = _altaReqs.find(x => x.id === _currentAltaId)
+  let createdDocId = null
+
+  if (action === 'approved' && req) {
+    // Crear documento en borrador con el código asignado
+    const { data: newDoc } = await db.from('documents').insert({
+      code,
+      name:              req.proposed_name,
+      document_type_id:  req.document_type_id || null,
+      department_id:     req.department_id    || null,
+      current_version:   '1.0',
+      status:            'borrador',
+      created_by:        _user.id
+    }).select().single()
+    createdDocId = newDoc?.id || null
+  }
+
+  const { error } = await db.from('document_code_requests').update({
+    status:              action,
+    assigned_code:       action === 'approved' ? code : null,
+    reviewed_by:         _user.id,
+    reviewed_at:         new Date().toISOString(),
+    review_notes:        notes || null,
+    created_document_id: createdDocId,
+    updated_at:          new Date().toISOString()
+  }).eq('id', _currentAltaId)
+
+  btnApprove.disabled = false
+  btnReject.disabled  = false
+  btnApprove.innerHTML = '<i class="fa-solid fa-check"></i> Aprobar y Crear Documento'
+
+  if (error) { showToast('Error: ' + error.message, 'red'); return }
+
+  const msg = action === 'approved'
+    ? `Clave ${code} aprobada. Documento creado en borrador.`
+    : 'Solicitud rechazada.'
+  showToast(msg, action === 'approved' ? 'green' : 'red')
+  closeModal('modal-approve-alta')
+  await loadAltaReqs()
+}
+
+// ── SOLICITUDES DE BAJA ───────────────────────────────────────────
+async function loadBajaReqs() {
   const { data, error } = await db
     .from('document_deactivation_requests')
     .select(`
@@ -42,110 +242,104 @@ async function loadRequests() {
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[Solicitudes] error:', error)
-    const msg = error.code === '42P01'
-      ? 'La tabla de solicitudes no existe aún. Ejecuta el SQL en Supabase primero.'
-      : 'Error al cargar solicitudes: ' + error.message
-    const errRow = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444">${msg}</td></tr>`
-    const tp = document.getElementById('tbody-pending')
-    const th = document.getElementById('tbody-history')
-    if (tp) tp.innerHTML = errRow
-    if (th) th.innerHTML = errRow
+    const msg = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444">
+      Error: ${esc(error.message)}</td></tr>`
+    document.getElementById('tbody-baja-pending').innerHTML = msg
+    document.getElementById('tbody-baja-history').innerHTML = msg
     return
   }
 
-  _requests = data || []
-  renderPending()
-  renderHistory()
-  updateBadges()
+  _bajaReqs = data || []
+  renderBajaPending()
+  renderBajaHistory()
+  updateKPIs()
 }
 
-function updateBadges() {
-  const count = _requests.filter(r => r.status === 'pending').length
-  const badge = document.getElementById('badge-pending')
-  if (badge) { badge.textContent = count; badge.style.display = count ? 'inline-flex' : 'none' }
-  const kpi = document.getElementById('kpi-pending-count')
-  if (kpi) kpi.textContent = count
-
-  // Actualizar badge en nav
-  const navBadge = document.getElementById('badge-sol')
-  if (navBadge) {
-    navBadge.textContent = count
-    navBadge.style.display = count > 0 ? 'inline-flex' : 'none'
-  }
-}
-
-function renderPending() {
-  const tbody = document.getElementById('tbody-pending')
+function renderBajaPending() {
+  const tbody = document.getElementById('tbody-baja-pending')
   if (!tbody) return
-  const pending = _requests.filter(r => r.status === 'pending')
+  const pending = _bajaReqs.filter(r => r.status === 'pending')
+
+  const badge = document.getElementById('badge-baja-pending')
+  if (badge) { badge.textContent = pending.length; badge.style.display = pending.length ? 'inline-flex' : 'none' }
+
   if (!pending.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">No hay solicitudes pendientes</td></tr>`
+    tbody.innerHTML = emptyRow(6, 'Sin solicitudes de baja pendientes')
     return
   }
+
   tbody.innerHTML = pending.map(req => `
     <tr>
-      <td><span class="doc-code">${esc(req.document?.code || '—')}</span><br><small style="color:#6b7280">${esc(req.document?.name || '')}</small></td>
+      <td>
+        <span class="doc-code">${esc(req.document?.code || '—')}</span><br>
+        <small style="color:#6b7280">${esc(req.document?.name || '')}</small>
+      </td>
       <td>${esc(req.document?.departments?.name || '—')}</td>
       <td>${esc(req.requester?.full_name || '—')}</td>
-      <td>${new Date(req.created_at).toLocaleDateString('es-MX')}</td>
+      <td style="white-space:nowrap">${fmtDate(req.created_at)}</td>
       <td style="max-width:220px;white-space:pre-wrap;font-size:.82rem">${esc(req.reason || '—')}</td>
-      <td>
+      <td class="center">
         <div class="action-btns">
-          <button onclick="approveReq('${req.id}')" class="btn-action green" title="Aprobar — dar de baja el documento"><i class="fa-solid fa-check"></i></button>
-          <button onclick="openReject('${req.id}')" class="btn-action red" title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
+          <button onclick="approveBaja('${req.id}')" class="btn-action green"
+                  title="Aprobar — dar de baja"><i class="fa-solid fa-check"></i></button>
+          <button onclick="openRejectBaja('${req.id}')" class="btn-action red"
+                  title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
         </div>
       </td>
-    </tr>
-  `).join('')
+    </tr>`).join('')
 }
 
-function renderHistory() {
-  const tbody = document.getElementById('tbody-history')
+function renderBajaHistory() {
+  const tbody = document.getElementById('tbody-baja-history')
   if (!tbody) return
-  const done = _requests.filter(r => r.status !== 'pending')
+  const done = _bajaReqs.filter(r => r.status !== 'pending')
+
   if (!done.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">Sin historial</td></tr>`
+    tbody.innerHTML = emptyRow(6, 'Sin historial')
     return
   }
+
   tbody.innerHTML = done.map(req => {
-    const isApproved = req.status === 'approved'
+    const approved = req.status === 'approved'
     return `
-      <tr>
-        <td><span class="doc-code">${esc(req.document?.code || '—')}</span><br><small style="color:#6b7280">${esc(req.document?.name || '')}</small></td>
-        <td>${esc(req.document?.departments?.name || '—')}</td>
-        <td>${esc(req.requester?.full_name || '—')}</td>
-        <td>${new Date(req.created_at).toLocaleDateString('es-MX')}</td>
-        <td><span class="pill ${isApproved ? 'pill--vigente' : 'pill--obsoleto'}">${isApproved ? 'Aprobada' : 'Rechazada'}</span></td>
-        <td style="font-size:.82rem;color:#6b7280">${esc(req.reviewer_comment || '—')}</td>
-      </tr>
-    `
+    <tr>
+      <td>
+        <span class="doc-code">${esc(req.document?.code || '—')}</span><br>
+        <small style="color:#6b7280">${esc(req.document?.name || '')}</small>
+      </td>
+      <td>${esc(req.document?.departments?.name || '—')}</td>
+      <td>${esc(req.requester?.full_name || '—')}</td>
+      <td style="white-space:nowrap">${fmtDate(req.created_at)}</td>
+      <td class="center">
+        <span class="pill ${approved ? 'pill--vigente' : 'pill--obsoleto'}">
+          ${approved ? 'Aprobada' : 'Rechazada'}
+        </span>
+      </td>
+      <td style="font-size:.82rem;color:#6b7280">${esc(req.reviewer_comment || '—')}</td>
+    </tr>`
   }).join('')
 }
 
-async function approveReq(reqId) {
-  if (!confirm('¿Confirmas que deseas aprobar esta solicitud? El documento pasará a estado Obsoleto.')) return
-  const req = _requests.find(r => r.id === reqId)
+async function approveBaja(reqId) {
+  if (!confirm('¿Confirmas aprobar esta solicitud? El documento pasará a estado Obsoleto.')) return
+  const req = _bajaReqs.find(r => r.id === reqId)
   if (!req) return
 
-  // 1. Cambiar doc a obsoleto
   const { error: e1 } = await db.from('documents')
-    .update({ status: 'obsoleto' })
-    .eq('id', req.document?.id)
-  if (e1) { showToast('Error al actualizar el documento: ' + e1.message, 'red'); return }
+    .update({ status: 'obsoleto' }).eq('id', req.document?.id)
+  if (e1) { showToast('Error al actualizar el documento.', 'red'); return }
 
-  // 2. Marcar solicitud como aprobada
   const { error: e2 } = await db.from('document_deactivation_requests')
     .update({ status: 'approved', reviewed_by: _user.id, reviewed_at: new Date().toISOString() })
     .eq('id', reqId)
-  if (e2) { showToast('Error al actualizar la solicitud: ' + e2.message, 'red'); return }
+  if (e2) { showToast('Error al actualizar la solicitud.', 'red'); return }
 
   showToast('Solicitud aprobada. Documento dado de baja.', 'green')
-  await loadRequests()
+  await loadBajaReqs()
 }
 
-function openReject(reqId) {
-  _currentReqId = reqId
+function openRejectBaja(reqId) {
+  _currentBajaId = reqId
   setVal('reject-comment', '')
   openModal('modal-reject')
 }
@@ -162,34 +356,52 @@ async function submitReject() {
       reviewed_by:      _user.id,
       reviewed_at:      new Date().toISOString(),
       reviewer_comment: comment
-    })
-    .eq('id', _currentReqId)
+    }).eq('id', _currentBajaId)
 
   btn.disabled = false
   if (error) { showToast('Error al rechazar.', 'red'); return }
   showToast('Solicitud rechazada.', 'green')
   closeModal('modal-reject')
-  await loadRequests()
+  await loadBajaReqs()
 }
 
-function setupTabs() {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
-      btn.classList.add('active')
-      document.getElementById(btn.dataset.tab)?.classList.add('active')
-    })
-  })
+// ── KPIs y badges ─────────────────────────────────────────────────
+function updateKPIs() {
+  const pendingAlta = _altaReqs.filter(r => r.status === 'pending').length
+  const pendingBaja = _bajaReqs.filter(r => r.status === 'pending').length
+
+  setText('kpi-alta-count', pendingAlta)
+  setText('kpi-baja-count', pendingBaja)
+
+  const badgeAlta = document.getElementById('badge-alta')
+  if (badgeAlta) { badgeAlta.textContent = pendingAlta; badgeAlta.style.display = pendingAlta ? 'inline-flex' : 'none' }
+
+  const badgeBaja = document.getElementById('badge-baja')
+  if (badgeBaja) { badgeBaja.textContent = pendingBaja; badgeBaja.style.display = pendingBaja ? 'inline-flex' : 'none' }
+
+  // Badge en el nav sidebar
+  const total = pendingAlta + pendingBaja
+  const navBadge = document.getElementById('badge-sol')
+  if (navBadge) { navBadge.textContent = total; navBadge.style.display = total > 0 ? 'inline-flex' : 'none' }
 }
 
-// ── Helpers ──────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id)?.classList.add('open') }
+// ── Helpers ───────────────────────────────────────────────────────
+function emptyRow(cols, msg) {
+  return `<tr><td colspan="${cols}" style="text-align:center;padding:2rem;color:#9ca3af">${msg}</td></tr>`
+}
+
+function fmtDate(d) {
+  if (!d) return '—'
+  return new Date(d).toLocaleDateString('es-MX', { day:'2-digit', month:'short', year:'numeric' })
+}
+
+function openModal(id)  { document.getElementById(id)?.classList.add('open') }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open') }
 function setText(id, v) { const el = document.getElementById(id); if (el) el.textContent = v }
 function setVal(id, v)  { const el = document.getElementById(id); if (el) el.value = v }
 function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+  return String(s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 function renderUserInfo() {
   setText('sb-user-name', _profile?.full_name || _user.email.split('@')[0])
@@ -204,7 +416,6 @@ function showToast(msg, color = 'green') {
   el._t = setTimeout(() => el.classList.remove('show'), 3500)
 }
 
-// ── Close modals on overlay click ────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Solicitudes de Baja — SGC Hospital Santa Margarita</title>
+  <title>Solicitudes — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -16,108 +16,41 @@
 
   <!-- ═══════════════ SIDEBAR ═══════════════ -->
   <aside class="sidebar" id="sidebar">
-
     <div class="sb-header">
       <div class="sb-brand">
         <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
-        <div class="sb-brand-txt">
-          <h2>Sta. Margarita</h2>
-          <p>SGC ISO 9001:2015</p>
-        </div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
       </div>
     </div>
-
     <nav class="sb-nav">
-
       <div class="sb-section">Principal</div>
-      <a class="nav-link" href="dashboard.html">
-        <i class="fa-solid fa-gauge-high"></i>
-        <span>Dashboard</span>
-      </a>
-
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
       <div class="sb-section">ISO 9001:2015</div>
-
-      <a class="nav-link" href="contexto.html">
-        <i class="fa-solid fa-building"></i>
-        <span>Contexto del SGC</span>
-      </a>
-      <a class="nav-link" href="#">
-        <i class="fa-solid fa-star"></i>
-        <span>Liderazgo y Política</span>
-      </a>
-      <a class="nav-link" href="#">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <span>Riesgos y Objetivos</span>
-      </a>
-      <a class="nav-link" href="documentos.html">
-        <i class="fa-solid fa-file-lines"></i>
-        <span>Control de Documentos</span>
-      </a>
-      <a class="nav-link" href="registros.html">
-        <i class="fa-solid fa-table-list"></i>
-        <span>Control de Registros</span>
-      </a>
-      <a class="nav-link" href="riesgos.html">
-        <i class="fa-solid fa-shield-halved"></i>
-        <span>Gestión de Riesgos</span>
-      </a>
-      <a class="nav-link" href="noconformidades.html" id="nav-nc">
-        <i class="fa-solid fa-circle-xmark"></i>
-        <span>No Conformidades</span>
-        <span class="nav-badge" id="badge-nc" style="display:none">0</span>
-      </a>
-      <a class="nav-link" href="acciones-correctivas.html">
-        <i class="fa-solid fa-list-check"></i>
-        <span>Acciones Correctivas</span>
-      </a>
-      <a class="nav-link" href="indicadores.html">
-        <i class="fa-solid fa-chart-line"></i>
-        <span>Indicadores</span>
-      </a>
-      <a class="nav-link" href="#">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <span>Auditorías Internas</span>
-      </a>
-      <a class="nav-link" href="auditorias-externas.html">
-        <i class="fa-solid fa-award"></i>
-        <span>Auditorías Externas</span>
-      </a>
-      <a class="nav-link" href="revision-direccion.html">
-        <i class="fa-solid fa-clipboard-list"></i>
-        <span>Revisión por Dirección</span>
-      </a>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-triangle-exclamation"></i><span>Riesgos y Objetivos</span></a>
+      <a class="nav-link" href="documentos.html"><i class="fa-solid fa-file-lines"></i><span>Control de Documentos</span></a>
+      <a class="nav-link" href="registros.html"><i class="fa-solid fa-table-list"></i><span>Control de Registros</span></a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span></a>
+      <a class="nav-link" href="noconformidades.html" id="nav-nc"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><span class="nav-badge" id="badge-nc" style="display:none">0</span></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span></a>
+      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span></a>
       <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span></a>
       <a class="nav-link active" href="solicitudes.html" id="nav-solicitudes">
         <i class="fa-solid fa-inbox"></i>
-        <span>Solicitudes de Baja</span>
+        <span>Solicitudes</span>
         <span class="nav-badge" id="badge-sol" style="display:none">0</span>
       </a>
-
       <div class="sb-section">Otros</div>
-
-      <a class="nav-link" href="personal.html">
-        <i class="fa-solid fa-id-card"></i>
-        <span>Personal</span>
-      </a>
-      <a class="nav-link" href="satisfaccion.html">
-        <i class="fa-solid fa-face-smile"></i>
-        <span>Satisfacción</span>
-      </a>
-      <a class="nav-link" href="comites.html">
-        <i class="fa-solid fa-users"></i>
-        <span>Comités</span>
-      </a>
-      <a class="nav-link" href="eventos-adversos.html">
-        <i class="fa-solid fa-hospital-user"></i>
-        <span>Eventos Adversos</span>
-      </a>
-      <a class="nav-link" href="configuracion.html">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Configuración</span>
-      </a>
-
+      <a class="nav-link" href="personal.html"><i class="fa-solid fa-id-card"></i><span>Personal</span></a>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span></a>
+      <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+      <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+      <a class="nav-link" href="configuracion.html"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
     </nav>
-
     <div class="sb-footer">
       <div class="sb-user">
         <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
@@ -130,7 +63,6 @@
         </button>
       </div>
     </div>
-
   </aside>
 
   <!-- ═══════════════ MAIN ═══════════════ -->
@@ -138,99 +70,220 @@
 
     <div class="topbar">
       <div>
-        <div class="topbar-page-title">Solicitudes de Baja</div>
-        <div class="topbar-sub">Revisión y gestión de solicitudes de baja de documentos</div>
+        <div class="topbar-page-title">Solicitudes de Alta y Baja</div>
+        <div class="topbar-sub">Gestión de solicitudes de documentos — Cláusula 7.5</div>
       </div>
       <div class="topbar-right">
-        <span class="iso-badge">
-          <i class="fa-solid fa-certificate"></i>
-          ISO 9001:2015
-        </span>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
       </div>
     </div>
 
     <div class="page-content" id="main-content">
 
-      <!-- KPI -->
-      <div class="sol-kpi">
-        <div class="sol-kpi-icon"><i class="fa-solid fa-inbox"></i></div>
-        <div>
-          <div class="sol-kpi-value" id="kpi-pending-count">—</div>
-          <div class="sol-kpi-label">Solicitudes pendientes</div>
+      <!-- KPIs -->
+      <div class="sol-kpis">
+        <div class="sol-kpi sol-kpi--alta">
+          <div class="sol-kpi-icon"><i class="fa-solid fa-key"></i></div>
+          <div>
+            <div class="sol-kpi-value" id="kpi-alta-count">—</div>
+            <div class="sol-kpi-label">Solicitudes de Alta pendientes</div>
+          </div>
+        </div>
+        <div class="sol-kpi sol-kpi--baja">
+          <div class="sol-kpi-icon"><i class="fa-solid fa-arrow-down-to-line"></i></div>
+          <div>
+            <div class="sol-kpi-value" id="kpi-baja-count">—</div>
+            <div class="sol-kpi-label">Solicitudes de Baja pendientes</div>
+          </div>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="tab-pending">
-          <i class="fa-solid fa-clock"></i>
-          Pendientes
-          <span class="tab-badge" id="badge-pending">0</span>
+      <!-- Tabs principales -->
+      <div class="tabs sol-tabs-main">
+        <button class="tab-btn active" data-section="alta">
+          <i class="fa-solid fa-key"></i>
+          Solicitudes de Alta
+          <span class="tab-badge" id="badge-alta">0</span>
         </button>
-        <button class="tab-btn" data-tab="tab-history">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          Historial
+        <button class="tab-btn" data-section="baja">
+          <i class="fa-solid fa-arrow-down-to-line"></i>
+          Solicitudes de Baja
+          <span class="tab-badge" id="badge-baja">0</span>
         </button>
       </div>
 
-      <!-- Tab: Pendientes -->
-      <div class="tab-panel active" id="tab-pending">
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Documento</th>
-                <th>Área</th>
-                <th>Solicitado por</th>
-                <th>Fecha</th>
-                <th>Motivo</th>
-                <th class="center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-pending">
-              <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
-              </td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <!-- ══════════ SECCIÓN: ALTA ══════════ -->
+      <div class="sol-section active" id="section-alta">
 
-      <!-- Tab: Historial -->
-      <div class="tab-panel" id="tab-history">
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Documento</th>
-                <th>Área</th>
-                <th>Solicitado por</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Comentario del revisor</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-history">
-              <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
-                <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
-              </td></tr>
-            </tbody>
-          </table>
+        <div class="tabs sol-tabs-sub">
+          <button class="tab-btn active" data-tab="alta-pending">
+            <i class="fa-solid fa-clock"></i> Pendientes
+            <span class="tab-badge" id="badge-alta-pending">0</span>
+          </button>
+          <button class="tab-btn" data-tab="alta-history">
+            <i class="fa-solid fa-clock-rotate-left"></i> Historial
+          </button>
         </div>
-      </div>
+
+        <!-- Alta — Pendientes -->
+        <div class="tab-panel active" id="tab-alta-pending">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código sugerido</th>
+                  <th>Nombre propuesto</th>
+                  <th>Tipo</th>
+                  <th>Departamento</th>
+                  <th>Solicitado por</th>
+                  <th>Fecha</th>
+                  <th>Justificación</th>
+                  <th class="center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-alta-pending">
+                <tr><td colspan="8" style="text-align:center;padding:2rem;color:#9ca3af">
+                  <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Alta — Historial -->
+        <div class="tab-panel" id="tab-alta-history">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Código asignado</th>
+                  <th>Nombre propuesto</th>
+                  <th>Departamento</th>
+                  <th>Solicitado por</th>
+                  <th>Fecha</th>
+                  <th class="center">Estado</th>
+                  <th>Notas del revisor</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-alta-history">
+                <tr><td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af">
+                  <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /section-alta -->
+
+      <!-- ══════════ SECCIÓN: BAJA ══════════ -->
+      <div class="sol-section" id="section-baja">
+
+        <div class="tabs sol-tabs-sub">
+          <button class="tab-btn active" data-tab="baja-pending">
+            <i class="fa-solid fa-clock"></i> Pendientes
+            <span class="tab-badge" id="badge-baja-pending">0</span>
+          </button>
+          <button class="tab-btn" data-tab="baja-history">
+            <i class="fa-solid fa-clock-rotate-left"></i> Historial
+          </button>
+        </div>
+
+        <!-- Baja — Pendientes -->
+        <div class="tab-panel active" id="tab-baja-pending">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Documento</th>
+                  <th>Área</th>
+                  <th>Solicitado por</th>
+                  <th>Fecha</th>
+                  <th>Motivo</th>
+                  <th class="center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-baja-pending">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                  <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Baja — Historial -->
+        <div class="tab-panel" id="tab-baja-history">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Documento</th>
+                  <th>Área</th>
+                  <th>Solicitado por</th>
+                  <th>Fecha</th>
+                  <th class="center">Estado</th>
+                  <th>Comentario del revisor</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-baja-history">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                  <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /section-baja -->
 
     </div><!-- /main-content -->
-
   </main>
-</div><!-- /layout -->
+</div>
 
 
-<!-- ═══════════════ MODAL — Rechazar Solicitud ═══════════════ -->
+<!-- ═══ MODAL — Aprobar / Revisar Alta ═══ -->
+<div class="modal-overlay" id="modal-approve-alta">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-key" style="color:#009688;margin-right:6px"></i>
+        Revisar Solicitud de Alta
+        <small id="ma-subtitle">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-approve-alta')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="sol-info-box" id="ma-info-box"></div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Código a asignar <span class="req">*</span></label>
+        <input type="text" id="ma-code" oninput="this.value=this.value.toUpperCase()"
+               placeholder="Ej. PT-UVE-05" style="font-family:monospace;font-weight:700">
+      </div>
+      <div class="field">
+        <label>Notas / Comentarios</label>
+        <textarea id="ma-notes" rows="2" placeholder="Observaciones para el solicitante…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-approve-alta')">Cancelar</button>
+      <button class="btn-secondary" id="btn-ma-reject" onclick="submitAltaReview('rejected')"
+              style="color:#991b1b;border-color:#fca5a5">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+      <button class="btn-primary" id="btn-ma-approve" onclick="submitAltaReview('approved')">
+        <i class="fa-solid fa-check"></i> Aprobar y Crear Documento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Rechazar Baja ═══ -->
 <div class="modal-overlay" id="modal-reject">
   <div class="modal" style="max-width:480px">
     <div class="modal-head">
       <div class="modal-ttl">
-        <i class="fa-solid fa-xmark" style="color:#dc2626"></i> Rechazar Solicitud
+        <i class="fa-solid fa-xmark" style="color:#dc2626"></i> Rechazar Solicitud de Baja
       </div>
       <button class="modal-x" onclick="closeModal('modal-reject')"><i class="fa-solid fa-xmark"></i></button>
     </div>
@@ -245,17 +298,14 @@
     <div class="modal-foot">
       <button class="btn-secondary" onclick="closeModal('modal-reject')">Cancelar</button>
       <button class="btn-primary" id="btn-reject-submit" onclick="submitReject()"
-              style="background:#dc2626;border-color:#dc2626">
+              style="background:#dc2626">
         <i class="fa-solid fa-xmark"></i> Rechazar
       </button>
     </div>
   </div>
 </div>
 
-
-<!-- ═══════════════ TOAST ═══════════════ -->
 <div id="toast" class="toast"></div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>

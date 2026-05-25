@@ -1,6 +1,14 @@
-/* ── Solicitudes de Baja ────────────────────────────────────────── */
+/* ── Solicitudes de Alta y Baja ─────────────────────────────────── */
 
-/* KPI card de pendientes */
+/* KPIs lado a lado */
+.sol-kpis {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* KPI card */
 .sol-kpi {
   display: flex;
   align-items: center;
@@ -9,9 +17,13 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 1rem 1.4rem;
-  margin-bottom: 1.5rem;
-  max-width: 320px;
+  flex: 1;
+  min-width: 240px;
+  max-width: 360px;
 }
+.sol-kpi--alta .sol-kpi-icon { background: #d1fae5; color: #059669; }
+.sol-kpi--baja .sol-kpi-icon { background: #fee2e2; color: #dc2626; }
+
 .sol-kpi-icon {
   width: 48px;
   height: 48px;
@@ -87,6 +99,41 @@
 /* Pill overrides for history */
 .pill--vigente  { background: #dcfce7; color: #15803d; }
 .pill--obsoleto { background: #fee2e2; color: #b91c1c; }
+
+/* Secciones principales (Alta / Baja) */
+.sol-section { display: none; }
+.sol-section.active { display: block; }
+
+/* Sub-tabs con estilo diferenciado */
+.sol-tabs-sub { margin-bottom: 1rem; }
+.sol-tabs-sub .tab-btn.active { color: #009688; border-bottom-color: #009688; }
+
+/* Info box en modal de alta */
+.sol-info-box {
+  background: #f8fafc;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.sol-info-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: .857rem;
+  line-height: 1.5;
+}
+.sol-info-row:last-child { margin-bottom: 0; }
+.sol-info-lbl {
+  font-size: .714rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #9ca3af;
+  width: 100px;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
 
 /* Action buttons orange */
 .btn-action.orange {
