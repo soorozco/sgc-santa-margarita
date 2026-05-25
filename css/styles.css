@@ -277,6 +277,24 @@ button { cursor: pointer; font-family: var(--font); border: none; outline: none;
   text-align: center;
 }
 
+/* Cláusula ISO 9001:2015 — chip discreto en el sidebar */
+/* Sólo el span de texto (no el nav-badge) crece para empujar la cláusula a la derecha */
+.nav-link > span:not(.nav-badge) { flex: 1; }
+.nav-clause {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-style: normal;
+  line-height: 1;
+}
+.nav-link:hover  .nav-clause,
+.nav-link.active .nav-clause {
+  color: rgba(255,255,255,0.55);
+}
+
 .sb-footer {
   padding: 14px 18px;
   border-top: 1px solid rgba(255,255,255,0.07);
