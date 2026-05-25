@@ -1473,10 +1473,17 @@ function editArrayRow(fieldName, row, cols, idx) {
 
 // Sección especial de Referencias con buscador de catálogo
 function editRefsSection(refs, deptId) {
-  // Documentos del mismo departamento como sugerencias
-  const sameDept = _allDocs.filter(d =>
-    d.department_id === deptId && d.status === 'vigente'
-  )
+  // Documentos del mismo departamento — excluye únicamente los obsoletos
+  // (incluye vigente, borrador, revisión, etc. para no omitir registros en proceso)
+  const sameDept = _allDocs
+    .filter(d => d.department_id === deptId && d.status !== 'obsoleto')
+    .sort((a, b) => {
+      // Formatos (FT-*) primero, luego el resto ordenado por código
+      const aFT = a.code?.startsWith('FT') ? 0 : 1
+      const bFT = b.code?.startsWith('FT') ? 0 : 1
+      if (aFT !== bFT) return aFT - bFT
+      return (a.code || '').localeCompare(b.code || '')
+    })
 
   const refRows = refs.map((r, i) =>
     `<tr data-idx="${i}">
@@ -1490,12 +1497,17 @@ function editRefsSection(refs, deptId) {
     </tr>`
   ).join('')
 
-  const deptDocs = sameDept.map(d =>
-    `<div class="ref-catalog-item" onclick="addRefFromCatalog('${esc(d.code)}','${esc(d.name).replace(/'/g,"\\'")}')">
+  const deptDocs = sameDept.map(d => {
+    const isFT = d.code?.startsWith('FT')
+    const statusLabel = d.status !== 'vigente'
+      ? `<span class="ref-cat-status">${d.status}</span>` : ''
+    return `<div class="ref-catalog-item${isFT ? ' ref-catalog-item--ft' : ''}"
+         onclick="addRefFromCatalog('${esc(d.code)}','${esc(d.name).replace(/'/g,"\\'")}')">
       <span class="ref-cat-code">${esc(d.code)}</span>
       <span class="ref-cat-name">${esc(d.name)}</span>
+      ${statusLabel}
     </div>`
-  ).join('') || `<p class="ref-cat-empty">No hay formatos vigentes en este departamento.</p>`
+  }).join('') || `<p class="ref-cat-empty">No hay documentos activos en este departamento.</p>`
 
   const deptName = _depts.find(d => d.id === deptId)?.name || 'este departamento'
 
@@ -1511,8 +1523,9 @@ function editRefsSection(refs, deptId) {
     <div class="ref-catalog-wrap">
       <div class="ref-catalog-hdr">
         <i class="fa-solid fa-folder-open"></i>
-        Formatos vigentes de <strong>${esc(deptName)}</strong>
-        <input type="text" class="ref-catalog-search" placeholder="Buscar…"
+        Documentos de <strong>${esc(deptName)}</strong>
+        <span class="ref-catalog-count">${sameDept.length}</span>
+        <input type="text" class="ref-catalog-search" placeholder="Buscar código o nombre…"
                oninput="filterRefCatalog(this.value)">
       </div>
       <div class="ref-catalog-list" id="ref-catalog-list">
