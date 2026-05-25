@@ -775,3 +775,60 @@
   border-color: #dc2626;
   color: #fff;
 }
+
+/* ── Tabs Información Documentada ──────────────────────────── */
+.infodoc-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+.infodoc-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 22px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  transition: color 0.15s, border-color 0.15s;
+}
+.infodoc-tab i { margin-right: 6px; }
+.infodoc-tab:hover { color: #374151; }
+.infodoc-tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+.infodoc-tab-sub {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #9ca3af;
+  display: block;
+  margin-left: 22px;
+}
+.infodoc-tab.active .infodoc-tab-sub { color: #93c5fd; }
+
+/* ── Badges de retención y cobertura ─────────────────────── */
+.badge-ret {
+  background: #e0f2fe; color: #0369a1;
+  font-size: 0.72rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-ret--sin { background: #f3f4f6; color: #9ca3af; }
+
+.badge-cov {
+  font-size: 0.72rem; font-weight: 600;
+  padding: 2px 9px; border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-cov--loading { background: #f3f4f6; color: #9ca3af; }
+.badge-cov--none    { background: #fef3c7; color: #92400e; }
+.badge-cov--ok      { background: #d1fae5; color: #065f46; }

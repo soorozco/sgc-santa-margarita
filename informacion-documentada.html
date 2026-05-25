@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Control de Documentos — SGC Hospital Santa Margarita</title>
+  <title>Información Documentada — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -51,7 +51,7 @@
         <span>Riesgos y Objetivos</span><small class="nav-clause">§ 6</small>
       </a>
 
-      <a class="nav-link" href="informacion-documentada.html">
+      <a class="nav-link active" href="informacion-documentada.html">
         <i class="fa-solid fa-folder-open"></i>
         <span>Información Documentada</span><small class="nav-clause">§ 7.5</small>
       </a>
@@ -138,8 +138,8 @@
     <!-- Top bar -->
     <div class="topbar">
       <div>
-        <div class="topbar-page-title">Control de Documentos</div>
-        <div class="topbar-sub">Cláusula 7.5 — Lista Maestra de Documentos</div>
+        <div class="topbar-page-title">Información Documentada</div>
+        <div class="topbar-sub">Cláusula 7.5 — Documentos y Registros del SGC</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -152,6 +152,20 @@
 
     <!-- Page content -->
     <div class="page-content">
+
+      <!-- ── Tabs principales §7.5 ──────────────────────── -->
+      <div class="infodoc-tabs">
+        <button class="infodoc-tab active" data-tab="docs">
+          <i class="fa-solid fa-file-lines"></i>
+          Documentos
+          <span class="infodoc-tab-sub">Procedimientos · Políticas · Instrucciones</span>
+        </button>
+        <button class="infodoc-tab" data-tab="regs">
+          <i class="fa-solid fa-table-list"></i>
+          Registros / Formatos
+          <span class="infodoc-tab-sub">Formatos · Bitácoras · Registros FT</span>
+        </button>
+      </div>
 
       <!-- ── Toolbar ──────────────────────────────── -->
       <div class="toolbar">
@@ -166,9 +180,11 @@
           <option value="">Todos los departamentos</option>
         </select>
 
-        <select class="filter-sel" id="f-type">
-          <option value="">Todos los tipos</option>
-        </select>
+        <div id="f-type-wrap">
+          <select class="filter-sel" id="f-type">
+            <option value="">Todos los tipos</option>
+          </select>
+        </div>
 
         <select class="filter-sel" id="f-status">
           <option value="">Todos los estados</option>
@@ -178,6 +194,14 @@
           <option value="vigente">Vigente</option>
           <option value="obsoleto">Obsoleto</option>
         </select>
+
+        <div id="f-ret-wrap" style="display:none">
+          <select class="filter-sel" id="f-ret">
+            <option value="">Retención: todas</option>
+            <option value="sin">Sin retención definida</option>
+            <option value="con">Con retención definida</option>
+          </select>
+        </div>
 
         <button class="btn-secondary" onclick="exportCSV()">
           <i class="fa-solid fa-download"></i>
@@ -224,10 +248,12 @@
             <tr>
               <th>Código</th>
               <th>Nombre</th>
-              <th>Tipo</th>
+              <th id="th-tipo">Tipo</th>
               <th class="center">Versión</th>
               <th>Departamento</th>
-              <th>Custodio</th>
+              <th id="th-custodio">Custodio</th>
+              <th id="th-ret" style="display:none" class="center">Retención</th>
+              <th id="th-cov" style="display:none" class="center">Cobertura</th>
               <th class="center">Estado</th>
               <th class="center">Solicitud de Baja</th>
               <th class="center">Acciones</th>
@@ -248,6 +274,43 @@
   </main>
 
 </div><!-- /layout -->
+
+
+<!-- ═══ MODAL — Visor PDF (Registros) ═══ -->
+<div class="modal-overlay" id="modal-pdf" style="z-index:1100">
+  <div class="modal" style="max-width:900px;height:80vh;display:flex;flex-direction:column">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-file-pdf" style="color:#e53935"></i>
+        <span id="pdf-code-ttl">—</span>
+        <small id="pdf-name-ttl" style="font-weight:400;color:var(--txt3)"></small>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="btn-pdf-download" onclick="downloadPdf()" class="btn-secondary" style="display:none">
+          <i class="fa-solid fa-download"></i> Descargar
+        </button>
+        <button id="btn-pdf-print" onclick="printPdf()" class="btn-secondary" style="display:none">
+          <i class="fa-solid fa-print"></i> Imprimir
+        </button>
+        <button class="modal-x" onclick="closeModal('modal-pdf')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="flex:1;padding:0;overflow:hidden;position:relative">
+      <div id="pdf-loading" style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--txt3)">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        <span>Cargando documento…</span>
+      </div>
+      <div id="pdf-empty" style="display:none;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;color:var(--txt3)">
+        <i class="fa-solid fa-file-circle-question fa-3x"></i>
+        <strong>Sin archivo adjunto</strong>
+        <span>Este formato aún no tiene PDF cargado</span>
+      </div>
+      <iframe id="pdf-iframe" style="width:100%;height:100%;border:none;display:none"></iframe>
+    </div>
+  </div>
+</div>
 
 
 <!-- ═══════════════ MODAL — Nuevo Documento ═══════════════ -->

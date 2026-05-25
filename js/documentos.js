@@ -10,6 +10,8 @@ let _types        = []
 let _personal     = []
 let _currentDocId = null
 let _pendingReqs  = new Set() // IDs de docs con solicitud pendiente
+let _activeTab    = 'docs'   // 'docs' | 'regs'
+let _coverage     = {}       // cobertura FT: { 'FT-XX-01': { count, refs } }
 
 // ── Init ────────────────────────────────────────────────────────
 async function initDocuments() {
@@ -38,6 +40,11 @@ async function initDocuments() {
       if (badge && count > 0) { badge.textContent = count; badge.style.display = 'inline-flex' }
     })
   }
+
+  // Setup tabs (solo aplica en informacion-documentada.html)
+  document.querySelectorAll('.infodoc-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab))
+  })
 }
 
 // ── User info ───────────────────────────────────────────────────
@@ -128,6 +135,38 @@ function applyRoleUI() {
   if (canReview) loadCodeRequests()
 }
 
+function switchTab(tab) {
+  _activeTab = tab
+  // Actualizar botones de tab
+  document.querySelectorAll('.infodoc-tab').forEach(btn =>
+    btn.classList.toggle('active', btn.dataset.tab === tab))
+  // Mostrar/ocultar filtro de tipo (solo Tab 1)
+  const fTypeWrap = document.getElementById('f-type-wrap')
+  if (fTypeWrap) fTypeWrap.style.display = tab === 'docs' ? '' : 'none'
+  // Mostrar/ocultar filtro de retención (solo Tab 2)
+  const fRetWrap = document.getElementById('f-ret-wrap')
+  if (fRetWrap) fRetWrap.style.display = tab === 'regs' ? '' : 'none'
+  // Cambiar label del botón Nuevo
+  const btnNew = document.getElementById('btn-new-doc')
+  if (btnNew) {
+    btnNew.innerHTML = tab === 'regs'
+      ? '<i class="fa-solid fa-plus"></i> Nuevo Formato'
+      : '<i class="fa-solid fa-plus"></i> Nuevo Documento'
+  }
+  // Actualizar header de tabla
+  const thTipo = document.getElementById('th-tipo')
+  const thCustodio = document.getElementById('th-custodio')
+  const thRet = document.getElementById('th-ret')
+  const thCov = document.getElementById('th-cov')
+  if (thTipo) thTipo.style.display = tab === 'docs' ? '' : 'none'
+  if (thCustodio) thCustodio.style.display = tab === 'docs' ? '' : 'none'
+  if (thRet) thRet.style.display = tab === 'regs' ? '' : 'none'
+  if (thCov) thCov.style.display = tab === 'regs' ? '' : 'none'
+  // Si cambia a regs y no hay cobertura, cargarla
+  if (tab === 'regs' && Object.keys(_coverage).length === 0) loadCoverage()
+  applyFilters()
+}
+
 // ── Solicitudes de baja pendientes ──────────────────────────────
 async function loadPendingReqs() {
   const { data } = await db.from('document_deactivation_requests')
@@ -162,13 +201,22 @@ function applyFilters() {
   const dept   = document.getElementById('f-dept')?.value   || ''
   const type   = document.getElementById('f-type')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
+  const ret    = document.getElementById('f-ret')?.value    || ''
 
   _filteredDocs = _allDocs.filter(d => {
+    const isFT = d.document_types?.code_prefix === 'FT'
+    // Filtrado por tab activo
+    if (_activeTab === 'docs' && isFT)  return false
+    if (_activeTab === 'regs' && !isFT) return false
     const txt = `${d.code} ${d.name} ${d.custodian_position || ''}`.toLowerCase()
+    const matchRet = !ret ||
+      (ret === 'sin' && d.retention_years == null) ||
+      (ret === 'con' && d.retention_years != null)
     return (!q || txt.includes(q))
         && (!dept   || d.department_id    === dept)
         && (!type   || d.document_type_id === type)
         && (!status || d.status           === status)
+        && matchRet
   })
   renderTable(_filteredDocs)
 }
@@ -228,21 +276,22 @@ function renderTable(docs) {
   const tbody = document.getElementById('docs-tbody')
   const count = document.getElementById('doc-count')
   if (count) count.textContent =
-    `${docs.length} documento${docs.length !== 1 ? 's' : ''}`
+    `${docs.length} ${_activeTab === 'regs' ? 'formato' : 'documento'}${docs.length !== 1 ? 's' : ''}`
   renderStats(docs)
   if (!tbody) return
 
   if (docs.length === 0) {
     tbody.innerHTML = `
-      <tr><td colspan="8" class="table-empty">
+      <tr><td colspan="9" class="table-empty">
         <i class="fa-solid fa-folder-open"></i>
-        <strong>Sin documentos</strong>
+        <strong>Sin ${_activeTab === 'regs' ? 'registros' : 'documentos'}</strong>
         Ningún documento coincide con los filtros seleccionados.
       </td></tr>`
     return
   }
 
   const canWrite = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
+  const isRegs = _activeTab === 'regs'
 
   tbody.innerHTML = docs.map(doc => {
     const canRequest = ['administrador','responsable_calidad','jefe_departamento'].includes(_role)
@@ -250,14 +299,22 @@ function renderTable(docs) {
       && !_pendingReqs.has(doc.id)
       && (_role === 'administrador' || _profile?.department_id === doc.department_id)
 
+    const retLabel = isRegs
+      ? (doc.retention_years != null
+          ? `<span class="badge-ret">${doc.retention_years} año${doc.retention_years !== 1 ? 's' : ''}</span>`
+          : `<span class="badge-ret badge-ret--sin">Sin definir</span>`)
+      : ''
+
     return `
     <tr>
       <td><span class="doc-code">${doc.code}</span></td>
       <td><span class="doc-name" title="${esc(doc.name)}">${esc(doc.name)}</span></td>
-      <td><span class="doc-type-tag">${doc.document_types?.code_prefix || '—'}</span></td>
+      ${!isRegs ? `<td><span class="doc-type-tag">${doc.document_types?.code_prefix || '—'}</span></td>` : ''}
       <td class="center"><strong>v${doc.current_version || '1'}</strong></td>
       <td>${esc(doc.departments?.name || '—')}</td>
-      <td>${esc(doc.custodian_position || '—')}</td>
+      ${!isRegs ? `<td>${esc(doc.custodian_position || '—')}</td>` : ''}
+      ${isRegs ? `<td class="center">${retLabel}</td>` : ''}
+      ${isRegs ? `<td class="center">${covBadge(doc.code)}</td>` : ''}
       <td class="center"><span class="pill ${sPill(doc.status)}">${sLabel(doc.status)}</span></td>
       <td class="center">
         ${canRequest
@@ -274,11 +331,16 @@ function renderTable(docs) {
           <button onclick="openDetail('${doc.id}')" class="btn-action" title="Ver detalle">
             <i class="fa-solid fa-eye"></i>
           </button>
-          <button onclick="openContent('${doc.id}')" class="btn-action teal" title="Ver contenido digital">
-            <i class="fa-solid fa-book-open"></i>
-          </button>
+          ${isRegs
+            ? `<button onclick="openPdfViewer('${doc.id}')" class="btn-action teal" title="Ver PDF">
+                 <i class="fa-solid fa-file-pdf"></i>
+               </button>`
+            : `<button onclick="openContent('${doc.id}')" class="btn-action teal" title="Ver contenido digital">
+                 <i class="fa-solid fa-book-open"></i>
+               </button>`
+          }
           ${canWrite ? `
-          <button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar documento">
+          <button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar">
             <i class="fa-solid fa-pencil"></i>
           </button>
           <button onclick="openUpload('${doc.id}')" class="btn-action green" title="Subir versión">
@@ -288,6 +350,109 @@ function renderTable(docs) {
       </td>
     </tr>`
   }).join('')
+}
+
+// ── Cobertura FT (cuántos procedimientos referencian cada formato) ──
+async function loadCoverage() {
+  const { data, error } = await db.rpc('get_ft_coverage')
+  _coverage = {}
+  if (error || !data) {
+    console.warn('loadCoverage:', error)
+    _allDocs.filter(d => d.document_types?.code_prefix === 'FT')
+            .forEach(d => { _coverage[d.code] = null })
+    renderTable(_filteredDocs)
+    return
+  }
+  data.forEach(row => {
+    _coverage[row.ft_code] = {
+      count: Number(row.ref_count),
+      refs:  Array.isArray(row.refs) ? row.refs : []
+    }
+  })
+  renderTable(_filteredDocs)
+}
+
+function covBadge(code) {
+  const cov = _coverage[code]
+  if (cov === undefined) return `<span class="badge-cov badge-cov--loading" title="Calculando…">—</span>`
+  if (cov === null)      return `<span class="badge-cov badge-cov--loading" title="No disponible">N/D</span>`
+  if (cov.count === 0)   return `<span class="badge-cov badge-cov--none" title="No aparece en ningún PR o IT">Sin ref.</span>`
+  const tip = cov.refs.map(r => r.code).join(' · ')
+  return `<span class="badge-cov badge-cov--ok" title="${esc(tip)}"><i class="fa-solid fa-check"></i> ${cov.count}</span>`
+}
+
+// ── Visor PDF para Registros/Formatos ───────────────────────────
+let _pdfDocId = null, _pdfUrl = null, _pdfName = null
+
+async function openPdfViewer(docId) {
+  _pdfDocId = docId
+  _pdfUrl   = null
+  _pdfName  = null
+  const doc = _allDocs.find(d => d.id === docId)
+  if (!doc) return
+
+  const ttlCode = document.getElementById('pdf-code-ttl')
+  const ttlName = document.getElementById('pdf-name-ttl')
+  if (ttlCode) ttlCode.textContent = doc.code
+  if (ttlName) ttlName.textContent = doc.name
+
+  const iframe  = document.getElementById('pdf-iframe')
+  const loading = document.getElementById('pdf-loading')
+  const empty   = document.getElementById('pdf-empty')
+  const btnDl   = document.getElementById('btn-pdf-download')
+  const btnPr   = document.getElementById('btn-pdf-print')
+
+  if (iframe)  { iframe.src = ''; iframe.style.display = 'none' }
+  if (loading) loading.style.display = 'flex'
+  if (empty)   empty.style.display   = 'none'
+  if (btnDl)   btnDl.style.display   = 'none'
+  if (btnPr)   btnPr.style.display   = 'none'
+
+  openModal('modal-pdf')
+
+  const { data: versions } = await db
+    .from('document_versions')
+    .select('file_path,file_name,version')
+    .eq('document_id', docId)
+    .not('file_path', 'is', null)
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  if (!versions || versions.length === 0) {
+    if (loading) loading.style.display = 'none'
+    if (empty)   empty.style.display   = 'flex'
+    return
+  }
+
+  const latest = versions[0]
+  const { data, error } = await db.storage
+    .from('sgc-documents')
+    .createSignedUrl(latest.file_path, 3600)
+
+  if (error || !data?.signedUrl) {
+    if (loading) loading.style.display = 'none'
+    if (empty)   empty.style.display   = 'flex'
+    return
+  }
+
+  _pdfUrl  = data.signedUrl
+  _pdfName = latest.file_name || `${doc.code}_v${latest.version}.pdf`
+
+  if (loading) loading.style.display = 'none'
+  if (iframe)  { iframe.src = _pdfUrl; iframe.style.display = 'block' }
+  if (btnDl)   btnDl.style.display = 'inline-flex'
+  if (btnPr)   btnPr.style.display = 'inline-flex'
+}
+
+function downloadPdf() {
+  if (!_pdfUrl) return
+  const a = document.createElement('a')
+  a.href = _pdfUrl; a.download = _pdfName || 'documento.pdf'; a.click()
+}
+
+function printPdf() {
+  const iframe = document.getElementById('pdf-iframe')
+  if (iframe?.contentWindow) iframe.contentWindow.print()
 }
 
 // ── Modal helpers ────────────────────────────────────────────────
