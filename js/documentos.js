@@ -907,7 +907,12 @@ async function downloadFile(filePath, fileName) {
 
 // ── Modal: CONTENIDO DIGITAL ─────────────────────────────────────
 async function openContent(docId) {
-  _currentDocId = docId
+  _currentDocId   = docId
+  _contentDocId   = docId
+  _contentEditMode= false
+  _contentData    = null
+  _contentId      = null
+
   const doc = _allDocs.find(d => d.id === docId)
   if (!doc) return
 
@@ -921,6 +926,15 @@ async function openContent(docId) {
       <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem"></i>
     </p>`
   if (mcAuth) mcAuth.innerHTML = ''
+
+  // Botones del footer — reset
+  const canEdit = ['administrador','responsable_calidad'].includes(_role)
+  const btnEdit   = document.getElementById('btn-content-edit')
+  const btnCancel = document.getElementById('btn-content-cancel')
+  const btnSave   = document.getElementById('btn-content-save')
+  if (btnEdit)   btnEdit.style.display   = 'none'
+  if (btnCancel) btnCancel.style.display = 'none'
+  if (btnSave)   btnSave.style.display   = 'none'
 
   openModal('modal-content')
 
@@ -940,40 +954,30 @@ async function openContent(docId) {
         Este documento aún no tiene vista digital registrada.<br>
         Consulta la copia física firmada en las carpetas del SGC.
       </div>`
+    // Permitir crear contenido desde cero
+    if (canEdit && btnEdit) {
+      _contentData = {
+        objetivo:'', alcance:'', definiciones:[], responsabilidades:[],
+        material_equipo:[], desarrollo:[], gestion_riesgos:[],
+        referencias:[], control_cambios:[],
+        elaborado_por:'', cargo_elaboro:'', revisado_por:'', cargo_reviso:'',
+        autorizado_por:'', cargo_autorizo:''
+      }
+      btnEdit.style.display = 'inline-flex'
+    }
     return
   }
 
+  _contentData = data[0]
+  _contentId   = data[0].id
   renderContentModal(doc, data[0])
+  renderContentAuthStrip(doc, data[0])
+  if (canEdit && btnEdit) btnEdit.style.display = 'inline-flex'
 }
 
 function renderContentModal(doc, c) {
   const typePrefix = doc.document_types?.code_prefix || ''
   const isIT = typePrefix === 'IT'
-
-  // ── Auth strip ────────────────────────────────────────────────
-  const mcAuth = document.getElementById('mc-auth-strip')
-  if (mcAuth) {
-    mcAuth.innerHTML = `
-      <div class="doc-auth-item">
-        <span class="doc-auth-lbl">Versión</span>
-        <span class="doc-auth-val">${esc(doc.current_version || '—')}</span>
-      </div>
-      <div class="doc-auth-item">
-        <span class="doc-auth-lbl">Elaboró</span>
-        <span class="doc-auth-val">${esc(c.elaborado_por || doc.elaborated_by || '—')}</span>
-        <span class="doc-auth-sub">${esc(c.cargo_elaboro || '—')}</span>
-      </div>
-      <div class="doc-auth-item">
-        <span class="doc-auth-lbl">Revisó</span>
-        <span class="doc-auth-val">${esc(c.revisado_por || doc.reviewed_by || '—')}</span>
-        <span class="doc-auth-sub">${esc(c.cargo_reviso || '—')}</span>
-      </div>
-      <div class="doc-auth-item">
-        <span class="doc-auth-lbl">Autorizó</span>
-        <span class="doc-auth-val">${esc(c.autorizado_por || '—')}</span>
-        <span class="doc-auth-sub">${esc(c.cargo_autorizo || '—')}</span>
-      </div>`
-  }
 
   // ── Sections ──────────────────────────────────────────────────
   let html = ''
@@ -1257,6 +1261,411 @@ async function submitSolBaja() {
   closeModal('modal-sol-baja')
   _pendingReqs.add(_currentDocId)
   applyFilters()
+}
+
+// ── EDICIÓN DE CONTENIDO DIGITAL ────────────────────────────────
+
+let _contentData    = null   // objeto document_content actual
+let _contentId      = null   // UUID del registro en document_content
+let _contentDocId   = null   // UUID del documento
+let _contentEditMode= false
+
+// Activa modo edición en el modal de contenido
+function enterContentEditMode() {
+  if (!_contentData) return
+  _contentEditMode = true
+  document.getElementById('btn-content-edit')?.style.setProperty('display','none')
+  document.getElementById('btn-content-cancel')?.style.setProperty('display','inline-flex')
+  document.getElementById('btn-content-save')?.style.setProperty('display','inline-flex')
+
+  const doc = _allDocs.find(d => d.id === _contentDocId)
+  renderContentEditMode(doc, _contentData)
+}
+
+// Cancela y vuelve a modo lectura
+function exitContentEditMode() {
+  _contentEditMode = false
+  document.getElementById('btn-content-edit')?.style.setProperty('display','inline-flex')
+  document.getElementById('btn-content-cancel')?.style.setProperty('display','none')
+  document.getElementById('btn-content-save')?.style.setProperty('display','none')
+
+  const doc = _allDocs.find(d => d.id === _contentDocId)
+  if (doc && _contentData) {
+    renderContentModal(doc, _contentData)
+    renderContentAuthStrip(doc, _contentData)
+  }
+}
+
+// Render de la franja de autorización en MODO LECTURA
+function renderContentAuthStrip(doc, c) {
+  const mcAuth = document.getElementById('mc-auth-strip')
+  if (!mcAuth) return
+  mcAuth.innerHTML = `
+    <div class="doc-auth-item">
+      <span class="doc-auth-lbl">Versión</span>
+      <span class="doc-auth-val">${esc(doc.current_version || '—')}</span>
+    </div>
+    <div class="doc-auth-item">
+      <span class="doc-auth-lbl">Elaboró</span>
+      <span class="doc-auth-val">${esc(c.elaborado_por || doc.elaborated_by || '—')}</span>
+      <span class="doc-auth-sub">${esc(c.cargo_elaboro || '—')}</span>
+    </div>
+    <div class="doc-auth-item">
+      <span class="doc-auth-lbl">Revisó</span>
+      <span class="doc-auth-val">${esc(c.revisado_por || doc.reviewed_by || '—')}</span>
+      <span class="doc-auth-sub">${esc(c.cargo_reviso || '—')}</span>
+    </div>
+    <div class="doc-auth-item">
+      <span class="doc-auth-lbl">Autorizó</span>
+      <span class="doc-auth-val">${esc(c.autorizado_por || '—')}</span>
+      <span class="doc-auth-sub">${esc(c.cargo_autorizo || '—')}</span>
+    </div>`
+}
+
+// Renderiza el modal en modo edición
+function renderContentEditMode(doc, c) {
+  const isIT = (doc.document_types?.code_prefix || '') === 'IT'
+  const deptId = doc.department_id
+
+  // Franja editable de autorización
+  const mcAuth = document.getElementById('mc-auth-strip')
+  if (mcAuth) {
+    mcAuth.innerHTML = `
+      <div class="doc-auth-item">
+        <span class="doc-auth-lbl">Versión</span>
+        <span class="doc-auth-val">${esc(doc.current_version || '—')}</span>
+      </div>
+      <div class="doc-auth-item edit-auth-item">
+        <span class="doc-auth-lbl">Elaboró</span>
+        <input class="edit-auth-input" id="ea-elaborado" value="${esc(c.elaborado_por || '')}" placeholder="Nombre">
+        <input class="edit-auth-input edit-auth-sub" id="ea-cargo-elaboro" value="${esc(c.cargo_elaboro || '')}" placeholder="Cargo">
+      </div>
+      <div class="doc-auth-item edit-auth-item">
+        <span class="doc-auth-lbl">Revisó</span>
+        <input class="edit-auth-input" id="ea-revisado" value="${esc(c.revisado_por || '')}" placeholder="Nombre">
+        <input class="edit-auth-input edit-auth-sub" id="ea-cargo-reviso" value="${esc(c.cargo_reviso || '')}" placeholder="Cargo">
+      </div>
+      <div class="doc-auth-item edit-auth-item">
+        <span class="doc-auth-lbl">Autorizó</span>
+        <input class="edit-auth-input" id="ea-autorizado" value="${esc(c.autorizado_por || '')}" placeholder="Nombre">
+        <input class="edit-auth-input edit-auth-sub" id="ea-cargo-autorizo" value="${esc(c.cargo_autorizo || '')}" placeholder="Cargo">
+      </div>`
+  }
+
+  let html = ''
+
+  // 1. Objetivo (solo PR)
+  if (!isIT) {
+    html += editSection('fa-bullseye', '1. Objetivo',
+      `<textarea class="edit-textarea" id="edit-objetivo" rows="3">${esc(c.objetivo || '')}</textarea>`)
+  }
+
+  // 2. Alcance
+  const nAlcance = isIT ? '1' : '2'
+  html += editSection('fa-expand', `${nAlcance}. Alcance`,
+    `<textarea class="edit-textarea" id="edit-alcance" rows="5">${esc(c.alcance || '')}</textarea>`)
+
+  // 3. Definiciones (solo PR)
+  if (!isIT) {
+    html += editSection('fa-book', '3. Definiciones',
+      editArrayTable('definiciones', c.definiciones || [],
+        [{ key:'termino', label:'Término', width:'30%' }, { key:'definicion', label:'Definición' }]))
+  }
+
+  // 4. Responsabilidades (solo PR)
+  if (!isIT) {
+    html += editSection('fa-users', '4. Responsabilidades',
+      editArrayTable('responsabilidades', c.responsabilidades || [],
+        [{ key:'tipo', label:'Tipo', width:'25%' }, { key:'descripcion', label:'Descripción' }]))
+  }
+
+  // 2. Material y Equipo (solo IT)
+  if (isIT) {
+    html += editSection('fa-toolbox', '2. Material y Equipo',
+      editArrayTable('material_equipo', c.material_equipo || [],
+        [{ key:'item', label:'Ítem' }]))
+  }
+
+  // Desarrollo
+  const nDes = isIT ? '3' : '5'
+  html += editSection('fa-list-ol', `${nDes}. Desarrollo`,
+    editArrayTable('desarrollo', c.desarrollo || [],
+      [{ key:'no', label:'No.', width:'60px' },
+       { key:'responsable', label:'Responsable', width:'25%' },
+       { key:'actividad', label:'Actividad' }]))
+
+  // Gestión de Riesgos
+  const nRiesgos = isIT ? '4' : '6'
+  html += editSection('fa-shield-halved', `${nRiesgos}. Gestión de Riesgos`,
+    editArrayTable('gestion_riesgos', c.gestion_riesgos || [],
+      [{ key:'riesgo', label:'Riesgo' }, { key:'barrera', label:'Barrera / Control' }]))
+
+  // Referencias — con buscador de catálogo del mismo departamento
+  const nRef = isIT ? '5' : '7'
+  const refsClean = (c.referencias || []).filter(r => r.nombre !== 'No Aplica')
+  html += editSection('fa-link', `${nRef}. Referencias`,
+    editRefsSection(refsClean, deptId))
+
+  // Control de Cambios
+  const nCC = isIT ? '6' : '8'
+  html += editSection('fa-clock-rotate-left', `${nCC}. Control de Cambios`,
+    editArrayTable('control_cambios', c.control_cambios || [],
+      [{ key:'version', label:'Ver.', width:'55px' },
+       { key:'fecha', label:'Fecha', width:'90px' },
+       { key:'descripcion', label:'Descripción' },
+       { key:'realizado', label:'Realizó', width:'18%' },
+       { key:'aprobado', label:'Aprobó', width:'18%' }]))
+
+  const mcBody = document.getElementById('mc-body')
+  if (mcBody) mcBody.innerHTML = html
+}
+
+// Contenedor de sección editable
+function editSection(icon, title, bodyHtml) {
+  return `
+    <div class="doc-section">
+      <div class="doc-section-hdr edit-section-hdr">
+        <i class="fa-solid ${icon}"></i>
+        <span>${title}</span>
+      </div>
+      <div class="doc-section-body">${bodyHtml}</div>
+    </div>`
+}
+
+// Tabla editable genérica para arrays JSON
+function editArrayTable(fieldName, rows, cols) {
+  const thead = cols.map(c =>
+    `<th style="${c.width ? 'width:'+c.width : ''}">${c.label}</th>`
+  ).join('') + '<th style="width:36px"></th>'
+
+  const tbody = rows.map((row, i) =>
+    editArrayRow(fieldName, row, cols, i)
+  ).join('')
+
+  return `
+    <table class="edit-array-table" id="eat-${fieldName}">
+      <thead><tr>${thead}</tr></thead>
+      <tbody id="eat-body-${fieldName}">${tbody}</tbody>
+    </table>
+    <button class="btn-add-row" onclick="addEditRow('${fieldName}')">
+      <i class="fa-solid fa-plus"></i> Agregar fila
+    </button>`
+}
+
+function editArrayRow(fieldName, row, cols, idx) {
+  const cells = cols.map(c => {
+    const val = esc(row[c.key] || '')
+    const isLong = !c.width || c.width === ''
+    return `<td>${isLong
+      ? `<textarea class="edit-cell-ta" data-field="${c.key}">${val}</textarea>`
+      : `<input class="edit-cell-in" data-field="${c.key}" value="${val}">`
+    }</td>`
+  }).join('')
+  return `<tr data-idx="${idx}">
+    ${cells}
+    <td class="center">
+      <button class="btn-del-row" onclick="removeEditRow('${fieldName}', this)" title="Eliminar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </td>
+  </tr>`
+}
+
+// Sección especial de Referencias con buscador de catálogo
+function editRefsSection(refs, deptId) {
+  // Documentos del mismo departamento como sugerencias
+  const sameDept = _allDocs.filter(d =>
+    d.department_id === deptId && d.status === 'vigente'
+  )
+
+  const refRows = refs.map((r, i) =>
+    `<tr data-idx="${i}">
+      <td><input class="edit-cell-in" data-field="nombre" value="${esc(r.nombre || '')}"></td>
+      <td><input class="edit-cell-in" data-field="codigo" value="${esc(r.codigo || '')}"></td>
+      <td class="center">
+        <button class="btn-del-row" onclick="removeEditRow('referencias', this)" title="Eliminar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </td>
+    </tr>`
+  ).join('')
+
+  const deptDocs = sameDept.map(d =>
+    `<div class="ref-catalog-item" onclick="addRefFromCatalog('${esc(d.code)}','${esc(d.name).replace(/'/g,"\\'")}')">
+      <span class="ref-cat-code">${esc(d.code)}</span>
+      <span class="ref-cat-name">${esc(d.name)}</span>
+    </div>`
+  ).join('') || `<p class="ref-cat-empty">No hay formatos vigentes en este departamento.</p>`
+
+  const deptName = _depts.find(d => d.id === deptId)?.name || 'este departamento'
+
+  return `
+    <table class="edit-array-table" id="eat-referencias">
+      <thead><tr><th>Nombre</th><th>Código</th><th style="width:36px"></th></tr></thead>
+      <tbody id="eat-body-referencias">${refRows}</tbody>
+    </table>
+    <button class="btn-add-row" onclick="addEditRow('referencias')">
+      <i class="fa-solid fa-plus"></i> Agregar fila vacía
+    </button>
+
+    <div class="ref-catalog-wrap">
+      <div class="ref-catalog-hdr">
+        <i class="fa-solid fa-folder-open"></i>
+        Formatos vigentes de <strong>${esc(deptName)}</strong>
+        <input type="text" class="ref-catalog-search" placeholder="Buscar…"
+               oninput="filterRefCatalog(this.value)">
+      </div>
+      <div class="ref-catalog-list" id="ref-catalog-list">
+        ${deptDocs}
+      </div>
+    </div>`
+}
+
+// Filtro de búsqueda en el catálogo de referencias
+function filterRefCatalog(q) {
+  const items = document.querySelectorAll('.ref-catalog-item')
+  const lq = q.toLowerCase()
+  items.forEach(el => {
+    const txt = el.textContent.toLowerCase()
+    el.style.display = (!lq || txt.includes(lq)) ? '' : 'none'
+  })
+}
+
+// Agrega un documento del catálogo como referencia
+function addRefFromCatalog(code, name) {
+  const tbody = document.getElementById('eat-body-referencias')
+  if (!tbody) return
+  const idx = tbody.querySelectorAll('tr').length
+  const tr = document.createElement('tr')
+  tr.dataset.idx = idx
+  tr.innerHTML = `
+    <td><input class="edit-cell-in" data-field="nombre" value="${esc(name)}"></td>
+    <td><input class="edit-cell-in" data-field="codigo" value="${esc(code)}"></td>
+    <td class="center">
+      <button class="btn-del-row" onclick="removeEditRow('referencias', this)" title="Eliminar">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </td>`
+  tbody.appendChild(tr)
+  showToast(`Referencia "${code}" agregada.`, 'green')
+}
+
+// Agrega una fila vacía a cualquier tabla editable
+function addEditRow(fieldName) {
+  const tbody = document.getElementById(`eat-body-${fieldName}`)
+  if (!tbody) return
+  const firstRow = tbody.querySelector('tr')
+  if (!firstRow && fieldName === 'referencias') {
+    // fila vacía para referencias
+    const idx = tbody.querySelectorAll('tr').length
+    const tr = document.createElement('tr')
+    tr.dataset.idx = idx
+    tr.innerHTML = `
+      <td><input class="edit-cell-in" data-field="nombre" value=""></td>
+      <td><input class="edit-cell-in" data-field="codigo" value=""></td>
+      <td class="center">
+        <button class="btn-del-row" onclick="removeEditRow('referencias', this)" title="Eliminar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </td>`
+    tbody.appendChild(tr)
+    return
+  }
+
+  // Clonar estructura de la primera fila
+  const cols = []
+  if (firstRow) {
+    firstRow.querySelectorAll('[data-field]').forEach(el => cols.push(el.dataset.field))
+  }
+  const idx = tbody.querySelectorAll('tr').length
+  const tr = document.createElement('tr')
+  tr.dataset.idx = idx
+  const cells = cols.map(f => {
+    const isLong = !['no','version','fecha','tipo','responsable','codigo'].includes(f)
+    return `<td>${isLong
+      ? `<textarea class="edit-cell-ta" data-field="${f}"></textarea>`
+      : `<input class="edit-cell-in" data-field="${f}" value="">`
+    }</td>`
+  }).join('')
+  tr.innerHTML = cells + `<td class="center">
+    <button class="btn-del-row" onclick="removeEditRow('${fieldName}', this)" title="Eliminar">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </td>`
+  tbody.appendChild(tr)
+}
+
+// Elimina una fila de la tabla
+function removeEditRow(fieldName, btn) {
+  btn.closest('tr').remove()
+}
+
+// Lee el estado actual de una tabla editable y devuelve array de objetos
+function readEditArray(fieldName) {
+  const tbody = document.getElementById(`eat-body-${fieldName}`)
+  if (!tbody) return []
+  const result = []
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const obj = {}
+    tr.querySelectorAll('[data-field]').forEach(el => {
+      obj[el.dataset.field] = el.value.trim()
+    })
+    // Solo incluir si tiene al menos un campo no vacío
+    if (Object.values(obj).some(v => v)) result.push(obj)
+  })
+  return result
+}
+
+// Guarda todos los cambios en document_content
+async function saveContentEdits() {
+  const btn = document.getElementById('btn-content-save')
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…'
+
+  const refsRaw = readEditArray('referencias')
+  const refs = refsRaw.length ? refsRaw : [{ nombre:'No Aplica', codigo:'No Aplica' }]
+
+  const doc = _allDocs.find(d => d.id === _contentDocId)
+  const isIT = (doc?.document_types?.code_prefix || '') === 'IT'
+
+  const payload = {
+    elaborado_por:   document.getElementById('ea-elaborado')?.value.trim()    || null,
+    cargo_elaboro:   document.getElementById('ea-cargo-elaboro')?.value.trim()|| null,
+    revisado_por:    document.getElementById('ea-revisado')?.value.trim()     || null,
+    cargo_reviso:    document.getElementById('ea-cargo-reviso')?.value.trim() || null,
+    autorizado_por:  document.getElementById('ea-autorizado')?.value.trim()   || null,
+    cargo_autorizo:  document.getElementById('ea-cargo-autorizo')?.value.trim()|| null,
+    alcance:         document.getElementById('edit-alcance')?.value.trim()    || null,
+    definiciones:    isIT ? [] : readEditArray('definiciones'),
+    responsabilidades: isIT ? [] : readEditArray('responsabilidades'),
+    material_equipo: isIT ? readEditArray('material_equipo') : [],
+    desarrollo:      readEditArray('desarrollo'),
+    gestion_riesgos: readEditArray('gestion_riesgos'),
+    referencias:     refs,
+    control_cambios: readEditArray('control_cambios'),
+    updated_at:      new Date().toISOString()
+  }
+  if (!isIT) payload.objetivo = document.getElementById('edit-objetivo')?.value.trim() || null
+
+  let error
+  if (_contentId) {
+    ;({ error } = await db.from('document_content').update(payload).eq('id', _contentId))
+  } else {
+    payload.document_id = _contentDocId
+    const { data: ins, error: insErr } = await db.from('document_content').insert(payload).select().single()
+    error = insErr
+    if (ins) _contentId = ins.id
+  }
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios'
+
+  if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
+
+  // Actualizar datos locales y volver a modo lectura
+  _contentData = { ..._contentData, ...payload }
+  showToast('Contenido actualizado correctamente.', 'green')
+  exitContentEditMode()
 }
 
 // ── SOLICITAR CLAVE NUEVA ────────────────────────────────────────

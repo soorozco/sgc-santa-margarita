@@ -695,8 +695,17 @@
 
     </div><!-- /modal-body -->
 
-    <div class="modal-foot">
+    <div class="modal-foot" id="mc-foot">
       <button class="btn-secondary" onclick="closeModal('modal-content')">Cerrar</button>
+      <button class="btn-secondary" id="btn-content-edit" onclick="enterContentEditMode()" style="display:none">
+        <i class="fa-solid fa-pencil"></i> Editar Contenido
+      </button>
+      <button class="btn-secondary" id="btn-content-cancel" onclick="exitContentEditMode()" style="display:none">
+        Cancelar
+      </button>
+      <button class="btn-primary" id="btn-content-save" onclick="saveContentEdits()" style="display:none">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+      </button>
     </div>
 
   </div>
