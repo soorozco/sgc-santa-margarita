@@ -35,6 +35,39 @@ async function initSolicitudes() {
   await Promise.all([loadAltaReqs(), loadBajaReqs()])
 }
 
+// ── Init desde tab de Información Documentada (sin segunda auth) ─
+async function initSolicitudesTab() {
+  // Reutilizar contexto ya cargado por documentos.js
+  const ctx = window._solCtx
+  if (ctx) {
+    _user    = ctx.user
+    _profile = ctx.profile
+    _role    = ctx.role
+  } else {
+    // fallback: auth completa si no hay contexto
+    const auth = await requireAuth()
+    if (!auth) return
+    _user    = auth.user
+    _profile = auth.profile
+    _role    = auth.profile?.roles?.name || 'lector'
+  }
+
+  if (!['administrador','responsable_calidad'].includes(_role)) {
+    const panel = document.getElementById('infodoc-panel-solicitudes')
+    if (panel) panel.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;
+                  justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
+        <i class="fa-solid fa-lock" style="font-size:3rem"></i>
+        <p>No tienes acceso a esta sección.</p>
+      </div>`
+    return
+  }
+
+  setupTabs()
+  loadAltaReqs()
+  loadBajaReqs()
+}
+
 // ── Tabs ─────────────────────────────────────────────────────────
 function setupTabs() {
   // Tabs principales (Alta / Baja)

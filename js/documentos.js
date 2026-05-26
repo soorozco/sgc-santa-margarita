@@ -145,10 +145,12 @@ function switchTab(tab) {
   if (solPanel)  solPanel.style.display  = isSol ? 'block' : 'none'
   if (docsArea)  docsArea.style.display  = isSol ? 'none'  : 'block'
   if (isSol) {
-    // Lazy init: solo la primera vez
+    // Lazy init: solo la primera vez — reutiliza el auth ya cargado
     if (!window._solInited) {
       window._solInited = true
-      initSolicitudes()
+      // Pasar contexto para evitar segunda llamada a requireAuth()
+      window._solCtx = { user: _user, profile: _profile, role: _role }
+      initSolicitudesTab()
     }
     // Actualizar botones de tab
     document.querySelectorAll('.infodoc-tab').forEach(btn =>
