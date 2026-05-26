@@ -1,3 +1,6 @@
+;(function () {
+'use strict'
+
 // ─── Solicitudes de Alta y Baja de Documentos ────────────────────
 
 let _solUser = null, _solProfile = null, _solRole = null
@@ -506,3 +509,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.body.dataset.page === 'infodoc') return
   initSolicitudes()
 })
+
+
+// ── Exponer al scope global solo lo que necesita documentos.js o el HTML ──
+window.initSolicitudesTab = initSolicitudesTab
+window.openAltaReview     = openAltaReview
+window.submitAltaReview   = submitAltaReview
+window.approveBaja        = approveBaja
+window.openRejectBaja     = openRejectBaja
+window.submitReject       = submitReject
+
+})()
