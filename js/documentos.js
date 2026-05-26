@@ -137,6 +137,25 @@ function applyRoleUI() {
 
 function switchTab(tab) {
   _activeTab = tab
+
+  // Mostrar/ocultar panel de solicitudes vs area de documentos
+  const solPanel  = document.getElementById('infodoc-panel-solicitudes')
+  const docsArea  = document.getElementById('infodoc-docs-area')
+  const isSol     = tab === 'solicitudes'
+  if (solPanel)  solPanel.style.display  = isSol ? 'block' : 'none'
+  if (docsArea)  docsArea.style.display  = isSol ? 'none'  : 'block'
+  if (isSol) {
+    // Lazy init: solo la primera vez
+    if (!window._solInited) {
+      window._solInited = true
+      initSolicitudes()
+    }
+    // Actualizar botones de tab
+    document.querySelectorAll('.infodoc-tab').forEach(btn =>
+      btn.classList.toggle('active', btn.dataset.tab === tab))
+    return  // no continuar con lógica de docs/regs
+  }
+
   // Actualizar botones de tab
   document.querySelectorAll('.infodoc-tab').forEach(btn =>
     btn.classList.toggle('active', btn.dataset.tab === tab))

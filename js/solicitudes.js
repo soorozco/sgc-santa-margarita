@@ -17,7 +17,9 @@ async function initSolicitudes() {
   renderUserInfo()
 
   if (!['administrador','responsable_calidad'].includes(_role)) {
-    document.getElementById('main-content').innerHTML = `
+    const target = document.getElementById('infodoc-panel-solicitudes')
+                 || document.getElementById('main-content')
+    target.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;
                   justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
         <i class="fa-solid fa-lock" style="font-size:3rem"></i>
@@ -422,5 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === overlay) overlay.classList.remove('open')
     })
   })
+  // En infodoc la inicialización es lazy (al hacer click en el tab)
+  if (document.body.dataset.page === 'infodoc') return
   initSolicitudes()
 })

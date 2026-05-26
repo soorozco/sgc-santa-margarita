@@ -9,8 +9,9 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <link rel="stylesheet" href="css/documentos.css">
+  <link rel="stylesheet" href="css/solicitudes.css">
 </head>
-<body>
+<body data-page="infodoc">
 <div class="layout">
 
   <!-- ═══════════════ SIDEBAR ═══════════════ -->
@@ -165,7 +166,15 @@
           Registros / Formatos
           <span class="infodoc-tab-sub">Formatos · Bitácoras · Registros FT</span>
         </button>
+        <button class="infodoc-tab" data-tab="solicitudes">
+          <i class="fa-solid fa-inbox"></i>
+          Solicitudes
+          <span class="infodoc-tab-sub">Alta · Baja · Historial</span>
+        </button>
       </div>
+
+      <!-- ══════════════ ÁREA — Documentos/Registros ══════════════ -->
+      <div id="infodoc-docs-area">
 
       <!-- ── Toolbar ──────────────────────────────── -->
       <div class="toolbar">
@@ -269,6 +278,170 @@
           </tbody>
         </table>
       </div>
+
+      </div><!-- /infodoc-docs-area -->
+
+      <!-- ══════════════ PANEL — Solicitudes ══════════════ -->
+      <div id="infodoc-panel-solicitudes" style="display:none">
+
+        <!-- KPIs -->
+        <div class="sol-kpis">
+          <div class="sol-kpi sol-kpi--alta">
+            <div class="sol-kpi-icon"><i class="fa-solid fa-key"></i></div>
+            <div>
+              <div class="sol-kpi-value" id="kpi-alta-count">—</div>
+              <div class="sol-kpi-label">Solicitudes de Alta pendientes</div>
+            </div>
+          </div>
+          <div class="sol-kpi sol-kpi--baja">
+            <div class="sol-kpi-icon"><i class="fa-solid fa-arrow-down-to-line"></i></div>
+            <div>
+              <div class="sol-kpi-value" id="kpi-baja-count">—</div>
+              <div class="sol-kpi-label">Solicitudes de Baja pendientes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs principales -->
+        <div class="tabs sol-tabs-main">
+          <button class="tab-btn active" data-section="alta">
+            <i class="fa-solid fa-key"></i>
+            Solicitudes de Alta
+            <span class="tab-badge" id="badge-alta">0</span>
+          </button>
+          <button class="tab-btn" data-section="baja">
+            <i class="fa-solid fa-arrow-down-to-line"></i>
+            Solicitudes de Baja
+            <span class="tab-badge" id="badge-baja">0</span>
+          </button>
+        </div>
+
+        <!-- ══════════ SECCIÓN: ALTA ══════════ -->
+        <div class="sol-section active" id="section-alta">
+
+          <div class="tabs sol-tabs-sub">
+            <button class="tab-btn active" data-tab="alta-pending">
+              <i class="fa-solid fa-clock"></i> Pendientes
+              <span class="tab-badge" id="badge-alta-pending">0</span>
+            </button>
+            <button class="tab-btn" data-tab="alta-history">
+              <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+          </div>
+
+          <!-- Alta — Pendientes -->
+          <div class="tab-panel active" id="tab-alta-pending">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código sugerido</th>
+                    <th>Nombre propuesto</th>
+                    <th>Tipo</th>
+                    <th>Departamento</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th>Justificación</th>
+                    <th class="center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-alta-pending">
+                  <tr><td colspan="8" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Alta — Historial -->
+          <div class="tab-panel" id="tab-alta-history">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código asignado</th>
+                    <th>Nombre propuesto</th>
+                    <th>Departamento</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th class="center">Estado</th>
+                    <th>Notas del revisor</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-alta-history">
+                  <tr><td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /section-alta -->
+
+        <!-- ══════════ SECCIÓN: BAJA ══════════ -->
+        <div class="sol-section" id="section-baja">
+
+          <div class="tabs sol-tabs-sub">
+            <button class="tab-btn active" data-tab="baja-pending">
+              <i class="fa-solid fa-clock"></i> Pendientes
+              <span class="tab-badge" id="badge-baja-pending">0</span>
+            </button>
+            <button class="tab-btn" data-tab="baja-history">
+              <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+          </div>
+
+          <!-- Baja — Pendientes -->
+          <div class="tab-panel active" id="tab-baja-pending">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Área</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th>Motivo</th>
+                    <th class="center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-baja-pending">
+                  <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Baja — Historial -->
+          <div class="tab-panel" id="tab-baja-history">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Área</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th class="center">Estado</th>
+                    <th>Comentario del revisor</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-baja-history">
+                  <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /section-baja -->
+
+      </div><!-- /infodoc-panel-solicitudes -->
 
     </div><!-- /page-content -->
   </main>
@@ -907,10 +1080,76 @@
 </div>
 
 
+<!-- ═══ MODAL — Aprobar / Revisar Alta ═══ -->
+<div class="modal-overlay" id="modal-approve-alta">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-key" style="color:#009688;margin-right:6px"></i>
+        Revisar Solicitud de Alta
+        <small id="ma-subtitle">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-approve-alta')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="sol-info-box" id="ma-info-box"></div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Código a asignar <span class="req">*</span></label>
+        <input type="text" id="ma-code" oninput="this.value=this.value.toUpperCase()"
+               placeholder="Ej. PT-UVE-05" style="font-family:monospace;font-weight:700">
+      </div>
+      <div class="field">
+        <label>Notas / Comentarios</label>
+        <textarea id="ma-notes" rows="2" placeholder="Observaciones para el solicitante…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-approve-alta')">Cancelar</button>
+      <button class="btn-secondary" id="btn-ma-reject" onclick="submitAltaReview('rejected')"
+              style="color:#991b1b;border-color:#fca5a5">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+      <button class="btn-primary" id="btn-ma-approve" onclick="submitAltaReview('approved')">
+        <i class="fa-solid fa-check"></i> Aprobar y Crear Documento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Rechazar Baja ═══ -->
+<div class="modal-overlay" id="modal-reject">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-xmark" style="color:#dc2626"></i> Rechazar Solicitud de Baja
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-reject')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Motivo del rechazo <span class="req">*</span></label>
+        <textarea id="reject-comment" rows="4"
+                  placeholder="Explica por qué se rechaza esta solicitud de baja…"
+                  style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-reject')">Cancelar</button>
+      <button class="btn-primary" id="btn-reject-submit" onclick="submitReject()"
+              style="background:#dc2626">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/documentos.js"></script>
+<script src="js/solicitudes.js"></script>
 </body>
 </html>
