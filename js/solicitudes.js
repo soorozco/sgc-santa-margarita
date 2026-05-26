@@ -37,35 +37,39 @@ async function initSolicitudes() {
 
 // ── Init desde tab de Información Documentada (sin segunda auth) ─
 async function initSolicitudesTab() {
-  // Reutilizar contexto ya cargado por documentos.js
-  const ctx = window._solCtx
-  if (ctx) {
-    _user    = ctx.user
-    _profile = ctx.profile
-    _role    = ctx.role
-  } else {
-    // fallback: auth completa si no hay contexto
-    const auth = await requireAuth()
-    if (!auth) return
-    _user    = auth.user
-    _profile = auth.profile
-    _role    = auth.profile?.roles?.name || 'lector'
-  }
+  try {
+    // Reutilizar contexto ya cargado por documentos.js
+    const ctx = window._solCtx
+    if (ctx) {
+      _user    = ctx.user
+      _profile = ctx.profile
+      _role    = ctx.role
+    } else {
+      // fallback: auth completa si no hay contexto
+      const auth = await requireAuth()
+      if (!auth) return
+      _user    = auth.user
+      _profile = auth.profile
+      _role    = auth.profile?.roles?.name || 'lector'
+    }
 
-  if (!['administrador','responsable_calidad'].includes(_role)) {
-    const panel = document.getElementById('infodoc-panel-solicitudes')
-    if (panel) panel.innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;
-                  justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
-        <i class="fa-solid fa-lock" style="font-size:3rem"></i>
-        <p>No tienes acceso a esta sección.</p>
-      </div>`
-    return
-  }
+    if (!['administrador','responsable_calidad'].includes(_role)) {
+      const panel = document.getElementById('infodoc-panel-solicitudes')
+      if (panel) panel.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;
+                    justify-content:center;min-height:40vh;gap:1rem;color:#9ca3af">
+          <i class="fa-solid fa-lock" style="font-size:3rem"></i>
+          <p>No tienes acceso a esta sección.</p>
+        </div>`
+      return
+    }
 
-  setupTabs()
-  loadAltaReqs()
-  loadBajaReqs()
+    setupTabs()
+    await Promise.all([loadAltaReqs(), loadBajaReqs()])
+  } catch (err) {
+    console.error('[Solicitudes] Error en initSolicitudesTab:', err)
+    _setAllSpinnersError('Error inesperado al cargar solicitudes: ' + (err.message || err))
+  }
 }
 
 // ── Tabs ─────────────────────────────────────────────────────────
@@ -92,32 +96,59 @@ function setupTabs() {
   })
 }
 
+// ── helper: poner error en todos los tbody de solicitudes ─────────
+function _setAllSpinnersError(msg) {
+  const ids = ['tbody-alta-pending','tbody-alta-history','tbody-baja-pending','tbody-baja-history']
+  const colspans = [8, 7, 6, 6]
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id)
+    if (el) el.innerHTML = `<tr><td colspan="${colspans[i]}"
+      style="text-align:center;padding:2rem;color:#ef4444;font-size:.9rem">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right:.4rem"></i>${esc(msg)}
+    </td></tr>`
+  })
+}
+
 // ── SOLICITUDES DE ALTA ───────────────────────────────────────────
 async function loadAltaReqs() {
-  const { data, error } = await db
-    .from('document_code_requests')
-    .select(`
-      id, suggested_code, proposed_name, justification, status,
-      assigned_code, review_notes, created_at,
-      document_types(code_prefix, name),
-      departments(name),
-      requester:requested_by(full_name),
-      reviewer:reviewed_by(full_name)
-    `)
-    .order('created_at', { ascending: false })
+  try {
+    const { data, error } = await db
+      .from('document_code_requests')
+      .select(`
+        id, suggested_code, proposed_name, justification, status,
+        assigned_code, review_notes, created_at,
+        document_types(code_prefix, name),
+        departments(name),
+        requester:requested_by(full_name),
+        reviewer:reviewed_by(full_name)
+      `)
+      .order('created_at', { ascending: false })
 
-  if (error) {
-    const msg = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#ef4444">
-      Error: ${esc(error.message)}</td></tr>`
-    document.getElementById('tbody-alta-pending').innerHTML = msg
-    document.getElementById('tbody-alta-history').innerHTML = msg
-    return
+    if (error) {
+      console.error('[Solicitudes] loadAltaReqs error:', error)
+      const isNoTable = error.code === '42P01' || error.message?.includes('does not exist')
+      const msg = isNoTable
+        ? 'Tabla no configurada — ejecuta <code>document_code_requests_setup.sql</code> en Supabase'
+        : 'Error al cargar: ' + error.message
+      const el8 = document.getElementById('tbody-alta-pending')
+      const el7 = document.getElementById('tbody-alta-history')
+      if (el8) el8.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#ef4444;font-size:.9rem">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:.4rem"></i>${msg}</td></tr>`
+      if (el7) el7.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:#ef4444;font-size:.9rem">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:.4rem"></i>${msg}</td></tr>`
+      return
+    }
+
+    _altaReqs = data || []
+    renderAltaPending()
+    renderAltaHistory()
+    updateKPIs()
+  } catch (err) {
+    console.error('[Solicitudes] loadAltaReqs exception:', err)
+    const el = document.getElementById('tbody-alta-pending')
+    if (el) el.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:#ef4444">
+      Error inesperado: ${esc(err.message || String(err))}</td></tr>`
   }
-
-  _altaReqs = data || []
-  renderAltaPending()
-  renderAltaHistory()
-  updateKPIs()
 }
 
 function renderAltaPending() {
@@ -266,28 +297,42 @@ async function submitAltaReview(action) {
 
 // ── SOLICITUDES DE BAJA ───────────────────────────────────────────
 async function loadBajaReqs() {
-  const { data, error } = await db
-    .from('document_deactivation_requests')
-    .select(`
-      id, reason, status, created_at, reviewer_comment, reviewed_at,
-      document:document_id(id, code, name, departments(name)),
-      requester:requested_by(full_name),
-      reviewer:reviewed_by(full_name)
-    `)
-    .order('created_at', { ascending: false })
+  try {
+    const { data, error } = await db
+      .from('document_deactivation_requests')
+      .select(`
+        id, reason, status, created_at, reviewer_comment, reviewed_at,
+        document:document_id(id, code, name, departments(name)),
+        requester:requested_by(full_name),
+        reviewer:reviewed_by(full_name)
+      `)
+      .order('created_at', { ascending: false })
 
-  if (error) {
-    const msg = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444">
-      Error: ${esc(error.message)}</td></tr>`
-    document.getElementById('tbody-baja-pending').innerHTML = msg
-    document.getElementById('tbody-baja-history').innerHTML = msg
-    return
+    if (error) {
+      console.error('[Solicitudes] loadBajaReqs error:', error)
+      const isNoTable = error.code === '42P01' || error.message?.includes('does not exist')
+      const msg = isNoTable
+        ? 'Tabla no configurada — ejecuta el SQL de configuración en Supabase'
+        : 'Error al cargar: ' + error.message
+      const el1 = document.getElementById('tbody-baja-pending')
+      const el2 = document.getElementById('tbody-baja-history')
+      if (el1) el1.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;font-size:.9rem">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:.4rem"></i>${msg}</td></tr>`
+      if (el2) el2.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444;font-size:.9rem">
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right:.4rem"></i>${msg}</td></tr>`
+      return
+    }
+
+    _bajaReqs = data || []
+    renderBajaPending()
+    renderBajaHistory()
+    updateKPIs()
+  } catch (err) {
+    console.error('[Solicitudes] loadBajaReqs exception:', err)
+    const el = document.getElementById('tbody-baja-pending')
+    if (el) el.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:#ef4444">
+      Error inesperado: ${esc(err.message || String(err))}</td></tr>`
   }
-
-  _bajaReqs = data || []
-  renderBajaPending()
-  renderBajaHistory()
-  updateKPIs()
 }
 
 function renderBajaPending() {
