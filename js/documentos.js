@@ -353,20 +353,23 @@ function renderTable(docs) {
             <i class="fa-solid fa-eye"></i>
           </button>
           ${isRegs
-            ? `<button onclick="openPdfViewer('${doc.id}')" class="btn-action teal" title="Ver PDF">
-                 <i class="fa-solid fa-file-pdf"></i>
-               </button>`
+            ? ''
             : `<button onclick="openContent('${doc.id}')" class="btn-action teal" title="Ver contenido digital">
                  <i class="fa-solid fa-book-open"></i>
                </button>`
           }
-          ${canWrite ? `
-          <button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar">
-            <i class="fa-solid fa-pencil"></i>
-          </button>
-          <button onclick="openUpload('${doc.id}')" class="btn-action green" title="Subir versión">
-            <i class="fa-solid fa-upload"></i>
-          </button>` : ''}
+          ${canWrite
+            ? isRegs
+              ? `<button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar">
+                   <i class="fa-solid fa-pencil"></i>
+                 </button>`
+              : `<button onclick="openEdit('${doc.id}')" class="btn-action blue" title="Editar">
+                   <i class="fa-solid fa-pencil"></i>
+                 </button>
+                 <button onclick="openUpload('${doc.id}')" class="btn-action green" title="Subir versión">
+                   <i class="fa-solid fa-upload"></i>
+                 </button>`
+            : ''}
         </div>
       </td>
     </tr>`
@@ -404,6 +407,8 @@ function covBadge(code) {
 
 // ── Visor PDF para Registros/Formatos ───────────────────────────
 let _pdfDocId = null, _pdfUrl = null, _pdfName = null
+let _detailPdfUrl  = null
+let _detailPdfName = null
 
 async function openPdfViewer(docId) {
   _pdfDocId = docId
@@ -473,6 +478,17 @@ function downloadPdf() {
 
 function printPdf() {
   const iframe = document.getElementById('pdf-iframe')
+  if (iframe?.contentWindow) iframe.contentWindow.print()
+}
+
+function downloadDetailPdf() {
+  if (!_detailPdfUrl) return
+  const a = document.createElement('a')
+  a.href = _detailPdfUrl; a.download = _detailPdfName || 'documento.pdf'; a.click()
+}
+
+function printDetailPdf() {
+  const iframe = document.getElementById('detail-pdf-iframe')
   if (iframe?.contentWindow) iframe.contentWindow.print()
 }
 
@@ -943,7 +959,63 @@ async function openDetail(docId) {
   // Version history
   await loadVersions(docId)
 
+  // Si es Registros/Formatos (FT), cargar PDF dentro del modal
+  const isFT = doc.document_types?.code_prefix === 'FT'
+  const pdfSection   = document.getElementById('detail-pdf-section')
+  const pdfIframe    = document.getElementById('detail-pdf-iframe')
+  const pdfLoading   = document.getElementById('detail-pdf-loading')
+  const pdfEmpty     = document.getElementById('detail-pdf-empty')
+  const btnDlDetail  = document.getElementById('btn-detail-download')
+  const btnPrDetail  = document.getElementById('btn-detail-print')
+
+  _detailPdfUrl  = null
+  _detailPdfName = null
+
+  if (pdfSection) pdfSection.style.display = isFT ? 'block' : 'none'
+  if (btnDlDetail) btnDlDetail.style.display = 'none'
+  if (btnPrDetail) btnPrDetail.style.display = 'none'
+
+  if (isFT) {
+    if (pdfIframe)  { pdfIframe.src = ''; pdfIframe.style.display = 'none' }
+    if (pdfLoading) pdfLoading.style.display = 'flex'
+    if (pdfEmpty)   pdfEmpty.style.display   = 'none'
+  }
+
   openModal('modal-detail')
+
+  // Cargar PDF en segundo plano (solo FT)
+  if (isFT) {
+    ;(async () => {
+      const { data: vers } = await db
+        .from('document_versions')
+        .select('file_path, file_name, version')
+        .eq('document_id', docId)
+        .not('file_path', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (!vers?.length) {
+        if (pdfLoading) pdfLoading.style.display = 'none'
+        if (pdfEmpty)   pdfEmpty.style.display   = 'flex'
+        return
+      }
+      const { data: signed } = await db.storage
+        .from('sgc-documents')
+        .createSignedUrl(vers[0].file_path, 3600)
+
+      if (!signed?.signedUrl) {
+        if (pdfLoading) pdfLoading.style.display = 'none'
+        if (pdfEmpty)   pdfEmpty.style.display   = 'flex'
+        return
+      }
+      _detailPdfUrl  = signed.signedUrl
+      _detailPdfName = vers[0].file_name || `${doc.code}_v${vers[0].version}.pdf`
+      if (pdfLoading) pdfLoading.style.display = 'none'
+      if (pdfIframe)  { pdfIframe.src = _detailPdfUrl; pdfIframe.style.display = 'block' }
+      if (btnDlDetail) btnDlDetail.style.display = 'inline-flex'
+      if (btnPrDetail) btnPrDetail.style.display = 'inline-flex'
+    })()
+  }
 }
 
 function renderWorkflow(status) {
