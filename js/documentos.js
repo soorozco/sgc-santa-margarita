@@ -780,8 +780,115 @@ function openUploadFromDetail() {
 }
 
 function openUploadFromEdit() {
+  const doc = _allDocs.find(d => d.id === _currentDocId)
+  if (!doc) return
   closeModal('modal-edit')
-  if (_currentDocId) openUpload(_currentDocId)
+  setText('upload-pdf-doc-name', `${doc.code} — ${doc.name}`)
+  clearPdfFile()
+  openModal('modal-upload-pdf')
+}
+
+// ── Drag & drop del modal simplificado ────────────────────────────
+function fileDragOverPdf(e) {
+  e.preventDefault()
+  document.getElementById('file-drop-pdf')?.classList.add('drag')
+}
+function fileDragLeavePdf(e) {
+  document.getElementById('file-drop-pdf')?.classList.remove('drag')
+}
+function fileDropPdf(e) {
+  e.preventDefault()
+  document.getElementById('file-drop-pdf')?.classList.remove('drag')
+  const file = e.dataTransfer.files[0]
+  if (file) {
+    const dt = new DataTransfer()
+    dt.items.add(file)
+    const inp = document.getElementById('upload-pdf-file')
+    if (inp) inp.files = dt.files
+    showPdfFileSelected(file)
+  }
+}
+function filePdfSelected(input) {
+  const file = input.files[0]
+  if (file) showPdfFileSelected(file)
+}
+function showPdfFileSelected(file) {
+  const info = document.getElementById('file-pdf-selected-info')
+  if (info) {
+    info.classList.add('show')
+    const span = document.getElementById('file-pdf-selected-name')
+    if (span) span.textContent = file.name
+  }
+}
+function clearPdfFile() {
+  const info = document.getElementById('file-pdf-selected-info')
+  if (info) info.classList.remove('show')
+  const bar  = document.getElementById('upload-pdf-progress')
+  const fill = document.getElementById('progress-pdf-fill')
+  if (bar)  bar.classList.remove('show')
+  if (fill) fill.style.width = '0%'
+  const inp  = document.getElementById('upload-pdf-file')
+  if (inp)  inp.value = ''
+}
+
+async function submitUploadPdf() {
+  const btn  = document.getElementById('btn-save-upload-pdf')
+  const inp  = document.getElementById('upload-pdf-file')
+  const file = inp?.files[0]
+  if (!file)          { showToast('Selecciona un archivo PDF.', 'red'); return }
+  if (!_currentDocId) return
+
+  const doc     = _allDocs.find(d => d.id === _currentDocId)
+  const version = doc?.current_version || '1.0'
+
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo…'
+
+  const bar  = document.getElementById('upload-pdf-progress')
+  const fill = document.getElementById('progress-pdf-fill')
+  if (bar)  bar.classList.add('show')
+  if (fill) fill.style.width = '30%'
+
+  const ext      = file.name.split('.').pop().toLowerCase()
+  const deptCode = doc?.departments?.code || 'GEN'
+  const docCode  = doc?.code  || _currentDocId
+  const ts       = Date.now()
+  const filePath = `${deptCode}/${docCode}/v${version}_${ts}.${ext}`
+
+  const { error: upErr } = await db.storage
+    .from('sgc-documents')
+    .upload(filePath, file, { cacheControl: '3600', upsert: false })
+
+  if (upErr) {
+    showToast('Error al subir el archivo: ' + upErr.message, 'red')
+    resetBtn(btn, '<i class="fa-solid fa-cloud-arrow-up"></i> Subir')
+    if (bar) bar.classList.remove('show')
+    return
+  }
+  if (fill) fill.style.width = '70%'
+
+  await db.from('document_versions').insert({
+    document_id:     _currentDocId,
+    version,
+    change_summary:  'PDF cargado',
+    change_date:     new Date().toISOString().split('T')[0],
+    file_path:       filePath,
+    file_name:       file.name,
+    file_size_bytes: file.size,
+    file_mime_type:  file.type,
+    status:          'borrador',
+    submitted_by:    _user.id,
+    submitted_at:    new Date().toISOString()
+  })
+
+  if (fill) fill.style.width = '100%'
+  setTimeout(async () => {
+    showToast('PDF cargado correctamente.', 'green')
+    closeModal('modal-upload-pdf')
+    resetBtn(btn, '<i class="fa-solid fa-cloud-arrow-up"></i> Subir')
+    clearPdfFile()
+    await loadDocuments()
+  }, 400)
 }
 
 // Drag & drop handlers

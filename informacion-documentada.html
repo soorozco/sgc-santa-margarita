@@ -579,6 +579,54 @@
 </div>
 
 
+<!-- ═══════════════ MODAL — Cargar PDF rápido (desde lápiz) ═══════════════ -->
+<div class="modal-overlay" id="modal-upload-pdf">
+  <div class="modal" style="max-width:480px">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Cargar PDF
+        <small id="upload-pdf-doc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-upload-pdf')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="file-drop" id="file-drop-pdf"
+           ondragover="fileDragOverPdf(event)" ondragleave="fileDragLeavePdf(event)"
+           ondrop="fileDropPdf(event)">
+        <i class="fa-solid fa-file-arrow-up" style="font-size:2rem;color:#0d9488"></i>
+        <p>Arrastra el PDF aquí o <strong>haz clic para seleccionar</strong></p>
+        <small>PDF — máximo 20 MB</small>
+        <input type="file" id="upload-pdf-file" accept=".pdf"
+               onchange="filePdfSelected(this)" style="opacity:0;position:absolute;inset:0;cursor:pointer">
+      </div>
+      <div class="file-selected" id="file-pdf-selected-info">
+        <i class="fa-solid fa-file-circle-check"></i>
+        <span id="file-pdf-selected-name">—</span>
+        <button class="btn-action red" onclick="clearPdfFile()" title="Quitar archivo">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="progress-bar" id="upload-pdf-progress">
+        <div class="progress-fill" id="progress-pdf-fill"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-upload-pdf')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-upload-pdf" onclick="submitUploadPdf()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Subir
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
 <!-- ═══════════════ MODAL — Subir Versión ═══════════════ -->
 <div class="modal-overlay" id="modal-upload">
   <div class="modal">
