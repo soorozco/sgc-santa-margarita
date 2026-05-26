@@ -763,6 +763,11 @@ function openUploadFromDetail() {
   if (_currentDocId) openUpload(_currentDocId)
 }
 
+function openUploadFromEdit() {
+  closeModal('modal-edit')
+  if (_currentDocId) openUpload(_currentDocId)
+}
+
 // Drag & drop handlers
 function fileDragOver(e) {
   e.preventDefault()
