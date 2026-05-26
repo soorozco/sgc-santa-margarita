@@ -1,6 +1,6 @@
 // ─── Solicitudes de Alta y Baja de Documentos ────────────────────
 
-let _user = null, _profile = null, _role = null
+let _solUser = null, _solProfile = null, _solRole = null
 let _altaReqs  = []   // document_code_requests
 let _bajaReqs  = []   // document_deactivation_requests
 let _currentAltaId = null
@@ -10,13 +10,13 @@ let _currentBajaId = null
 async function initSolicitudes() {
   const auth = await requireAuth()
   if (!auth) return
-  _user    = auth.user
-  _profile = auth.profile
-  _role    = auth.profile?.roles?.name || 'lector'
+  _solUser    = auth.user
+  _solProfile = auth.profile
+  _solRole    = auth.profile?.roles?.name || 'lector'
 
   renderUserInfo()
 
-  if (!['administrador','responsable_calidad'].includes(_role)) {
+  if (!['administrador','responsable_calidad'].includes(_solRole)) {
     const target = document.getElementById('infodoc-panel-solicitudes')
                  || document.getElementById('main-content')
     target.innerHTML = `
@@ -41,19 +41,19 @@ async function initSolicitudesTab() {
     // Reutilizar contexto ya cargado por documentos.js
     const ctx = window._solCtx
     if (ctx) {
-      _user    = ctx.user
-      _profile = ctx.profile
-      _role    = ctx.role
+      _solUser    = ctx.user
+      _solProfile = ctx.profile
+      _solRole    = ctx.role
     } else {
       // fallback: auth completa si no hay contexto
       const auth = await requireAuth()
       if (!auth) return
-      _user    = auth.user
-      _profile = auth.profile
-      _role    = auth.profile?.roles?.name || 'lector'
+      _solUser    = auth.user
+      _solProfile = auth.profile
+      _solRole    = auth.profile?.roles?.name || 'lector'
     }
 
-    if (!['administrador','responsable_calidad'].includes(_role)) {
+    if (!['administrador','responsable_calidad'].includes(_solRole)) {
       const panel = document.getElementById('infodoc-panel-solicitudes')
       if (panel) panel.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;
@@ -266,7 +266,7 @@ async function submitAltaReview(action) {
       department_id:     req.department_id    || null,
       current_version:   '1.0',
       status:            'borrador',
-      created_by:        _user.id
+      created_by:        _solUser.id
     }).select().single()
     createdDocId = newDoc?.id || null
   }
@@ -274,7 +274,7 @@ async function submitAltaReview(action) {
   const { error } = await db.from('document_code_requests').update({
     status:              action,
     assigned_code:       action === 'approved' ? code : null,
-    reviewed_by:         _user.id,
+    reviewed_by:         _solUser.id,
     reviewed_at:         new Date().toISOString(),
     review_notes:        notes || null,
     created_document_id: createdDocId,
@@ -410,7 +410,7 @@ async function approveBaja(reqId) {
   if (e1) { showToast('Error al actualizar el documento.', 'red'); return }
 
   const { error: e2 } = await db.from('document_deactivation_requests')
-    .update({ status: 'approved', reviewed_by: _user.id, reviewed_at: new Date().toISOString() })
+    .update({ status: 'approved', reviewed_by: _solUser.id, reviewed_at: new Date().toISOString() })
     .eq('id', reqId)
   if (e2) { showToast('Error al actualizar la solicitud.', 'red'); return }
 
@@ -433,7 +433,7 @@ async function submitReject() {
   const { error } = await db.from('document_deactivation_requests')
     .update({
       status:           'rejected',
-      reviewed_by:      _user.id,
+      reviewed_by:      _solUser.id,
       reviewed_at:      new Date().toISOString(),
       reviewer_comment: comment
     }).eq('id', _currentBajaId)
@@ -484,8 +484,8 @@ function esc(s) {
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
 }
 function renderUserInfo() {
-  setText('sb-user-name', _profile?.full_name || _user.email.split('@')[0])
-  setText('sb-user-role', _profile?.roles?.display_name || 'Usuario')
+  setText('sb-user-name', _solProfile?.full_name || _solUser.email.split('@')[0])
+  setText('sb-user-role', _solProfile?.roles?.display_name || 'Usuario')
 }
 function showToast(msg, color = 'green') {
   const el = document.getElementById('toast')
