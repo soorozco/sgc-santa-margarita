@@ -243,9 +243,16 @@
       <div class="tab-btn active" onclick="switchTab('tab-plan', this)">
         <i class="fa-solid fa-calendar-days"></i> Plan
       </div>
+      <div class="tab-btn" onclick="switchTab('tab-verificacion', this)">
+        <i class="fa-solid fa-clipboard-check"></i> Verificación
+        <span class="tab-badge" id="tab-chk-count" style="display:none">0</span>
+      </div>
       <div class="tab-btn" onclick="switchTab('tab-hallazgos', this)">
         <i class="fa-solid fa-flag"></i> Hallazgos
         <span class="tab-badge" id="tab-findings-count" style="display:none">0</span>
+      </div>
+      <div class="tab-btn" onclick="switchTab('tab-evaluaciones', this)">
+        <i class="fa-solid fa-user-check"></i> Evaluaciones
       </div>
       <div class="tab-btn" onclick="switchTab('tab-informe', this)">
         <i class="fa-solid fa-file-certificate"></i> Informe
@@ -331,7 +338,39 @@
         </div>
       </div>
 
-      <!-- ── TAB 2: Hallazgos ───────────────────────────── -->
+      <!-- ── TAB 2: Verificación (FT-CA-15) ──────────────── -->
+      <div class="tab-panel" id="tab-verificacion">
+
+        <div class="form-row">
+          <div class="field">
+            <label>Nombre y cargo del auditado</label>
+            <input type="text" id="chk-auditado"
+              placeholder="Ej. Dra. García — Jefa de Urgencias">
+          </div>
+        </div>
+
+        <div class="findings-toolbar" style="margin-top:14px">
+          <div class="section-sep" style="margin:0;flex:1;border:none;padding-bottom:0">
+            <i class="fa-solid fa-clipboard-check"></i> Lista de Verificación — FT-CA-15
+          </div>
+          <button class="btn-edit-findings" id="btn-chk-edit" onclick="toggleChecklistEdit()" style="display:none">
+            <i class="fa-solid fa-pen"></i> Editar
+          </button>
+        </div>
+
+        <div id="checklist-list" style="margin-top:12px"></div>
+
+        <div id="checklist-actions" style="display:none;margin-top:14px;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn-secondary" onclick="addChecklistRow()">
+            <i class="fa-solid fa-plus"></i> Agregar criterio
+          </button>
+          <button class="btn-primary" onclick="saveChecklist()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Verificación
+          </button>
+        </div>
+      </div>
+
+      <!-- ── TAB 3: Hallazgos ───────────────────────────── -->
       <div class="tab-panel" id="tab-hallazgos">
 
         <!-- Summary strip -->
@@ -360,11 +399,62 @@
         </div>
       </div>
 
-      <!-- ── TAB 3: Informe / Resultado ─────────────────── -->
+      <!-- ── TAB 4: Evaluaciones (FT-CA-26) ───────────────── -->
+      <div class="tab-panel" id="tab-evaluaciones">
+        <div class="findings-toolbar">
+          <div class="section-sep" style="margin:0;flex:1;border:none;padding-bottom:0">
+            <i class="fa-solid fa-user-check"></i> Evaluación a Auditor Interno — FT-CA-26
+          </div>
+          <button class="btn-secondary" id="btn-add-eval" onclick="addEvaluacion()" style="display:none">
+            <i class="fa-solid fa-user-plus"></i> Agregar evaluación
+          </button>
+        </div>
+        <div id="evaluaciones-list" style="margin-top:14px"></div>
+        <div id="eval-save-row" style="display:none;text-align:right;margin-top:20px">
+          <button class="btn-primary" onclick="saveEvaluaciones()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Evaluaciones
+          </button>
+        </div>
+      </div>
+
+      <!-- ── TAB 5: Informe (tropicalizado de FT-DIGC-017) ── -->
       <div class="tab-panel" id="tab-informe">
 
+        <!-- Actuaciones -->
         <div class="section-sep">
-          <i class="fa-solid fa-file-certificate"></i> Resultado de la Auditoría
+          <i class="fa-solid fa-clock-rotate-left"></i> Actuaciones (Actividades de Auditoría)
+        </div>
+        <div class="inf-table-wrap" style="overflow-x:auto">
+          <table class="data-table inf-acts-table">
+            <thead><tr>
+              <th style="width:110px">Fecha</th>
+              <th style="width:75px">Hora</th>
+              <th>Equipo Auditor</th>
+              <th>Área / Proceso</th>
+              <th style="width:105px">Req. ISO 9001</th>
+              <th id="acts-th-del" style="width:36px;display:none"></th>
+            </tr></thead>
+            <tbody id="acts-tbody"></tbody>
+          </table>
+        </div>
+        <div id="acts-toolbar" style="display:none;margin-top:10px;gap:10px;justify-content:space-between;align-items:center">
+          <button class="btn-secondary" onclick="addActuacion()">
+            <i class="fa-solid fa-plus"></i> Agregar actividad
+          </button>
+          <button class="btn-primary" onclick="saveActuaciones()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar actuaciones
+          </button>
+        </div>
+
+        <!-- Resumen NC por cláusula ISO 9001:2015 -->
+        <div class="section-sep" style="margin-top:22px">
+          <i class="fa-solid fa-table-list"></i> Resumen NC por Cláusula — ISO 9001:2015
+        </div>
+        <div id="nc-summary-wrap"></div>
+
+        <!-- Resultado y Conclusión -->
+        <div class="section-sep" style="margin-top:22px">
+          <i class="fa-solid fa-file-certificate"></i> Resultado y Conclusión
         </div>
 
         <div class="form-row">
@@ -386,20 +476,60 @@
         <div class="form-row one">
           <div class="field">
             <label>Conclusión General</label>
-            <textarea id="d-conclusion" rows="6"
+            <textarea id="d-conclusion" rows="4"
               placeholder="Resumen del resultado de la auditoría, decisiones tomadas, compromisos adquiridos…"></textarea>
           </div>
         </div>
 
-        <!-- Informe PDF -->
+        <!-- Reunión Final (tropicalizado de FT-DIGC-017) -->
         <div class="section-sep" style="margin-top:8px">
+          <i class="fa-solid fa-handshake"></i> Reunión Final — Compromisos y Valoración
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Fecha compromiso Plan de Acción Correctiva</label>
+            <input type="date" id="rf-fecha-compromiso">
+          </div>
+        </div>
+        <div class="reunion-grid">
+          <div class="field">
+            <label>Puntos Fuertes</label>
+            <textarea id="rf-puntos-fuertes" rows="2"
+              placeholder="Aspectos positivos destacados del área auditada…"></textarea>
+          </div>
+          <div class="field">
+            <label>Potencial de Mejora</label>
+            <textarea id="rf-potencial-mejora" rows="2"
+              placeholder="Áreas o procesos con oportunidad de mejora…"></textarea>
+          </div>
+          <div class="field">
+            <label>Quejas / Reclamaciones del Paciente</label>
+            <textarea id="rf-quejas" rows="2"
+              placeholder="Quejas o reclamaciones relevantes para esta área…"></textarea>
+          </div>
+          <div class="field">
+            <label>Auditorías Internas y Externas Previas</label>
+            <textarea id="rf-auditorias-previas" rows="2"
+              placeholder="Estado de hallazgos de auditorías anteriores relacionadas…"></textarea>
+          </div>
+          <div class="field">
+            <label>Revisión del Sistema</label>
+            <textarea id="rf-revision-sistema" rows="2"
+              placeholder="Observaciones sobre revisión y seguimiento del SGC…"></textarea>
+          </div>
+        </div>
+
+        <div style="text-align:right;margin-top:16px">
+          <button class="btn-primary" onclick="saveReport()">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Informe y Reunión Final
+          </button>
+        </div>
+
+        <!-- Documentos adjuntos -->
+        <div class="section-sep" style="margin-top:20px">
           <i class="fa-solid fa-file-pdf"></i> Informe Oficial (PDF)
         </div>
-
-        <div id="report-file-area">
-          <!-- rendered by JS -->
-        </div>
-
+        <div id="report-file-area"></div>
         <div id="report-upload-wrap" style="margin-top:12px">
           <label class="btn-attach-report">
             <i class="fa-solid fa-cloud-arrow-up"></i> Subir informe PDF
@@ -409,15 +539,10 @@
           <span class="upload-hint">Solo PDF · máx. 20 MB</span>
         </div>
 
-        <!-- Registro de reunión final -->
         <div class="section-sep" style="margin-top:20px">
-          <i class="fa-solid fa-people-group"></i> Registro de Reunión Final de la Auditoría
+          <i class="fa-solid fa-file-lines"></i> Registro de Reunión Final
         </div>
-
-        <div id="meeting-file-area">
-          <!-- rendered by JS -->
-        </div>
-
+        <div id="meeting-file-area"></div>
         <div id="meeting-upload-wrap" style="margin-top:12px">
           <label class="btn-attach-report">
             <i class="fa-solid fa-cloud-arrow-up"></i> Subir registro de reunión
@@ -427,11 +552,6 @@
           <span class="upload-hint">PDF o imagen · máx. 20 MB</span>
         </div>
 
-        <div style="text-align:right;margin-top:20px">
-          <button class="btn-primary" onclick="saveReport()">
-            <i class="fa-solid fa-floppy-disk"></i> Guardar Informe
-          </button>
-        </div>
       </div>
 
     </div><!-- /modal-body -->
