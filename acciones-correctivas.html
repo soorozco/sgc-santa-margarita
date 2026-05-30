@@ -42,7 +42,7 @@
         <span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small>
       </a>
       <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
-      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
       <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
       <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
       <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span><small class="nav-clause">§ 8.2.1</small></a>
@@ -270,7 +270,11 @@
       <div class="tab-panel active" id="tab-info">
 
         <div class="info-grid" style="margin-bottom:18px">
-          <div class="info-item"><label>N° Acción</label><span id="d-number">—</span></div>
+          <div class="info-item">
+            <label>N° Acción <span class="req" id="d-number-req" style="display:none">*</span></label>
+            <input type="text" id="d-number" placeholder="Ej. AC-2025-001" style="display:none">
+            <span id="d-number-lbl">—</span>
+          </div>
           <div class="info-item"><label>Fecha de Detección</label><span id="d-date">—</span></div>
           <div class="info-item"><label>Fuente</label><span id="d-source">—</span></div>
           <div class="info-item"><label>Registrado por</label><span id="d-created-by">—</span></div>

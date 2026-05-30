@@ -117,6 +117,7 @@ async function loadSurveys() {
   _surveys = data || []
   buildAreaFilter()
   buildMonthFilter()
+  buildExportMonthFilter()
   applyFilters()
   renderKPIs()
   renderScoresPanel()
@@ -760,6 +761,77 @@ function buildMonthFilter() {
   const fmtM = ym => { const [y,m]=ym.split('-'); const ms=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return ms[parseInt(m)]+' '+y }
   sel.innerHTML = '<option value="">Todos los meses</option>' +
     months.map(ym=>`<option value="${ym}">${fmtM(ym)}</option>`).join('')
+}
+
+function buildExportMonthFilter() {
+  const months = [...new Set(_surveys.map(s=>(s.survey_date||'').substring(0,7)).filter(Boolean))].sort().reverse()
+  const sel = document.getElementById('exp-pos-month')
+  if (!sel) return
+  const fmtM = ym => { const [y,m]=ym.split('-'); const ms=['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']; return ms[parseInt(m)]+' '+y }
+  const cur = sel.value
+  sel.innerHTML = '<option value="">Todos los meses</option>' +
+    months.map(ym=>`<option value="${ym}"${ym===cur?' selected':''}>${fmtM(ym)}</option>`).join('')
+}
+
+// ── Exportar comentarios positivos de un mes ──────────────────
+function exportPositivos() {
+  const monthVal = document.getElementById('exp-pos-month')?.value || ''
+
+  // Recopilar comentarios POSITIVO (o legacy FELICITACION / SUGERENCIA)
+  const rows = [['Fecha','Paciente','Habitación','Médico','Área','Categoría','Comentario']]
+
+  _surveys.forEach(s => {
+    // Filtrar por mes si se seleccionó uno
+    if (monthVal && (s.survey_date||'').substring(0,7) !== monthVal) return
+
+    getCommentsList(s).forEach(c => {
+      if (ctypeNorm(c.type) !== 'POSITIVO') return
+      if (!c.text || !c.text.trim()) return
+      rows.push([
+        s.survey_date || '',
+        s.patient_name || 'Anónimo',
+        s.room_number  || '',
+        s.doctor_name  || '',
+        s.area         || '',
+        c.category     || '',
+        c.text.trim()
+      ])
+    })
+  })
+
+  if (rows.length <= 1) {
+    showToast('No hay comentarios positivos para exportar' +
+      (monthVal ? ' en el mes seleccionado.' : '.'), 'red')
+    return
+  }
+
+  // Nombre de archivo con mes
+  const fmtSlug = ym => {
+    if (!ym) return ''
+    const [y,m] = ym.split('-')
+    const ms = ['','enero','febrero','marzo','abril','mayo','junio',
+                'julio','agosto','septiembre','octubre','noviembre','diciembre']
+    return `_${ms[parseInt(m)]}_${y}`
+  }
+
+  const csv = rows.map(r => r.map(v => {
+    const s = String(v ?? '')
+    return (s.includes(',') || s.includes('"') || s.includes('\n'))
+      ? '"' + s.replace(/"/g,'""') + '"'
+      : s
+  }).join(',')).join('\n')
+
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'})
+  const url  = URL.createObjectURL(blob)
+  const a    = Object.assign(document.createElement('a'), {
+    href: url,
+    download: `comentarios_positivos${fmtSlug(monthVal)}.csv`
+  })
+  a.click()
+  URL.revokeObjectURL(url)
+
+  const n = rows.length - 1
+  showToast(`${n} comentario${n!==1?'s':''} positivo${n!==1?'s':''} exportado${n!==1?'s':''}.`, 'green')
 }
 
 // ── Helpers ───────────────────────────────────────────────────

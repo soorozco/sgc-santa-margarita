@@ -163,14 +163,28 @@ function renderTable(list) {
   }).join('')
 }
 
+// ── Número consecutivo real ──────────────────────────────────────
+// Busca el mayor sufijo numérico entre los registros AC-YYYY-NNN del año actual
+function nextACNumber() {
+  const year   = new Date().getFullYear()
+  const prefix = `AC-${year}-`
+  let max = 0
+  _allAC.forEach(ac => {
+    const num = (ac.number || '')
+    if (num.toUpperCase().startsWith(prefix)) {
+      const n = parseInt(num.slice(prefix.length), 10) || 0
+      if (n > max) max = n
+    }
+  })
+  return `${prefix}${(max + 1).toString().padStart(3, '0')}`
+}
+
 // ── Modal: Nueva AC ──────────────────────────────────────────────
 function openNewAC() {
   const canWrite = ['administrador','responsable_calidad','jefe_departamento','auditor'].includes(_role)
   if (!canWrite) return
 
-  const year = new Date().getFullYear()
-  const next = (_allAC.length + 1).toString().padStart(3, '0')
-  setVal('new-number',      `AC-${year}-${next}`)
+  setVal('new-number',      nextACNumber())
   setVal('new-date',        new Date().toISOString().split('T')[0])
   setVal('new-source',      'Queja y/o sugerencia')
   setVal('new-responsible', '')
@@ -222,11 +236,26 @@ async function openDetail(id) {
   _currentAC = _allAC.find(a => a.id === id)
   if (!_currentAC) return
 
-  const ac = _currentAC
+  const ac       = _currentAC
+  const canWrite = ['administrador','responsable_calidad','jefe_departamento','auditor'].includes(_role)
+
   setText('detail-number', ac.number || '—')
   setText('detail-source', ac.source || '—')
 
-  setText('d-number',     ac.number || '—')
+  // N° Acción: input editable para roles con permisos, span para lectores
+  const numInput = document.getElementById('d-number')
+  const numLabel = document.getElementById('d-number-lbl')
+  const numReq   = document.getElementById('d-number-req')
+  if (canWrite) {
+    if (numInput) { numInput.style.display = ''; numInput.value = ac.number || '' }
+    if (numLabel) numLabel.style.display = 'none'
+    if (numReq)   numReq.style.display   = 'inline'
+  } else {
+    if (numInput) numInput.style.display = 'none'
+    if (numLabel) { numLabel.style.display = ''; numLabel.textContent = ac.number || '—' }
+    if (numReq)   numReq.style.display   = 'none'
+  }
+
   setText('d-date',       fmtDate(ac.detection_date))
   setText('d-source',     ac.source || '—')
   setText('d-created-by', ac.created_by_name || '—')
@@ -253,9 +282,17 @@ async function saveInfo() {
   if (!_currentAC) return
   const ac = _currentAC
 
+  // Leer número del input si es editable, o conservar el original
+  const numInput  = document.getElementById('d-number')
+  const newNumber = (numInput && numInput.style.display !== 'none')
+    ? (numInput.value.trim() || ac.number)
+    : ac.number
+
+  if (!newNumber) { showToast('El número de acción es obligatorio.', 'red'); return }
+
   const payload = {
     id:                     ac.id,
-    number:                 ac.number,
+    number:                 newNumber,
     detection_date:         ac.detection_date,
     source:                 ac.source,
     responsible:            document.getElementById('d-responsible')?.value.trim(),
@@ -272,6 +309,7 @@ async function saveInfo() {
   if (error) { showToast('Error: ' + error.message, 'red'); return }
 
   Object.assign(_currentAC, {
+    number:                 newNumber,
     responsible:            payload.responsible,
     nc_description:         payload.nc_description,
     root_cause:             payload.root_cause,
@@ -281,6 +319,9 @@ async function saveInfo() {
   })
   const idx = _allAC.findIndex(a => a.id === ac.id)
   if (idx > -1) Object.assign(_allAC[idx], _currentAC)
+
+  // Actualizar título del modal con el número nuevo
+  setText('detail-number', newNumber)
 
   showToast('Cambios guardados.', 'green')
   renderKPIs()

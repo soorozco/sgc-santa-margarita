@@ -36,7 +36,7 @@
       <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
       <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
       <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
-      <a class="nav-link" href="#"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
       <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
       <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
       <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span><small class="nav-clause">§ 8.2.1</small></a>
@@ -135,12 +135,20 @@
       <div class="panel" style="margin-bottom:22px">
         <div class="panel-head">
           <div class="panel-ttl"><i class="fa-solid fa-comments"></i> Comentarios Recientes</div>
-          <div style="display:flex;gap:8px;align-items:center">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <select class="filter-sel" id="f-ctype" onchange="applyFilters()" style="font-size:.786rem;padding:5px 28px 5px 10px">
               <option value="">Todos los tipos</option>
               <option value="NEGATIVO">Negativos</option>
               <option value="POSITIVO">Positivos</option>
             </select>
+            <select class="filter-sel" id="exp-pos-month" style="font-size:.786rem;padding:5px 28px 5px 10px">
+              <option value="">Todos los meses</option>
+            </select>
+            <button class="btn-secondary" onclick="exportPositivos()"
+                    title="Exportar comentarios positivos del mes seleccionado"
+                    style="font-size:.786rem;padding:5px 14px;color:#16a34a;border-color:#86efac;white-space:nowrap;gap:6px">
+              <i class="fa-solid fa-download"></i> Exportar positivos
+            </button>
           </div>
         </div>
         <div class="panel-body">

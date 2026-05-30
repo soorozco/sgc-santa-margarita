@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auditorías Externas — SGC Hospital Santa Margarita</title>
+  <title>Auditorías Internas — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/auditorias-externas.css">
+  <link rel="stylesheet" href="css/auditorias-internas.css">
 </head>
 <body>
 <div class="layout">
@@ -36,8 +36,8 @@
       <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
       <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
       <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
-      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
-      <a class="nav-link active" href="auditorias-externas.html">
+      <a class="nav-link active" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="auditorias-externas.html">
         <i class="fa-solid fa-award"></i>
         <span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small>
       </a>
@@ -72,8 +72,8 @@
   <main class="main">
     <div class="topbar">
       <div>
-        <div class="topbar-page-title">Auditorías Externas</div>
-        <div class="topbar-sub">Cláusula 9.2 — Gestión del proceso de certificación ISO</div>
+        <div class="topbar-page-title">Auditorías Internas</div>
+        <div class="topbar-sub">Cláusula 9.2 — Programa de Auditorías Internas</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -112,14 +112,13 @@
         <div class="search-wrap">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input type="text" class="search-input" id="search-input"
-                 placeholder="Buscar por número, organismo o alcance…"
+                 placeholder="Buscar por número, responsable o alcance…"
                  oninput="applyFilters()">
         </div>
         <select class="filter-sel" id="f-type" onchange="applyFilters()">
           <option value="">Todos los tipos</option>
-          <option value="certificacion">Certificación</option>
+          <option value="programada">Programada</option>
           <option value="seguimiento">Seguimiento</option>
-          <option value="recertificacion">Recertificación</option>
           <option value="extraordinaria">Extraordinaria</option>
         </select>
         <select class="filter-sel" id="f-status" onchange="applyFilters()">
@@ -129,7 +128,7 @@
           <option value="completada">Completada</option>
           <option value="cancelada">Cancelada</option>
         </select>
-        <button class="btn-primary" id="btn-new-ae" onclick="openNewAE()" style="display:none">
+        <button class="btn-primary" id="btn-new-ai" onclick="openNewAI()" style="display:none">
           <i class="fa-solid fa-plus"></i> Nueva Auditoría
         </button>
       </div>
@@ -137,13 +136,13 @@
       <!-- Table -->
       <div class="table-wrap">
         <div class="table-head-bar">
-          <span class="table-count" id="ae-count">Cargando…</span>
+          <span class="table-count" id="ai-count">Cargando…</span>
         </div>
         <table class="data-table">
           <thead>
             <tr>
               <th style="width:110px">N°</th>
-              <th>Organismo / Tipo</th>
+              <th>Responsable / Tipo</th>
               <th>Alcance</th>
               <th class="center">Fecha</th>
               <th class="center">Hallazgos</th>
@@ -152,7 +151,7 @@
               <th class="center">Acción</th>
             </tr>
           </thead>
-          <tbody id="ae-tbody">
+          <tbody id="ai-tbody">
             <tr><td colspan="8" class="table-empty">
               <i class="fa-solid fa-spinner fa-spin"></i>
               <strong>Cargando…</strong>
@@ -170,7 +169,7 @@
 <div class="modal-overlay" id="modal-new">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-ttl">Nueva Auditoría Externa
+      <div class="modal-ttl">Nueva Auditoría Interna
         <small>Complete los datos básicos para crear el expediente</small>
       </div>
       <button class="modal-x" onclick="closeModal('modal-new')"><i class="fa-solid fa-xmark"></i></button>
@@ -180,27 +179,22 @@
       <div class="form-row">
         <div class="field">
           <label>N° de Auditoría <span class="req">*</span></label>
-          <input type="text" id="new-number" placeholder="Ej. AE-2026-001">
+          <input type="text" id="new-number" placeholder="Ej. AI-2026-001">
         </div>
         <div class="field">
           <label>Tipo <span class="req">*</span></label>
           <select id="new-type">
-            <option value="certificacion">Certificación</option>
+            <option value="programada">Programada</option>
             <option value="seguimiento">Seguimiento</option>
-            <option value="recertificacion">Recertificación</option>
             <option value="extraordinaria">Extraordinaria</option>
           </select>
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form-row one">
         <div class="field">
-          <label>Organismo Certificador <span class="req">*</span></label>
-          <input type="text" id="new-body" placeholder="Ej. Bureau Veritas, SGS, TÜV…">
-        </div>
-        <div class="field">
-          <label>Norma</label>
-          <input type="text" id="new-standard" value="ISO 9001:2015">
+          <label>Responsable / Coordinador <span class="req">*</span></label>
+          <input type="text" id="new-coordinator" placeholder="Nombre del responsable o coordinador">
         </div>
       </div>
 
@@ -225,7 +219,7 @@
     </div>
     <div class="modal-foot">
       <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
-      <button class="btn-primary" id="btn-save-new" onclick="submitNewAE()">
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewAI()">
         <i class="fa-solid fa-floppy-disk"></i> Crear Expediente
       </button>
     </div>
@@ -266,8 +260,8 @@
         <div class="info-grid" style="margin-bottom:18px">
           <div class="info-item"><label>N° Auditoría</label><span id="d-number">—</span></div>
           <div class="info-item"><label>Tipo</label><span id="d-type-lbl">—</span></div>
-          <div class="info-item"><label>Norma</label><span id="d-standard">—</span></div>
-          <div class="info-item"><label>Registrada por</label><span id="d-created-by">—</span></div>
+          <div class="info-item"><label>Coordinador</label><span id="d-coordinator-lbl">—</span></div>
+          <div class="info-item"><label>Registrado por</label><span id="d-created-by">—</span></div>
         </div>
 
         <div class="form-row">
@@ -281,8 +275,8 @@
             </select>
           </div>
           <div class="field">
-            <label>Organismo Certificador</label>
-            <input type="text" id="d-body" placeholder="Bureau Veritas, SGS…">
+            <label>Responsable / Coordinador</label>
+            <input type="text" id="d-coordinator" placeholder="Nombre del responsable o coordinador">
           </div>
         </div>
 
@@ -375,13 +369,12 @@
 
         <div class="form-row">
           <div class="field">
-            <label>Resultado de Certificación</label>
-            <select id="d-cert-result">
+            <label>Resultado de Auditoría</label>
+            <select id="d-audit-result">
               <option value="">— Sin resultado aún —</option>
-              <option value="otorgada">✅ Certificación Otorgada</option>
-              <option value="mantenida">✅ Certificación Mantenida</option>
-              <option value="suspendida">⚠️ Certificación Suspendida</option>
-              <option value="retirada">❌ Certificación Retirada</option>
+              <option value="sin_hallazgos">✅ Sin hallazgos significativos</option>
+              <option value="hallazgos_menores">⚠️ Hallazgos menores</option>
+              <option value="hallazgos_mayores">🔴 Hallazgos mayores</option>
             </select>
           </div>
           <div class="field">
@@ -453,6 +446,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/auditorias-externas.js"></script>
+<script src="js/auditorias-internas.js"></script>
 </body>
 </html>
