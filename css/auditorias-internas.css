@@ -2,6 +2,84 @@
    MÓDULO — Auditorías Internas (Cláusula 9.2)
    ============================================================ */
 
+/* ── Plan Anual de Auditorías ──────────────────────────────────── */
+.plan-anual-section {
+  background:var(--white); border:1.5px solid var(--border);
+  border-radius:var(--r); margin-bottom:18px; overflow:hidden; }
+
+.plan-anual-header {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  padding:14px 18px; border-bottom:1px solid var(--border); background:var(--bg2); }
+
+.plan-anual-titles { flex:1; min-width:180px; }
+.plan-anual-title  {
+  font-size:.929rem; font-weight:700; color:var(--txt);
+  display:flex; align-items:center; gap:8px; }
+.plan-anual-title i { color:#4f46e5; }
+.plan-anual-sub    { font-size:.786rem; color:var(--txt3); margin-top:2px; }
+
+.plan-year-tabs { display:flex; gap:4px; }
+.plan-year-btn  {
+  border:1.5px solid var(--border); background:var(--white); color:var(--txt2);
+  border-radius:8px; padding:5px 14px; font-size:.857rem; font-weight:600;
+  cursor:pointer; transition:var(--ease); }
+.plan-year-btn:hover  { border-color:#4f46e5; color:#4f46e5; }
+.plan-year-btn.active { background:#4f46e5; color:#fff; border-color:#4f46e5; }
+
+/* KPI strip */
+.plan-kpi-strip {
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+  padding:10px 4px 14px; border-bottom:1px solid var(--border); }
+.plan-kpi        { display:flex; flex-direction:column; align-items:center; gap:2px; min-width:70px; }
+.plan-kpi-val    { font-size:1.286rem; font-weight:800; color:var(--txt); }
+.plan-kpi-lbl    { font-size:.714rem; color:var(--txt3); font-weight:500; }
+.plan-progress-bar  {
+  width:160px; height:8px; background:var(--bg2); border-radius:10px;
+  overflow:hidden; border:1px solid var(--border); }
+.plan-progress-fill { height:100%; background:linear-gradient(90deg,#4f46e5,#818cf8); border-radius:10px; transition:.4s; }
+
+/* Grid */
+.plan-grid  { width:100%; border-collapse:collapse; font-size:.8rem; }
+.plan-grid th, .plan-grid td { border:1px solid var(--border); }
+.plan-area-col   { min-width:170px; max-width:200px; padding:8px 10px; background:var(--bg2);
+                   font-weight:600; font-size:.8rem; position:sticky; left:0; z-index:2; }
+.plan-month-col  { width:56px; text-align:center; padding:6px 4px; background:var(--bg2);
+                   font-weight:600; color:var(--txt2); white-space:nowrap; }
+.plan-current-month { background:#eef2ff!important; color:#4f46e5!important; }
+
+.plan-area-name  {
+  padding:7px 10px; font-size:.8rem; color:var(--txt); font-weight:500;
+  max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  position:sticky; left:0; background:var(--white); z-index:1; }
+
+.plan-cell       { text-align:center; padding:5px 3px; vertical-align:middle; }
+.plan-cell-empty { color:var(--border); cursor:default; }
+.plan-cell-empty:hover .plan-add-hint { opacity:1; }
+.plan-add-hint   { opacity:0; transition:opacity .2s; color:var(--txt3); font-size:1rem; cursor:pointer; }
+.plan-cell-has   { background:#f8faff; }
+
+/* Badges de estado */
+.plan-badge {
+  display:inline-block; font-size:.71rem; font-weight:800;
+  padding:2px 7px; border-radius:8px; letter-spacing:.03em;
+  white-space:nowrap; }
+.plan-P   { background:#eef2ff; color:#4f46e5; border:1px solid #c7d2fe; }
+.plan-R   { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+.plan-S   { background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+.plan-RE  { background:#ffedd5; color:#c2410c; border:1px solid #fed7aa; }
+.plan-C   { background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; }
+
+/* Leyenda */
+.plan-legend {
+  display:flex; gap:8px; flex-wrap:wrap; padding:10px 14px;
+  border-top:1px solid var(--border); background:var(--bg2); }
+
+/* Empty state */
+.plan-empty {
+  text-align:center; padding:32px; color:var(--txt3); font-size:.857rem;
+  line-height:1.8; }
+.plan-empty i { font-size:2rem; display:block; margin-bottom:10px; }
+
 /* ── Toolbar ─────────────────────────────────────────────────── */
 .toolbar { display:flex; align-items:center; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
 .search-wrap { position:relative; flex:1; min-width:220px; }

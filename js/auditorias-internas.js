@@ -17,6 +17,12 @@ let _reunionFinal   = {}
 let _findingsEditMode  = false
 let _checklistEditMode = false
 
+// Plan Anual state
+let _plan          = []
+let _planYear      = new Date().getFullYear()
+let _editPlanEntry = null   // entry being edited in modal
+let _planVisible   = true
+
 // ── Init ────────────────────────────────────────────────────────
 async function initAI() {
   const auth = await requireAuth()
@@ -37,7 +43,7 @@ async function initAI() {
 
   renderUserInfo()
   setCurrentDate()
-  await loadAI()
+  await Promise.all([loadAI(), loadPlan()])
   applyRoleUI()
 }
 
@@ -1195,6 +1201,257 @@ function switchTab(panelId,btn) {
 }
 function openModal(id)  { document.getElementById(id)?.classList.add('open') }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open') }
+
+// ══ Plan Anual de Auditorías (FT-CA-39) ══════════════════════════
+
+async function loadPlan() {
+  const { data, error } = await db
+    .from('plan_anual_auditorias')
+    .select('*')
+    .order('month', { ascending: true })
+
+  if (error) {
+    const wrap = document.getElementById('plan-grid-wrap')
+    if (wrap) wrap.innerHTML = `<div style="padding:12px;color:#dc2626;font-size:.857rem">
+      ⚠️ Error al cargar el plan: ${esc(error.message)}<br>
+      ${error.message.includes('does not exist') ? 'Ejecuta <code>sql/plan_anual_setup.sql</code> en Supabase.' : ''}
+    </div>`
+    return
+  }
+  _plan = data || []
+  buildPlanYearTabs()
+  renderPlan()
+}
+
+function buildPlanYearTabs() {
+  const container = document.getElementById('plan-year-tabs')
+  if (!container) return
+  const years = [...new Set(_plan.map(e => e.year))].sort()
+  const currentYear = new Date().getFullYear()
+  if (!years.includes(currentYear)) years.push(currentYear)
+  if (!years.includes(currentYear + 1)) years.push(currentYear + 1)
+  years.sort()
+
+  if (!years.includes(_planYear)) _planYear = currentYear
+
+  container.innerHTML = years.map(y => `
+    <button class="plan-year-btn ${y === _planYear ? 'active' : ''}"
+      onclick="setPlanYear(${y})">${y}</button>
+  `).join('')
+}
+
+function setPlanYear(y) {
+  _planYear = y
+  buildPlanYearTabs()
+  renderPlan()
+}
+
+function togglePlan() {
+  _planVisible = !_planVisible
+  const body = document.getElementById('plan-body')
+  const icon = document.getElementById('plan-toggle-icon')
+  if (body)  body.style.display = _planVisible ? '' : 'none'
+  if (icon)  icon.className     = _planVisible ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'
+}
+
+function renderPlan() {
+  const wrap = document.getElementById('plan-grid-wrap')
+  if (!wrap) return
+  const canWrite = ['administrador','responsable_calidad','auditor'].includes(_role)
+  const btn = document.getElementById('btn-new-plan')
+  if (btn) btn.style.display = canWrite ? 'inline-flex' : 'none'
+
+  const yearPlan = _plan.filter(e => e.year === _planYear)
+  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+
+  // Orden sugerido de áreas
+  const AREA_ORDER = [
+    'Quirófano','Urgencias','Enfermería / Hospitalización','Admisión',
+    'Farmacia Hospitalaria','Imagenología / Laboratorio','Cocina / Nutrición',
+    'Recursos Humanos','Gestión de Riesgos y Eventos Adversos',
+    'Satisfacción del Paciente','Revisión General SGC'
+  ]
+  const existingAreas = [...new Set(yearPlan.map(e => e.area))]
+  const areas = [
+    ...AREA_ORDER.filter(a => existingAreas.includes(a)),
+    ...existingAreas.filter(a => !AREA_ORDER.includes(a))
+  ]
+
+  if (areas.length === 0) {
+    wrap.innerHTML = `<div class="plan-empty">
+      <i class="fa-solid fa-calendar-xmark"></i><br>
+      Sin actividades planificadas para ${_planYear}.
+      ${canWrite ? `<br><button class="btn-secondary" onclick="openNewPlan()" style="margin-top:10px">
+        <i class="fa-solid fa-plus"></i> Agregar primera actividad</button>` : ''}
+    </div>`
+    return
+  }
+
+  // Resumen KPIs del plan
+  const total  = yearPlan.length
+  const real   = yearPlan.filter(e => e.status === 'realizada').length
+  const pct    = total > 0 ? Math.round((real / total) * 100) : 0
+  const pending = yearPlan.filter(e => e.status === 'programada').length
+
+  const kpiStrip = `<div class="plan-kpi-strip">
+    <div class="plan-kpi"><span class="plan-kpi-val">${total}</span><span class="plan-kpi-lbl">Actividades</span></div>
+    <div class="plan-kpi"><span class="plan-kpi-val" style="color:#16a34a">${real}</span><span class="plan-kpi-lbl">Realizadas</span></div>
+    <div class="plan-kpi"><span class="plan-kpi-val" style="color:#4f46e5">${pending}</span><span class="plan-kpi-lbl">Programadas</span></div>
+    <div class="plan-kpi">
+      <div class="plan-progress-bar"><div class="plan-progress-fill" style="width:${pct}%"></div></div>
+      <span class="plan-kpi-lbl">${pct}% completado</span>
+    </div>
+  </div>`
+
+  // Grid
+  const thead = `<thead><tr>
+    <th class="plan-area-col">Área / Proceso</th>
+    ${MONTHS.map((m, mi) => {
+      const isCurrentMonth = (mi + 1 === new Date().getMonth() + 1) && (_planYear === new Date().getFullYear())
+      return `<th class="plan-month-col${isCurrentMonth ? ' plan-current-month' : ''}">${m}</th>`
+    }).join('')}
+  </tr></thead>`
+
+  const tbody = areas.map(area => {
+    const cells = MONTHS.map((_, mi) => {
+      const entries = yearPlan.filter(e => e.area === area && e.month === mi + 1)
+      if (entries.length === 0) {
+        return canWrite
+          ? `<td class="plan-cell plan-cell-empty"
+              onclick="openNewPlan(${_planYear}, ${mi+1}, '${area.replace(/'/g,"\\'")}')"
+              title="Agregar auditoría en este mes">
+              <span class="plan-add-hint">+</span>
+            </td>`
+          : `<td class="plan-cell plan-cell-empty"></td>`
+      }
+      const badges = entries.map(e => {
+        const k = planStatusKey(e.status)
+        return `<span class="plan-badge plan-${k}"
+          onclick="openEditPlan('${e.id}')"
+          title="${planStatusLabel(e.status)}${e.alcance ? ' · '+e.alcance : ''}"
+          style="cursor:pointer;display:block;margin:2px 0">${k}</span>`
+      }).join('')
+      return `<td class="plan-cell plan-cell-has">${badges}</td>`
+    }).join('')
+
+    return `<tr>
+      <td class="plan-area-name" title="${esc(area)}">${esc(area)}</td>
+      ${cells}
+    </tr>`
+  }).join('')
+
+  const addRow = canWrite
+    ? `<tr><td colspan="13" style="text-align:center;padding:8px 0">
+        <button class="btn-secondary" onclick="openNewPlan(${_planYear}, null, null)"
+          style="font-size:.8rem;padding:5px 14px">
+          <i class="fa-solid fa-plus"></i> Agregar área a ${_planYear}
+        </button>
+      </td></tr>` : ''
+
+  wrap.innerHTML = kpiStrip + `<table class="plan-grid">
+    ${thead}<tbody>${tbody}${addRow}</tbody>
+  </table>`
+}
+
+function planStatusKey(status) {
+  return { programada:'P', realizada:'R', seguimiento:'S', reprogramada:'RE', cancelada:'C' }[status] || 'P'
+}
+function planStatusLabel(status) {
+  return { programada:'Programada', realizada:'Realizada', seguimiento:'Seguimiento',
+           reprogramada:'Reprogramada', cancelada:'Cancelada' }[status] || status
+}
+
+function openNewPlan(year = null, month = null, area = null) {
+  _editPlanEntry = null
+  setText('plan-modal-sub', 'Nueva actividad de auditoría')
+  setVal('pm-year',       year   || _planYear)
+  setVal('pm-month',      month  || new Date().getMonth() + 1)
+  setVal('pm-area',       area   || '')
+  setVal('pm-alcance',    '')
+  setVal('pm-auditor',    'Dra. Giselle De la Torre')
+  setVal('pm-responsable','')
+  setVal('pm-status',     'programada')
+  setVal('pm-notas',      '')
+  const btnDel = document.getElementById('btn-delete-plan')
+  if (btnDel) btnDel.style.display = 'none'
+  openModal('modal-plan')
+}
+
+function openEditPlan(id) {
+  const entry = _plan.find(e => e.id === id)
+  if (!entry) return
+  _editPlanEntry = entry
+  const mNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+                  'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+  setText('plan-modal-sub', `${esc(entry.area)} · ${mNames[entry.month-1]} ${entry.year}`)
+  setVal('pm-year',        entry.year)
+  setVal('pm-month',       entry.month)
+  setVal('pm-area',        entry.area        || '')
+  setVal('pm-alcance',     entry.alcance     || '')
+  setVal('pm-auditor',     entry.auditor_lider || '')
+  setVal('pm-responsable', entry.responsable || '')
+  setVal('pm-status',      entry.status      || 'programada')
+  setVal('pm-notas',       entry.notas       || '')
+  const canWrite = ['administrador','responsable_calidad','auditor'].includes(_role)
+  const btnDel = document.getElementById('btn-delete-plan')
+  if (btnDel) btnDel.style.display = canWrite ? 'inline-flex' : 'none'
+  openModal('modal-plan')
+}
+
+async function savePlanEntry() {
+  const btn   = document.getElementById('btn-save-plan')
+  const area  = document.getElementById('pm-area')?.value.trim()
+  const year  = parseInt(document.getElementById('pm-year')?.value)
+  const month = parseInt(document.getElementById('pm-month')?.value)
+
+  if (!area)  { showToast('Indica el área / proceso.','red'); return }
+  if (!year)  { showToast('Indica el año.','red'); return }
+  if (!month) { showToast('Indica el mes.','red'); return }
+
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
+
+  const payload = {
+    year, month, area,
+    alcance:      document.getElementById('pm-alcance')?.value.trim()     || null,
+    auditor_lider: document.getElementById('pm-auditor')?.value.trim()    || null,
+    responsable:  document.getElementById('pm-responsable')?.value.trim() || null,
+    status:       document.getElementById('pm-status')?.value             || 'programada',
+    notas:        document.getElementById('pm-notas')?.value.trim()       || null,
+    updated_at:   new Date().toISOString()
+  }
+
+  let error
+  if (_editPlanEntry) {
+    // Update
+    ({ error } = await db.from('plan_anual_auditorias').update(payload).eq('id', _editPlanEntry.id))
+  } else {
+    // Insert
+    payload.created_by = _user?.id
+    ;({ error } = await db.from('plan_anual_auditorias').insert(payload))
+  }
+
+  if (error) {
+    showToast('Error: ' + error.message, 'red')
+    btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar'
+    return
+  }
+
+  showToast(_editPlanEntry ? 'Actividad actualizada.' : 'Actividad agregada al plan.', 'green')
+  closeModal('modal-plan')
+  btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar'
+  await loadPlan()
+}
+
+async function deletePlanEntry() {
+  if (!_editPlanEntry) return
+  if (!confirm(`¿Eliminar "${_editPlanEntry.area}" del plan ${_editPlanEntry.year}?`)) return
+  const { error } = await db.from('plan_anual_auditorias').delete().eq('id', _editPlanEntry.id)
+  if (error) { showToast('Error: ' + error.message,'red'); return }
+  showToast('Actividad eliminada del plan.','green')
+  closeModal('modal-plan')
+  await loadPlan()
+}
 
 // ── Boot ──────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initAI)
