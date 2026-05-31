@@ -45,7 +45,7 @@ INSERT INTO management_reviews (
   '2025-12-19',
   '2026-05-31',
   'Sala de Juntas, Hospital Santa Margarita GDL',
-  'COMPLETADA',
+  'aprobado',
 
   -- improvement_opportunities
   'La Alta Dirección revisó el desempeño del SGC del segundo semestre 2025. El período estuvo marcado por la auditoría externa ISO 9001:2015 (noviembre 2025) que identificó 3 No Conformidades y 7 Desviaciones, y por dos eventos adversos graves en el área de hospitalización durante noviembre. Se cumplió por primera vez la meta de satisfacción ≥ 90%. Se aprueba un plan de acción inmediato para protocolos de medicamentos de alto riesgo y comunicación clínica estructurada.',
@@ -237,7 +237,7 @@ INSERT INTO management_reviews (
   '2026-05-29',
   '2026-11-28',
   'Sala de Juntas, Hospital Santa Margarita GDL',
-  'COMPLETADA',
+  'aprobado',
 
   -- improvement_opportunities
   'La Alta Dirección revisó el desempeño del SGC del primer semestre 2026. El período incluyó 4 auditorías internas programadas y un evento de muerte relacionado con el manejo de ventilación mecánica (26-Mar-2026) que requirió revisión extraordinaria del Comité de Seguridad del Paciente. Se aprueba un plan de fortalecimiento integral de competencias en enfermería para H2 2026. Los indicadores de satisfacción y documentación muestran cumplimiento sostenido. La Dirección instruye la implementación inmediata del protocolo de retiro de soporte vital antes del 15-Jun-2026.',

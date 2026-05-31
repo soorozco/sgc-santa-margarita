@@ -30,7 +30,7 @@ BEGIN
     status, prepared_by, attendees, outputs, form_data
   ) VALUES (
     p_review_number, p_period, p_review_date, p_next_review_date, p_location,
-    'PLANIFICADA', p_created_by, '[]', '[]', '{}'
+    'borrador', p_created_by, '[]', '[]', '{}'
   ) RETURNING id INTO v_id;
   RETURN v_id;
 END;
@@ -107,7 +107,7 @@ VALUES (
   '2025-09-30',
   '2026-03-31',
   'Sala de Juntas, Hospital Santa Margarita GDL',
-  'COMPLETADA',
+  'aprobado',
 
   -- improvement_opportunities (conclusiones generales)
   'La Alta Dirección revisó el desempeño del SGC correspondiente al primer semestre 2025. Se identificaron áreas de mejora en satisfacción del usuario y se comprometieron acciones para el siguiente período. El sistema de gestión se considera adecuado y eficaz para los propósitos del hospital.',
