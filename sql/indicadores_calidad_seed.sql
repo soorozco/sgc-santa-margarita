@@ -39,7 +39,7 @@ BEGIN
       'Grado de cumplimiento en la implementación, seguimiento y cierre oportuno de las acciones correctivas y preventivas derivadas de auditorías internas y externas, análisis de eventos adversos, quejas, no conformidades y oportunidades de mejora, con el fin de asegurar la mejora continua y la eficacia del Sistema de Gestión de la Calidad.',
       'Operativo',
       '75%', '87.5%', '100%',
-      'Mensual', 100, 75,
+      'mensual', 100, 75,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -59,7 +59,7 @@ BEGIN
       'Evalúa el número de proyectos de mejora realizados, autorizados e implementados en la unidad hospitalaria, orientados a optimizar procesos, fortalecer la seguridad del paciente, mejorar la calidad de la atención y elevar la eficiencia operativa, en alineación con los objetivos estratégicos institucionales.',
       'Normativo',
       '2 proyectos', '3 proyectos', '4 proyectos',
-      'Semestral', 4, 2,
+      'anual', 4, 2,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -79,7 +79,7 @@ BEGIN
       'Mide la capacidad institucional para atender, analizar, dar seguimiento y cerrar oportunamente las quejas y sugerencias presentadas por pacientes, familiares y usuarios, garantizando una respuesta formal, documentada y orientada a la mejora de la calidad y seguridad de la atención.',
       'Normativo',
       '75%', '87.5%', '100%',
-      'Mensual', 100, 75,
+      'mensual', 100, 75,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -99,7 +99,7 @@ BEGIN
       'Evalúa el cumplimiento en la programación y realización de las sesiones del Comité de Calidad y Seguridad del Paciente (COCASEP) según el calendario anual de sesiones.',
       'Operativo',
       '90%', '95%', '100%',
-      'Mensual', 100, 90,
+      'mensual', 100, 90,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -120,7 +120,7 @@ BEGIN
       'Cuantifica los eventos centinela ocurridos en la unidad hospitalaria durante un periodo determinado.',
       'Operativo',
       '> 5 (alerta)', '< 5, > 2 (precaución)', '< 2 (meta)',
-      'Mensual', 0, 5,
+      'mensual', 0, 5,
       FALSE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -141,7 +141,7 @@ BEGIN
       'Cuantifica los eventos adversos ocurridos en la unidad hospitalaria durante un periodo determinado.',
       'Operativo',
       '> 20 (alerta)', '< 10, > 5 (precaución)', '< 5 (meta)',
-      'Mensual', 0, 20,
+      'mensual', 0, 20,
       FALSE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -161,7 +161,7 @@ BEGIN
       'Evalúa el nivel de satisfacción global de pacientes y familiares respecto a la atención recibida, considerando aspectos clínicos, administrativos, trato digno, comunicación, oportunidad y condiciones del entorno hospitalario, como insumo clave para la mejora continua de los servicios.',
       'Normativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -181,7 +181,7 @@ BEGIN
       'Mide el nivel de satisfacción de los médicos respecto a la funcionalidad de los servicios hospitalarios, procesos administrativos, disponibilidad de recursos, apoyo institucional y condiciones para la atención de sus pacientes, con el fin de fortalecer la relación médico-hospital y la calidad asistencial.',
       'Operativo',
       '85%', '90%', '95%',
-      'Semestral', 95, 85,
+      'anual', 95, 85,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -201,7 +201,7 @@ BEGIN
       'Evalúa la percepción del usuario sobre la calidad de la atención brindada por el personal médico, incluyendo trato humano, comunicación clara, confianza, respeto y resolución de sus necesidades de salud durante el proceso de atención.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -221,7 +221,7 @@ BEGIN
       'Mide la percepción del usuario respecto a los tiempos de espera para recibir la atención.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -241,7 +241,7 @@ BEGIN
       'Indicador que evalúa la percepción del usuario sobre la calidad de la atención y cuidados proporcionados por el personal de enfermería, considerando aspectos como trato digno, oportunidad, seguridad, comunicación, continuidad del cuidado y apoyo durante su estancia hospitalaria.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -261,7 +261,7 @@ BEGIN
       'Indicador que mide el nivel de satisfacción de los usuarios respecto al servicio de alimentos proporcionado por la unidad hospitalaria, considerando aspectos como calidad, sabor, temperatura, presentación, oportunidad en la entrega y cumplimiento de dietas indicadas, como parte del apoyo integral a la atención del paciente.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -281,7 +281,7 @@ BEGIN
       'Indicador que evalúa la percepción del usuario sobre la limpieza y orden de las áreas hospitalarias, incluyendo áreas clínicas, administrativas y de uso común, como un elemento clave para la seguridad del paciente, la prevención de infecciones y la imagen institucional.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -301,7 +301,7 @@ BEGIN
       'Indicador que mide la percepción de los usuarios respecto al servicio de vigilancia interna, considerando aspectos como seguridad, trato, control de accesos, orientación y respuesta ante situaciones de riesgo, contribuyendo a un entorno hospitalario seguro y confiable.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -321,7 +321,7 @@ BEGIN
       'Mide la lealtad y disposición de los usuarios para regresar o recomendar el hospital, como indicador de percepción global de la calidad y satisfacción con la experiencia de atención.',
       'Operativo',
       '< 80%', '80–89%', '≥ 90%',
-      'Mensual', 100, 80,
+      'mensual', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -341,7 +341,7 @@ BEGIN
       'Indicador que cuantifica las revisiones y actualizaciones efectuadas a los protocolos y procedimientos institucionales en relación con la lista maestra vigente, con el propósito de asegurar la actualización normativa, la estandarización de procesos y la mejora continua del Sistema de Gestión de la Calidad.',
       'Operativo',
       NULL, NULL, '100%',
-      'Mensual', 100, NULL,
+      'mensual', 100, NULL,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -362,7 +362,7 @@ BEGIN
       'Indicador que mide la cantidad de quejas recibidas por parte de pacientes, familiares o usuarios durante un periodo determinado, relacionadas con la atención clínica, administrativa o de apoyo.',
       'Operativo',
       '≥ 10 (alerta)', '5–9 (precaución)', '0–4 (meta)',
-      'Mensual', 0, 10,
+      'mensual', 0, 10,
       FALSE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -383,7 +383,7 @@ BEGIN
       'Indicador que cuantifica las felicitaciones recibidas por la institución, servicios o personal, como reconocimiento a la calidad de la atención, el trato humano y las buenas prácticas implementadas.',
       'Operativo',
       '0 (por debajo de meta)', '1 (mínimo)', '≥ 1 (meta)',
-      'Mensual', 1, 1,
+      'mensual', 1, 1,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -403,7 +403,7 @@ BEGIN
       'Indicador que mide el grado de avance y cumplimiento de los proyectos de mejora implementados en la unidad hospitalaria, orientados a fortalecer la calidad de los procesos, la seguridad del paciente y la eficiencia operativa, conforme a los objetivos estratégicos institucionales.',
       'Operativo',
       '75%', '88%', '100%',
-      'Mensual', 100, 75,
+      'mensual', 100, 75,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -423,7 +423,7 @@ BEGIN
       'Indicador que evalúa el nivel de cumplimiento de los acuerdos establecidos durante las sesiones del Comité de Calidad y Seguridad del Paciente (COCASEP), verificando su implementación, seguimiento y cierre oportuno, como mecanismo de gobernanza y mejora continua en materia de calidad y seguridad.',
       'Operativo',
       '75%', '88%', '100%',
-      'Mensual', 100, 75,
+      'mensual', 100, 75,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -443,7 +443,7 @@ BEGIN
       'Indicador que mide el grado de cumplimiento en la ejecución de auditorías internas y externas programadas en el periodo evaluado, asegurando la verificación sistemática de los procesos, el cumplimiento normativo y la identificación de oportunidades de mejora.',
       'Operativo',
       '80%', '90%', '100%',
-      'Trimestral', 100, 80,
+      'trimestral', 100, 80,
       TRUE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
@@ -464,7 +464,7 @@ BEGIN
       'Cuantifica las cuasifallas ocurridas en la unidad hospitalaria durante un periodo determinado. Las cuasifallas son incidentes que no llegaron a afectar al paciente pero tienen el potencial de causar daño si no se gestionan. Su reporte activo es un indicador de cultura de seguridad.',
       'Operativo',
       '> 20 (alerta)', '< 10, > 5 (precaución)', '< 5 (meta)',
-      'Mensual', 0, 20,
+      'mensual', 0, 20,
       FALSE, v_dept_id, 'Dra. Giselle De la Torre', TRUE, v_user
     );
   END IF;
