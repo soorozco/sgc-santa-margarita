@@ -1268,7 +1268,7 @@ function renderPlan() {
   const AREA_ORDER = [
     'Quirófano','Urgencias','Enfermería / Hospitalización','Admisión',
     'Farmacia Hospitalaria','Imagenología / Laboratorio','Cocina / Nutrición',
-    'Recursos Humanos','Gestión de Riesgos y Eventos Adversos',
+    'Compras','Recursos Humanos','Gestión de Riesgos y Eventos Adversos',
     'Satisfacción del Paciente','Revisión General SGC'
   ]
   const existingAreas = [...new Set(yearPlan.map(e => e.area))]
