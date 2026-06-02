@@ -211,7 +211,7 @@ async function loadDocuments() {
 
 // ── Filters ─────────────────────────────────────────────────────
 function setupSearchFilter() {
-  ['search-input','f-dept','f-type','f-status','f-origen'].forEach(id => {
+  ['search-input','f-dept','f-type','f-status','f-origen','f-subtipo'].forEach(id => {
     const el = document.getElementById(id)
     if (el) el.addEventListener('input', applyFilters)
   })
@@ -222,8 +222,13 @@ function applyFilters() {
   const dept   = document.getElementById('f-dept')?.value   || ''
   const type   = document.getElementById('f-type')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
-  const ret    = document.getElementById('f-ret')?.value    || ''
-  const origen = document.getElementById('f-origen')?.value || ''
+  const ret     = document.getElementById('f-ret')?.value     || ''
+  const origen  = document.getElementById('f-origen')?.value  || ''
+
+  // Mostrar / ocultar sub-tipo externo
+  const subtipoWrap = document.getElementById('f-subtipo-wrap')
+  if (subtipoWrap) subtipoWrap.style.display = (origen === 'externo') ? 'inline-block' : 'none'
+  const subtipo = (origen === 'externo') ? (document.getElementById('f-subtipo')?.value || '') : ''
 
   _filteredDocs = _allDocs.filter(d => {
     const isFT = d.document_types?.code_prefix === 'FT'
@@ -234,16 +239,20 @@ function applyFilters() {
     const matchRet = !ret ||
       (ret === 'sin' && d.retention_years == null) ||
       (ret === 'con' && d.retention_years != null)
-    const isExterno = (d.code || '').toUpperCase().startsWith('DE')
-    const matchOrigen = !origen ||
+    const codeParts  = (d.code || '').toUpperCase().split('-')
+    const isExterno  = codeParts[0] === 'DE'
+    const codeSubtype = codeParts[1] || ''
+    const matchOrigen  = !origen ||
       (origen === 'externo' && isExterno) ||
       (origen === 'interno' && !isExterno)
+    const matchSubtipo = !subtipo || codeSubtype === subtipo
     return (!q || txt.includes(q))
         && (!dept   || d.department_id    === dept)
         && (!type   || d.document_type_id === type)
         && (!status || d.status           === status)
         && matchRet
         && matchOrigen
+        && matchSubtipo
   })
   renderTable(_filteredDocs)
 }
@@ -1440,14 +1449,18 @@ function renderContentModal(doc, c) {
   // Referencias
   if (c.referencias?.length && c.referencias[0]?.nombre !== 'No Aplica') {
     const n = isIT ? '5' : '7'
-    const rows = c.referencias.map(r => `
-      <tr>
-        <td>${esc(r.nombre)}</td>
-        <td>${esc(r.codigo)}</td>
-      </tr>`).join('')
+    const rows = c.referencias.map(r => {
+      const isUrl = /^https?:\/\//i.test(r.codigo || '')
+      const codigoCell = isUrl
+        ? `<a href="${esc(r.codigo)}" target="_blank" rel="noopener noreferrer"
+             style="color:var(--blue);text-decoration:underline;word-break:break-all">
+             <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:.75rem;margin-right:4px"></i>${esc(r.codigo)}</a>`
+        : esc(r.codigo)
+      return `<tr><td>${esc(r.nombre)}</td><td>${codigoCell}</td></tr>`
+    }).join('')
     html += docSection('fa-link', `${n}. Referencias`, `
       <table class="doc-table">
-        <thead><tr><th>Nombre</th><th>Código</th></tr></thead>
+        <thead><tr><th>Nombre</th><th>Código / Enlace</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>`)
   }
