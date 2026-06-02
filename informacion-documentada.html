@@ -177,6 +177,12 @@
                  placeholder="Buscar por código, nombre o custodia…">
         </div>
 
+        <select class="filter-sel" id="f-origen" onchange="applyFilters()">
+          <option value="">Interno y externo</option>
+          <option value="interno">Interno</option>
+          <option value="externo">Externo</option>
+        </select>
+
         <select class="filter-sel" id="f-dept">
           <option value="">Todos los departamentos</option>
         </select>

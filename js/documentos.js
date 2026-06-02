@@ -211,7 +211,7 @@ async function loadDocuments() {
 
 // ── Filters ─────────────────────────────────────────────────────
 function setupSearchFilter() {
-  ['search-input','f-dept','f-type','f-status'].forEach(id => {
+  ['search-input','f-dept','f-type','f-status','f-origen'].forEach(id => {
     const el = document.getElementById(id)
     if (el) el.addEventListener('input', applyFilters)
   })
@@ -223,6 +223,7 @@ function applyFilters() {
   const type   = document.getElementById('f-type')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
   const ret    = document.getElementById('f-ret')?.value    || ''
+  const origen = document.getElementById('f-origen')?.value || ''
 
   _filteredDocs = _allDocs.filter(d => {
     const isFT = d.document_types?.code_prefix === 'FT'
@@ -233,11 +234,16 @@ function applyFilters() {
     const matchRet = !ret ||
       (ret === 'sin' && d.retention_years == null) ||
       (ret === 'con' && d.retention_years != null)
+    const isExterno = (d.code || '').toUpperCase().startsWith('DE')
+    const matchOrigen = !origen ||
+      (origen === 'externo' && isExterno) ||
+      (origen === 'interno' && !isExterno)
     return (!q || txt.includes(q))
         && (!dept   || d.department_id    === dept)
         && (!type   || d.document_type_id === type)
         && (!status || d.status           === status)
         && matchRet
+        && matchOrigen
   })
   renderTable(_filteredDocs)
 }
