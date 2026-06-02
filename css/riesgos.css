@@ -222,7 +222,7 @@
 .tab-btn:hover { color:var(--txt); }
 .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
 .tab-panel { display:none; }
-.tab-panel.active { display:block; }
+.tab-panel.active { display:block; flex:1; overflow-y:auto; min-height:0; }
 
 /* ── Info grid ───────────────────────────────────────────────── */
 .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:18px; }
