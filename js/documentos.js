@@ -1053,7 +1053,10 @@ async function openDetail(docId) {
   setText('d-dept',      doc.departments?.name    || '—')
   setText('d-custodian', doc.custodian_position   || '—')
   setText('d-elab-date', doc.elaboration_date ? fmtDate(doc.elaboration_date) : '—')
-  setText('d-vigencia',  doc.retention_years ? `${doc.retention_years} año(s)` : '—')
+  setText('d-vigencia',
+    doc.retention_months ? `${doc.retention_months} mes${doc.retention_months !== 1 ? 'es' : ''}` :
+    doc.retention_years  ? `${doc.retention_years} año${doc.retention_years  !== 1 ? 's' : ''}` : '—')
+  setText('d-disposition', doc.disposition || '—')
   setText('d-desc',      doc.description          || '—')
 
   // URL de verificación para documentos externos
