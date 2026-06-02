@@ -1056,6 +1056,20 @@ async function openDetail(docId) {
   setText('d-vigencia',  doc.retention_years ? `${doc.retention_years} año(s)` : '—')
   setText('d-desc',      doc.description          || '—')
 
+  // URL de verificación para documentos externos
+  const srcWrap = document.getElementById('d-source-url-wrap')
+  if (srcWrap) {
+    if (doc.source_url) {
+      srcWrap.style.display = 'flex'
+      srcWrap.innerHTML = `<span class="meta-label"><i class="fa-solid fa-arrow-up-right-from-square"></i> Versión vigente</span>
+        <a href="${esc(doc.source_url)}" target="_blank" rel="noopener noreferrer"
+           style="color:var(--blue);text-decoration:underline;word-break:break-all;font-size:.857rem">
+           ${esc(doc.source_url)}</a>`
+    } else {
+      srcWrap.style.display = 'none'
+    }
+  }
+
   // Elaboró / Revisó / Autorizó con cargo desde personal
   const elaboroPerson   = _personal.find(p => p.nombre === doc.elaborated_by)
   const revisoPerson    = _personal.find(p => p.nombre === doc.reviewed_by)
