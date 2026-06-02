@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Objetivos de Calidad — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/contexto.css">
+  <style>
+    /* Estilos de Objetivos de Calidad */
+    .objectives-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .objective-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-left: 4px solid var(--blue, #2563eb);
+      border-radius: 10px;
+      padding: 18px 18px 18px 20px;
+      transition: box-shadow .15s, transform .15s;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .objective-card:hover {
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .07);
+      transform: translateY(-1px);
+    }
+    .objective-card.amber  { border-left-color: #f59e0b; }
+    .objective-card.green  { border-left-color: #10b981; }
+    .objective-card.red    { border-left-color: #ef4444; }
+    .objective-card.purple { border-left-color: #8b5cf6; }
+
+    .obj-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: #eff6ff;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+    .objective-card.amber .obj-icon  { background: #fffbeb; color: #f59e0b; }
+    .objective-card.green .obj-icon  { background: #ecfdf5; color: #10b981; }
+    .objective-card.red .obj-icon    { background: #fef2f2; color: #ef4444; }
+    .objective-card.purple .obj-icon { background: #f5f3ff; color: #8b5cf6; }
+
+    .obj-body { flex: 1; min-width: 0; }
+    .obj-num {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--txt3, #6b7280);
+      margin-bottom: 4px;
+    }
+    .obj-body p {
+      font-size: .85rem;
+      color: var(--txt2, #4b5563);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .obj-target {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f3f4f6;
+      color: #111827;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .objective-card.amber  .obj-target { background: #fef3c7; color: #92400e; }
+    .objective-card.green  .obj-target { background: #d1fae5; color: #065f46; }
+    .objective-card.red    .obj-target { background: #fee2e2; color: #991b1b; }
+    .objective-card.purple .obj-target { background: #ede9fe; color: #5b21b6; }
+
+    /* Tarjeta de "viene de la Política" */
+    .policy-ref {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-left: 4px solid #2563eb;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .policy-ref-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .policy-ref-body { flex: 1; }
+    .policy-ref-body h4 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 2px;
+    }
+    .policy-ref-body p {
+      font-size: .8rem;
+      color: var(--txt2, #4b5563);
+      margin: 0;
+    }
+    .policy-ref a {
+      background: #2563eb;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .policy-ref a:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span><small class="nav-clause">§ 4</small></a>
+      <a class="nav-link" href="liderazgo.html"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span><small class="nav-clause">§ 5</small></a>
+      <a class="nav-link active" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+      <a class="nav-link" href="informacion-documentada.html">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Información Documentada</span><small class="nav-clause">§ 7.5</small>
+      </a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
+      <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span><small class="nav-clause">§ 8.2.1</small></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="personal.html">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Personal</span>
+      </a>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small></a>
+      <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+      <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+      <a class="nav-link" href="configuracion.html" id="nav-config"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Objetivos de Calidad</div>
+        <div class="topbar-sub">Cláusula 6.2 — Objetivos de la Calidad y Planificación para Lograrlos</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Banner -->
+      <div class="ctx-banner">
+        <div class="ctx-banner-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div>
+          <h2>Objetivos de Calidad medibles del Hospital Santa Margarita</h2>
+          <p>Los objetivos de calidad son <b>medibles, coherentes con la Política de Calidad</b> y se revisan
+             periódicamente para asegurar el cumplimiento del SGC. Cada uno tiene una <b>meta cuantificable</b>,
+             un responsable y una frecuencia de medición.</p>
+          <div class="ctx-banner-pills">
+            <span class="ctx-pill"><i class="fa-solid fa-certificate" style="margin-right:4px"></i>ISO 9001:2015 § 6.2</span>
+            <span class="ctx-pill"><i class="fa-solid fa-list-check" style="margin-right:4px"></i>4 objetivos institucionales</span>
+            <span class="ctx-pill"><i class="fa-solid fa-arrows-spin" style="margin-right:4px"></i>Revisión periódica</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Referencia a la Política -->
+      <div class="policy-ref">
+        <div class="policy-ref-icon"><i class="fa-solid fa-link"></i></div>
+        <div class="policy-ref-body">
+          <h4>Estos objetivos derivan de la Política de Calidad</h4>
+          <p>Para entender el contexto y el compromiso institucional del que parten, consulta la Política.</p>
+        </div>
+        <a href="liderazgo.html"><i class="fa-solid fa-arrow-right" style="margin-right:6px"></i>Ver Política</a>
+      </div>
+
+      <!-- ══════ Las 4 tarjetas de objetivos ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-bullseye"></i>
+            Objetivos Institucionales
+            <span class="clause-badge">6.2</span>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <div class="objectives-grid">
+
+            <!-- Objetivo 1: Trato digno -->
+            <div class="objective-card green">
+              <div class="obj-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+              <div class="obj-body">
+                <div class="obj-num">Objetivo 1</div>
+                <p>
+                  Garantizar el <b>trato digno y respetuoso</b> a todos los pacientes y familiares,
+                  promoviendo una cultura de humanismo, ética y profesionalismo en la atención hospitalaria.
+                </p>
+                <span class="obj-target">
+                  <i class="fa-solid fa-arrow-up"></i> Satisfacción &gt; 90%
+                </span>
+              </div>
+            </div>
+
+            <!-- Objetivo 2: Inconformidades -->
+            <div class="objective-card amber">
+              <div class="obj-icon"><i class="fa-solid fa-comments"></i></div>
+              <div class="obj-body">
+                <div class="obj-num">Objetivo 2</div>
+                <p>
+                  <b>Atender oportunamente</b> las inconformidades de manera efectiva y documentada
+                  a la totalidad de quejas presentadas por los usuarios y sus familiares.
+                </p>
+                <span class="obj-target">
+                  <i class="fa-solid fa-check-double"></i> 100% atendidas
+                </span>
+              </div>
+            </div>
+
+            <!-- Objetivo 3: Infecciones nosocomiales -->
+            <div class="objective-card red">
+              <div class="obj-icon"><i class="fa-solid fa-virus-slash"></i></div>
+              <div class="obj-body">
+                <div class="obj-num">Objetivo 3</div>
+                <p>
+                  Reducir la tasa de <b>infecciones nosocomiales</b> en el hospital,
+                  manteniéndola bajo el umbral establecido por las normas sanitarias.
+                </p>
+                <span class="obj-target">
+                  <i class="fa-solid fa-arrow-down"></i> Tasa &lt; 7%
+                </span>
+              </div>
+            </div>
+
+            <!-- Objetivo 4: Capacitación -->
+            <div class="objective-card purple">
+              <div class="obj-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <div class="obj-body">
+                <div class="obj-num">Objetivo 4</div>
+                <p>
+                  <b>Cumplir el plan anual de capacitación</b> del personal del hospital,
+                  asegurando competencia y desarrollo profesional continuo.
+                </p>
+                <span class="obj-target">
+                  <i class="fa-solid fa-bullseye"></i> Cumplimiento &gt; 85%
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ Tabla de Seguimiento ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-table-list"></i>
+            Tabla de Seguimiento de Objetivos
+            <span class="clause-badge">9.1</span>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <table class="parties-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Objetivo</th>
+                <th>Indicador</th>
+                <th>Meta</th>
+                <th>Responsable</th>
+                <th>Frecuencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>1</b></td>
+                <td>Trato digno y respetuoso</td>
+                <td>Encuesta de satisfacción</td>
+                <td><b style="color:#065f46">&gt; 90%</b></td>
+                <td>Dirección Médica</td>
+                <td>Mensual</td>
+              </tr>
+              <tr>
+                <td><b>2</b></td>
+                <td>Atención de inconformidades</td>
+                <td>% quejas atendidas y documentadas</td>
+                <td><b style="color:#92400e">100%</b></td>
+                <td>Calidad / Atención al usuario</td>
+                <td>Mensual</td>
+              </tr>
+              <tr>
+                <td><b>3</b></td>
+                <td>Reducción de infecciones nosocomiales</td>
+                <td>Tasa de infecciones intrahospitalarias</td>
+                <td><b style="color:#991b1b">&lt; 7%</b></td>
+                <td>Epidemiología / CODECIN</td>
+                <td>Mensual</td>
+              </tr>
+              <tr>
+                <td><b>4</b></td>
+                <td>Plan anual de capacitación</td>
+                <td>% de cursos impartidos vs. programados</td>
+                <td><b style="color:#5b21b6">&gt; 85%</b></td>
+                <td>Capital Humano / Enseñanza</td>
+                <td>Trimestral</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="font-size:.78rem;color:var(--txt3, #6b7280);margin-top:12px;font-style:italic">
+            El seguimiento detallado de cada indicador se realiza en el módulo
+            <a href="indicadores.html" style="color:var(--blue, #2563eb);text-decoration:none;font-weight:600">📊 Indicadores</a>.
+            Los riesgos asociados al cumplimiento de estos objetivos se gestionan en
+            <a href="riesgos.html" style="color:var(--blue, #2563eb);text-decoration:none;font-weight:600">🛡️ Gestión de Riesgos (§ 6.1)</a>.
+          </p>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<script>
+  (function() {
+    const el = document.getElementById('current-date');
+    if (el) {
+      const d = new Date();
+      el.textContent = d.toLocaleDateString('es-MX', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+  })();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

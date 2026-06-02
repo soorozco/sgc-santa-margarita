@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liderazgo y Política — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/contexto.css">
+  <style>
+    /* Estilos específicos de Liderazgo y Política */
+    .policy-card {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+      color: white;
+      padding: 28px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(30, 58, 138, .25);
+      position: relative;
+      overflow: hidden;
+    }
+    .policy-card::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 180px;
+      height: 180px;
+      background: rgba(255, 255, 255, .05);
+      border-radius: 50%;
+    }
+    .policy-card::after {
+      content: '\f005';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      bottom: -30px;
+      left: -10px;
+      font-size: 7rem;
+      opacity: .05;
+      color: white;
+    }
+    .policy-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+      opacity: .9;
+      position: relative;
+      z-index: 1;
+    }
+    .policy-card p {
+      font-size: .95rem;
+      line-height: 1.75;
+      font-weight: 400;
+      position: relative;
+      z-index: 1;
+    }
+
+    .commitment-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .commitment-list li {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: .85rem;
+      color: var(--txt2, #4b5563);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .commitment-list li i {
+      color: var(--blue, #2563eb);
+      margin-top: 3px;
+      flex-shrink: 0;
+    }
+
+    /* Card de paso a Objetivos */
+    .next-card {
+      background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      border: 1px solid #bbf7d0;
+      border-left: 4px solid #10b981;
+      border-radius: 10px;
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .next-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #d1fae5;
+      color: #065f46;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .next-card-body { flex: 1; }
+    .next-card-body h4 {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #065f46;
+      margin-bottom: 3px;
+    }
+    .next-card-body p {
+      font-size: .82rem;
+      color: var(--txt2, #4b5563);
+      margin: 0;
+      line-height: 1.5;
+    }
+    .next-card a {
+      background: #10b981;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background .15s;
+    }
+    .next-card a:hover { background: #059669; }
+
+    /* Roles 5.3 */
+    .roles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .role-card {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .role-card h5 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--txt1, #111827);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .role-card h5 i { color: var(--blue, #2563eb); }
+    .role-card p {
+      font-size: .8rem;
+      color: var(--txt2, #4b5563);
+      line-height: 1.5;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span><small class="nav-clause">§ 4</small></a>
+      <a class="nav-link active" href="liderazgo.html"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span><small class="nav-clause">§ 5</small></a>
+      <a class="nav-link" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+      <a class="nav-link" href="informacion-documentada.html">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Información Documentada</span><small class="nav-clause">§ 7.5</small>
+      </a>
+      <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
+      <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
+      <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Quejas</span><small class="nav-clause">§ 8.2.1</small></a>
+      <div class="sb-section">Otros</div>
+      <a class="nav-link" href="personal.html">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Personal</span>
+      </a>
+      <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small></a>
+      <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+      <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+      <a class="nav-link" href="configuracion.html" id="nav-config"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Liderazgo y Política</div>
+        <div class="topbar-sub">Cláusula 5 — Liderazgo y Compromiso de la Dirección</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Banner -->
+      <div class="ctx-banner">
+        <div class="ctx-banner-icon"><i class="fa-solid fa-star"></i></div>
+        <div>
+          <h2>Liderazgo y Compromiso de la Dirección</h2>
+          <p>La Alta Dirección del Hospital Santa Margarita asume el liderazgo y la responsabilidad
+             del Sistema de Gestión de Calidad, demostrando su compromiso a través de la
+             <b>Política de Calidad</b> y de los roles y responsabilidades definidos para el SGC.</p>
+          <div class="ctx-banner-pills">
+            <span class="ctx-pill"><i class="fa-solid fa-certificate" style="margin-right:4px"></i>ISO 9001:2015 § 5</span>
+            <span class="ctx-pill"><i class="fa-solid fa-shield-heart" style="margin-right:4px"></i>Atención centrada en el paciente</span>
+            <span class="ctx-pill"><i class="fa-solid fa-arrows-spin" style="margin-right:4px"></i>Mejora continua</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════ Sección 5.2 — Política de Calidad ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-scroll"></i>
+            Política de Calidad
+            <span class="clause-badge">5.2</span>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <div class="policy-card">
+            <h3><i class="fa-solid fa-quote-left" style="margin-right:6px"></i> Declaración Institucional</h3>
+            <p>
+              Somos una Institución dedicada a la salud, en la que nuestro objetivo es brindar
+              <b>atenciones de salud seguras y de calidad centrada en los pacientes y sus familiares</b>,
+              disminuyendo el riesgo asociado a la atención en salud, a través de la implementación
+              de un Sistema de Gestión de Calidad otorgando atención y tecnología de vanguardia,
+              ética en nuestra actividad diaria con un espíritu de servicio,
+              <b>mejorando continuamente nuestros procesos</b>.
+            </p>
+          </div>
+
+          <!-- Compromisos clave derivados de la política -->
+          <div style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+               letter-spacing:.05em;color:var(--txt3, #6b7280);margin:22px 0 10px">
+            Compromisos derivados
+          </div>
+          <ul class="commitment-list">
+            <li><i class="fa-solid fa-hospital-user"></i> Atención centrada en pacientes y familiares</li>
+            <li><i class="fa-solid fa-shield-halved"></i> Disminución de riesgos asociados a la atención</li>
+            <li><i class="fa-solid fa-microchip"></i> Tecnología y atención de vanguardia</li>
+            <li><i class="fa-solid fa-scale-balanced"></i> Ética y espíritu de servicio en la actividad diaria</li>
+            <li><i class="fa-solid fa-arrows-spin"></i> Mejora continua de los procesos</li>
+            <li><i class="fa-solid fa-clipboard-check"></i> Implementación efectiva del SGC</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ══════ Sección 5.1 — Compromiso de la Dirección ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-handshake"></i>
+            Compromiso de la Alta Dirección
+            <span class="clause-badge">5.1</span>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <p style="font-size:.85rem;color:var(--txt2, #4b5563);line-height:1.65;margin-bottom:14px">
+            La Alta Dirección demuestra su liderazgo y compromiso con el SGC al:
+          </p>
+          <ul class="commitment-list">
+            <li><i class="fa-solid fa-circle-check"></i> Asumir la responsabilidad de la eficacia del SGC</li>
+            <li><i class="fa-solid fa-circle-check"></i> Asegurar que la Política y los Objetivos sean compatibles con la dirección estratégica</li>
+            <li><i class="fa-solid fa-circle-check"></i> Integrar los requisitos del SGC en los procesos del hospital</li>
+            <li><i class="fa-solid fa-circle-check"></i> Promover el enfoque a procesos y el pensamiento basado en riesgos</li>
+            <li><i class="fa-solid fa-circle-check"></i> Proveer los recursos necesarios para el SGC</li>
+            <li><i class="fa-solid fa-circle-check"></i> Comunicar la importancia del SGC y del cumplimiento de requisitos</li>
+            <li><i class="fa-solid fa-circle-check"></i> Apoyar a otros roles directivos a demostrar su liderazgo</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ══════ Sección 5.3 — Roles y Responsabilidades ══════ -->
+      <div class="ctx-section">
+        <div class="ctx-section-head">
+          <div class="ctx-section-title">
+            <i class="fa-solid fa-sitemap"></i>
+            Roles y Responsabilidades del SGC
+            <span class="clause-badge">5.3</span>
+          </div>
+        </div>
+        <div class="ctx-section-body">
+          <div class="roles-grid">
+            <div class="role-card">
+              <h5><i class="fa-solid fa-user-tie"></i> Dirección General</h5>
+              <p>Aprueba la Política y Objetivos de Calidad. Asegura los recursos y conduce la Revisión por Dirección.</p>
+            </div>
+            <div class="role-card">
+              <h5><i class="fa-solid fa-user-doctor"></i> Dirección Médica</h5>
+              <p>Garantiza la atención segura y de calidad. Vigila el cumplimiento de los objetivos clínicos.</p>
+            </div>
+            <div class="role-card">
+              <h5><i class="fa-solid fa-clipboard-check"></i> Coordinación de Calidad</h5>
+              <p>Mantiene el SGC, coordina auditorías, indicadores, no conformidades y acciones correctivas.</p>
+            </div>
+            <div class="role-card">
+              <h5><i class="fa-solid fa-users"></i> Personal del Hospital</h5>
+              <p>Cumple con los procedimientos del SGC y reporta no conformidades, eventos adversos y oportunidades de mejora.</p>
+            </div>
+          </div>
+          <p style="font-size:.78rem;color:var(--txt3, #6b7280);margin-top:14px;font-style:italic">
+            El detalle completo del personal y comités se gestiona en los módulos
+            <a href="personal.html" style="color:var(--blue, #2563eb);text-decoration:none;font-weight:600">👤 Personal</a>
+            y
+            <a href="comites.html" style="color:var(--blue, #2563eb);text-decoration:none;font-weight:600">👥 Comités</a>.
+          </p>
+        </div>
+      </div>
+
+      <!-- ══════ Paso a Objetivos ══════ -->
+      <div class="next-card">
+        <div class="next-card-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="next-card-body">
+          <h4>Los Objetivos de Calidad derivan de esta Política</h4>
+          <p>Consulta los 4 objetivos medibles del hospital, sus metas y responsables en la cláusula § 6.2.</p>
+        </div>
+        <a href="objetivos.html">
+          Ver Objetivos <i class="fa-solid fa-arrow-right" style="margin-left:6px"></i>
+        </a>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<script>
+  // Fecha actual en topbar
+  (function() {
+    const el = document.getElementById('current-date');
+    if (el) {
+      const d = new Date();
+      el.textContent = d.toLocaleDateString('es-MX', {
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+      });
+    }
+  })();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>
