@@ -1073,6 +1073,21 @@ async function openDetail(docId) {
     }
   }
 
+  // Sección de vigencia y verificación (solo para documentos externos DE)
+  const isDE = doc.document_types?.code_prefix === 'DE'
+  const verWrap = document.getElementById('d-verification-wrap')
+  if (verWrap) {
+    if (isDE) {
+      verWrap.style.display = 'block'
+      renderVerificationStatus(doc)
+      const canVerify = ['administrador', 'responsable_calidad'].includes(_role)
+      const btnVerify = document.getElementById('btn-mark-verified')
+      if (btnVerify) btnVerify.style.display = canVerify ? 'inline-flex' : 'none'
+    } else {
+      verWrap.style.display = 'none'
+    }
+  }
+
   // Elaboró / Revisó / Autorizó con cargo desde personal
   const elaboroPerson   = _personal.find(p => p.nombre === doc.elaborated_by)
   const revisoPerson    = _personal.find(p => p.nombre === doc.reviewed_by)
@@ -2324,6 +2339,87 @@ async function submitReviewClave(action) {
   showToast(msg, action === 'approved' ? 'green' : 'red')
   closeModal('modal-review-clave')
   await Promise.all([loadCodeRequests(), loadDocuments()])
+}
+
+// ── Verificación de vigencia (documentos externos DE) ────────────
+
+function renderVerificationStatus(doc) {
+  const badge = document.getElementById('d-ver-badge')
+  const label = document.getElementById('d-ver-label')
+  const date  = document.getElementById('d-ver-date')
+  const byEl  = document.getElementById('d-ver-by')
+
+  if (!doc.last_verified_at) {
+    if (badge) badge.innerHTML = pill('red', 'fa-circle-exclamation', 'Sin verificar')
+    if (label) label.textContent = 'Vigencia no verificada'
+    if (date)  date.textContent  = 'Nunca verificada — se recomienda confirmar la versión vigente en la fuente oficial'
+    if (byEl)  byEl.textContent  = ''
+    return
+  }
+
+  const now    = new Date()
+  const verAt  = new Date(doc.last_verified_at)
+  const months = (now - verAt) / (1000 * 60 * 60 * 24 * 30.5)
+
+  let badgeHtml, labelText
+  if (doc.is_current === false) {
+    badgeHtml = pill('red', 'fa-circle-xmark', 'Posiblemente desactualizada')
+    labelText = 'Marcada como posiblemente desactualizada — revisar en la fuente oficial'
+  } else if (months <= 12) {
+    badgeHtml = pill('green', 'fa-circle-check', 'Vigente')
+    labelText = 'Verificada y vigente (verificación reciente)'
+  } else if (months <= 24) {
+    badgeHtml = pill('yellow', 'fa-triangle-exclamation', 'Verificación próxima')
+    labelText = 'Próxima a vencer — más de 12 meses desde la última verificación'
+  } else {
+    badgeHtml = pill('red', 'fa-circle-exclamation', 'Verificación vencida')
+    labelText = 'Verificación vencida — más de 24 meses sin confirmar vigencia'
+  }
+
+  if (badge) badge.innerHTML = badgeHtml
+  if (label) label.textContent = labelText
+  if (date)  date.textContent  = `Verificada el ${fmtDate(doc.last_verified_at)}`
+  if (byEl)  byEl.textContent  = doc.verified_by ? `por ${doc.verified_by}` : ''
+}
+
+function pill(color, icon, text) {
+  const styles = {
+    green:  'background:#d1fae5;color:#065f46',
+    yellow: 'background:#fef9c3;color:#854d0e',
+    red:    'background:#fee2e2;color:#991b1b'
+  }
+  return `<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;
+    border-radius:20px;font-size:.75rem;font-weight:600;white-space:nowrap;${styles[color] || ''}">
+    <i class="fa-solid ${icon}"></i>${text}</span>`
+}
+
+async function markVerified() {
+  const doc = _allDocs.find(d => d.id === _currentDocId)
+  if (!doc) return
+
+  const btn = document.getElementById('btn-mark-verified')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…' }
+
+  const now    = new Date().toISOString()
+  const byName = _profile?.full_name || _user?.email || 'Usuario'
+
+  const { error } = await db.from('documents').update({
+    last_verified_at: now,
+    verified_by:      byName,
+    is_current:       true
+  }).eq('id', _currentDocId)
+
+  if (error) {
+    showToast('Error al guardar la verificación: ' + error.message, 'red')
+  } else {
+    doc.last_verified_at = now
+    doc.verified_by      = byName
+    doc.is_current       = true
+    renderVerificationStatus(doc)
+    showToast('Vigencia verificada y registrada correctamente', 'green')
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Marcar verificado' }
 }
 
 // ── Arrancar ──────────────────────────────────────────────────────

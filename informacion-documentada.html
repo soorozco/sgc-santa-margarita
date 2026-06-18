@@ -190,6 +190,7 @@
             <option value="REG">Reglamentos</option>
             <option value="NOM">NOMs</option>
             <option value="GPC">Guías de Práctica Clínica</option>
+            <option value="CSG">Normas y Estándares SGC</option>
             <option value="IT">Instructivos</option>
             <option value="LA">Manuales de equipo</option>
           </select>
@@ -552,7 +553,7 @@
           <input type="text" id="new-custodian" placeholder="Nombre del responsable">
         </div>
         <div class="field">
-          <label>Vigencia (años)</label>
+          <label>Tiempo de retención (años)</label>
           <input type="number" id="new-vigencia" value="2" min="1" max="10">
         </div>
       </div>
@@ -786,7 +787,7 @@
           <span id="d-elab-date">—</span>
         </div>
         <div class="info-item">
-          <label>Vigencia</label>
+          <label>Tiempo de retención</label>
           <span id="d-vigencia">—</span>
         </div>
         <div class="info-item">
@@ -804,6 +805,29 @@
       <!-- URL de verificación (solo documentos externos) -->
       <div id="d-source-url-wrap" style="display:none;flex-direction:column;gap:4px;margin-bottom:16px;
            padding:10px 14px;background:var(--bg2);border-radius:8px;border-left:3px solid var(--blue)">
+      </div>
+
+      <!-- Vigencia y verificación (solo documentos externos DE) -->
+      <div id="d-verification-wrap" style="display:none;margin-bottom:16px">
+        <div class="section-sep">
+          <i class="fa-solid fa-circle-check" style="margin-right:6px"></i>
+          Vigencia y Verificación
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;
+                    padding:10px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span id="d-ver-badge"></span>
+            <div>
+              <div style="font-size:.857rem;font-weight:600;color:var(--txt)" id="d-ver-label">—</div>
+              <div style="font-size:.75rem;color:var(--txt3);margin-top:2px" id="d-ver-date"></div>
+              <div style="font-size:.75rem;color:var(--txt3)" id="d-ver-by"></div>
+            </div>
+          </div>
+          <button id="btn-mark-verified" onclick="markVerified()" class="btn-secondary"
+                  style="display:none;font-size:.786rem;padding:6px 12px;white-space:nowrap;flex-shrink:0">
+            <i class="fa-solid fa-circle-check"></i> Marcar verificado
+          </button>
+        </div>
       </div>
 
       <!-- Historial de versiones -->
@@ -938,7 +962,7 @@
 
       <div class="form-row">
         <div class="field">
-          <label>Vigencia (años)</label>
+          <label>Tiempo de retención (años)</label>
           <input type="number" id="edit-vigencia" min="1" max="10">
         </div>
         <div class="field">
