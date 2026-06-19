@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evaluaciones RRHH — Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .sb-section-rrhh { color:#4ade80;font-size:.65rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;padding:18px 20px 6px;opacity:.9 }
+    .eval-card { background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+      padding:20px 24px;margin-bottom:14px;cursor:pointer;transition:.2s;
+      display:flex;align-items:center;gap:16px }
+    .eval-card:hover { border-color:#009688;box-shadow:0 4px 14px rgba(0,150,136,.1) }
+    .eval-ico { width:52px;height:52px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0 }
+    .eval-card h3 { font-size:.95rem;font-weight:700;color:#111;margin:0 0 4px }
+    .eval-card p  { font-size:.8rem;color:#6b7280;margin:0 }
+    .eval-card .arrow { margin-left:auto;color:#d1d5db;font-size:1rem }
+
+    /* Survey screen */
+    .survey-screen { display:none;position:fixed;inset:0;background:#f9fafb;
+      z-index:100;overflow-y:auto }
+    .survey-screen.open { display:block }
+    .survey-header { background:#fff;border-bottom:1px solid #e5e7eb;
+      padding:16px 20px;display:flex;align-items:center;gap:12px;
+      position:sticky;top:0;z-index:10 }
+    .survey-header h2 { font-size:.95rem;font-weight:700;color:#111;margin:0;flex:1 }
+    .survey-progress { height:4px;background:#e5e7eb;margin:0 }
+    .survey-progress-bar { height:4px;background:#009688;transition:.3s }
+    .survey-body { max-width:720px;margin:0 auto;padding:24px 20px 100px }
+    .q-card { background:#fff;border-radius:12px;border:1px solid #e5e7eb;
+      padding:18px 20px;margin-bottom:14px }
+    .q-text { font-size:.875rem;font-weight:600;color:#111;margin-bottom:14px }
+    .q-num  { color:#009688;font-weight:900;margin-right:6px }
+    .opts-row { display:flex;gap:6px }
+    .opts-row.scale-5 { gap:4px }
+    .opt-btn { flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 4px;
+      background:#f9fafb;cursor:pointer;font-size:.78rem;font-weight:700;
+      text-align:center;transition:.15s;line-height:1.3 }
+    .opt-btn:hover { border-color:#009688;background:#e0f2f1 }
+    .opt-btn.selected { border-color:#009688;background:#009688;color:#fff }
+    .survey-foot { position:fixed;bottom:0;left:0;right:0;background:#fff;
+      border-top:1px solid #e5e7eb;padding:14px 20px;display:flex;gap:10px;justify-content:flex-end }
+
+    /* Competency eval */
+    .comp-score { display:flex;gap:4px;margin-top:10px }
+    .comp-btn { flex:1;padding:8px 4px;border:1.5px solid #e5e7eb;border-radius:8px;
+      cursor:pointer;font-weight:700;text-align:center;background:#f9fafb;transition:.15s }
+    .comp-btn:hover { border-color:#009688 }
+    .comp-btn.s1 { border-color:#ef4444;background:#fef2f2;color:#991b1b }
+    .comp-btn.s2 { border-color:#f97316;background:#fff7ed;color:#9a3412 }
+    .comp-btn.s3 { border-color:#f59e0b;background:#fffbeb;color:#78350f }
+    .comp-btn.s4 { border-color:#22c55e;background:#f0fdf4;color:#166534 }
+    .comp-btn.s5 { border-color:#009688;background:#e0f2f1;color:#065f46 }
+
+    /* Form */
+    .form-row { margin-bottom:14px }
+    .form-row label { display:block;font-size:.72rem;font-weight:700;
+      color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px }
+    .form-row input,.form-row select,.form-row textarea {
+      width:100%;border:1.5px solid #e5e7eb;border-radius:10px;
+      padding:9px 13px;font-size:.875rem;font-family:inherit;outline:none;background:#f9fafb }
+    .form-row input:focus,.form-row select:focus,.form-row textarea:focus { border-color:#009688;background:#fff }
+    .btn-primary  { background:#009688;color:#fff;border:none;border-radius:10px;
+      padding:10px 22px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-secondary{ background:#f3f4f6;color:#374151;border:none;border-radius:10px;
+      padding:10px 22px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-back { background:#f3f4f6;border:none;border-radius:10px;padding:8px 14px;
+      cursor:pointer;display:flex;align-items:center;gap:6px;font-weight:600;font-size:.85rem }
+
+    /* Login */
+    #login-overlay { display:none;position:fixed;inset:0;
+      background:linear-gradient(135deg,#0d3d38 0%,#009688 100%);
+      z-index:500;align-items:center;justify-content:center;padding:20px }
+    #login-overlay.show { display:flex }
+    .login-card { background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px }
+    .login-logo { display:flex;align-items:center;gap:12px;margin-bottom:28px }
+    .login-logo-ico { width:48px;height:48px;background:#009688;border-radius:14px;
+      display:flex;align-items:center;justify-content:center }
+    .login-logo-ico i { color:#fff;font-size:1.3rem }
+    .login-logo h2 { font-size:1.1rem;font-weight:800;color:#111;margin:0 }
+    .login-logo p  { font-size:.75rem;color:#9ca3af;margin:2px 0 0 }
+
+    /* Mobile */
+    .mob-header { display:none }
+    .mob-bottom-nav { display:none }
+    @media (max-width:700px) {
+      .sidebar,.topbar { display:none !important }
+      .main { margin-left:0 !important;padding:0 0 90px !important }
+      .page-content { padding:0 !important }
+      .mob-header {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:14px 16px;background:#0d3d38;position:sticky;top:0;z-index:50 }
+      .mob-header-title { color:#fff;font-weight:800;font-size:1rem }
+      .mob-header-sub   { color:#8bbcb6;font-size:.72rem }
+      .mob-avatar { width:36px;height:36px;background:rgba(255,255,255,.15);
+        border-radius:10px;display:flex;align-items:center;justify-content:center;
+        color:#fff;font-weight:700 }
+      .eval-card { padding:14px 16px;margin:0 16px 10px;border-radius:14px }
+      .mob-bottom-nav {
+        display:flex;position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:1px solid #e5e7eb;z-index:100;
+        padding-bottom:env(safe-area-inset-bottom) }
+      .mob-nav-item { flex:1;display:flex;flex-direction:column;align-items:center;
+        justify-content:center;padding:10px 4px 8px;cursor:pointer;
+        font-size:.65rem;font-weight:700;color:#9ca3af;gap:3px;border:none;
+        background:none;text-transform:uppercase;letter-spacing:.06em }
+      .mob-nav-item.active { color:#009688 }
+      .mob-nav-item i { font-size:1.2rem }
+      .survey-foot { padding-bottom:calc(14px + env(safe-area-inset-bottom)) }
+      .opts-row { flex-wrap:wrap }
+      .opt-btn { min-width:calc(33% - 4px) }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay" class="show">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-ico"><i class="fa-solid fa-people-roof"></i></div>
+      <div><h2>RRHH — HSM</h2><p>Hospital Santa Margarita</p></div>
+    </div>
+    <div id="login-err" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;
+      padding:8px 12px;margin-bottom:12px;font-size:.82rem;font-weight:600"></div>
+    <div class="form-row"><label>No. Trabajador / Usuario</label>
+      <input id="li-user" type="text" placeholder="ej. 10567 o jperez"></div>
+    <div class="form-row"><label>Contraseña</label>
+      <input id="li-pass" type="password" placeholder="••••••••"></div>
+    <button class="btn-primary" style="width:100%;padding:12px;font-size:.95rem;margin-top:4px"
+      onclick="doLogin()" id="btn-login">Ingresar</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+      <div class="sb-section-rrhh">Recursos Humanos</div>
+      <a class="nav-link" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+      <a class="nav-link" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+      <a class="nav-link active" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">—</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mob-header">
+      <div>
+        <div class="mob-header-title">Evaluaciones</div>
+        <div class="mob-header-sub" id="mob-user-name">RRHH — HSM</div>
+      </div>
+      <div class="mob-avatar" id="mob-avatar" onclick="doLogout()">?</div>
+    </div>
+    <div class="topbar" style="display:none" id="desk-topbar">
+      <div>
+        <div class="topbar-page-title">Evaluaciones de Personal</div>
+        <div class="topbar-sub">NOM-035 · Desempeño · Clima Laboral</div>
+      </div>
+      <div class="topbar-right"><div class="topbar-date" id="current-date"></div></div>
+    </div>
+
+    <div class="page-content" id="eval-menu">
+      <div style="max-width:680px;padding-top:8px">
+
+        <div style="padding:16px 0 8px">
+          <p style="font-size:.72rem;font-weight:700;color:#9ca3af;text-transform:uppercase;
+            letter-spacing:.1em;margin:0 0 12px 2px">Evaluaciones disponibles</p>
+        </div>
+
+        <div class="eval-card" onclick="startNom035()">
+          <div class="eval-ico" style="background:#dbeafe;color:#1d4ed8">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3>NOM-035 STPS</h3>
+            <p>Evaluación de factores de riesgo psicosocial · 20 preguntas</p>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow"></i>
+        </div>
+
+        <div class="eval-card" onclick="startClimate()">
+          <div class="eval-ico" style="background:#d1fae5;color:#065f46">
+            <i class="fa-solid fa-wind"></i>
+          </div>
+          <div>
+            <h3>Clima Laboral</h3>
+            <p>Encuesta de satisfacción y ambiente de trabajo · 15 preguntas</p>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow"></i>
+        </div>
+
+        <div class="eval-card" id="card-performance" onclick="startPerformance()" style="display:none">
+          <div class="eval-ico" style="background:#ede9fe;color:#6d28d9">
+            <i class="fa-solid fa-star-half-stroke"></i>
+          </div>
+          <div>
+            <h3>Evaluación de Desempeño</h3>
+            <p>Evaluación por competencias (solo Encargados y Admin RH)</p>
+          </div>
+          <i class="fa-solid fa-chevron-right arrow"></i>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mob-bottom-nav" id="mob-bottom-nav" style="display:none">
+  <button class="mob-nav-item" onclick="location.href='rrhh-solicitudes.html'">
+    <i class="fa-solid fa-file-signature"></i>Solicitudes
+  </button>
+  <button class="mob-nav-item" onclick="location.href='rrhh-personal.html'">
+    <i class="fa-solid fa-users"></i>Personal
+  </button>
+  <button class="mob-nav-item active" onclick="location.href='rrhh-evaluaciones.html'">
+    <i class="fa-solid fa-star-half-stroke"></i>Evaluaciones
+  </button>
+</nav>
+
+<!-- ══════ NOM-035 SURVEY ══════ -->
+<div class="survey-screen" id="screen-nom035">
+  <div class="survey-header">
+    <button class="btn-back" onclick="closeScreen('nom035')"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <h2>NOM-035 STPS</h2>
+    <span id="nom-progress-txt" style="font-size:.8rem;color:#9ca3af;white-space:nowrap">0/20</span>
+  </div>
+  <div class="survey-progress"><div class="survey-progress-bar" id="nom-bar" style="width:0%"></div></div>
+  <div class="survey-body" id="nom-body"></div>
+  <div class="survey-foot">
+    <button class="btn-secondary" onclick="closeScreen('nom035')">Cancelar</button>
+    <button class="btn-primary" onclick="submitNom035()">Enviar evaluación</button>
+  </div>
+</div>
+
+<!-- ══════ CLIMATE SURVEY ══════ -->
+<div class="survey-screen" id="screen-climate">
+  <div class="survey-header">
+    <button class="btn-back" onclick="closeScreen('climate')"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <h2>Encuesta de Clima Laboral</h2>
+    <span id="clim-progress-txt" style="font-size:.8rem;color:#9ca3af;white-space:nowrap">0/15</span>
+  </div>
+  <div class="survey-progress"><div class="survey-progress-bar" id="clim-bar" style="width:0%"></div></div>
+  <div class="survey-body" id="clim-body"></div>
+  <div class="survey-foot">
+    <button class="btn-secondary" onclick="closeScreen('climate')">Cancelar</button>
+    <button class="btn-primary" onclick="submitClimate()">Enviar encuesta</button>
+  </div>
+</div>
+
+<!-- ══════ PERFORMANCE EVAL ══════ -->
+<div class="survey-screen" id="screen-performance">
+  <div class="survey-header">
+    <button class="btn-back" onclick="closeScreen('performance')"><i class="fa-solid fa-arrow-left"></i> Volver</button>
+    <h2>Evaluación de Desempeño</h2>
+    <span id="perf-avg-txt" style="font-size:.9rem;font-weight:900;color:#009688">—</span>
+  </div>
+  <div class="survey-body" id="perf-body"></div>
+  <div class="survey-foot">
+    <button class="btn-secondary" onclick="closeScreen('performance')">Cancelar</button>
+    <button class="btn-primary" onclick="submitPerformance()">Enviar evaluación</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/rrhh-api.js"></script>
+<script>
+let _user = null
+const _nomAnswers  = {}
+const _climAnswers = {}
+const _perfScores  = {}
+
+// ── Auth ──────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('li-user').value.trim()
+  const p = document.getElementById('li-pass').value
+  const btn = document.getElementById('btn-login')
+  const err = document.getElementById('login-err')
+  err.style.display = 'none'
+  btn.textContent = 'Verificando...'; btn.disabled = true
+  try {
+    _user = await rrhhLogin(u, p)
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  } catch(e) {
+    err.textContent = e.message || 'Credenciales incorrectas'
+    err.style.display = 'block'
+  } finally { btn.textContent = 'Ingresar'; btn.disabled = false }
+}
+document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin() })
+function doLogout() { rrhhClearSession(); location.reload() }
+
+function init() {
+  document.getElementById('sb-user-name').textContent = _user.name
+  document.getElementById('sb-user-role').textContent = _user.role
+  document.getElementById('mob-user-name').textContent = _user.name
+  document.getElementById('mob-avatar').textContent    = _user.name.charAt(0).toUpperCase()
+  document.getElementById('mob-bottom-nav').style.display = ''
+  document.getElementById('desk-topbar').style.display  = ''
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+
+  if (_user.role === 'MANAGER' || _user.role === 'ADMIN_RH') {
+    document.getElementById('card-performance').style.display = 'flex'
+  }
+}
+
+// ── Screen helpers ────────────────────────────────────────────────
+function openScreen(id) { document.getElementById('screen-' + id).classList.add('open') }
+function closeScreen(id) { document.getElementById('screen-' + id).classList.remove('open') }
+
+// ── NOM-035 ───────────────────────────────────────────────────────
+const NOM_QUESTIONS = [
+  { cat:'Ambiente de trabajo',           q:'Mi trabajo implica que me exponga a situaciones difíciles de controlar.' },
+  { cat:'Ambiente de trabajo',           q:'Las condiciones en que trabajo son buenas (iluminación, temperatura, ventilación).' },
+  { cat:'Ambiente de trabajo',           q:'Mi trabajo me exige hacer varios asuntos al mismo tiempo.' },
+  { cat:'Ambiente de trabajo',           q:'En mi trabajo tengo que hacer un esfuerzo muy importante para no enfermarme.' },
+  { cat:'Factores de la actividad',      q:'Cuando termino mi jornada me siento agotado(a).' },
+  { cat:'Factores de la actividad',      q:'En mi trabajo tengo que dar más del 100% para que salga bien.' },
+  { cat:'Factores de la actividad',      q:'Mi trabajo cuenta con reglas y procedimientos claros.' },
+  { cat:'Factores de la actividad',      q:'Tengo autonomía para organizar mi propio trabajo.' },
+  { cat:'Organización del tiempo',       q:'Mi jornada me permite tener tiempo para mi familia y vida personal.' },
+  { cat:'Organización del tiempo',       q:'Puedo descansar los días establecidos en mi horario.' },
+  { cat:'Organización del tiempo',       q:'Mis jornadas de trabajo superan las 10 horas.' },
+  { cat:'Organización del tiempo',       q:'Trabajo en días de descanso sin recibir compensación.' },
+  { cat:'Liderazgo y relaciones',        q:'Mi jefe me trata con respeto.' },
+  { cat:'Liderazgo y relaciones',        q:'Mi jefe me da retroalimentación sobre mi desempeño.' },
+  { cat:'Liderazgo y relaciones',        q:'Entre compañeros nos ayudamos cuando alguien tiene dificultades.' },
+  { cat:'Liderazgo y relaciones',        q:'En el trabajo siento que mis compañeros o jefes me ignoran.' },
+  { cat:'Entorno organizacional',        q:'Mi trabajo me permite desarrollar mis habilidades.' },
+  { cat:'Entorno organizacional',        q:'En mi trabajo existen oportunidades de desarrollo profesional.' },
+  { cat:'Entorno organizacional',        q:'Se me reconoce cuando hago bien mi trabajo.' },
+  { cat:'Entorno organizacional',        q:'En mi área se trabaja bajo mucha presión.' },
+]
+const NOM_OPTS = ['Nunca','Casi nunca','Algunas veces','Casi siempre','Siempre']
+
+function startNom035() {
+  const body = document.getElementById('nom-body')
+  body.innerHTML = NOM_QUESTIONS.map((item,i) => `
+    <div class="q-card" id="nom-q${i}">
+      <div style="font-size:.65rem;font-weight:700;color:#9ca3af;text-transform:uppercase;
+        letter-spacing:.08em;margin-bottom:6px">${item.cat}</div>
+      <div class="q-text"><span class="q-num">${i+1}.</span>${item.q}</div>
+      <div class="opts-row">
+        ${NOM_OPTS.map((o,v) => `<button class="opt-btn" data-q="${i}" data-v="${v}"
+          onclick="selNom(${i},${v},this)">${v}<br><span style="font-size:.65rem;font-weight:500">${o}</span></button>`).join('')}
+      </div>
+    </div>`).join('')
+  openScreen('nom035')
+  updateNomProgress()
+}
+
+function selNom(q, v, el) {
+  _nomAnswers[q] = v
+  el.closest('.opts-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'))
+  el.classList.add('selected')
+  updateNomProgress()
+}
+
+function updateNomProgress() {
+  const n = Object.keys(_nomAnswers).length
+  document.getElementById('nom-progress-txt').textContent = `${n}/${NOM_QUESTIONS.length}`
+  document.getElementById('nom-bar').style.width = `${(n/NOM_QUESTIONS.length)*100}%`
+}
+
+async function submitNom035() {
+  const unanswered = NOM_QUESTIONS.findIndex((_,i) => _nomAnswers[i] === undefined)
+  if (unanswered >= 0) {
+    document.getElementById(`nom-q${unanswered}`).scrollIntoView({behavior:'smooth', block:'center'})
+    document.getElementById(`nom-q${unanswered}`).style.border = '2px solid #ef4444'
+    setTimeout(() => document.getElementById(`nom-q${unanswered}`).style.border = '', 2000)
+    alert('Por favor responde todas las preguntas.')
+    return
+  }
+  await rrhhSubmitSurvey(_user.id, 'NOM035', _nomAnswers)
+  closeScreen('nom035')
+  alert('✓ Evaluación NOM-035 enviada correctamente. ¡Gracias!')
+}
+
+// ── Clima Laboral ─────────────────────────────────────────────────
+const CLIM_QUESTIONS = [
+  { cat:'Comunicación',          q:'La información que necesito para hacer mi trabajo llega a tiempo.' },
+  { cat:'Comunicación',          q:'Me siento escuchado(a) por mi jefe directo.' },
+  { cat:'Comunicación',          q:'La comunicación entre áreas funciona bien en el hospital.' },
+  { cat:'Liderazgo',             q:'Mi jefe es justo y consistente en sus decisiones.' },
+  { cat:'Liderazgo',             q:'Mi jefe me apoya cuando tengo un problema en el trabajo.' },
+  { cat:'Liderazgo',             q:'Las decisiones de la dirección benefician al equipo.' },
+  { cat:'Equipo',                q:'Me llevo bien con mis compañeros de trabajo.' },
+  { cat:'Equipo',                q:'Existe un ambiente de respeto en mi área.' },
+  { cat:'Equipo',                q:'Cuando alguien tiene dificultades, el equipo se apoya.' },
+  { cat:'Desarrollo',            q:'Tengo oportunidades de crecimiento en el hospital.' },
+  { cat:'Desarrollo',            q:'Mi trabajo es reconocido cuando lo hago bien.' },
+  { cat:'Desarrollo',            q:'Recibo la capacitación necesaria para mi puesto.' },
+  { cat:'Satisfacción',          q:'Las condiciones físicas de mi área son adecuadas.' },
+  { cat:'Satisfacción',          q:'Me siento orgulloso(a) de trabajar en el Hospital Santa Margarita.' },
+  { cat:'Satisfacción',          q:'Recomendaría este hospital como un buen lugar para trabajar.' },
+]
+const CLIM_OPTS = ['Muy en\ndesacuerdo','En\ndesacuerdo','Neutral','De\nacuerdo','Muy de\nacuerdo']
+
+function startClimate() {
+  const body = document.getElementById('clim-body')
+  body.innerHTML = CLIM_QUESTIONS.map((item,i) => `
+    <div class="q-card" id="clim-q${i}">
+      <div style="font-size:.65rem;font-weight:700;color:#9ca3af;text-transform:uppercase;
+        letter-spacing:.08em;margin-bottom:6px">${item.cat}</div>
+      <div class="q-text"><span class="q-num">${i+1}.</span>${item.q}</div>
+      <div class="opts-row scale-5">
+        ${CLIM_OPTS.map((o,v) => `<button class="opt-btn" data-q="${i}" data-v="${v+1}"
+          onclick="selClim(${i},${v+1},this)">${v+1}<br><span style="font-size:.6rem;font-weight:500;white-space:pre-line">${o}</span></button>`).join('')}
+      </div>
+    </div>`).join('')
+  openScreen('climate')
+  updateClimProgress()
+}
+
+function selClim(q, v, el) {
+  _climAnswers[q] = v
+  el.closest('.opts-row').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'))
+  el.classList.add('selected')
+  updateClimProgress()
+}
+
+function updateClimProgress() {
+  const n = Object.keys(_climAnswers).length
+  document.getElementById('clim-progress-txt').textContent = `${n}/${CLIM_QUESTIONS.length}`
+  document.getElementById('clim-bar').style.width = `${(n/CLIM_QUESTIONS.length)*100}%`
+}
+
+async function submitClimate() {
+  const unanswered = CLIM_QUESTIONS.findIndex((_,i) => _climAnswers[i] === undefined)
+  if (unanswered >= 0) {
+    document.getElementById(`clim-q${unanswered}`).scrollIntoView({behavior:'smooth', block:'center'})
+    alert('Por favor responde todas las preguntas.')
+    return
+  }
+  const comment = '' // could add open text field
+  await rrhhSubmitSurvey(_user.id, 'CLIMATE', { answers: _climAnswers, comment })
+  closeScreen('climate')
+  alert('✓ Encuesta de clima laboral enviada. ¡Gracias!')
+}
+
+// ── Performance ───────────────────────────────────────────────────
+const COMPETENCIES = [
+  { id:'calidad',        label:'Calidad en el trabajo',          desc:'Precisión, limpieza y cumplimiento de estándares.' },
+  { id:'puntualidad',    label:'Puntualidad y asistencia',        desc:'Cumplimiento del horario y registro de asistencia.' },
+  { id:'equipo',         label:'Trabajo en equipo',              desc:'Colaboración y apoyo al resto del área.' },
+  { id:'iniciativa',     label:'Iniciativa y proactividad',       desc:'Propone mejoras y actúa sin esperar instrucciones.' },
+  { id:'conocimiento',   label:'Conocimiento técnico',            desc:'Dominio de las competencias de su puesto.' },
+  { id:'comunicacion',   label:'Comunicación efectiva',           desc:'Se expresa con claridad y escucha activamente.' },
+  { id:'seguridad',      label:'Normas y seguridad',              desc:'Respeta procedimientos, usa EPP, reporta incidentes.' },
+  { id:'servicio',       label:'Orientación al paciente',         desc:'Trato humano, empático y resolutivo.' },
+]
+const SCALE_LABELS = ['','Deficiente','Regular','Bueno','Muy bueno','Excelente']
+
+function startPerformance() {
+  const body = document.getElementById('perf-body')
+  body.innerHTML = `
+    <div style="background:#ede9fe;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:.82rem;color:#6d28d9;font-weight:600">
+      <i class="fa-solid fa-circle-info"></i>
+      Evalúa cada competencia del 1 al 5. Puedes evaluar a cualquier miembro de tu equipo.
+    </div>
+    ${COMPETENCIES.map(c => `
+      <div class="q-card">
+        <div class="q-text">${c.label}
+          <span style="font-size:.75rem;font-weight:400;color:#6b7280;display:block;margin-top:3px">${c.desc}</span>
+        </div>
+        <div class="comp-score">
+          ${[1,2,3,4,5].map(v => `<button class="comp-btn s${v}" onclick="selPerf('${c.id}',${v},this)">
+            ${v}<br><span style="font-size:.6rem;font-weight:600">${SCALE_LABELS[v]}</span>
+          </button>`).join('')}
+        </div>
+      </div>`).join('')}
+    <div class="q-card">
+      <div class="q-text">Comentarios adicionales</div>
+      <textarea id="perf-comments" rows="3" style="width:100%;border:1.5px solid #e5e7eb;border-radius:8px;
+        padding:8px 12px;font-size:.875rem;font-family:inherit;outline:none;resize:none"
+        placeholder="Fortalezas, áreas de mejora, objetivos..."></textarea>
+    </div>`
+  openScreen('performance')
+}
+
+function selPerf(id, v, el) {
+  _perfScores[id] = v
+  el.closest('.comp-score').querySelectorAll('.comp-btn').forEach(b => {
+    const bv = parseInt(b.textContent)
+    if (bv <= v) { b.style.opacity = '1'; b.style.fontWeight = '700' }
+    else         { b.style.opacity = '.3'; b.style.fontWeight = '400' }
+  })
+  el.style.transform = 'scale(1.08)'
+  setTimeout(() => el.style.transform = '', 150)
+  const scores = Object.values(_perfScores)
+  const avg = scores.length ? (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1) : '—'
+  document.getElementById('perf-avg-txt').textContent = `Promedio: ${avg}`
+}
+
+async function submitPerformance() {
+  if (Object.keys(_perfScores).length < COMPETENCIES.length) {
+    alert('Por favor evalúa todas las competencias.'); return
+  }
+  const scores  = Object.values(_perfScores)
+  const avg     = (scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1)
+  const comments = document.getElementById('perf-comments')?.value || ''
+  await rrhhSubmitSurvey(_user.id, 'PERFORMANCE', { scores: _perfScores, avg, comments })
+  closeScreen('performance')
+  alert(`✓ Evaluación de desempeño enviada. Promedio: ${avg}/5`)
+}
+
+// ── Start ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const session = rrhhLoadSession()
+  if (session) {
+    _user = session
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  }
+})
+</script>
+</body>
+</html>

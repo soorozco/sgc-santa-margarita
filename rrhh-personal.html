@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal RRHH — Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .sb-section-rrhh { color:#4ade80;font-size:.65rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;padding:18px 20px 6px;opacity:.9 }
+    .role-badge { display:inline-block;padding:2px 9px;border-radius:99px;font-size:.7rem;font-weight:700 }
+    .role-WORKER   { background:#f3f4f6;color:#374151 }
+    .role-MANAGER  { background:#dbeafe;color:#1e40af }
+    .role-ADMIN_RH { background:#ede9fe;color:#6d28d9 }
+
+    .form-row { margin-bottom:14px }
+    .form-row label { display:block;font-size:.72rem;font-weight:700;
+      color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px }
+    .form-row input,.form-row select {
+      width:100%;border:1.5px solid #e5e7eb;border-radius:10px;
+      padding:9px 13px;font-size:.875rem;font-family:inherit;
+      outline:none;transition:.2s;background:#f9fafb }
+    .form-row input:focus,.form-row select:focus { border-color:#009688;background:#fff }
+    .form-grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:12px }
+    .form-grid-3 { display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px }
+
+    .btn-primary   { background:#009688;color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-secondary { background:#f3f4f6;color:#374151;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-danger    { background:#ef4444;color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-icon { background:none;border:none;cursor:pointer;padding:6px 8px;
+      border-radius:8px;font-size:.85rem }
+    .btn-icon.edit { color:#009688;background:#e0f2f1 }
+    .btn-icon.del  { color:#ef4444;background:#fee2e2 }
+
+    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+      z-index:200;align-items:center;justify-content:center;padding:20px }
+    .modal-overlay.open { display:flex }
+    .modal-box { background:#fff;border-radius:16px;width:100%;max-width:560px;
+      max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2) }
+    .modal-head { padding:20px 24px 16px;border-bottom:1px solid #f0f0f0;
+      display:flex;align-items:center;justify-content:space-between;
+      position:sticky;top:0;background:#fff;border-radius:16px 16px 0 0 }
+    .modal-head h3 { font-size:1rem;font-weight:700;color:#111 }
+    .modal-body { padding:20px 24px }
+    .modal-foot { padding:12px 24px 20px;display:flex;gap:10px;justify-content:flex-end;
+      border-top:1px solid #f0f0f0 }
+
+    .rrhh-table { width:100%;border-collapse:collapse;font-size:.86rem }
+    .rrhh-table th { background:#f9fafb;padding:10px 14px;text-align:left;
+      font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;
+      letter-spacing:.06em;border-bottom:2px solid #f0f0f0 }
+    .rrhh-table td { padding:11px 14px;border-bottom:1px solid #f5f5f5;color:#374151;vertical-align:middle }
+    .rrhh-table tr:hover td { background:#fafafa }
+
+    .search-bar { position:relative;flex:1 }
+    .search-bar input { width:100%;border:1.5px solid #e5e7eb;border-radius:10px;
+      padding:9px 13px 9px 38px;font-size:.875rem;font-family:inherit;outline:none;background:#f9fafb }
+    .search-bar input:focus { border-color:#009688;background:#fff }
+    .search-bar i { position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af }
+
+    /* confirm modal */
+    .confirm-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+      z-index:300;align-items:center;justify-content:center;padding:20px }
+    .confirm-overlay.open { display:flex }
+    .confirm-box { background:#fff;border-radius:14px;padding:24px;max-width:380px;width:100% }
+
+    /* Login */
+    #login-overlay { display:none;position:fixed;inset:0;
+      background:linear-gradient(135deg,#0d3d38 0%,#009688 100%);
+      z-index:500;align-items:center;justify-content:center;padding:20px }
+    #login-overlay.show { display:flex }
+    .login-card { background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px }
+    .login-logo { display:flex;align-items:center;gap:12px;margin-bottom:28px }
+    .login-logo-ico { width:48px;height:48px;background:#009688;border-radius:14px;
+      display:flex;align-items:center;justify-content:center }
+    .login-logo-ico i { color:#fff;font-size:1.3rem }
+    .login-logo h2 { font-size:1.1rem;font-weight:800;color:#111;margin:0 }
+    .login-logo p  { font-size:.75rem;color:#9ca3af;margin:2px 0 0 }
+
+    /* ── Mobile ─────────────────────────────────────── */
+    .mob-header { display:none }
+    .mob-bottom-nav { display:none }
+    .mob-only { display:none }
+    .desk-only { display:block }
+
+    @media (max-width:700px) {
+      .sidebar,.topbar { display:none !important }
+      .main { margin-left:0 !important;padding:0 0 90px !important }
+      .page-content { padding:0 !important }
+      .desk-only { display:none !important }
+      .mob-header {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:14px 16px;background:#0d3d38;position:sticky;top:0;z-index:50 }
+      .mob-header-title { color:#fff;font-weight:800;font-size:1rem }
+      .mob-header-sub   { color:#8bbcb6;font-size:.72rem }
+      .mob-avatar { width:36px;height:36px;background:rgba(255,255,255,.15);
+        border-radius:10px;display:flex;align-items:center;justify-content:center;
+        color:#fff;font-weight:700;font-size:.95rem;cursor:pointer }
+      .mob-only { display:block }
+      .mob-section { padding:14px 16px }
+      .mob-section-title { font-size:.65rem;font-weight:800;color:#9ca3af;
+        text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px }
+      .mob-card { background:#fff;border-radius:16px;padding:16px;
+        margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #f0f0f0 }
+      .mob-card-head { display:flex;align-items:flex-start;justify-content:space-between;gap:8px }
+      .mob-card-name { font-weight:700;font-size:.9rem;color:#111 }
+      .mob-card-sub  { font-size:.75rem;color:#9ca3af;margin-top:2px }
+      .mob-card-actions { display:flex;gap:8px;margin-top:10px }
+      .mob-bottom-nav {
+        display:flex;position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:1px solid #e5e7eb;z-index:100;
+        padding-bottom:env(safe-area-inset-bottom) }
+      .mob-nav-item { flex:1;display:flex;flex-direction:column;align-items:center;
+        justify-content:center;padding:10px 4px 8px;cursor:pointer;
+        font-size:.65rem;font-weight:700;color:#9ca3af;gap:3px;border:none;
+        background:none;text-transform:uppercase;letter-spacing:.06em }
+      .mob-nav-item.active { color:#009688 }
+      .mob-nav-item i { font-size:1.2rem }
+      .modal-overlay { align-items:flex-end;padding:0 }
+      .modal-box { border-radius:20px 20px 0 0;max-height:92vh }
+      .form-grid-2,.form-grid-3 { grid-template-columns:1fr }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-overlay" class="show">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-ico"><i class="fa-solid fa-people-roof"></i></div>
+      <div><h2>RRHH — HSM</h2><p>Hospital Santa Margarita</p></div>
+    </div>
+    <div id="login-err" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;
+      padding:8px 12px;margin-bottom:12px;font-size:.82rem;font-weight:600"></div>
+    <div class="form-row">
+      <label>No. Trabajador / Usuario</label>
+      <input id="li-user" type="text" placeholder="ej. 10567 o jperez">
+    </div>
+    <div class="form-row">
+      <label>Contraseña</label>
+      <input id="li-pass" type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" style="width:100%;padding:12px;font-size:.95rem;margin-top:4px"
+      onclick="doLogin()" id="btn-login">Ingresar</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+      <div class="sb-section-rrhh">Recursos Humanos</div>
+      <a class="nav-link" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+      <a class="nav-link active" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+      <a class="nav-link" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">—</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="mob-header">
+      <div>
+        <div class="mob-header-title">Personal</div>
+        <div class="mob-header-sub" id="mob-user-name">RRHH — HSM</div>
+      </div>
+      <div class="mob-avatar" id="mob-avatar" onclick="doLogout()">?</div>
+    </div>
+
+    <div class="topbar desk-only">
+      <div>
+        <div class="topbar-page-title">Gestión de Personal</div>
+        <div class="topbar-sub">Directorio de empleados y configuración de turnos</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ACCESS DENIED -->
+      <div id="access-denied" style="display:none;text-align:center;padding:60px 20px">
+        <i class="fa-solid fa-lock" style="font-size:3rem;color:#d1d5db;margin-bottom:16px"></i>
+        <p style="font-weight:700;color:#374151">Acceso restringido</p>
+        <p style="color:#9ca3af;font-size:.875rem">Esta sección es solo para Encargados y Administración de RH.</p>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <div id="main-content" style="display:none">
+
+        <!-- Toolbar -->
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+          <div class="search-bar desk-only">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" id="search-input" placeholder="Buscar por nombre, usuario o área..." oninput="renderStaff()">
+          </div>
+          <select id="filter-area" onchange="renderStaff()"
+            style="border:1.5px solid #e5e7eb;border-radius:10px;padding:9px 13px;
+                   font-size:.875rem;background:#f9fafb;outline:none">
+            <option value="">Todas las áreas</option>
+          </select>
+          <button class="btn-primary" id="btn-add" onclick="openAdd()" style="margin-left:auto;white-space:nowrap">
+            <i class="fa-solid fa-plus"></i> Agregar empleado
+          </button>
+        </div>
+
+        <!-- Mobile search -->
+        <div class="mob-only" style="padding:12px 16px 0">
+          <div class="search-bar" style="flex:1">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" id="mob-search-input" placeholder="Buscar..." oninput="renderStaff()">
+          </div>
+        </div>
+
+        <!-- Mobile cards -->
+        <div class="mob-only mob-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div class="mob-section-title" style="margin-bottom:0" id="staff-count">0 empleados</div>
+            <button class="btn-primary btn-sm" onclick="openAdd()" style="font-size:.78rem;padding:6px 14px;border-radius:8px">
+              <i class="fa-solid fa-plus"></i> Agregar
+            </button>
+          </div>
+          <div id="mob-staff-list"></div>
+        </div>
+
+        <!-- Desktop table -->
+        <div class="desk-only" style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden">
+          <div style="padding:14px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between">
+            <h3 style="font-size:.95rem;font-weight:700;color:#111" id="desk-staff-count">0 empleados</h3>
+          </div>
+          <table class="rrhh-table">
+            <thead><tr>
+              <th>Nombre</th><th>Usuario</th><th>Área</th><th>Puesto</th>
+              <th>Turno</th><th>Rol</th><th>Vac</th><th>Acciones</th>
+            </tr></thead>
+            <tbody id="desk-staff-tbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mob-bottom-nav" id="mob-bottom-nav" style="display:none">
+  <button class="mob-nav-item" onclick="location.href='rrhh-solicitudes.html'">
+    <i class="fa-solid fa-file-signature"></i>Solicitudes
+  </button>
+  <button class="mob-nav-item active" onclick="location.href='rrhh-personal.html'">
+    <i class="fa-solid fa-users"></i>Personal
+  </button>
+  <button class="mob-nav-item" onclick="location.href='rrhh-evaluaciones.html'">
+    <i class="fa-solid fa-star-half-stroke"></i>Evaluaciones
+  </button>
+</nav>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="modal-employee">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-emp-title">Nuevo Empleado</h3>
+      <button onclick="closeEmployee()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#9ca3af">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-emp-id">
+      <div class="form-row"><label>Nombre completo *</label><input id="f-name" placeholder="Dr. Juan Pérez López"></div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>No. Trabajador / Usuario *</label><input id="f-username" placeholder="10567 o jperez"></div>
+        <div class="form-row"><label>Contraseña <span id="pass-hint" style="color:#9ca3af;font-weight:400">(dejar vacío = sin cambio)</span></label>
+          <input id="f-password" type="password" placeholder="Nueva contraseña"></div>
+      </div>
+      <div class="form-row"><label>Correo electrónico</label><input id="f-email" type="email" placeholder="correo@hsm.mx"></div>
+      <div class="form-grid-2">
+        <div class="form-row"><label>Fecha de contratación</label><input id="f-hire" type="date"></div>
+        <div class="form-row"><label>Fecha de nacimiento</label><input id="f-birth" type="date"></div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-row">
+          <label>Área *</label>
+          <select id="f-area" onchange="updatePositions()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Puesto *</label>
+          <select id="f-position"><option value="">— Seleccionar área primero —</option></select>
+        </div>
+      </div>
+      <div class="form-grid-3">
+        <div class="form-row">
+          <label>Rol</label>
+          <select id="f-role">
+            <option value="WORKER">Empleado</option>
+            <option value="MANAGER">Encargado</option>
+            <option value="ADMIN_RH">Admin RH</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Turno</label>
+          <select id="f-shift"></select>
+        </div>
+        <div class="form-row"><label>Días vacaciones</label><input id="f-vac" type="number" value="12" min="0"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeEmployee()">Cancelar</button>
+      <button class="btn-primary" onclick="saveEmployee()" id="btn-save-emp">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="modal-confirm">
+  <div class="confirm-box">
+    <h3 style="font-weight:700;color:#111;margin-bottom:8px">¿Eliminar empleado?</h3>
+    <p style="color:#6b7280;font-size:.875rem;margin-bottom:20px" id="confirm-msg">Esta acción no se puede deshacer.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn-secondary" onclick="document.getElementById('modal-confirm').classList.remove('open')">Cancelar</button>
+      <button class="btn-danger" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/rrhh-api.js"></script>
+<script>
+let _user = null
+let _staff = []
+let _deleteTarget = null
+let _editMode = false
+
+const AREAS_POSITIONS = {
+  'Urgencias':            ['Médico Urgenciólogo','Enfermera Urgencias','Camillero'],
+  'Hospitalización':      ['Médico Internista','Enfermera General','Auxiliar Enfermería'],
+  'Quirófano':            ['Médico Cirujano','Enfermera Quirúrgica','Anestesiólogo'],
+  'Ginecología y Obst.':  ['Ginecólogo','Enfermera Ginecología','Partera'],
+  'Pediatría':            ['Pediatra','Enfermera Pediatría'],
+  'UCI / UCIN':           ['Intensivista','Enfermera UCI','Auxiliar UCI'],
+  'Radiología':           ['Radiólogo','Técnico Radiólogo'],
+  'Laboratorio':          ['Químico Clínico','Auxiliar Laboratorio'],
+  'Farmacia':             ['Químico Farmacéutico','Auxiliar Farmacia'],
+  'Nutrición':            ['Nutriólogo','Auxiliar Nutrición'],
+  'Trabajo Social':       ['Trabajadora Social'],
+  'Psicología':           ['Psicólogo Clínico'],
+  'Administración':       ['Director Administrativo','Contador','Auxiliar Administrativo','Recepcionista'],
+  'Recursos Humanos':     ['Jefe RH','Auxiliar RH'],
+  'Mantenimiento':        ['Jefe Mantenimiento','Técnico Mantenimiento'],
+  'Limpieza':             ['Supervisor Limpieza','Personal Limpieza'],
+  'Cocina':               ['Chef','Cocinero','Auxiliar Cocina'],
+  'Seguridad':            ['Jefe Seguridad','Guardia'],
+  'Calidad':              ['Responsable Calidad','Auditor Interno'],
+  'Dirección Médica':     ['Director Médico','Subdirector Médico'],
+}
+
+// ── Auth ──────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('li-user').value.trim()
+  const p = document.getElementById('li-pass').value
+  const btn = document.getElementById('btn-login')
+  const err = document.getElementById('login-err')
+  err.style.display = 'none'
+  btn.textContent = 'Verificando...'; btn.disabled = true
+  try {
+    _user = await rrhhLogin(u, p)
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  } catch(e) {
+    err.textContent = e.message || 'Credenciales incorrectas'
+    err.style.display = 'block'
+  } finally { btn.textContent = 'Ingresar'; btn.disabled = false }
+}
+document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin() })
+function doLogout() { rrhhClearSession(); location.reload() }
+
+// ── Init ──────────────────────────────────────────────────────────
+async function init() {
+  document.getElementById('sb-user-name').textContent = _user.name
+  document.getElementById('sb-user-role').textContent = _user.role
+  document.getElementById('mob-user-name').textContent = _user.name
+  document.getElementById('mob-avatar').textContent    = _user.name.charAt(0).toUpperCase()
+  document.getElementById('mob-bottom-nav').style.display = ''
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+
+  // Populate shifts
+  const shiftSel = document.getElementById('f-shift')
+  RRHH_SHIFTS.forEach(s => {
+    const o = document.createElement('option')
+    o.value = s.id; o.textContent = `${s.name} (${s.startTime}–${s.endTime})`
+    shiftSel.appendChild(o)
+  })
+
+  // Populate areas
+  const areaSel = document.getElementById('f-area')
+  const filterSel = document.getElementById('filter-area')
+  Object.keys(AREAS_POSITIONS).forEach(a => {
+    areaSel.innerHTML  += `<option value="${a}">${a}</option>`
+    filterSel.innerHTML += `<option value="${a}">${a}</option>`
+  })
+
+  if (_user.role === 'WORKER') {
+    document.getElementById('access-denied').style.display = 'block'
+  } else {
+    document.getElementById('main-content').style.display = 'block'
+    await loadStaff()
+  }
+}
+
+async function loadStaff() {
+  _staff = await rrhhGetStaff(_user.id)
+  renderStaff()
+}
+
+// ── Render ────────────────────────────────────────────────────────
+function renderStaff() {
+  const q   = (document.getElementById('search-input')?.value || document.getElementById('mob-search-input')?.value || '').toLowerCase()
+  const area = document.getElementById('filter-area').value
+
+  const list = _staff.filter(s => {
+    const mQ = !q || s.name.toLowerCase().includes(q) || (s.username||'').toLowerCase().includes(q) || (s.area||'').toLowerCase().includes(q)
+    const mA = !area || s.area === area
+    return mQ && mA
+  })
+
+  const countTxt = `${list.length} empleado${list.length !== 1 ? 's' : ''}`
+  document.getElementById('staff-count').textContent = countTxt
+  document.getElementById('desk-staff-count').textContent = countTxt
+
+  // Mobile
+  const mobEl = document.getElementById('mob-staff-list')
+  if (!list.length) {
+    mobEl.innerHTML = '<div style="text-align:center;padding:30px 0;color:#9ca3af">Sin resultados</div>'
+  } else {
+    mobEl.innerHTML = list.map(s => {
+      const shift = RRHH_SHIFTS.find(sh => sh.id === s.shiftId)
+      return `<div class="mob-card">
+        <div class="mob-card-head">
+          <div style="flex:1;min-width:0">
+            <div class="mob-card-name">${s.name}</div>
+            <div class="mob-card-sub">${s.position} · ${s.area}</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              <span class="role-badge role-${s.role}">${s.role}</span>
+              <span style="background:#f3f4f6;border-radius:99px;padding:2px 9px;font-size:.7rem;color:#6b7280">
+                ${shift ? shift.name : s.shiftId}
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn-icon edit" onclick="openEdit('${s.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn-icon del"  onclick="askDelete('${s.id}','${s.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>
+      </div>`
+    }).join('')
+  }
+
+  // Desktop
+  const tbody = document.getElementById('desk-staff-tbody')
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px">Sin resultados</td></tr>'
+  } else {
+    tbody.innerHTML = list.map(s => {
+      const shift = RRHH_SHIFTS.find(sh => sh.id === s.shiftId)
+      return `<tr>
+        <td><strong>${s.name}</strong></td>
+        <td style="color:#6b7280;font-family:monospace">${s.username||'—'}</td>
+        <td>${s.area}</td>
+        <td>${s.position}</td>
+        <td style="white-space:nowrap">${shift ? shift.name : s.shiftId}</td>
+        <td><span class="role-badge role-${s.role}">${s.role}</span></td>
+        <td>${s.vacationDays||12}d</td>
+        <td style="white-space:nowrap">
+          <button class="btn-icon edit" onclick="openEdit('${s.id}')"><i class="fa-solid fa-pen"></i> Editar</button>
+          <button class="btn-icon del"  onclick="askDelete('${s.id}','${s.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>`
+    }).join('')
+  }
+}
+
+// ── Add / Edit ────────────────────────────────────────────────────
+function updatePositions() {
+  const area = document.getElementById('f-area').value
+  const pos  = AREAS_POSITIONS[area] || []
+  const sel  = document.getElementById('f-position')
+  sel.innerHTML = pos.length
+    ? pos.map(p => `<option value="${p}">${p}</option>`).join('')
+    : '<option value="">— Seleccionar área primero —</option>'
+}
+
+function openAdd() {
+  _editMode = false
+  document.getElementById('modal-emp-title').textContent = 'Nuevo Empleado'
+  document.getElementById('pass-hint').textContent = ''
+  document.getElementById('f-emp-id').value  = ''
+  document.getElementById('f-name').value    = ''
+  document.getElementById('f-username').value= ''
+  document.getElementById('f-password').value= ''
+  document.getElementById('f-email').value   = ''
+  document.getElementById('f-hire').value    = ''
+  document.getElementById('f-birth').value   = ''
+  document.getElementById('f-area').value    = ''
+  document.getElementById('f-role').value    = 'WORKER'
+  document.getElementById('f-shift').value   = 't-matutino'
+  document.getElementById('f-vac').value     = '12'
+  updatePositions()
+  document.getElementById('modal-employee').classList.add('open')
+}
+
+function openEdit(id) {
+  const s = _staff.find(x => x.id === id)
+  if (!s) return
+  _editMode = true
+  document.getElementById('modal-emp-title').textContent = 'Editar Empleado'
+  document.getElementById('pass-hint').textContent = '(dejar vacío = sin cambio)'
+  document.getElementById('f-emp-id').value   = s.id
+  document.getElementById('f-name').value     = s.name
+  document.getElementById('f-username').value = s.username || ''
+  document.getElementById('f-password').value = ''
+  document.getElementById('f-email').value    = s.email || ''
+  document.getElementById('f-hire').value     = s.hireDate || ''
+  document.getElementById('f-birth').value    = ''
+  document.getElementById('f-area').value     = s.area || ''
+  document.getElementById('f-role').value     = s.role || 'WORKER'
+  document.getElementById('f-shift').value    = s.shiftId || 't-matutino'
+  document.getElementById('f-vac').value      = s.vacationDays || 12
+  updatePositions()
+  document.getElementById('f-position').value = s.position || ''
+  document.getElementById('modal-employee').classList.add('open')
+}
+
+function closeEmployee() { document.getElementById('modal-employee').classList.remove('open') }
+
+async function saveEmployee() {
+  const name     = document.getElementById('f-name').value.trim()
+  const username = document.getElementById('f-username').value.trim()
+  const password = document.getElementById('f-password').value
+  const area     = document.getElementById('f-area').value
+  const position = document.getElementById('f-position').value
+  if (!name || !username || !area || !position) {
+    alert('Por favor completa nombre, usuario, área y puesto.'); return
+  }
+  if (!_editMode && !password) { alert('La contraseña es obligatoria para nuevos empleados.'); return }
+
+  const btn = document.getElementById('btn-save-emp')
+  btn.textContent = 'Guardando...'; btn.disabled = true
+  try {
+    if (_editMode) {
+      const id = document.getElementById('f-emp-id').value
+      const updates = {
+        name, area, position,
+        email:        document.getElementById('f-email').value || null,
+        role:         document.getElementById('f-role').value,
+        shiftId:      document.getElementById('f-shift').value,
+        vacationDays: parseInt(document.getElementById('f-vac').value) || 12,
+      }
+      await rrhhUpdateStaff(_user.id, id, updates)
+      if (password) await rrhhUpdatePassword(_user.id, id, password)
+    } else {
+      await rrhhCreateUser(_user.id, {
+        name, username, password,
+        email:        document.getElementById('f-email').value || '',
+        hireDate:     document.getElementById('f-hire').value  || '',
+        birthDate:    document.getElementById('f-birth').value || '',
+        area, position,
+        role:         document.getElementById('f-role').value,
+        shiftId:      document.getElementById('f-shift').value,
+        vacationDays: parseInt(document.getElementById('f-vac').value) || 12,
+        sindicalDays: 1,
+      })
+    }
+    closeEmployee()
+    await loadStaff()
+  } finally { btn.textContent = 'Guardar'; btn.disabled = false }
+}
+
+// ── Delete ────────────────────────────────────────────────────────
+function askDelete(id, name) {
+  _deleteTarget = id
+  document.getElementById('confirm-msg').textContent = `¿Eliminar a ${name}? Esta acción no se puede deshacer.`
+  document.getElementById('modal-confirm').classList.add('open')
+}
+async function confirmDelete() {
+  if (!_deleteTarget) return
+  await rrhhDeleteStaff(_user.id, _deleteTarget)
+  _deleteTarget = null
+  document.getElementById('modal-confirm').classList.remove('open')
+  await loadStaff()
+}
+
+// ── Start ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const session = rrhhLoadSession()
+  if (session) {
+    _user = session
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  }
+})
+</script>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitudes RRHH — Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ── Status pills ───────────────────────────────── */
+    .status-pill { display:inline-block;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700 }
+    .status-pending   { background:#fef3c7;color:#92400e }
+    .status-approved1 { background:#dbeafe;color:#1e40af }
+    .status-approved  { background:#d1fae5;color:#065f46 }
+    .status-rejected  { background:#fee2e2;color:#991b1b }
+
+    /* ── Sidebar RRHH section ───────────────────────── */
+    .sb-section-rrhh { color:#4ade80;font-size:.65rem;font-weight:700;
+      letter-spacing:.1em;text-transform:uppercase;padding:18px 20px 6px;opacity:.9 }
+
+    /* ── Desktop: modal overlay ─────────────────────── */
+    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);
+      z-index:200;align-items:center;justify-content:center;padding:20px }
+    .modal-overlay.open { display:flex }
+    .modal-box { background:#fff;border-radius:16px;width:100%;max-width:520px;
+      max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2) }
+    .modal-head { padding:20px 24px 16px;border-bottom:1px solid #f0f0f0;
+      display:flex;align-items:center;justify-content:space-between }
+    .modal-head h3 { font-size:1rem;font-weight:700;color:#111 }
+    .modal-body { padding:20px 24px }
+    .modal-foot { padding:12px 24px 20px;display:flex;gap:10px;justify-content:flex-end }
+
+    /* ── Form controls ──────────────────────────────── */
+    .form-row { margin-bottom:14px }
+    .form-row label { display:block;font-size:.72rem;font-weight:700;
+      color:#6b7280;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px }
+    .form-row input,.form-row select,.form-row textarea {
+      width:100%;border:1.5px solid #e5e7eb;border-radius:10px;
+      padding:9px 13px;font-size:.875rem;font-family:inherit;
+      outline:none;transition:.2s;background:#f9fafb }
+    .form-row input:focus,.form-row select:focus,.form-row textarea:focus {
+      border-color:#009688;background:#fff }
+    .form-grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:12px }
+
+    /* ── Buttons ────────────────────────────────────── */
+    .btn-primary   { background:#009688;color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-secondary { background:#f3f4f6;color:#374151;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-danger    { background:#ef4444;color:#fff;border:none;border-radius:10px;
+      padding:9px 20px;font-size:.875rem;font-weight:600;cursor:pointer }
+    .btn-sm { padding:5px 12px;font-size:.78rem;border-radius:7px }
+    .btn-approve { background:#d1fae5;color:#065f46;border:none;border-radius:7px;
+      padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer }
+    .btn-reject  { background:#fee2e2;color:#991b1b;border:none;border-radius:7px;
+      padding:5px 12px;font-size:.78rem;font-weight:600;cursor:pointer }
+
+    /* ── Stats row ──────────────────────────────────── */
+    .stats-row { display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap }
+    .stat-mini { flex:1;min-width:120px;background:#fff;border:1px solid #e5e7eb;
+      border-radius:12px;padding:14px 16px }
+    .stat-mini .val { font-size:1.5rem;font-weight:900;color:#111;line-height:1 }
+    .stat-mini .lbl { font-size:.7rem;font-weight:700;color:#9ca3af;
+      text-transform:uppercase;letter-spacing:.06em;margin-top:4px }
+
+    /* ── Table ──────────────────────────────────────── */
+    .rrhh-table { width:100%;border-collapse:collapse;font-size:.86rem }
+    .rrhh-table th { background:#f9fafb;padding:10px 14px;text-align:left;
+      font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;
+      letter-spacing:.06em;border-bottom:2px solid #f0f0f0 }
+    .rrhh-table td { padding:11px 14px;border-bottom:1px solid #f5f5f5;color:#374151 }
+    .rrhh-table tr:hover td { background:#fafafa }
+
+    /* ── Login overlay ──────────────────────────────── */
+    #login-overlay { display:none;position:fixed;inset:0;
+      background:linear-gradient(135deg,#0d3d38 0%,#009688 100%);
+      z-index:500;align-items:center;justify-content:center;padding:20px }
+    #login-overlay.show { display:flex }
+    .login-card { background:#fff;border-radius:20px;padding:36px 32px;
+      width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.3) }
+    .login-logo { display:flex;align-items:center;gap:12px;margin-bottom:28px }
+    .login-logo-ico { width:48px;height:48px;background:#009688;border-radius:14px;
+      display:flex;align-items:center;justify-content:center }
+    .login-logo-ico i { color:#fff;font-size:1.3rem }
+    .login-logo h2 { font-size:1.1rem;font-weight:800;color:#111;margin:0 }
+    .login-logo p  { font-size:.75rem;color:#9ca3af;margin:2px 0 0 }
+
+    /* ══════════════════════════════════════════════════
+       MOBILE  (≤ 700px)
+    ══════════════════════════════════════════════════ */
+    .mob-header { display:none }
+    .mob-bottom-nav { display:none }
+    .mob-only { display:none }
+    .desk-only { display:block }
+
+    @media (max-width:700px) {
+      /* hide desktop chrome */
+      .sidebar,.topbar { display:none !important }
+      .main { margin-left:0 !important;padding:0 0 90px !important }
+      .page-content { padding:0 !important }
+      .desk-only { display:none !important }
+
+      /* mobile header */
+      .mob-header {
+        display:flex;align-items:center;justify-content:space-between;
+        padding:14px 16px;background:#0d3d38;position:sticky;top:0;z-index:50 }
+      .mob-header-title { color:#fff;font-weight:800;font-size:1rem }
+      .mob-header-sub   { color:#8bbcb6;font-size:.72rem }
+      .mob-avatar { width:36px;height:36px;background:rgba(255,255,255,.15);
+        border-radius:10px;display:flex;align-items:center;justify-content:center;
+        color:#fff;font-weight:700;font-size:.95rem;cursor:pointer }
+
+      /* mobile cards */
+      .mob-only { display:block }
+      .mob-section { padding:16px }
+      .mob-section-title { font-size:.65rem;font-weight:800;color:#9ca3af;
+        text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px }
+      .mob-card { background:#fff;border-radius:16px;padding:16px;
+        margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+        border:1px solid #f0f0f0 }
+      .mob-card-head { display:flex;align-items:center;justify-content:space-between;margin-bottom:8px }
+      .mob-card-name { font-weight:700;font-size:.9rem;color:#111 }
+      .mob-card-sub  { font-size:.75rem;color:#9ca3af;margin-top:2px }
+      .mob-card-actions { display:flex;gap:8px;margin-top:10px }
+
+      /* quick action buttons */
+      .mob-actions-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px }
+      .mob-action-btn { border:none;border-radius:14px;padding:16px 12px;
+        font-weight:700;font-size:.82rem;cursor:pointer;text-align:left;
+        display:flex;flex-direction:column;gap:6px }
+      .mob-action-btn i { font-size:1.2rem }
+
+      /* stats */
+      .mob-stats { display:grid;grid-template-columns:1fr 1fr;gap:10px;
+        padding:16px 16px 8px }
+      .mob-stat { background:#fff;border-radius:14px;padding:14px;
+        border:1px solid #f0f0f0 }
+      .mob-stat .v { font-size:1.6rem;font-weight:900;color:#111;line-height:1 }
+      .mob-stat .l { font-size:.65rem;font-weight:700;color:#9ca3af;
+        text-transform:uppercase;margin-top:4px }
+
+      /* bottom nav */
+      .mob-bottom-nav {
+        display:flex;position:fixed;bottom:0;left:0;right:0;
+        background:#fff;border-top:1px solid #e5e7eb;z-index:100;
+        padding-bottom:env(safe-area-inset-bottom) }
+      .mob-nav-item { flex:1;display:flex;flex-direction:column;align-items:center;
+        justify-content:center;padding:10px 4px 8px;cursor:pointer;
+        font-size:.65rem;font-weight:700;color:#9ca3af;gap:3px;border:none;
+        background:none;text-transform:uppercase;letter-spacing:.06em }
+      .mob-nav-item.active { color:#009688 }
+      .mob-nav-item i { font-size:1.2rem }
+
+      /* mobile modal */
+      .modal-overlay { align-items:flex-end;padding:0 }
+      .modal-box { border-radius:20px 20px 0 0;max-height:92vh }
+
+      /* hide desktop table, show mob cards */
+      .rrhh-table-wrap { display:none }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════ LOGIN OVERLAY ══════ -->
+<div id="login-overlay" class="show">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-ico"><i class="fa-solid fa-people-roof"></i></div>
+      <div>
+        <h2>RRHH — HSM</h2>
+        <p>Hospital Santa Margarita</p>
+      </div>
+    </div>
+    <div id="login-err" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;
+      padding:8px 12px;margin-bottom:12px;font-size:.82rem;font-weight:600"></div>
+    <div class="form-row">
+      <label>No. Trabajador / Usuario</label>
+      <input id="li-user" type="text" placeholder="ej. 10567 o jperez" autocomplete="username">
+    </div>
+    <div class="form-row">
+      <label>Contraseña</label>
+      <div style="position:relative">
+        <input id="li-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+        <button type="button" onclick="togglePass()" id="btn-eye"
+          style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
+                 background:none;border:none;color:#9ca3af;cursor:pointer">
+          <i class="fa-solid fa-eye" id="eye-ico"></i>
+        </button>
+      </div>
+    </div>
+    <button class="btn-primary" style="width:100%;padding:12px;font-size:.95rem;margin-top:4px"
+      onclick="doLogin()" id="btn-login">Ingresar</button>
+  </div>
+</div>
+
+<!-- ══════ LAYOUT ══════ -->
+<div class="layout">
+
+  <!-- SIDEBAR (desktop) -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
+      <div class="sb-section">ISO 9001:2015</div>
+      <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+      <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+      <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+      <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+      <div class="sb-section-rrhh">Recursos Humanos</div>
+      <a class="nav-link active" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+      <a class="nav-link" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+      <a class="nav-link" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">—</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Mobile header -->
+    <div class="mob-header">
+      <div>
+        <div class="mob-header-title">Solicitudes</div>
+        <div class="mob-header-sub" id="mob-user-name">RRHH — HSM</div>
+      </div>
+      <div class="mob-avatar" id="mob-avatar" onclick="doLogout()">?</div>
+    </div>
+
+    <!-- Desktop topbar -->
+    <div class="topbar desk-only">
+      <div>
+        <div class="topbar-page-title">Solicitudes de Personal</div>
+        <div class="topbar-sub">Vacaciones · Pases · Permisos Sindicales</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+      </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ── WORKER VIEW ────────────────────────────── -->
+      <div id="worker-view" style="display:none">
+
+        <!-- Mobile stats -->
+        <div class="mob-stats mob-only">
+          <div class="mob-stat">
+            <div class="v" id="m-vac-used">0</div>
+            <div class="l">Días vacaciones usados</div>
+          </div>
+          <div class="mob-stat">
+            <div class="v" id="m-pass-used">0</div>
+            <div class="l">Min pases este mes</div>
+          </div>
+          <div class="mob-stat">
+            <div class="v" id="m-req-total">0</div>
+            <div class="l">Mis solicitudes</div>
+          </div>
+          <div class="mob-stat">
+            <div class="v" id="m-vac-avail" style="color:#009688">0</div>
+            <div class="l">Días disponibles</div>
+          </div>
+        </div>
+
+        <!-- Desktop stats -->
+        <div class="stats-row desk-only">
+          <div class="stat-mini"><div class="val" id="d-vac-used">0</div><div class="lbl">Días vacaciones usados</div></div>
+          <div class="stat-mini"><div class="val" id="d-vac-avail" style="color:#009688">0</div><div class="lbl">Días disponibles</div></div>
+          <div class="stat-mini"><div class="val" id="d-pass-used">0</div><div class="lbl">Min pases este mes</div></div>
+          <div class="stat-mini"><div class="val" id="d-pass-avail" style="color:#009688">0</div><div class="lbl">Min disponibles</div></div>
+        </div>
+
+        <!-- Mobile quick actions -->
+        <div class="mob-only">
+          <div style="padding:8px 16px 6px">
+            <div class="mob-section-title">Nueva solicitud</div>
+          </div>
+          <div class="mob-actions-grid">
+            <button class="mob-action-btn" style="background:#dbeafe;color:#1e40af"
+              onclick="openForm('VACATION')">
+              <i class="fa-solid fa-umbrella-beach"></i>Vacaciones
+            </button>
+            <button class="mob-action-btn" style="background:#fef3c7;color:#92400e"
+              onclick="openForm('PASS_EXIT')">
+              <i class="fa-solid fa-door-open"></i>Pase de Salida
+            </button>
+            <button class="mob-action-btn" style="background:#fed7aa;color:#9a3412"
+              onclick="openForm('PASS_ENTRY')">
+              <i class="fa-solid fa-door-closed"></i>Pase de Entrada
+            </button>
+            <button class="mob-action-btn" style="background:#d1fae5;color:#065f46"
+              onclick="openForm('SINDICAL')">
+              <i class="fa-solid fa-briefcase"></i>Día Sindical
+            </button>
+          </div>
+        </div>
+
+        <!-- Desktop: new request button -->
+        <div class="desk-only" style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-primary" onclick="openForm('VACATION')"><i class="fa-solid fa-plus"></i> Vacaciones</button>
+          <button class="btn-primary" style="background:#f59e0b" onclick="openForm('PASS_EXIT')"><i class="fa-solid fa-plus"></i> Pase de Salida</button>
+          <button class="btn-primary" style="background:#f97316" onclick="openForm('PASS_ENTRY')"><i class="fa-solid fa-plus"></i> Pase de Entrada</button>
+          <button class="btn-primary" style="background:#10b981" onclick="openForm('SINDICAL')"><i class="fa-solid fa-plus"></i> Día Sindical</button>
+        </div>
+
+        <!-- Mobile: recent requests -->
+        <div class="mob-only mob-section">
+          <div class="mob-section-title">Mis solicitudes recientes</div>
+          <div id="mob-my-requests"></div>
+        </div>
+
+        <!-- Desktop: requests table -->
+        <div class="rrhh-table-wrap desk-only" style="background:#fff;border-radius:12px;
+          border:1px solid #e5e7eb;overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid #f0f0f0;
+            display:flex;align-items:center;justify-content:space-between">
+            <h3 style="font-size:.95rem;font-weight:700;color:#111">Mis Solicitudes</h3>
+          </div>
+          <table class="rrhh-table" id="desk-my-table">
+            <thead><tr>
+              <th>Tipo</th><th>Inicio</th><th>Fin</th><th>Duración</th><th>Estado</th><th>Motivo</th>
+            </tr></thead>
+            <tbody id="desk-my-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── MANAGER / ADMIN VIEW ───────────────────── -->
+      <div id="manager-view" style="display:none">
+
+        <!-- Mobile pending -->
+        <div class="mob-only mob-section">
+          <div class="mob-section-title" id="mob-pending-title">Pendientes de aprobación</div>
+          <div id="mob-pending-list"></div>
+        </div>
+        <div class="mob-only mob-section" style="padding-top:0">
+          <div class="mob-section-title">Todas las solicitudes</div>
+          <div id="mob-all-list"></div>
+        </div>
+
+        <!-- Desktop -->
+        <div class="desk-only" style="display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap">
+          <div class="stat-mini"><div class="val" id="d-pending">0</div><div class="lbl">Pendientes</div></div>
+          <div class="stat-mini"><div class="val" id="d-approved">0</div><div class="lbl">Aprobadas</div></div>
+          <div class="stat-mini"><div class="val" id="d-rejected">0</div><div class="lbl">Rechazadas</div></div>
+        </div>
+
+        <div class="desk-only" style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;margin-bottom:16px">
+          <div style="padding:16px 20px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between">
+            <h3 style="font-size:.95rem;font-weight:700;color:#111" id="d-pending-title">Pendientes de aprobación</h3>
+            <button class="btn-primary btn-sm" onclick="exportXLSX()"><i class="fa-solid fa-download"></i> Excel</button>
+          </div>
+          <table class="rrhh-table">
+            <thead><tr><th>Empleado</th><th>Tipo</th><th>Inicio</th><th>Fin</th><th>Duración</th><th>Motivo</th><th>Acciones</th></tr></thead>
+            <tbody id="desk-pending-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="desk-only" style="background:#fff;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid #f0f0f0">
+            <h3 style="font-size:.95rem;font-weight:700;color:#111">Todas las solicitudes</h3>
+          </div>
+          <table class="rrhh-table">
+            <thead><tr><th>Empleado</th><th>Tipo</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Motivo</th></tr></thead>
+            <tbody id="desk-all-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /page-content -->
+  </main>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="mob-bottom-nav" id="mob-bottom-nav" style="display:none">
+  <button class="mob-nav-item active" onclick="location.href='rrhh-solicitudes.html'">
+    <i class="fa-solid fa-file-signature"></i>Solicitudes
+  </button>
+  <button class="mob-nav-item" onclick="location.href='rrhh-personal.html'">
+    <i class="fa-solid fa-users"></i>Personal
+  </button>
+  <button class="mob-nav-item" onclick="location.href='rrhh-evaluaciones.html'">
+    <i class="fa-solid fa-star-half-stroke"></i>Evaluaciones
+  </button>
+</nav>
+
+<!-- REQUEST FORM MODAL -->
+<div class="modal-overlay" id="modal-form">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-form-title">Nueva Solicitud</h3>
+      <button onclick="closeForm()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#9ca3af">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>Tipo de solicitud</label>
+        <select id="f-type" onchange="onTypeChange()">
+          <option value="VACATION">Vacaciones</option>
+          <option value="PASS_EXIT">Pase de Salida</option>
+          <option value="PASS_ENTRY">Pase de Entrada</option>
+          <option value="SINDICAL">Día Sindical</option>
+          <option value="CONVENIO">Convenio</option>
+        </select>
+      </div>
+      <div id="f-dates-range">
+        <div class="form-grid-2">
+          <div class="form-row"><label>Fecha inicio</label><input type="date" id="f-start"></div>
+          <div class="form-row"><label>Fecha fin</label><input type="date" id="f-end"></div>
+        </div>
+      </div>
+      <div id="f-pass-block" style="display:none">
+        <div class="form-row"><label>Fecha</label><input type="date" id="f-pass-date"></div>
+        <div class="form-grid-2">
+          <div class="form-row"><label>Hora salida</label><input type="time" id="f-start-time" value="10:00"></div>
+          <div class="form-row"><label>Hora regreso</label><input type="time" id="f-end-time" value="11:00"></div>
+        </div>
+        <div id="f-pass-info" style="background:#fef3c7;border-radius:8px;padding:8px 12px;
+          font-size:.82rem;font-weight:600;color:#92400e;margin-bottom:14px"></div>
+      </div>
+      <div class="form-row">
+        <label>Motivo *</label>
+        <textarea id="f-reason" rows="3" placeholder="Describe brevemente el motivo de tu solicitud..."></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeForm()">Cancelar</button>
+      <button class="btn-primary" onclick="submitForm()" id="btn-submit-form">Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/rrhh-api.js"></script>
+<script>
+let _user = null
+let _requests = []
+
+// ── Auth ──────────────────────────────────────────────────────────
+function togglePass() {
+  const i = document.getElementById('li-pass')
+  const ico = document.getElementById('eye-ico')
+  if (i.type === 'password') { i.type = 'text'; ico.className = 'fa-solid fa-eye-slash' }
+  else { i.type = 'password'; ico.className = 'fa-solid fa-eye' }
+}
+
+async function doLogin() {
+  const u = document.getElementById('li-user').value.trim()
+  const p = document.getElementById('li-pass').value
+  const btn = document.getElementById('btn-login')
+  const err = document.getElementById('login-err')
+  err.style.display = 'none'
+  btn.textContent = 'Verificando...'
+  btn.disabled = true
+  try {
+    _user = await rrhhLogin(u, p)
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  } catch(e) {
+    err.textContent = e.message || 'Credenciales incorrectas'
+    err.style.display = 'block'
+  } finally {
+    btn.textContent = 'Ingresar'
+    btn.disabled = false
+  }
+}
+document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin() })
+document.getElementById('li-user').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('li-pass').focus() })
+
+function doLogout() {
+  rrhhClearSession()
+  location.reload()
+}
+
+// ── Init ──────────────────────────────────────────────────────────
+async function init() {
+  // Set today as default dates
+  const today = new Date().toISOString().split('T')[0]
+  document.getElementById('f-start').value = today
+  document.getElementById('f-end').value   = today
+  document.getElementById('f-pass-date').value = today
+
+  // Update header
+  document.getElementById('sb-user-name').textContent = _user.name
+  document.getElementById('sb-user-role').textContent = _user.role
+  document.getElementById('mob-user-name').textContent = _user.name
+  document.getElementById('mob-avatar').textContent    = _user.name.charAt(0).toUpperCase()
+
+  // Show bottom nav on mobile
+  document.getElementById('mob-bottom-nav').style.display = ''
+
+  // Show/hide views based on role
+  const isManager = _user.role === 'MANAGER' || _user.role === 'ADMIN_RH'
+  document.getElementById('worker-view').style.display  = isManager ? 'none' : 'block'
+  document.getElementById('manager-view').style.display = isManager ? 'block' : 'none'
+  if (_user.role === 'MANAGER') {
+    document.getElementById('mob-pending-title').textContent = 'Pendientes de mi aprobación'
+    document.getElementById('d-pending-title').textContent = 'Pendientes de mi aprobación'
+  } else if (_user.role === 'ADMIN_RH') {
+    document.getElementById('mob-pending-title').textContent = 'Aprobadas por encargado (pendientes RH)'
+    document.getElementById('d-pending-title').textContent = 'Aprobadas por encargado (pendientes RH)'
+  }
+
+  // Date header
+  document.getElementById('current-date').textContent =
+    new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+
+  await loadData()
+}
+
+async function loadData() {
+  _requests = await rrhhGetRequests(_user.id)
+  if (_user.role === 'WORKER') renderWorker()
+  else renderManager()
+}
+
+// ── Worker render ─────────────────────────────────────────────────
+function renderWorker() {
+  const mine = _requests.filter(r => r.userId === _user.id)
+  const thisMonth = new Date().getMonth()
+
+  const usedVac = mine
+    .filter(r => r.type === 'VACATION' && r.status === 'APPROVED_HR')
+    .reduce((a, r) => a + fmtDiff(r.startDate, r.endDate), 0)
+  const usedPass = mine
+    .filter(r => ['PASS_EXIT','PASS_ENTRY'].includes(r.type) &&
+                 r.status !== 'REJECTED' &&
+                 new Date(r.startDate).getMonth() === thisMonth)
+    .reduce((a, r) => a + (r.durationMinutes || 0), 0)
+  const vacAvail = (_user.vacationDays || 12) - usedVac
+  const passAvail = 120 - usedPass
+
+  // stats
+  ;['m-vac-used','d-vac-used'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = usedVac })
+  ;['m-vac-avail','d-vac-avail'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = vacAvail })
+  ;['m-pass-used','d-pass-used'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = usedPass })
+  ;['d-pass-avail'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = passAvail })
+  const mTotal = document.getElementById('m-req-total'); if(mTotal) mTotal.textContent = mine.length
+
+  // Mobile cards
+  const mobEl = document.getElementById('mob-my-requests')
+  if (mobEl) {
+    if (!mine.length) { mobEl.innerHTML = '<p style="color:#9ca3af;font-size:.85rem;text-align:center;padding:20px 0">Sin solicitudes aún</p>'; }
+    else mobEl.innerHTML = mine.slice(0,10).map(r => {
+      const s = STATUS_LABELS[r.status] || {}
+      return `<div class="mob-card">
+        <div class="mob-card-head">
+          <div>
+            <div class="mob-card-name">${TYPE_LABELS[r.type] || r.type}</div>
+            <div class="mob-card-sub">${fmtDate(r.startDate)}${r.endDate !== r.startDate ? ' — ' + fmtDate(r.endDate) : ''}
+              ${r.durationMinutes ? ' · ' + r.durationMinutes + ' min' : ''}</div>
+          </div>
+          <span class="status-pill ${s.cls}">${s.label}</span>
+        </div>
+        ${r.reason ? `<div style="font-size:.8rem;color:#6b7280">${r.reason}</div>` : ''}
+      </div>`
+    }).join('')
+  }
+
+  // Desktop table
+  const tbody = document.getElementById('desk-my-tbody')
+  if (tbody) {
+    if (!mine.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px">Sin solicitudes</td></tr>'
+    else tbody.innerHTML = mine.map(r => {
+      const s = STATUS_LABELS[r.status] || {}
+      const dur = ['PASS_EXIT','PASS_ENTRY'].includes(r.type)
+        ? (r.durationMinutes ? r.durationMinutes + ' min' : '—')
+        : (fmtDiff(r.startDate, r.endDate) + ' días')
+      return `<tr><td>${TYPE_LABELS[r.type]||r.type}</td><td>${fmtDate(r.startDate)}</td>
+        <td>${fmtDate(r.endDate)}</td><td>${dur}</td>
+        <td><span class="status-pill ${s.cls}">${s.label}</span></td>
+        <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.reason}</td></tr>`
+    }).join('')
+  }
+}
+
+// ── Manager render ────────────────────────────────────────────────
+function renderManager() {
+  const needsMyApproval = _user.role === 'MANAGER'
+    ? _requests.filter(r => r.status === 'PENDING')
+    : _requests.filter(r => r.status === 'APPROVED_MANAGER')
+
+  const approveStatus = _user.role === 'MANAGER' ? 'APPROVED_MANAGER' : 'APPROVED_HR'
+
+  // Desktop stats
+  ;['d-pending'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = needsMyApproval.length })
+  const approved = _requests.filter(r => r.status === 'APPROVED_HR').length
+  const rejected = _requests.filter(r => r.status === 'REJECTED').length
+  ;['d-approved'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = approved })
+  ;['d-rejected'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = rejected })
+
+  // Mobile pending
+  const mobPend = document.getElementById('mob-pending-list')
+  if (mobPend) {
+    if (!needsMyApproval.length) mobPend.innerHTML = '<div class="mob-card" style="text-align:center;color:#9ca3af">Todo al día ✓</div>'
+    else mobPend.innerHTML = needsMyApproval.map(r => `
+      <div class="mob-card">
+        <div class="mob-card-head">
+          <div>
+            <div class="mob-card-name">${r.userName}</div>
+            <div class="mob-card-sub">${TYPE_LABELS[r.type]||r.type} · ${fmtDate(r.startDate)}</div>
+          </div>
+        </div>
+        ${r.reason ? `<div style="font-size:.8rem;color:#6b7280;margin-bottom:8px">${r.reason}</div>` : ''}
+        <div class="mob-card-actions">
+          <button class="btn-approve" style="flex:1" onclick="doApprove('${r.id}','${approveStatus}')">
+            <i class="fa-solid fa-check"></i> Aprobar
+          </button>
+          <button class="btn-reject" style="flex:1" onclick="doApprove('${r.id}','REJECTED')">
+            <i class="fa-solid fa-xmark"></i> Rechazar
+          </button>
+        </div>
+      </div>`).join('')
+  }
+
+  // Mobile all
+  const mobAll = document.getElementById('mob-all-list')
+  if (mobAll) {
+    mobAll.innerHTML = _requests.map(r => {
+      const s = STATUS_LABELS[r.status] || {}
+      return `<div class="mob-card">
+        <div class="mob-card-head">
+          <div>
+            <div class="mob-card-name">${r.userName}</div>
+            <div class="mob-card-sub">${TYPE_LABELS[r.type]||r.type} · ${fmtDate(r.startDate)}</div>
+          </div>
+          <span class="status-pill ${s.cls}">${s.label}</span>
+        </div>
+      </div>`
+    }).join('') || '<p style="color:#9ca3af;text-align:center;padding:20px 0">Sin solicitudes</p>'
+  }
+
+  // Desktop pending
+  const pendTbody = document.getElementById('desk-pending-tbody')
+  if (pendTbody) {
+    if (!needsMyApproval.length) pendTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px">Sin solicitudes pendientes</td></tr>'
+    else pendTbody.innerHTML = needsMyApproval.map(r => {
+      const dur = ['PASS_EXIT','PASS_ENTRY'].includes(r.type)
+        ? (r.durationMinutes ? r.durationMinutes + ' min' : '—')
+        : (fmtDiff(r.startDate, r.endDate) + ' días')
+      return `<tr><td>${r.userName}</td><td>${TYPE_LABELS[r.type]||r.type}</td>
+        <td>${fmtDate(r.startDate)}</td><td>${fmtDate(r.endDate)}</td><td>${dur}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.reason}</td>
+        <td><button class="btn-approve" onclick="doApprove('${r.id}','${approveStatus}')"><i class="fa-solid fa-check"></i> Aprobar</button>
+        <button class="btn-reject" style="margin-left:6px" onclick="doApprove('${r.id}','REJECTED')"><i class="fa-solid fa-xmark"></i> Rechazar</button></td></tr>`
+    }).join('')
+  }
+
+  // Desktop all
+  const allTbody = document.getElementById('desk-all-tbody')
+  if (allTbody) {
+    if (!_requests.length) allTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px">Sin solicitudes</td></tr>'
+    else allTbody.innerHTML = _requests.map(r => {
+      const s = STATUS_LABELS[r.status] || {}
+      return `<tr><td>${r.userName}</td><td>${TYPE_LABELS[r.type]||r.type}</td>
+        <td>${fmtDate(r.startDate)}</td><td>${fmtDate(r.endDate)}</td>
+        <td><span class="status-pill ${s.cls}">${s.label}</span></td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.reason}</td></tr>`
+    }).join('')
+  }
+}
+
+async function doApprove(reqId, status) {
+  await rrhhUpdateStatus(_user.id, reqId, status)
+  await loadData()
+}
+
+// ── Request form ──────────────────────────────────────────────────
+let _formType = 'VACATION'
+
+function openForm(type) {
+  _formType = type
+  document.getElementById('f-type').value = type
+  onTypeChange()
+  document.getElementById('modal-form').classList.add('open')
+}
+function closeForm() { document.getElementById('modal-form').classList.remove('open') }
+
+function onTypeChange() {
+  _formType = document.getElementById('f-type').value
+  const isPass = _formType === 'PASS_EXIT' || _formType === 'PASS_ENTRY'
+  document.getElementById('f-dates-range').style.display = isPass ? 'none' : 'block'
+  document.getElementById('f-pass-block').style.display  = isPass ? 'block' : 'none'
+  if (isPass) updatePassInfo()
+}
+
+function calcPassMin() {
+  const st = document.getElementById('f-start-time').value
+  const et = document.getElementById('f-end-time').value
+  const [sh,sm] = st.split(':').map(Number)
+  const [eh,em] = et.split(':').map(Number)
+  return Math.max(0, (eh*60+em) - (sh*60+sm))
+}
+
+function updatePassInfo() {
+  if (!_user) return
+  const thisMonth = new Date().getMonth()
+  const usedMin = _requests
+    .filter(r => r.userId === _user.id &&
+                 ['PASS_EXIT','PASS_ENTRY'].includes(r.type) &&
+                 r.status !== 'REJECTED' &&
+                 new Date(r.startDate).getMonth() === thisMonth)
+    .reduce((a,r) => a + (r.durationMinutes||0), 0)
+  const req = calcPassMin()
+  const avail = 120 - usedMin
+  const info = document.getElementById('f-pass-info')
+  info.textContent = `${req} min solicitados · ${avail} min disponibles este mes`
+  info.style.background = req > avail ? '#fee2e2' : '#fef3c7'
+  info.style.color       = req > avail ? '#991b1b' : '#92400e'
+}
+
+document.getElementById('f-start-time').addEventListener('change', updatePassInfo)
+document.getElementById('f-end-time').addEventListener('change', updatePassInfo)
+
+async function submitForm() {
+  const reason = document.getElementById('f-reason').value.trim()
+  if (!reason) { alert('Por favor escribe el motivo de la solicitud.'); return }
+
+  const isPass = _formType === 'PASS_EXIT' || _formType === 'PASS_ENTRY'
+  let startDate, endDate, startTime, endTime, durationMinutes
+
+  if (isPass) {
+    startDate = endDate = document.getElementById('f-pass-date').value
+    startTime = document.getElementById('f-start-time').value
+    endTime   = document.getElementById('f-end-time').value
+    durationMinutes = calcPassMin()
+    const thisMonth = new Date().getMonth()
+    const usedMin = _requests
+      .filter(r => r.userId === _user.id &&
+                   ['PASS_EXIT','PASS_ENTRY'].includes(r.type) &&
+                   r.status !== 'REJECTED' &&
+                   new Date(r.startDate).getMonth() === thisMonth)
+      .reduce((a,r) => a + (r.durationMinutes||0), 0)
+    if (durationMinutes > (120 - usedMin)) {
+      alert(`Solo tienes ${120-usedMin} minutos disponibles este mes.`)
+      return
+    }
+  } else {
+    startDate = document.getElementById('f-start').value
+    endDate   = document.getElementById('f-end').value
+  }
+
+  const btn = document.getElementById('btn-submit-form')
+  btn.textContent = 'Enviando...'
+  btn.disabled = true
+
+  await rrhhCreateRequest(_user.id, _user.name, {
+    type: _formType, startDate, endDate,
+    ...(isPass ? { startTime, endTime, durationMinutes } : {}),
+    reason
+  })
+
+  btn.textContent = 'Enviar solicitud'
+  btn.disabled = false
+  closeForm()
+  document.getElementById('f-reason').value = ''
+  await loadData()
+}
+
+// ── Export ────────────────────────────────────────────────────────
+function exportXLSX() {
+  // Simple CSV fallback (no library needed)
+  const rows = [['Empleado','Tipo','Inicio','Fin','Estado','Motivo']]
+  _requests.forEach(r => rows.push([r.userName, r.type, r.startDate, r.endDate, r.status, r.reason]))
+  const csv = rows.map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n')
+  const a = document.createElement('a')
+  a.href = 'data:text/csv;charset=utf-8,﻿' + encodeURIComponent(csv)
+  a.download = `solicitudes_${new Date().toISOString().split('T')[0]}.csv`
+  a.click()
+}
+
+// ── Start ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const session = rrhhLoadSession()
+  if (session) {
+    _user = session
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+  }
+})
+</script>
+</body>
+</html>
