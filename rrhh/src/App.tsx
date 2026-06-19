@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import {
   LogOut, RefreshCw, Plus, Check, X, ChevronDown, ChevronUp,
-  Download, Search, Trash2, Edit3, Eye, EyeOff, Calendar,
+  Download, Search, Trash2, Edit3, Eye, EyeOff,
   ClipboardList, Users, Clock, TrendingUp, AlertCircle, Shield,
-  FileText, BarChart2, Star, Wind, UserCheck
+  FileText, BarChart2, Star, Wind, UserCheck, Calendar
 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 
@@ -13,17 +13,17 @@ import {
   apiLogin, apiGetStaff, apiGetRequests, apiCreateRequest,
   apiUpdateRequestStatus, apiCreateUser, apiUpdateStaff,
   apiDeleteStaff, apiSubmitSurvey, apiUpdatePassword,
-  loadSession, clearSession
+  loadSession, clearSession, saveSession
 } from './lib/api'
 
-import { Navigation }          from './components/Navigation'
-import { StatsCard }           from './components/StatsCard'
-import { RequestForm }         from './components/RequestForm'
-import { AddEmployeeModal }    from './components/AddEmployeeModal'
-import { ConfirmationModal }   from './components/ConfirmationModal'
-import { Nom035Survey }        from './components/Nom035Survey'
+import { Navigation }            from './components/Navigation'
+import { StatsCard }             from './components/StatsCard'
+import { RequestForm }           from './components/RequestForm'
+import { AddEmployeeModal }      from './components/AddEmployeeModal'
+import { ConfirmationModal }     from './components/ConfirmationModal'
+import { Nom035Survey }          from './components/Nom035Survey'
 import { PerformanceEvaluation } from './components/PerformanceEvaluation'
-import { WorkClimateSurvey }   from './components/WorkClimateSurvey'
+import { WorkClimateSurvey }     from './components/WorkClimateSurvey'
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -37,36 +37,36 @@ function diffDays(a: string, b: string) {
 // ─── App ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  // Auth state
-  const [user,        setUser]        = useState<User | null>(null)
-  const [loginUser,   setLoginUser]   = useState('')
-  const [loginPass,   setLoginPass]   = useState('')
-  const [loginErr,    setLoginErr]    = useState('')
+  // Auth
+  const [user,         setUser]         = useState<User | null>(null)
+  const [loginUser,    setLoginUser]    = useState('')
+  const [loginPass,    setLoginPass]    = useState('')
+  const [loginErr,     setLoginErr]     = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
-  const [showPass,    setShowPass]    = useState(false)
-  const [firstLogin,  setFirstLogin]  = useState(false)
-  const [newPass,     setNewPass]     = useState('')
-  const [newPass2,    setNewPass2]    = useState('')
+  const [showPass,     setShowPass]     = useState(false)
+  const [firstLogin,   setFirstLogin]   = useState(false)
+  const [newPass,      setNewPass]      = useState('')
+  const [newPass2,     setNewPass2]     = useState('')
 
   // Data
-  const [staff,       setStaff]       = useState<User[]>([])
-  const [requests,    setRequests]    = useState<RequestRecord[]>([])
-  const [loading,     setLoading]     = useState(false)
+  const [staff,    setStaff]    = useState<User[]>([])
+  const [requests, setRequests] = useState<RequestRecord[]>([])
+  const [loading,  setLoading]  = useState(false)
 
   // UI
-  const [tab,         setTab]         = useState('inicio')
-  const [search,      setSearch]      = useState('')
-  const [filterArea,  setFilterArea]  = useState('')
+  const [tab,        setTab]        = useState('inicio')
+  const [search,     setSearch]     = useState('')
+  const [filterArea, setFilterArea] = useState('')
 
   // Modals / sub-views
-  const [showRequestForm,  setShowRequestForm]  = useState(false)
-  const [reqFormType,      setReqFormType]      = useState<RequestType>(RequestType.VACATION)
-  const [showAddEmployee,  setShowAddEmployee]  = useState(false)
-  const [newEmployee,      setNewEmployee]      = useState<Partial<User> & { password?: string }>({})
-  const [confirmDelete,    setConfirmDelete]    = useState<User | null>(null)
-  const [editingUser,      setEditingUser]      = useState<User | null>(null)
-  const [expandedReqId,    setExpandedReqId]    = useState<string | null>(null)
-  const [subView,          setSubView]          = useState<
+  const [showRequestForm, setShowRequestForm] = useState(false)
+  const [reqFormType,     setReqFormType]     = useState<RequestType>(RequestType.VACATION)
+  const [showAddEmployee, setShowAddEmployee] = useState(false)
+  const [newEmployee,     setNewEmployee]     = useState<Partial<User> & { password?: string }>({})
+  const [confirmDelete,   setConfirmDelete]   = useState<User | null>(null)
+  const [editingUser,     setEditingUser]     = useState<User | null>(null)
+  const [expandedReqId,   setExpandedReqId]   = useState<string | null>(null)
+  const [subView, setSubView] = useState<
     null | { type: 'nom035' } | { type: 'performance'; target: User } | { type: 'climate' }
   >(null)
 
@@ -75,7 +75,7 @@ export default function App() {
     const session = loadSession()
     if (session) {
       setUser(session)
-      if (session.passwordChangeRequired) setFirstLogin(true)
+      if (session.needsPasswordReset) setFirstLogin(true)
     }
   }, [])
 
@@ -84,8 +84,8 @@ export default function App() {
     setLoading(true)
     try {
       const [staffData, reqData] = await Promise.all([
-        u.role !== UserRole.WORKER ? apiGetStaff(u) : Promise.resolve([]),
-        apiGetRequests(u),
+        u.role !== UserRole.WORKER ? apiGetStaff(u.id) : Promise.resolve([]),
+        apiGetRequests(u.id),
       ])
       setStaff(staffData)
       setRequests(reqData)
@@ -103,8 +103,10 @@ export default function App() {
     setLoginLoading(true)
     try {
       const u = await apiLogin(loginUser.trim(), loginPass)
+      if (!u) { setLoginErr('Credenciales incorrectas'); return }
+      saveSession(u)
       setUser(u)
-      if (u.passwordChangeRequired) setFirstLogin(true)
+      if (u.needsPasswordReset) setFirstLogin(true)
     } catch (err: unknown) {
       setLoginErr(err instanceof Error ? err.message : 'Credenciales incorrectas')
     } finally {
@@ -114,10 +116,10 @@ export default function App() {
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!user) return
     if (newPass.length < 6) { alert('La contraseña debe tener al menos 6 caracteres.'); return }
     if (newPass !== newPass2) { alert('Las contraseñas no coinciden.'); return }
-    if (!user) return
-    await apiUpdatePassword(user.id, newPass)
+    await apiUpdatePassword(user.id, user.id, newPass)
     setFirstLogin(false)
     setNewPass('')
     setNewPass2('')
@@ -137,14 +139,14 @@ export default function App() {
     startTime?: string; endTime?: string; durationMinutes?: number; reason: string
   }) => {
     if (!user) return
-    await apiCreateRequest(user, data)
+    await apiCreateRequest(user.id, user.name, data)
     setShowRequestForm(false)
     await fetchData(user)
   }
 
-  const handleUpdateStatus = async (reqId: string, status: RequestStatus, comment = '') => {
+  const handleUpdateStatus = async (reqId: string, status: RequestStatus) => {
     if (!user) return
-    await apiUpdateRequestStatus(user, reqId, status, comment)
+    await apiUpdateRequestStatus(user.id, reqId, status)
     await fetchData(user)
   }
 
@@ -156,7 +158,20 @@ export default function App() {
       alert('Por favor completa nombre, usuario, contraseña, área y puesto.')
       return
     }
-    await apiCreateUser(user, { ...rest, password } as User & { password: string })
+    await apiCreateUser(user.id, {
+      name:         rest.name         || '',
+      username:     rest.username     || '',
+      password,
+      email:        rest.email        || '',
+      hireDate:     rest.hireDate     || '',
+      birthDate:    rest.birthDate    || '',
+      area:         rest.area         || '',
+      position:     rest.position     || '',
+      shiftId:      rest.shiftId      || 't-matutino',
+      role:         rest.role         || UserRole.WORKER,
+      vacationDays: rest.vacationDays ?? 12,
+      sindicalDays: rest.sindicalDays ?? 1,
+    })
     setShowAddEmployee(false)
     setNewEmployee({})
     await fetchData(user)
@@ -164,21 +179,24 @@ export default function App() {
 
   const handleDeleteEmployee = async () => {
     if (!user || !confirmDelete) return
-    await apiDeleteStaff(user, confirmDelete.id)
+    await apiDeleteStaff(user.id, confirmDelete.id)
     setConfirmDelete(null)
     await fetchData(user)
   }
 
   const handleUpdateEmployee = async () => {
     if (!user || !editingUser) return
-    await apiUpdateStaff(user, editingUser)
+    await apiUpdateStaff(user.id, editingUser.id, editingUser)
     setEditingUser(null)
     await fetchData(user)
   }
 
-  const handleSubmitSurvey = async (type: string, answers: Record<string, unknown>) => {
+  const handleSubmitSurvey = async (
+    type: 'NOM035' | 'PERFORMANCE' | 'CLIMATE',
+    answers: Record<string, unknown>
+  ) => {
     if (!user) return
-    await apiSubmitSurvey(user, type, answers)
+    await apiSubmitSurvey(user.id, type, answers)
     setSubView(null)
     alert('¡Evaluación enviada correctamente!')
   }
@@ -186,16 +204,16 @@ export default function App() {
   // ─── Export ────────────────────────────────────────────────────────────────
   const exportToExcel = () => {
     const rows = requests.map(r => ({
-      'Empleado':     r.employeeName || r.employeeId,
-      'Tipo':         r.type,
-      'Inicio':       r.startDate,
-      'Fin':          r.endDate,
-      'Días/Min':     r.type === RequestType.PASS_EXIT || r.type === RequestType.PASS_ENTRY
-                        ? `${r.durationMinutes || 0} min`
-                        : `${diffDays(r.startDate, r.endDate)} días`,
-      'Estado':       r.status,
-      'Motivo':       r.reason,
-      'Creado':       r.createdAt,
+      'Empleado': r.userName,
+      'Tipo':     r.type,
+      'Inicio':   r.startDate,
+      'Fin':      r.endDate,
+      'Días/Min': (r.type === RequestType.PASS_EXIT || r.type === RequestType.PASS_ENTRY)
+                    ? `${r.durationMinutes || 0} min`
+                    : `${diffDays(r.startDate, r.endDate)} días`,
+      'Estado':   r.status,
+      'Motivo':   r.reason,
+      'Creado':   r.createdAt,
     }))
     const ws = XLSX.utils.json_to_sheet(rows)
     const wb = XLSX.utils.book_new()
@@ -204,7 +222,8 @@ export default function App() {
   }
 
   // ─── Derived data ──────────────────────────────────────────────────────────
-  const myRequests = user ? requests.filter(r => r.employeeId === user.id) : []
+  const myRequests = user ? requests.filter(r => r.userId === user.id) : []
+
   const pendingForMe = user?.role === UserRole.MANAGER
     ? requests.filter(r => r.status === RequestStatus.PENDING)
     : user?.role === UserRole.ADMIN_RH
@@ -225,8 +244,8 @@ export default function App() {
 
   const filteredStaff = staff.filter(s => {
     const q = search.toLowerCase()
-    const matchQ = !q || s.name.toLowerCase().includes(q) || s.username.toLowerCase().includes(q)
-    const matchA = !filterArea || s.area === filterArea
+    const matchQ = !q || s.name.toLowerCase().includes(q) || (s.username ?? '').toLowerCase().includes(q)
+    const matchA  = !filterArea || s.area === filterArea
     return matchQ && matchA
   })
 
@@ -234,18 +253,26 @@ export default function App() {
 
   // ─── Sub-views ─────────────────────────────────────────────────────────────
   if (subView?.type === 'nom035')
-    return <Nom035Survey onBack={() => setSubView(null)}
-      onSubmit={ans => handleSubmitSurvey('nom035', ans as Record<string, unknown>)} />
+    return <Nom035Survey
+      onBack={() => setSubView(null)}
+      onSubmit={ans => handleSubmitSurvey('NOM035', ans as Record<string, unknown>)}
+    />
 
   if (subView?.type === 'performance' && user)
-    return <PerformanceEvaluation user={subView.target} onBack={() => setSubView(null)}
-      onSubmit={ans => handleSubmitSurvey('performance', ans)} />
+    return <PerformanceEvaluation
+      user={subView.target}
+      onBack={() => setSubView(null)}
+      onSubmit={ans => handleSubmitSurvey('PERFORMANCE', ans)}
+    />
 
   if (subView?.type === 'climate' && user)
-    return <WorkClimateSurvey user={user} onBack={() => setSubView(null)}
-      onSubmit={ans => handleSubmitSurvey('climate', ans)} />
+    return <WorkClimateSurvey
+      user={user}
+      onBack={() => setSubView(null)}
+      onSubmit={ans => handleSubmitSurvey('CLIMATE', ans)}
+    />
 
-  // ─── Login screen ──────────────────────────────────────────────────────────
+  // ─── Login ─────────────────────────────────────────────────────────────────
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center p-6">
@@ -300,20 +327,24 @@ export default function App() {
     )
   }
 
-  // ─── First login: change password ─────────────────────────────────────────
+  // ─── Cambio de contraseña obligatorio ────────────────────────────────────
   if (firstLogin) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 flex items-center justify-center p-6">
         <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6">
           <h2 className="font-black text-gray-900 text-lg mb-1">Cambia tu contraseña</h2>
-          <p className="text-xs text-gray-500 mb-5">Por seguridad debes establecer una contraseña personal antes de continuar.</p>
+          <p className="text-xs text-gray-500 mb-5">
+            Por seguridad debes establecer una contraseña personal antes de continuar.
+          </p>
           <form onSubmit={handleChangePassword} className="space-y-4">
             {[
               { label: 'Nueva contraseña', v: newPass,  sv: setNewPass  },
               { label: 'Confirmar',         v: newPass2, sv: setNewPass2 },
             ].map(f => (
               <div key={f.label}>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">{f.label}</label>
+                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
+                  {f.label}
+                </label>
                 <input type="password" value={f.v} onChange={e => f.sv(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold outline-none" />
               </div>
@@ -329,15 +360,14 @@ export default function App() {
 
   // ─── Role badge ───────────────────────────────────────────────────────────
   const roleBadge = {
-    [UserRole.WORKER]:   { label: 'Empleado',   cls: 'bg-gray-100 text-gray-600' },
-    [UserRole.MANAGER]:  { label: 'Encargado',  cls: 'bg-blue-100 text-blue-700' },
+    [UserRole.WORKER]:   { label: 'Empleado',   cls: 'bg-gray-100 text-gray-600'   },
+    [UserRole.MANAGER]:  { label: 'Encargado',  cls: 'bg-blue-100 text-blue-700'   },
     [UserRole.ADMIN_RH]: { label: 'Admin RH',   cls: 'bg-purple-100 text-purple-700' },
   }[user.role]
 
   // ─── INICIO ───────────────────────────────────────────────────────────────
   const renderInicio = () => (
     <div className="p-6 space-y-5 pb-28">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-black text-gray-900 text-xl leading-tight">
@@ -352,31 +382,34 @@ export default function App() {
         </button>
       </div>
 
-      {/* Worker: stats */}
       {user.role === UserRole.WORKER && (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <StatsCard label="Vacaciones usadas" value={`${usedVacation}/${user.vacationDays || 12}d`}
-              icon={Calendar}  color="bg-blue-600" />
-            <StatsCard label="Pases este mes"    value={`${usedPassMin}/120min`}
-              icon={Clock}     color="bg-amber-500" />
-            <StatsCard label="Días sindicato"    value={`${myRequests.filter(r => r.type === RequestType.SINDICAL && r.status === RequestStatus.APPROVED_HR).length}/${user.sindicalDays || 1}`}
+            <StatsCard label="Vacaciones usadas"
+              value={`${usedVacation}/${user.vacationDays || 12}d`}
+              icon={Calendar} color="bg-blue-600" />
+            <StatsCard label="Pases este mes"
+              value={`${usedPassMin}/120min`}
+              icon={Clock} color="bg-amber-500" />
+            <StatsCard label="Días sindicato"
+              value={`${myRequests.filter(r => r.type === RequestType.SINDICAL && r.status === RequestStatus.APPROVED_HR).length}/${user.sindicalDays || 1}`}
               icon={UserCheck} color="bg-emerald-600" />
-            <StatsCard label="Mis solicitudes"   value={myRequests.length}
+            <StatsCard label="Mis solicitudes"
+              value={myRequests.length}
               icon={ClipboardList} color="bg-gray-600" />
           </div>
 
-          {/* Quick actions */}
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Nueva solicitud</p>
             <div className="grid grid-cols-2 gap-2">
-              {[
-                { type: RequestType.VACATION,   label: 'Vacaciones',      cls: 'bg-blue-700 text-white'   },
-                { type: RequestType.PASS_EXIT,  label: 'Pase de Salida',  cls: 'bg-amber-600 text-white'  },
-                { type: RequestType.PASS_ENTRY, label: 'Pase de Entrada', cls: 'bg-orange-600 text-white' },
-                { type: RequestType.SINDICAL,   label: 'Día Sindical',    cls: 'bg-emerald-600 text-white'},
-              ].map(a => (
-                <button key={a.type} onClick={() => { setReqFormType(a.type); setShowRequestForm(true) }}
+              {([
+                { type: RequestType.VACATION,   label: 'Vacaciones',      cls: 'bg-blue-700 text-white'    },
+                { type: RequestType.PASS_EXIT,  label: 'Pase de Salida',  cls: 'bg-amber-600 text-white'   },
+                { type: RequestType.PASS_ENTRY, label: 'Pase de Entrada', cls: 'bg-orange-600 text-white'  },
+                { type: RequestType.SINDICAL,   label: 'Día Sindical',    cls: 'bg-emerald-600 text-white' },
+              ] as const).map(a => (
+                <button key={a.type}
+                  onClick={() => { setReqFormType(a.type); setShowRequestForm(true) }}
                   className={`${a.cls} py-3 px-4 rounded-2xl text-sm font-bold text-left shadow-sm`}>
                   <Plus size={14} className="inline mb-0.5 mr-1" />{a.label}
                 </button>
@@ -384,30 +417,31 @@ export default function App() {
             </div>
           </div>
 
-          {/* Evaluaciones */}
           <div>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Evaluaciones</p>
             <div className="space-y-2">
-              {[
-                { label: 'NOM-035 STPS',      sub: 'Factores de riesgo psicosocial', icon: Shield,   action: () => setSubView({ type: 'nom035' }),  cls: 'bg-blue-50 border-blue-200' },
-                { label: 'Clima Laboral',      sub: 'Encuesta anual',                 icon: Wind,     action: () => setSubView({ type: 'climate' }), cls: 'bg-green-50 border-green-200' },
-              ].map(e => (
-                <button key={e.label} onClick={e.action}
-                  className={`w-full ${e.cls} border rounded-2xl p-4 flex items-center gap-4 text-left`}>
-                  <e.icon size={20} className="text-gray-600 shrink-0" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">{e.label}</p>
-                    <p className="text-[11px] text-gray-500">{e.sub}</p>
-                  </div>
-                </button>
-              ))}
+              <button onClick={() => setSubView({ type: 'nom035' })}
+                className="w-full bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center gap-4 text-left">
+                <Shield size={20} className="text-blue-600 shrink-0" />
+                <div>
+                  <p className="font-bold text-gray-800 text-sm">NOM-035 STPS</p>
+                  <p className="text-[11px] text-gray-500">Factores de riesgo psicosocial</p>
+                </div>
+              </button>
+              <button onClick={() => setSubView({ type: 'climate' })}
+                className="w-full bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-4 text-left">
+                <Wind size={20} className="text-green-600 shrink-0" />
+                <div>
+                  <p className="font-bold text-gray-800 text-sm">Clima Laboral</p>
+                  <p className="text-[11px] text-gray-500">Encuesta anual</p>
+                </div>
+              </button>
             </div>
           </div>
 
-          {/* Últimas solicitudes */}
           {myRequests.length > 0 && (
             <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Mis solicitudes recientes</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Solicitudes recientes</p>
               <div className="space-y-2">
                 {myRequests.slice(0, 3).map(r => {
                   const cfg = getStatusConfig(r.status)
@@ -427,14 +461,14 @@ export default function App() {
         </>
       )}
 
-      {/* Manager / Admin: dashboard */}
       {(user.role === UserRole.MANAGER || user.role === UserRole.ADMIN_RH) && (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <StatsCard label="Total personal"    value={staff.length}          icon={Users}       color="bg-blue-700" />
-            <StatsCard label="Pendientes"        value={pendingForMe.length}   icon={AlertCircle} color="bg-amber-500" />
-            <StatsCard label="Total solicitudes" value={requests.length}       icon={ClipboardList} color="bg-gray-600" />
-            <StatsCard label="Aprobadas"         value={requests.filter(r => r.status === RequestStatus.APPROVED_HR).length}
+            <StatsCard label="Total personal"    value={staff.length}          icon={Users}         color="bg-blue-700"    />
+            <StatsCard label="Pendientes"        value={pendingForMe.length}   icon={AlertCircle}   color="bg-amber-500"   />
+            <StatsCard label="Total solicitudes" value={requests.length}       icon={ClipboardList} color="bg-gray-600"    />
+            <StatsCard label="Aprobadas"
+              value={requests.filter(r => r.status === RequestStatus.APPROVED_HR).length}
               icon={TrendingUp} color="bg-emerald-600" />
           </div>
 
@@ -448,11 +482,13 @@ export default function App() {
                   <div key={r.id} className="bg-white rounded-2xl p-4 border border-amber-100 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="font-bold text-gray-800 text-sm">{r.employeeName}</p>
+                        <p className="font-bold text-gray-800 text-sm">{r.userName}</p>
                         <p className="text-xs text-gray-500">{r.type} · {formatDate(r.startDate)}</p>
                       </div>
                       <div className="flex gap-2">
-                        <button onClick={() => handleUpdateStatus(r.id, user.role === UserRole.MANAGER ? RequestStatus.APPROVED_MANAGER : RequestStatus.APPROVED_HR)}
+                        <button
+                          onClick={() => handleUpdateStatus(r.id, user.role === UserRole.MANAGER
+                            ? RequestStatus.APPROVED_MANAGER : RequestStatus.APPROVED_HR)}
                           className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center">
                           <Check size={16} />
                         </button>
@@ -468,10 +504,11 @@ export default function App() {
             </div>
           )}
 
-          {/* Evaluaciones para manager */}
           {user.role === UserRole.ADMIN_RH && staff.length > 0 && (
             <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">Evaluaciones de desempeño</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                Evaluaciones de desempeño
+              </p>
               <div className="space-y-2">
                 {staff.slice(0, 3).map(s => (
                   <button key={s.id} onClick={() => setSubView({ type: 'performance', target: s })}
@@ -494,7 +531,7 @@ export default function App() {
     </div>
   )
 
-  // ─── SOLICITUDES (bandeja de aprobación) ─────────────────────────────────
+  // ─── SOLICITUDES ─────────────────────────────────────────────────────────
   const renderSolicitudes = () => (
     <div className="p-6 space-y-4 pb-28">
       <div className="flex items-center justify-between">
@@ -524,7 +561,7 @@ export default function App() {
             <button onClick={() => setExpandedReqId(expanded ? null : r.id)}
               className="w-full p-4 flex items-center justify-between text-left">
               <div>
-                <p className="font-bold text-gray-800 text-sm">{r.employeeName}</p>
+                <p className="font-bold text-gray-800 text-sm">{r.userName}</p>
                 <p className="text-xs text-gray-500">{r.type} · {formatDate(r.startDate)}</p>
               </div>
               {expanded ? <ChevronUp size={18} className="text-gray-400" /> : <ChevronDown size={18} className="text-gray-400" />}
@@ -582,7 +619,7 @@ export default function App() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       {user.role !== UserRole.WORKER && (
-                        <p className="font-bold text-gray-800 text-sm truncate">{r.employeeName}</p>
+                        <p className="font-bold text-gray-800 text-sm truncate">{r.userName}</p>
                       )}
                       <p className={`${user.role === UserRole.WORKER ? 'font-bold text-gray-800 text-sm' : 'text-xs text-gray-500'}`}>
                         {r.type}
@@ -609,7 +646,7 @@ export default function App() {
     )
   }
 
-  // ─── CONFIG (gestión de personal) ────────────────────────────────────────
+  // ─── CONFIG ───────────────────────────────────────────────────────────────
   const renderConfig = () => (
     <div className="p-6 space-y-4 pb-28">
       <div className="flex items-center justify-between">
@@ -620,7 +657,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Search + filter */}
       <div className="space-y-2">
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -657,7 +693,7 @@ export default function App() {
                 </button>
               </div>
             </div>
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex gap-2 flex-wrap">
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
                 {DEFAULT_SHIFTS.find(sh => sh.id === s.shiftId)?.name || s.shiftId}
               </span>
@@ -677,15 +713,17 @@ export default function App() {
               <h3 className="font-bold text-gray-900">Editar empleado</h3>
               <button onClick={() => setEditingUser(null)}><X size={20} className="text-gray-400" /></button>
             </div>
-            {[
-              { label: 'Nombre', key: 'name' },
+            {([
+              { label: 'Nombre', key: 'name'  },
               { label: 'Correo', key: 'email' },
-            ].map(f => (
+            ] as const).map(f => (
               <div key={f.key}>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{f.label}</label>
-                <input value={(editingUser as Record<string, unknown>)[f.key] as string || ''}
+                <input
+                  value={(editingUser[f.key] ?? '') as string}
                   onChange={e => setEditingUser({ ...editingUser, [f.key]: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none" />
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none"
+                />
               </div>
             ))}
             <div className="grid grid-cols-2 gap-3">
@@ -730,8 +768,6 @@ export default function App() {
     return (
       <div className="p-6 space-y-5 pb-28">
         <h2 className="font-black text-gray-900 text-lg">Mi Perfil</h2>
-
-        {/* Avatar card */}
         <div className="bg-blue-700 text-white rounded-3xl p-6 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-3">
             <span className="text-2xl font-black">{user.name.charAt(0)}</span>
@@ -741,16 +777,15 @@ export default function App() {
           <p className="text-blue-300 text-xs mt-1">{user.area}</p>
         </div>
 
-        {/* Info rows */}
-        {[
-          { label: 'Usuario',       value: user.username },
-          { label: 'Correo',        value: user.email || '—' },
-          { label: 'Rol',           value: roleBadge.label },
-          { label: 'Turno',         value: shift ? `${shift.name} (${shift.startTime}–${shift.endTime})` : user.shiftId || '—' },
-          { label: 'Vacaciones',    value: `${usedVacation} / ${user.vacationDays || 12} días usados` },
+        {([
+          { label: 'Usuario',        value: user.username ?? '—' },
+          { label: 'Correo',         value: user.email    ?? '—' },
+          { label: 'Rol',            value: roleBadge.label },
+          { label: 'Turno',          value: shift ? `${shift.name} (${shift.startTime}–${shift.endTime})` : (user.shiftId || '—') },
+          { label: 'Vacaciones',     value: `${usedVacation} / ${user.vacationDays || 12} días usados` },
           { label: 'Pases este mes', value: `${usedPassMin} / 120 min usados` },
-          { label: 'Contratación',  value: user.hireDate ? formatDate(user.hireDate) : '—' },
-        ].map(row => (
+          { label: 'Contratación',   value: user.hireDate ? formatDate(user.hireDate) : '—' },
+        ] as const).map(row => (
           <div key={row.label} className="flex items-center justify-between py-2 border-b border-gray-100">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{row.label}</span>
             <span className="text-sm font-bold text-gray-800">{row.value}</span>
@@ -768,7 +803,6 @@ export default function App() {
   // ─── Main layout ──────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-gray-50 max-w-md mx-auto relative">
-      {/* Content */}
       <main className="overflow-y-auto">
         {tab === 'inicio'      && renderInicio()}
         {tab === 'solicitudes' && renderSolicitudes()}
@@ -777,10 +811,8 @@ export default function App() {
         {tab === 'perfil'      && renderPerfil()}
       </main>
 
-      {/* Navigation */}
       <Navigation currentTab={tab} setTab={setTab} role={user.role} />
 
-      {/* Modals */}
       {showRequestForm && (
         <RequestForm
           user={user}

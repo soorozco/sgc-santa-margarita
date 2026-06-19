@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { X, Calendar, Clock, Briefcase, SlidersHorizontal, DoorOpen } from 'lucide-react'
+import { X, Calendar, Briefcase, SlidersHorizontal, DoorOpen, type LucideIcon } from 'lucide-react'
 import { RequestType, RequestStatus, User, RequestRecord } from '../types'
 
 interface Props {
@@ -21,12 +21,12 @@ interface FormData {
   attachment?:      File
 }
 
-const TYPE_META: Record<RequestType, { label: string; icon: React.FC<{ size?: number }>, color: string }> = {
-  [RequestType.VACATION]:   { label: 'Vacaciones',       icon: Calendar,         color: 'bg-blue-700'   },
-  [RequestType.PASS_EXIT]:  { label: 'Pase de Salida',   icon: DoorOpen,         color: 'bg-amber-600'  },
-  [RequestType.PASS_ENTRY]: { label: 'Pase de Entrada',  icon: DoorOpen,         color: 'bg-orange-600' },
-  [RequestType.SINDICAL]:   { label: 'Día Sindical',     icon: Briefcase,        color: 'bg-emerald-600'},
-  [RequestType.CONVENIO]:   { label: 'Convenio',         icon: SlidersHorizontal, color: 'bg-gray-600'  },
+const TYPE_META: Record<RequestType, { label: string; icon: LucideIcon; color: string }> = {
+  [RequestType.VACATION]:   { label: 'Vacaciones',       icon: Calendar,          color: 'bg-blue-700'    },
+  [RequestType.PASS_EXIT]:  { label: 'Pase de Salida',   icon: DoorOpen,          color: 'bg-amber-600'   },
+  [RequestType.PASS_ENTRY]: { label: 'Pase de Entrada',  icon: DoorOpen,          color: 'bg-orange-600'  },
+  [RequestType.SINDICAL]:   { label: 'Día Sindical',     icon: Briefcase,         color: 'bg-emerald-600' },
+  [RequestType.CONVENIO]:   { label: 'Convenio',         icon: SlidersHorizontal, color: 'bg-gray-600'    },
 }
 
 function calcDuration(start: string, end: string): number {
