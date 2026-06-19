@@ -295,6 +295,27 @@ button { cursor: pointer; font-family: var(--font); border: none; outline: none;
   color: rgba(255,255,255,0.55);
 }
 
+/* ── Accordion nav groups ─────────────────────────────────── */
+.nav-group-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 9px 18px;
+  background: none; border: none; cursor: pointer;
+  color: var(--sidebar-txt); font-size: 0.857rem; font-weight: 500;
+  text-align: left; transition: var(--ease);
+  border-left: 3px solid transparent;
+}
+.nav-group-btn i.icon { width: 17px; font-size: 13px; text-align: center; flex-shrink: 0; }
+.nav-group-btn .nav-group-label { flex: 1; }
+.nav-group-btn:hover { background: var(--sidebar-hover); color: #fff; }
+.nav-group-btn.open { color: #fff; }
+.nav-chevron { font-size: 10px; transition: transform .25s ease; flex-shrink: 0; }
+.nav-group-btn.open .nav-chevron { transform: rotate(180deg); }
+.nav-group-body {
+  overflow: hidden; max-height: 0; transition: max-height .35s ease;
+}
+.nav-group-body.open { max-height: 1200px; }
+.nav-group-body .nav-link { padding-left: 30px; font-size: 0.814rem; }
+
 .sb-footer {
   padding: 14px 18px;
   border-top: 1px solid rgba(255,255,255,0.07);
