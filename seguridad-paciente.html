@@ -9,92 +9,201 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    /* ── Form layout ─────────────────────────────────────────── */
+    /* ── Variables locales (resuelven las no definidas en styles.css) ── */
+    :root {
+      --surface: #ffffff;
+      --text:    #1e293b;
+      --text-muted: #64748b;
+      --radius:  12px;
+      --field-border: #cbd5e1;
+      --field-bg:     #ffffff;
+    }
+
+    /* ── Tarjetas del formulario ──────────────────────────────── */
     .form-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
       margin-bottom: 20px;
       overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
     }
     .form-card-head {
       display: flex; align-items: center; gap: 10px;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      font-size: .85rem; font-weight: 600; color: var(--text);
+      padding: 15px 22px;
+      font-size: .85rem; font-weight: 700; letter-spacing: .02em;
     }
-    .form-card-head i { width: 20px; text-align: center; font-size: .9rem; }
-    .form-card-head.blue  { background: #eff6ff; color: #1e40af; border-bottom-color:#bfdbfe; }
-    .form-card-head.teal  { background: #f0fdfa; color: #0f766e; border-bottom-color:#99f6e4; }
-    .form-card-head.amber { background: #fffbeb; color: #92400e; border-bottom-color:#fde68a; }
-    .form-card-head.violet{ background: #f5f3ff; color: #5b21b6; border-bottom-color:#ddd6fe; }
-    .form-card-body { padding: 20px; }
-    .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+    .form-card-head i { width: 22px; text-align: center; font-size: 1rem; }
+    .form-card-head.blue   { background: #eff6ff; color: #1d4ed8; border-bottom: 2px solid #bfdbfe; }
+    .form-card-head.teal   { background: #f0fdfa; color: #0f766e; border-bottom: 2px solid #5eead4; }
+    .form-card-head.amber  { background: #fffbeb; color: #92400e; border-bottom: 2px solid #fde68a; }
+    .form-card-body { padding: 24px; background: #fff; }
+
+    /* ── Grid de campos ───────────────────────────────────────── */
+    .form-grid { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); }
     .form-grid.col2 { grid-template-columns: repeat(2, 1fr); }
     .form-grid.col1 { grid-template-columns: 1fr; }
     .span2 { grid-column: span 2; }
     .span3 { grid-column: span 3; }
-    .form-field { display: flex; flex-direction: column; gap: 5px; }
+
+    /* ── Campo individual ─────────────────────────────────────── */
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+
     .form-field label {
-      font-size: .78rem; font-weight: 600; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: .04em;
+      font-size: .775rem; font-weight: 700;
+      color: #374151;
+      text-transform: uppercase; letter-spacing: .05em;
+      display: flex; align-items: center; gap: 4px;
     }
-    .form-field label .req { color: var(--red); margin-left: 2px; }
+    .form-field label .req { color: #dc2626; font-size: .85rem; }
+
+    /* Inputs, selects y textareas ─────────────────────────────── */
     .form-field input,
     .form-field select,
     .form-field textarea {
-      padding: 9px 12px;
-      border: 1px solid var(--border);
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #cbd5e1;
       border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-size: .875rem;
+      background: #f8fafc;
+      color: #1e293b;
+      font-size: .9rem;
       font-family: inherit;
-      transition: border-color .15s, box-shadow .15s;
+      line-height: 1.45;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      appearance: none;
+      -webkit-appearance: none;
     }
+    /* Select — flecha personalizada */
+    .form-field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+    /* Placeholder / opción vacía */
+    .form-field input::placeholder { color: #94a3b8; }
+    .form-field select option[value=""] { color: #94a3b8; }
+
+    /* Focus */
     .form-field input:focus,
     .form-field select:focus,
     .form-field textarea:focus {
       outline: none;
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(0,150,136,.12);
+      border-color: #009688;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(0,150,136,.15);
     }
-    .form-field textarea { resize: vertical; min-height: 80px; }
-    .form-field .field-hint {
-      font-size: .72rem; color: var(--text-muted); margin-top: 2px;
+    /* Hover (sin foco) */
+    .form-field input:hover:not(:focus),
+    .form-field select:hover:not(:focus),
+    .form-field textarea:hover:not(:focus) {
+      border-color: #94a3b8;
+      background: #fff;
     }
 
-    /* WHO badge */
+    .form-field textarea { resize: vertical; min-height: 90px; }
+
+    .form-field .field-hint {
+      display: block;
+      font-size: .72rem; color: #64748b; line-height: 1.4;
+    }
+
+    /* ── Divider entre sub-selects ICPS ──────────────────────── */
+    #icps-l2-wrap,
+    #icps-l3-wrap {
+      padding-left: 14px;
+      border-left: 3px solid #5eead4;
+      margin-top: 10px;
+    }
+    #icps-l3-wrap { border-left-color: #009688; }
+
+    /* ── Breadcrumb ICPS ──────────────────────────────────────── */
+    #icps-breadcrumb {
+      display: block;
+      margin-top: 8px;
+      font-size: .75rem;
+      color: #0f766e;
+      font-weight: 500;
+    }
+
+    /* ── Badge OMS ────────────────────────────────────────────── */
     .who-badge {
       display: inline-flex; align-items: center; gap: 6px;
-      background: #f0fdf4; border: 1px solid #bbf7d0;
-      color: #166534; font-size: .72rem; font-weight: 600;
-      padding: 3px 8px; border-radius: 20px; margin-bottom: 12px;
+      background: #f0fdf4; border: 1px solid #86efac;
+      color: #166534; font-size: .72rem; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px; margin-bottom: 12px;
     }
 
-    /* Submit area */
+    /* ── Pills de tipo de incidente ───────────────────────────── */
+    .type-pills { display: flex; flex-wrap: wrap; gap: 10px; margin: 4px 0 6px; }
+    .type-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 9px 16px; border-radius: 24px;
+      border: 2px solid #e2e8f0;
+      background: #f8fafc; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: all .18s ease; color: #64748b;
+      user-select: none;
+    }
+    .type-pill:hover { border-color: #009688; background: #f0fdfa; color: #0f766e; }
+    .type-pill.selected { border-width: 2px; color: #fff; }
+    .type-pill.pill-ae.selected  { background: #dc2626; border-color: #dc2626; }
+    .type-pill.pill-ce.selected  { background: #7c3aed; border-color: #7c3aed; }
+    .type-pill.pill-cf.selected  { background: #d97706; border-color: #d97706; }
+    .type-pill.pill-sd.selected  { background: #059669; border-color: #059669; }
+    input[name="incident_type"] { display: none; }
+
+    /* Hint del tipo seleccionado */
+    #type-hint {
+      margin-top: 4px;
+      font-size: .78rem;
+      color: #475569;
+      background: #f1f5f9;
+      border-left: 3px solid #009688;
+      padding: 6px 10px;
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* ── Encabezado de página ─────────────────────────────────── */
+    .sp-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 20px 0 18px;
+    }
+    .sp-header-icon {
+      width: 50px; height: 50px; border-radius: 14px;
+      background: linear-gradient(135deg,#0d3d38,#009688);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.25rem; flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,150,136,.3);
+    }
+    .sp-header-txt h1 { font-size: 1.18rem; font-weight: 700; color: #1e293b; margin: 0; }
+    .sp-header-txt p  { font-size: .82rem; color: #64748b; margin: 3px 0 0; }
+
+    /* ── Botones de acción ────────────────────────────────────── */
     .form-actions {
-      display: flex; justify-content: flex-end; gap: 10px;
-      padding-top: 8px; margin-top: 4px;
+      display: flex; justify-content: flex-end; gap: 12px;
+      padding-top: 10px; margin-top: 4px;
     }
     .btn-reset {
-      padding: 10px 20px; border: 1px solid var(--border);
-      border-radius: 8px; background: var(--surface);
-      color: var(--text-muted); font-size: .875rem; cursor: pointer;
-      transition: var(--ease);
+      padding: 11px 22px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px; background: #fff;
+      color: #64748b; font-size: .875rem; font-weight: 500;
+      cursor: pointer; transition: all .18s ease;
     }
-    .btn-reset:hover { background: var(--bg); color: var(--text); }
+    .btn-reset:hover { background: #f1f5f9; border-color: #94a3b8; color: #1e293b; }
     .btn-submit {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 10px 24px; border: none; border-radius: 8px;
-      background: var(--blue); color: #fff;
-      font-size: .875rem; font-weight: 600; cursor: pointer;
-      transition: var(--ease);
+      padding: 11px 28px; border: none; border-radius: 8px;
+      background: #009688; color: #fff;
+      font-size: .9rem; font-weight: 700; cursor: pointer;
+      transition: all .18s ease;
+      box-shadow: 0 2px 8px rgba(0,150,136,.35);
     }
-    .btn-submit:hover { background: #00796b; }
-    .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+    .btn-submit:hover { background: #00796b; box-shadow: 0 4px 12px rgba(0,150,136,.4); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; box-shadow: none; }
 
-    /* Toast */
+    /* ── Toast ────────────────────────────────────────────────── */
     #toast {
       position: fixed; bottom: 24px; right: 24px; z-index: 9999;
       padding: 14px 20px; border-radius: 10px;
@@ -105,42 +214,14 @@
     }
     #toast.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; display: flex; }
     #toast.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: flex; }
-    @keyframes slideUp { from { transform: translateY(20px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+    @keyframes slideUp { from { transform:translateY(20px);opacity:0 } to { transform:translateY(0);opacity:1 } }
 
-    /* Page header */
-    .sp-header {
-      display: flex; align-items: center; gap: 14px;
-      padding: 20px 0 16px;
-    }
-    .sp-header-icon {
-      width: 48px; height: 48px; border-radius: 12px;
-      background: linear-gradient(135deg,#0d3d38,#009688);
-      display: flex; align-items: center; justify-content: center;
-      color: #fff; font-size: 1.2rem; flex-shrink: 0;
-    }
-    .sp-header-txt h1 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0; }
-    .sp-header-txt p  { font-size: .8rem; color: var(--text-muted); margin: 2px 0 0; }
-
-    /* Incident type pills */
-    .type-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
-    .type-pill {
-      display: flex; align-items: center; gap: 6px;
-      padding: 7px 14px; border-radius: 20px;
-      border: 2px solid transparent;
-      background: var(--bg); font-size: .8rem; font-weight: 500;
-      cursor: pointer; transition: var(--ease); color: var(--text-muted);
-    }
-    .type-pill:hover { border-color: var(--blue); color: var(--text); }
-    .type-pill.selected { color: #fff; }
-    .type-pill.pill-ae.selected  { background: #dc2626; border-color: #dc2626; }
-    .type-pill.pill-ce.selected  { background: #7c3aed; border-color: #7c3aed; }
-    .type-pill.pill-cf.selected  { background: #d97706; border-color: #d97706; }
-    .type-pill.pill-sd.selected  { background: #059669; border-color: #059669; }
-    input[name="incident_type"] { display: none; }
-
+    /* ── Responsive ───────────────────────────────────────────── */
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr !important; }
       .span2, .span3 { grid-column: span 1; }
+      .type-pills { flex-direction: column; }
+      .type-pill { justify-content: center; }
     }
   </style>
 </head>
