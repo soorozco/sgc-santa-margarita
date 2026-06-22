@@ -356,117 +356,43 @@
                 <span class="field-hint" id="type-hint" style="display:none"></span>
               </div>
 
-              <!-- Tipo de incidente — Clasificación OMS ICPS -->
+              <!-- Tipo de incidente — Clasificación OMS ICPS (cascading) -->
               <div class="form-field span3">
                 <div class="who-badge"><i class="fa-solid fa-earth-americas"></i> Clasificación Internacional OMS · ICPS v1.1</div>
-                <label>Clasificación del Tipo de Incidente (OMS) <span class="req">*</span></label>
-                <select name="incident_subtype" id="incident_subtype" required>
-                  <option value="">— Seleccionar categoría —</option>
-                  <optgroup label="1. Administración Clínica">
-                    <option value="Administración Clínica — Entrega de turno">Entrega de turno / Handover</option>
-                    <option value="Administración Clínica — Cita/Lista de espera">Cita / Lista de espera / Referencia</option>
-                    <option value="Administración Clínica — Admisión/Egreso/Traslado">Admisión, Egreso o Traslado del paciente</option>
-                    <option value="Administración Clínica — Identificación del paciente">Identificación incorrecta del paciente</option>
-                    <option value="Administración Clínica — Consentimiento informado">Consentimiento informado</option>
-                    <option value="Administración Clínica — Asignación de tareas">Asignación de tareas / Respuesta a emergencias</option>
-                  </optgroup>
-                  <optgroup label="2. Proceso / Procedimiento Clínico">
-                    <option value="Proceso Clínico — Diagnóstico/Evaluación">Diagnóstico o evaluación incorrecta/tardía</option>
-                    <option value="Proceso Clínico — Procedimiento/Tratamiento">Procedimiento o tratamiento inadecuado</option>
-                    <option value="Proceso Clínico — Cuidado general">Cuidado general y seguimiento</option>
-                    <option value="Proceso Clínico — Pruebas/Estudios">Pruebas, estudios o especímenes</option>
-                    <option value="Proceso Clínico — Parte/Lado equivocado">Sitio, lado o parte del cuerpo equivocado</option>
-                    <option value="Proceso Clínico — Paciente equivocado">Paciente equivocado en el procedimiento</option>
-                  </optgroup>
-                  <optgroup label="3. Documentación">
-                    <option value="Documentación — Expediente/Historia clínica">Expediente clínico / Historia incompleta o errónea</option>
-                    <option value="Documentación — Órdenes/Solicitudes">Órdenes o solicitudes erróneas</option>
-                    <option value="Documentación — Listas de verificación">Listas de verificación / Checklists</option>
-                    <option value="Documentación — Formularios/Certificados">Formularios o certificados</option>
-                    <option value="Documentación — Etiquetas/Identificación">Etiquetas, brazaletes o identificaciones</option>
-                    <option value="Documentación — Resultados/Imágenes">Resultados, informes e imágenes</option>
-                  </optgroup>
-                  <optgroup label="4. Infección Asociada a la Atención de Salud (IAAS)">
-                    <option value="IAAS — Bacteriana">Infección bacteriana</option>
-                    <option value="IAAS — Viral">Infección viral</option>
-                    <option value="IAAS — Fúngica">Infección fúngica</option>
-                    <option value="IAAS — Otro microorganismo">Otro microorganismo / No identificado</option>
-                    <option value="IAAS — Torrente sanguíneo">Infección del torrente sanguíneo</option>
-                    <option value="IAAS — Sitio quirúrgico">Infección de sitio quirúrgico</option>
-                    <option value="IAAS — Neumonía">Neumonía asociada a ventilador / atención</option>
-                    <option value="IAAS — Vías urinarias">Infección de vías urinarias asociada a catéter</option>
-                    <option value="IAAS — Acceso vascular">Infección por acceso vascular / catéter</option>
-                    <option value="IAAS — Tejidos blandos">Infección de tejidos blandos</option>
-                  </optgroup>
-                  <optgroup label="5. Medicación / Fluidos IV">
-                    <option value="Medicación — Prescripción errónea">Prescripción errónea</option>
-                    <option value="Medicación — Preparación/Dispensación">Preparación o dispensación incorrecta</option>
-                    <option value="Medicación — Administración errónea">Administración errónea</option>
-                    <option value="Medicación — Paciente equivocado">Medicamento administrado a paciente equivocado</option>
-                    <option value="Medicación — Fármaco equivocado">Fármaco equivocado</option>
-                    <option value="Medicación — Dosis/Frecuencia errónea">Dosis, concentración o frecuencia errónea</option>
-                    <option value="Medicación — Vía errónea">Vía de administración errónea</option>
-                    <option value="Medicación — Omisión de dosis">Omisión de dosis o medicamento</option>
-                    <option value="Medicación — Contraindicación">Contraindicación / Alergia conocida</option>
-                    <option value="Medicación — Reacción adversa">Reacción adversa a medicamento (RAM)</option>
-                    <option value="Medicación — Medicamento caducado">Medicamento caducado o en mal estado</option>
-                  </optgroup>
-                  <optgroup label="6. Sangre / Hemoderivados">
-                    <option value="Sangre — Pruebas pretransfusionales">Pruebas pretransfusionales incorrectas</option>
-                    <option value="Sangre — Paciente equivocado">Transfusión a paciente equivocado</option>
-                    <option value="Sangre — Hemoderivado incorrecto">Hemoderivado incorrecto</option>
-                    <option value="Sangre — Administración errónea">Administración errónea de hemoderivado</option>
-                    <option value="Sangre — Reacción transfusional">Reacción transfusional adversa</option>
-                    <option value="Sangre — Producto caducado">Producto sanguíneo caducado o contaminado</option>
-                  </optgroup>
-                  <optgroup label="7. Nutrición">
-                    <option value="Nutrición — Dieta equivocada">Dieta equivocada o inadecuada para el paciente</option>
-                    <option value="Nutrición — Paciente equivocado">Dieta entregada a paciente equivocado</option>
-                    <option value="Nutrición — Preparación/Almacenamiento">Error en preparación o almacenamiento</option>
-                    <option value="Nutrición — Nutrición parenteral/enteral">Error en nutrición parenteral o enteral</option>
-                  </optgroup>
-                  <optgroup label="8. Oxígeno / Gas / Vapor">
-                    <option value="Gas — Administración errónea">Administración errónea de gas/oxígeno</option>
-                    <option value="Gas — Gas equivocado">Gas equivocado administrado</option>
-                    <option value="Gas — Falla en suministro">Falla o interrupción en suministro de gases</option>
-                    <option value="Gas — Contaminación">Contaminación de gas medicinal</option>
-                  </optgroup>
-                  <optgroup label="9. Dispositivo / Equipo Médico">
-                    <option value="Equipo — Falla/Mal funcionamiento">Falla o mal funcionamiento del equipo</option>
-                    <option value="Equipo — No disponible">Equipo no disponible cuando se necesitó</option>
-                    <option value="Equipo — Uso incorrecto">Uso incorrecto del dispositivo</option>
-                    <option value="Equipo — No estéril/Contaminado">Equipo no estéril o contaminado</option>
-                    <option value="Equipo — Desconexión/Desplazamiento">Desconexión o desplazamiento accidental</option>
-                  </optgroup>
-                  <optgroup label="10. Comportamiento">
-                    <option value="Comportamiento — Agresión verbal">Agresión verbal</option>
-                    <option value="Comportamiento — Agresión física">Agresión física</option>
-                    <option value="Comportamiento — Agresión sexual">Agresión sexual</option>
-                    <option value="Comportamiento — Autolesión/Suicidio">Autolesión o intento de suicidio del paciente</option>
-                    <option value="Comportamiento — Fuga/Abandono">Fuga o abandono del paciente</option>
-                    <option value="Comportamiento — Incumplimiento del paciente">Incumplimiento del tratamiento por el paciente</option>
-                    <option value="Comportamiento — Conducta inapropiada del personal">Conducta inapropiada del personal</option>
-                  </optgroup>
-                  <optgroup label="11. Accidentes de Pacientes">
-                    <option value="Accidente — Caída">Caída del paciente</option>
-                    <option value="Accidente — Quemadura">Quemadura (térmica, química, eléctrica)</option>
-                    <option value="Accidente — Exposición a sustancia tóxica">Exposición a sustancia tóxica o química</option>
-                    <option value="Accidente — Lesión por fuerza mecánica">Lesión por fuerza mecánica (golpe, corte)</option>
-                    <option value="Accidente — Obstrucción de vía aérea">Obstrucción de vía aérea / Ahogamiento</option>
-                    <option value="Accidente — Exposición eléctrica/radiación">Exposición a electricidad o radiación</option>
-                  </optgroup>
-                  <optgroup label="12. Infraestructura / Edificios / Instalaciones">
-                    <option value="Infraestructura — Instalación dañada/defectuosa">Instalación dañada, defectuosa o inadecuada</option>
-                    <option value="Infraestructura — No disponible">Infraestructura no disponible</option>
-                    <option value="Infraestructura — Falla en servicios">Falla en servicios (luz, agua, HVAC)</option>
-                  </optgroup>
-                  <optgroup label="13. Recursos / Gestión Organizacional">
-                    <option value="Recursos — Carga de trabajo excesiva">Carga de trabajo excesiva / Subdotación</option>
-                    <option value="Recursos — Disponibilidad de camas/servicios">Falta de disponibilidad de camas o servicios</option>
-                    <option value="Recursos — Organización de equipos">Problemas en organización de equipos</option>
-                    <option value="Recursos — Protocolos/Políticas">Falta o inadecuación de protocolos y políticas</option>
-                  </optgroup>
+                <label>Categoría del Incidente (OMS-ICPS) <span class="req">*</span></label>
+                <select id="icps-cat" onchange="icpsL1(this.value)">
+                  <option value="">— 1. Seleccionar categoría principal —</option>
+                  <option>1. Administración Clínica</option>
+                  <option>2. Proceso/Procedimiento Clínico</option>
+                  <option>3. Documentación</option>
+                  <option>4. Infección Asociada a la Atención de Salud (IAAS)</option>
+                  <option>5. Medicación/Fluidos IV</option>
+                  <option>6. Sangre/Hemoderivados</option>
+                  <option>7. Nutrición</option>
+                  <option>8. Oxígeno/Gas/Vapor</option>
+                  <option>9. Dispositivo/Equipo Médico</option>
+                  <option>10. Comportamiento</option>
+                  <option>11. Accidentes de Pacientes</option>
+                  <option>12. Infraestructura/Edificios/Instalaciones</option>
+                  <option>13. Recursos/Gestión Organizacional</option>
                 </select>
+
+                <div id="icps-l2-wrap" style="display:none;margin-top:10px">
+                  <label style="margin-top:0">Rama / Clasificación <span class="req">*</span></label>
+                  <select id="icps-branch" onchange="icpsL2(this.value)">
+                    <option value="">— 2. Seleccionar rama —</option>
+                  </select>
+                </div>
+
+                <div id="icps-l3-wrap" style="display:none;margin-top:10px">
+                  <label style="margin-top:0">Tipo Específico <span class="req">*</span></label>
+                  <select id="icps-item" onchange="icpsL3(this.value)">
+                    <option value="">— 3. Seleccionar tipo específico —</option>
+                  </select>
+                </div>
+
+                <input type="hidden" name="incident_subtype" id="incident_subtype_hidden">
+                <span class="field-hint" id="icps-breadcrumb" style="margin-top:8px;font-size:.75rem;color:var(--blue)"></span>
                 <span class="field-hint">Clasificación Internacional para la Seguridad del Paciente — OMS (ICPS v1.1, 2009)</span>
               </div>
 
@@ -688,6 +614,7 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
   document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
   document.getElementById('incident_type_val').value = ''
   document.getElementById('type-hint').style.display = 'none'
+  resetICPS()
 
   // Re-set date/time defaults
   const now = new Date()
@@ -698,12 +625,128 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
     `${pad(now.getHours())}:${pad(now.getMinutes())}`
 })
 
+// ── Clasificación OMS-ICPS v1.1 — datos en cascada ───────────
+const ICPS = {
+  '1. Administración Clínica': {
+    'Proceso': ['Entrega de turno (Handover)','Cita','Lista de espera','Referencia/Consulta','Admisión','Egreso','Traslado de cuidados','Identificación del paciente','Consentimiento informado','Asignación de tareas','Respuesta a emergencias'],
+    'Problema': ['No realizado cuando se indicó','Incompleto/Inadecuado','No disponible cuando se necesitó','Paciente equivocado','Proceso/Servicio equivocado']
+  },
+  '2. Proceso/Procedimiento Clínico': {
+    'Proceso': ['Tamizaje/Prevención/Revisión rutinaria','Diagnóstico/Evaluación','Procedimiento/Tratamiento/Intervención','Cuidado general/Manejo','Pruebas/Investigaciones','Muestras/Resultados','Detención/Restricción'],
+    'Problema': ['No realizado cuando se indicó','Incompleto/Inadecuado','No disponible cuando se necesitó','Paciente equivocado','Proceso/Tratamiento equivocado','Parte/Lado/Sitio corporal equivocado']
+  },
+  '3. Documentación': {
+    'Documento Involucrado': ['Órdenes/Solicitudes','Expediente clínico/Registros/Evaluaciones','Listas de verificación (Checklists)','Formularios/Certificados','Instrucciones/Políticas/Procedimientos/Guías','Etiquetas/Brazaletes/Identificaciones','Cartas/Correos/Registros de comunicación','Reportes/Resultados/Imágenes'],
+    'Problema': ['Documento faltante o no disponible','Retraso en acceso al documento','Documento de paciente equivocado','Información poco clara/ambigua/ilegible/incompleta']
+  },
+  '4. Infección Asociada a la Atención de Salud (IAAS)': {
+    'Tipo de Organismo': ['Bacteria','Virus','Hongo','Parásito','Protozoo','Rickettsia','Prión','Organismo no identificado'],
+    'Sitio/Tipo de Infección': ['Torrente sanguíneo','Sitio quirúrgico','Absceso','Neumonía asociada a ventilador','Cánula intravascular','Prótesis/Sitio de implante','Sonda urinaria/Catéter','Tejido blando']
+  },
+  '5. Medicación/Fluidos IV': {
+    'Medicamento/Fluido Involucrado': ['Medicamento (especificar en descripción)','Fluido IV (especificar en descripción)'],
+    'Proceso de Uso': ['Prescripción','Preparación/Dispensación','Presentación/Empaque','Entrega','Administración','Suministro/Pedido','Almacenamiento','Monitoreo'],
+    'Problema': ['Paciente equivocado','Fármaco equivocado','Dosis/Concentración/Frecuencia incorrecta','Formulación o presentación incorrecta','Vía de administración incorrecta','Cantidad incorrecta','Etiqueta/Instrucción de dispensación incorrecta','Contraindicación/Alergia conocida','Almacenamiento incorrecto','Omisión de medicamento o dosis','Medicamento caducado','Reacción adversa al medicamento (RAM)']
+  },
+  '6. Sangre/Hemoderivados': {
+    'Hemoderivado Involucrado': ['Productos celulares','Factores de coagulación','Albúmina/Proteína plasmática','Inmunoglobulina'],
+    'Proceso de Uso': ['Pruebas pretransfusionales','Prescripción','Preparación/Dispensación','Entrega','Administración','Almacenamiento','Monitoreo','Presentación/Empaque','Suministro/Pedido'],
+    'Problema': ['Paciente equivocado','Sangre/Hemoderivado incorrecto','Dosis o frecuencia incorrecta','Cantidad incorrecta','Etiqueta/Instrucción de dispensación incorrecta','Contraindicado','Almacenamiento incorrecto','Omisión de dosis','Sangre/Hemoderivado caducado','Reacción transfusional adversa']
+  },
+  '7. Nutrición': {
+    'Nutrición Involucrada': ['Dieta general','Dieta especial (terapéutica)'],
+    'Proceso de Uso': ['Prescripción/Solicitud','Preparación/Fabricación/Cocción','Suministro/Pedido','Presentación','Dispensación/Asignación','Entrega','Administración','Almacenamiento'],
+    'Problema': ['Paciente equivocado','Dieta incorrecta','Cantidad incorrecta','Frecuencia incorrecta','Consistencia incorrecta','Almacenamiento incorrecto']
+  },
+  '8. Oxígeno/Gas/Vapor': {
+    'Gas/Vapor Involucrado': ['Oxígeno','Óxido nitroso','Dióxido de carbono','Aire medicinal','Otro gas (especificar en descripción)'],
+    'Proceso de Uso': ['Etiquetado/Codificación de color/PIN de cilindro','Prescripción','Administración','Entrega','Suministro/Pedido','Almacenamiento'],
+    'Problema': ['Paciente equivocado','Gas/Vapor incorrecto','Tasa/Flujo/Concentración incorrecta','Modo de entrega incorrecto','Contraindicación','Almacenamiento incorrecto','Falla en administrar','Contaminación']
+  },
+  '9. Dispositivo/Equipo Médico': {
+    'Tipo de Dispositivo/Equipo': ['Dispositivo de monitoreo','Equipo de soporte vital','Dispositivo de infusión','Equipo quirúrgico','Dispositivo de diagnóstico por imagen','Prótesis/Implante','Otro dispositivo (especificar en descripción)'],
+    'Problema': ['Presentación/Empaque deficiente','Falta de disponibilidad','Inapropiado para la tarea','No limpio/No estéril','Falla o mal funcionamiento','Desplazamiento/Desconexión/Remoción accidental','Error del usuario']
+  },
+  '10. Comportamiento': {
+    'Personal': ['No conforme/No cooperativo/Obstaculizador','Desconsiderado/Grosero/Hostil/Inapropiado','Arriesgado/Imprudente/Peligroso','Problema con uso/abuso de sustancias','Acoso','Discriminación/Prejuicio','Agresión verbal','Agresión física','Agresión sexual','Amenaza de muerte'],
+    'Paciente': ['No conforme/No cooperativo','Desconsiderado/Grosero/Hostil/Inapropiado','Arriesgado/Imprudente/Peligroso','Problema con uso/abuso de sustancias','Deambulación/Fuga del servicio','Autolesión intencional/Intento de suicidio','Agresión verbal','Agresión física','Agresión sexual']
+  },
+  '11. Accidentes de Pacientes': {
+    'Caídas — Tipo': ['Tropiezo/Tambaleo','Resbalón','Colapso','Pérdida de equilibrio'],
+    'Caídas — Involucra': ['Cuna/Cunero','Cama','Silla','Camilla/Carro','Inodoro/Baño','Equipo terapéutico','Escaleras/Escalones','Siendo cargado o apoyado por otra persona'],
+    'Fuerza Contundente/Mecánica': ['Contacto con objeto o animal','Contacto con persona','Aplastamiento','Abrasión/Rozamiento','Golpe por explosión','Contacto con maquinaria'],
+    'Fuerza Cortante/Penetrante': ['Rasguño/Corte/Desgarro','Punción/Apuñalamiento','Mordida/Picadura/Envenenamiento','Otra fuerza penetrante'],
+    'Mecanismo Térmico': ['Quemadura por calor excesivo/Fuego','Quemadura por frío/Congelación'],
+    'Amenaza a la Respiración': ['Amenaza mecánica (atragantamiento)','Ahogamiento/Casi ahogamiento','Confinamiento con déficit de oxígeno'],
+    'Exposición a Sustancia Química': ['Envenenamiento por sustancia química','Corrosión por sustancia química'],
+    'Otro Mecanismo': ['Exposición a electricidad/Radiación','Exposición a sonido/Vibración','Exposición a presión de aire','Fenómeno natural/Desastre']
+  },
+  '12. Infraestructura/Edificios/Instalaciones': {
+    'Elemento Involucrado': ['Estructura (especificar en descripción)','Edificio (especificar en descripción)','Instalación/Accesorio (especificar en descripción)'],
+    'Problema': ['Inexistente/Inadecuado','Dañado/Defectuoso/Desgastado','Falla en servicios (luz, agua, HVAC)']
+  },
+  '13. Recursos/Gestión Organizacional': {
+    'Tipo de Problema': ['Ajuste/Manejo de carga de trabajo','Disponibilidad/Adecuación de camas o servicios','Recursos humanos/Disponibilidad o adecuación de personal','Organización de equipos o personas','Disponibilidad o adecuación de protocolos, políticas, procedimientos o guías']
+  }
+}
+
+function icpsL1(cat) {
+  const l2 = document.getElementById('icps-l2-wrap')
+  const l3 = document.getElementById('icps-l3-wrap')
+  const branch = document.getElementById('icps-branch')
+  document.getElementById('incident_subtype_hidden').value = ''
+  document.getElementById('icps-breadcrumb').textContent = ''
+  if (!cat || !ICPS[cat]) { l2.style.display = 'none'; l3.style.display = 'none'; return }
+  branch.innerHTML = '<option value="">— 2. Seleccionar rama —</option>'
+  Object.keys(ICPS[cat]).forEach(b => {
+    const o = document.createElement('option'); o.value = b; o.textContent = b; branch.appendChild(o)
+  })
+  l2.style.display = 'block'
+  l3.style.display = 'none'
+  document.getElementById('icps-item').innerHTML = '<option value="">— 3. Seleccionar tipo específico —</option>'
+}
+
+function icpsL2(branchVal) {
+  const cat = document.getElementById('icps-cat').value
+  const l3 = document.getElementById('icps-l3-wrap')
+  const itemSel = document.getElementById('icps-item')
+  document.getElementById('incident_subtype_hidden').value = ''
+  document.getElementById('icps-breadcrumb').textContent = ''
+  if (!branchVal || !ICPS[cat] || !ICPS[cat][branchVal]) { l3.style.display = 'none'; return }
+  itemSel.innerHTML = '<option value="">— 3. Seleccionar tipo específico —</option>'
+  ICPS[cat][branchVal].forEach(item => {
+    const o = document.createElement('option'); o.value = item; o.textContent = item; itemSel.appendChild(o)
+  })
+  l3.style.display = 'block'
+  document.getElementById('incident_subtype_hidden').value = `${cat} > ${branchVal}`
+  document.getElementById('icps-breadcrumb').textContent = `${cat} › ${branchVal}`
+}
+
+function icpsL3(item) {
+  const cat = document.getElementById('icps-cat').value
+  const branch = document.getElementById('icps-branch').value
+  const val = item ? `${cat} > ${branch} > ${item}` : `${cat} > ${branch}`
+  document.getElementById('incident_subtype_hidden').value = val
+  document.getElementById('icps-breadcrumb').textContent = item ? `${cat} › ${branch} › ${item}` : `${cat} › ${branch}`
+}
+
+function resetICPS() {
+  document.getElementById('icps-cat').value = ''
+  document.getElementById('icps-branch').innerHTML = '<option value="">— 2. Seleccionar rama —</option>'
+  document.getElementById('icps-item').innerHTML = '<option value="">— 3. Seleccionar tipo específico —</option>'
+  document.getElementById('icps-l2-wrap').style.display = 'none'
+  document.getElementById('icps-l3-wrap').style.display = 'none'
+  document.getElementById('incident_subtype_hidden').value = ''
+  document.getElementById('icps-breadcrumb').textContent = ''
+}
+
 // ── Helpers ───────────────────────────────────────────────────
 function resetForm() {
   document.getElementById('incident-form').reset()
   document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
   document.getElementById('incident_type_val').value = ''
   document.getElementById('type-hint').style.display = 'none'
+  resetICPS()
 }
 
 let toastTimer
