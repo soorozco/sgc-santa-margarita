@@ -515,12 +515,7 @@
                 <textarea name="contributing_factors" rows="3"
                   placeholder="Factores que pudieron haber influido: carga de trabajo, comunicación, capacitación, diseño del proceso, entorno, etc."></textarea>
               </div>
-              <div class="form-field">
-                <label>Factores Mitigantes / Acciones de Recuperación</label>
-                <textarea name="mitigating_factors" rows="3"
-                  placeholder="¿Qué impidió que el daño fuera mayor? ¿Qué acción o circunstancia detectó o detuvo la progresión del incidente?"></textarea>
-              </div>
-              <div class="form-field">
+<div class="form-field">
                 <label>Acciones Inmediatas Tomadas</label>
                 <textarea name="immediate_actions" rows="3"
                   placeholder="Describa las medidas que se tomaron de inmediato para atender al paciente y contener el incidente."></textarea>
@@ -626,7 +621,6 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
     description:          get('description'),
     causes:               get('causes') || null,
     contributing_factors: get('contributing_factors') || null,
-    mitigating_factors:   get('mitigating_factors') || null,
     immediate_actions:    get('immediate_actions') || null,
   }
 
