@@ -448,46 +448,6 @@
           </div>
         </div>
 
-        <!-- ── 4. Datos del Notificante ──────────────────────── -->
-        <div class="form-card">
-          <div class="form-card-head violet">
-            <i class="fa-solid fa-user-nurse"></i> Datos del Notificante
-          </div>
-          <div class="form-card-body">
-            <div class="form-grid">
-              <div class="form-field">
-                <label>Nombre del Notificante</label>
-                <input type="text" name="reporter_name" placeholder="Opcional — puede ser anónimo">
-              </div>
-              <div class="form-field">
-                <label>Área / Servicio</label>
-                <input type="text" name="reporter_area" placeholder="Ej. Urgencias, UCI, Quirófano…">
-              </div>
-              <div class="form-field">
-                <label>Cargo / Categoría</label>
-                <select name="reporter_role">
-                  <option value="">— Seleccionar —</option>
-                  <option>Médico(a)</option>
-                  <option>Enfermero(a)</option>
-                  <option>Enfermero(a) Especialista</option>
-                  <option>Técnico(a) en Enfermería</option>
-                  <option>Residente / Interno(a)</option>
-                  <option>Químico(a) / Farmacéutico(a)</option>
-                  <option>Técnico(a) / Auxiliar</option>
-                  <option>Trabajo Social</option>
-                  <option>Administrativo(a)</option>
-                  <option>Otro</option>
-                  <option value="Anónimo">Prefiero no identificarme</option>
-                </select>
-              </div>
-            </div>
-            <p style="font-size:.75rem;color:var(--text-muted);margin-top:12px;margin-bottom:0">
-              <i class="fa-solid fa-lock" style="margin-right:4px"></i>
-              Los datos del notificante son confidenciales y sólo se usan para seguimiento del reporte. La notificación puede realizarse de forma anónima.
-            </p>
-          </div>
-        </div>
-
         <div class="form-actions">
           <button type="button" class="btn-reset" onclick="resetForm()">
             <i class="fa-solid fa-rotate-left"></i> Limpiar formulario
@@ -571,14 +531,6 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
   btn.disabled = true
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
 
-  // Build notes with reporter data
-  const reporterNote = [
-    get('reporter_name') && `Notificante: ${get('reporter_name')}`,
-    get('reporter_area') && `Área: ${get('reporter_area')}`,
-    get('reporter_role') && `Cargo: ${get('reporter_role')}`,
-    get('patient_record') && `Expediente/NSS: ${get('patient_record')}`,
-  ].filter(Boolean).join(' | ')
-
   const payload = {
     reported_at:          new Date().toISOString(),
     patient_name:         get('patient_name'),
@@ -594,8 +546,7 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
     causes:               get('causes') || null,
     contributing_factors: get('contributing_factors') || null,
     mitigating_factors:   get('mitigating_factors') || null,
-    immediate_actions:    (get('immediate_actions') || '') +
-                          (reporterNote ? `\n\n[${reporterNote}]` : ''),
+    immediate_actions:    get('immediate_actions') || null,
   }
 
   const { error } = await db.from('clinical_incidents').insert(payload)
