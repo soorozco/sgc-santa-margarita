@@ -216,6 +216,58 @@
     #toast.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: flex; }
     @keyframes slideUp { from { transform:translateY(20px);opacity:0 } to { transform:translateY(0);opacity:1 } }
 
+    /* ── Área de carga de archivos ────────────────────────────── */
+    .upload-zone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .18s, background .18s;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: #009688;
+      background: #f0fdfa;
+    }
+    .upload-zone-icon { font-size: 2rem; color: #94a3b8; margin-bottom: 8px; display: block; }
+    .upload-zone:hover .upload-zone-icon, .upload-zone.drag-over .upload-zone-icon { color: #009688; }
+    .upload-zone-txt  { font-size: .875rem; color: #475569; margin: 0; }
+    .upload-zone-link { color: #009688; font-weight: 600; text-decoration: underline; }
+    .upload-zone-sub  { font-size: .75rem; color: #94a3b8; margin: 4px 0 0; }
+
+    /* Lista de archivos seleccionados */
+    #file-preview-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+    .file-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+    }
+    .file-item-thumb {
+      width: 36px; height: 36px; border-radius: 6px;
+      object-fit: cover; flex-shrink: 0;
+      border: 1px solid #e2e8f0;
+    }
+    .file-item-icon {
+      width: 36px; height: 36px; border-radius: 6px;
+      background: #f1f5f9; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; color: #64748b; font-size: 1rem;
+    }
+    .file-item-info { flex: 1; min-width: 0; }
+    .file-item-name { font-size: .82rem; font-weight: 500; color: #1e293b;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-item-size { font-size: .72rem; color: #94a3b8; }
+    .file-item-status { font-size: .72rem; font-weight: 600; flex-shrink: 0; }
+    .file-item-status.ok     { color: #059669; }
+    .file-item-status.err    { color: #dc2626; }
+    .file-item-status.wait   { color: #d97706; }
+    .file-item-remove {
+      background: none; border: none; cursor: pointer;
+      color: #94a3b8; padding: 4px; border-radius: 4px;
+      transition: color .15s; flex-shrink: 0;
+    }
+    .file-item-remove:hover { color: #dc2626; }
+
     /* ── Responsive ───────────────────────────────────────────── */
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr !important; }
@@ -501,6 +553,16 @@
                 <textarea name="immediate_actions" rows="3"
                   placeholder="Describa las medidas que se tomaron de inmediato para atender al paciente y contener el incidente."></textarea>
               </div>
+              <div class="form-field">
+                <label>Archivos Adjuntos <span class="field-hint" style="text-transform:none;letter-spacing:0;font-weight:400">(imágenes, documentos — máx. 5 archivos, 10 MB c/u)</span></label>
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="uploadDragOver(event)" ondragleave="uploadDragLeave(event)" ondrop="uploadDrop(event)">
+                  <i class="fa-solid fa-cloud-arrow-up upload-zone-icon"></i>
+                  <p class="upload-zone-txt">Arrastra archivos aquí o <span class="upload-zone-link">haz clic para seleccionar</span></p>
+                  <p class="upload-zone-sub">PNG, JPG, PDF, DOCX, XLSX</p>
+                </div>
+                <input type="file" id="file-input" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="display:none" onchange="uploadFilesSelected(this.files)">
+                <div id="file-preview-list"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -586,7 +648,11 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
 
   const btn = document.getElementById('btn-submit')
   btn.disabled = true
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo archivos…'
+
+  const attachmentUrls = await uploadAllFiles(_user.id)
+
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…'
 
   const payload = {
     reported_at:          new Date().toISOString(),
@@ -603,6 +669,7 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
     causes:               get('causes') || null,
     contributing_factors: get('contributing_factors') || null,
     immediate_actions:    get('immediate_actions') || null,
+    attachments:          attachmentUrls.length ? attachmentUrls.join(',') : null,
   }
 
   const { error } = await db.from('clinical_incidents').insert(payload)
@@ -621,6 +688,7 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
   document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
   document.getElementById('incident_type_val').value = ''
   document.getElementById('type-hint').style.display = 'none'
+  resetFiles()
   resetLocation()
   resetICPS()
 
@@ -632,6 +700,89 @@ document.getElementById('incident-form').addEventListener('submit', async e => {
   form.querySelector('[name="incident_time"]').value =
     `${pad(now.getHours())}:${pad(now.getMinutes())}`
 })
+
+// ── Adjuntos ──────────────────────────────────────────────────
+const MAX_FILES = 5
+const MAX_MB    = 10
+let _pendingFiles = []  // Array of File objects
+
+function uploadDragOver(e)  { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over') }
+function uploadDragLeave()  { document.getElementById('upload-zone').classList.remove('drag-over') }
+function uploadDrop(e) {
+  e.preventDefault()
+  uploadDragLeave()
+  uploadFilesSelected(e.dataTransfer.files)
+}
+
+function uploadFilesSelected(fileList) {
+  const available = MAX_FILES - _pendingFiles.length
+  const toAdd = Array.from(fileList).slice(0, available)
+  toAdd.forEach(f => {
+    if (f.size > MAX_MB * 1024 * 1024) { showToast('error', `"${f.name}" supera ${MAX_MB} MB`); return }
+    if (_pendingFiles.find(p => p.name === f.name && p.size === f.size)) return
+    _pendingFiles.push(f)
+  })
+  renderFileList()
+  document.getElementById('file-input').value = ''
+}
+
+function removeFile(idx) {
+  _pendingFiles.splice(idx, 1)
+  renderFileList()
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-preview-list')
+  if (!_pendingFiles.length) { list.innerHTML = ''; return }
+  list.innerHTML = _pendingFiles.map((f, i) => {
+    const isImg = f.type.startsWith('image/')
+    const kb = f.size < 1024*1024 ? `${Math.round(f.size/1024)} KB` : `${(f.size/1024/1024).toFixed(1)} MB`
+    const icon = f.type === 'application/pdf' ? 'fa-file-pdf'
+               : f.type.includes('word')       ? 'fa-file-word'
+               : f.type.includes('sheet') || f.type.includes('excel') ? 'fa-file-excel'
+               : 'fa-file'
+    const thumb = isImg
+      ? `<img class="file-item-thumb" src="${URL.createObjectURL(f)}" alt="">`
+      : `<div class="file-item-icon"><i class="fa-solid ${icon}"></i></div>`
+    return `<div class="file-item" id="file-item-${i}">
+      ${thumb}
+      <div class="file-item-info">
+        <div class="file-item-name">${f.name}</div>
+        <div class="file-item-size">${kb}</div>
+      </div>
+      <span class="file-item-status wait" id="file-status-${i}">Pendiente</span>
+      <button type="button" class="file-item-remove" onclick="removeFile(${i})" title="Quitar"><i class="fa-solid fa-xmark"></i></button>
+    </div>`
+  }).join('')
+}
+
+async function uploadAllFiles(userId) {
+  if (!_pendingFiles.length) return []
+  const urls = []
+  for (let i = 0; i < _pendingFiles.length; i++) {
+    const f = _pendingFiles[i]
+    const statusEl = document.getElementById(`file-status-${i}`)
+    if (statusEl) { statusEl.textContent = 'Subiendo…'; statusEl.className = 'file-item-status wait' }
+    const ext  = f.name.split('.').pop()
+    const path = `incidents/${userId}/${Date.now()}-${i}.${ext}`
+    const { data, error } = await db.storage.from('incident-attachments').upload(path, f, { upsert: false })
+    if (error) {
+      if (statusEl) { statusEl.textContent = 'Error'; statusEl.className = 'file-item-status err' }
+      console.error('Upload error:', error)
+      continue
+    }
+    const { data: pub } = db.storage.from('incident-attachments').getPublicUrl(data.path)
+    urls.push(pub.publicUrl)
+    if (statusEl) { statusEl.textContent = '✓ Subido'; statusEl.className = 'file-item-status ok' }
+  }
+  return urls
+}
+
+function resetFiles() {
+  _pendingFiles = []
+  document.getElementById('file-preview-list').innerHTML = ''
+  document.getElementById('file-input').value = ''
+}
 
 // ── Ubicación — áreas y habitaciones (igual que satisfaccion.js) ─
 const ROOMS_BY_AREA = {
@@ -795,6 +946,7 @@ function resetForm() {
   document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
   document.getElementById('incident_type_val').value = ''
   document.getElementById('type-hint').style.display = 'none'
+  resetFiles()
   resetLocation()
   resetICPS()
 }
