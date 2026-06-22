@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notificación de Incidentes — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* ── Form layout ─────────────────────────────────────────── */
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .form-card-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: .85rem; font-weight: 600; color: var(--text);
+    }
+    .form-card-head i { width: 20px; text-align: center; font-size: .9rem; }
+    .form-card-head.blue  { background: #eff6ff; color: #1e40af; border-bottom-color:#bfdbfe; }
+    .form-card-head.teal  { background: #f0fdfa; color: #0f766e; border-bottom-color:#99f6e4; }
+    .form-card-head.amber { background: #fffbeb; color: #92400e; border-bottom-color:#fde68a; }
+    .form-card-head.violet{ background: #f5f3ff; color: #5b21b6; border-bottom-color:#ddd6fe; }
+    .form-card-body { padding: 20px; }
+    .form-grid { display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr); }
+    .form-grid.col2 { grid-template-columns: repeat(2, 1fr); }
+    .form-grid.col1 { grid-template-columns: 1fr; }
+    .span2 { grid-column: span 2; }
+    .span3 { grid-column: span 3; }
+    .form-field { display: flex; flex-direction: column; gap: 5px; }
+    .form-field label {
+      font-size: .78rem; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+    .form-field label .req { color: var(--red); margin-left: 2px; }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: .875rem;
+      font-family: inherit;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,150,136,.12);
+    }
+    .form-field textarea { resize: vertical; min-height: 80px; }
+    .form-field .field-hint {
+      font-size: .72rem; color: var(--text-muted); margin-top: 2px;
+    }
+
+    /* WHO badge */
+    .who-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #f0fdf4; border: 1px solid #bbf7d0;
+      color: #166534; font-size: .72rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 20px; margin-bottom: 12px;
+    }
+
+    /* Submit area */
+    .form-actions {
+      display: flex; justify-content: flex-end; gap: 10px;
+      padding-top: 8px; margin-top: 4px;
+    }
+    .btn-reset {
+      padding: 10px 20px; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--surface);
+      color: var(--text-muted); font-size: .875rem; cursor: pointer;
+      transition: var(--ease);
+    }
+    .btn-reset:hover { background: var(--bg); color: var(--text); }
+    .btn-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 24px; border: none; border-radius: 8px;
+      background: var(--blue); color: #fff;
+      font-size: .875rem; font-weight: 600; cursor: pointer;
+      transition: var(--ease);
+    }
+    .btn-submit:hover { background: #00796b; }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      padding: 14px 20px; border-radius: 10px;
+      font-size: .875rem; font-weight: 500;
+      display: none; align-items: center; gap: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+      animation: slideUp .3s ease;
+    }
+    #toast.success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; display: flex; }
+    #toast.error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; display: flex; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+    /* Page header */
+    .sp-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 20px 0 16px;
+    }
+    .sp-header-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: linear-gradient(135deg,#0d3d38,#009688);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .sp-header-txt h1 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin: 0; }
+    .sp-header-txt p  { font-size: .8rem; color: var(--text-muted); margin: 2px 0 0; }
+
+    /* Incident type pills */
+    .type-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+    .type-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 20px;
+      border: 2px solid transparent;
+      background: var(--bg); font-size: .8rem; font-weight: 500;
+      cursor: pointer; transition: var(--ease); color: var(--text-muted);
+    }
+    .type-pill:hover { border-color: var(--blue); color: var(--text); }
+    .type-pill.selected { color: #fff; }
+    .type-pill.pill-ae.selected  { background: #dc2626; border-color: #dc2626; }
+    .type-pill.pill-ce.selected  { background: #7c3aed; border-color: #7c3aed; }
+    .type-pill.pill-cf.selected  { background: #d97706; border-color: #d97706; }
+    .type-pill.pill-sd.selected  { background: #059669; border-color: #059669; }
+    input[name="incident_type"] { display: none; }
+
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr !important; }
+      .span2, .span3 { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt"><h2>Sta. Margarita</h2><p>SGC ISO 9001:2015</p></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <a class="nav-link" href="dashboard.html">
+        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+      <button class="nav-group-btn" data-target="group-iso">
+        <i class="icon fa-solid fa-certificate"></i>
+        <span class="nav-group-label">ISO 9001:2015</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-iso">
+        <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span><small class="nav-clause">§ 4</small></a>
+        <a class="nav-link" href="liderazgo.html"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span><small class="nav-clause">§ 5</small></a>
+        <a class="nav-link" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+        <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+        <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small></a>
+        <a class="nav-link" href="noconformidades.html" id="nav-nc"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small><span class="nav-badge" id="badge-nc" style="display:none">0</span></a>
+        <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+        <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+        <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
+        <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Q, S y Felicitaciones</span><small class="nav-clause">§ 8.2.1</small></a>
+        <a class="nav-link" href="personal.html"><i class="fa-solid fa-id-card"></i><span>Personal</span></a>
+        <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small></a>
+        <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+        <a class="nav-link" href="configuracion.html" id="nav-config"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-sp">
+        <i class="icon fa-solid fa-shield-heart"></i>
+        <span class="nav-group-label">Seguridad del Paciente</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-sp">
+        <a class="nav-link" href="seguridad-paciente.html"><i class="fa-solid fa-file-medical"></i><span>Notificar Incidente</span></a>
+        <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Dashboard de Incidentes</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-rrhh">
+        <i class="icon fa-solid fa-people-roof"></i>
+        <span class="nav-group-label">Recursos Humanos</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-rrhh">
+        <a class="nav-link" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+        <a class="nav-link" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+        <a class="nav-link" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-page-title">Seguridad del Paciente</div>
+        <div class="topbar-sub">Notificación de eventos adversos, eventos centinela y cuasi fallas</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <a class="btn-primary" href="eventos-adversos.html">
+          <i class="fa-solid fa-chart-bar"></i> Ver Dashboard
+        </a>
+        <span class="iso-badge"><i class="fa-solid fa-certificate"></i> ISO 9001:2015</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <div class="sp-header">
+        <div class="sp-header-icon"><i class="fa-solid fa-shield-heart"></i></div>
+        <div class="sp-header-txt">
+          <h1>Formulario de Notificación de Incidentes</h1>
+          <p>Reporte eventos adversos, eventos centinela y cuasi fallas de forma confidencial y oportuna.</p>
+        </div>
+      </div>
+
+      <form id="incident-form" autocomplete="off" novalidate>
+
+        <!-- ── 1. Datos del Paciente ─────────────────────────── -->
+        <div class="form-card">
+          <div class="form-card-head blue">
+            <i class="fa-solid fa-user-injured"></i> Datos del Paciente
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid">
+              <div class="form-field span3">
+                <label>Nombre del Paciente <span class="req">*</span></label>
+                <input type="text" name="patient_name" placeholder="Apellidos y nombre completo" required>
+              </div>
+              <div class="form-field">
+                <label>Fecha de Nacimiento <span class="req">*</span></label>
+                <input type="date" name="patient_dob" required>
+              </div>
+              <div class="form-field">
+                <label>Sexo <span class="req">*</span></label>
+                <select name="patient_sex" required>
+                  <option value="">— Seleccionar —</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Femenino">Femenino</option>
+                  <option value="No especificado">No especificado</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>No. Expediente / NSS</label>
+                <input type="text" name="patient_record" placeholder="Opcional">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 2. Datos del Incidente ────────────────────────── -->
+        <div class="form-card">
+          <div class="form-card-head teal">
+            <i class="fa-solid fa-calendar-xmark"></i> Datos del Incidente
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Fecha del Incidente <span class="req">*</span></label>
+                <input type="date" name="incident_date" required>
+              </div>
+              <div class="form-field">
+                <label>Hora del Incidente <span class="req">*</span></label>
+                <input type="time" name="incident_time" required>
+              </div>
+              <div class="form-field">
+                <label>Ubicación <span class="req">*</span></label>
+                <select name="location" required>
+                  <option value="">— Seleccionar área —</option>
+                  <optgroup label="Hospitalización">
+                    <option>Medicina Interna</option>
+                    <option>Cirugía General</option>
+                    <option>Ginecología y Obstetricia</option>
+                    <option>Pediatría</option>
+                    <option>Traumatología y Ortopedia</option>
+                    <option>Oncología</option>
+                    <option>Geriatría</option>
+                  </optgroup>
+                  <optgroup label="Cuidados Críticos">
+                    <option>Unidad de Cuidados Intensivos (UCI)</option>
+                    <option>Unidad de Cuidados Intensivos Neonatales (UCIN)</option>
+                    <option>Unidad Coronaria</option>
+                  </optgroup>
+                  <optgroup label="Servicios de Apoyo Diagnóstico">
+                    <option>Urgencias</option>
+                    <option>Quirófano</option>
+                    <option>Sala de Recuperación / UCPA</option>
+                    <option>Laboratorio Clínico</option>
+                    <option>Imagenología / Radiología</option>
+                    <option>Banco de Sangre / Hematología</option>
+                    <option>Endoscopía</option>
+                  </optgroup>
+                  <optgroup label="Consulta y Procedimientos">
+                    <option>Consulta Externa</option>
+                    <option>Hemodiálisis</option>
+                    <option>Quimioterapia Ambulatoria</option>
+                    <option>Rehabilitación / Fisioterapia</option>
+                  </optgroup>
+                  <optgroup label="Servicios Generales">
+                    <option>Farmacia</option>
+                    <option>Nutrición y Dietética</option>
+                    <option>Trabajo Social</option>
+                    <option>Admisión y Archivo Clínico</option>
+                    <option>Traslado / Ambulancia</option>
+                  </optgroup>
+                  <option value="Otro">Otro (especificar en descripción)</option>
+                </select>
+              </div>
+
+              <!-- Tipo de incidente — clasificación básica -->
+              <div class="form-field span3">
+                <label>Tipo de Incidente <span class="req">*</span></label>
+                <div class="type-pills">
+                  <div class="type-pill pill-ae" onclick="selectType('Evento Adverso',this)">
+                    <i class="fa-solid fa-circle-exclamation"></i> Evento Adverso
+                  </div>
+                  <div class="type-pill pill-ce" onclick="selectType('Evento Centinela',this)">
+                    <i class="fa-solid fa-radiation"></i> Evento Centinela
+                  </div>
+                  <div class="type-pill pill-cf" onclick="selectType('Cuasi Falla',this)">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Cuasi Falla
+                  </div>
+                  <div class="type-pill pill-sd" onclick="selectType('Incidente sin Daño',this)">
+                    <i class="fa-solid fa-circle-check"></i> Incidente sin Daño
+                  </div>
+                </div>
+                <input type="hidden" name="incident_type" id="incident_type_val" required>
+                <span class="field-hint" id="type-hint" style="display:none"></span>
+              </div>
+
+              <!-- Tipo de incidente — Clasificación OMS ICPS -->
+              <div class="form-field span3">
+                <div class="who-badge"><i class="fa-solid fa-earth-americas"></i> Clasificación Internacional OMS · ICPS v1.1</div>
+                <label>Clasificación del Tipo de Incidente (OMS) <span class="req">*</span></label>
+                <select name="incident_subtype" id="incident_subtype" required>
+                  <option value="">— Seleccionar categoría —</option>
+                  <optgroup label="1. Administración Clínica">
+                    <option value="Administración Clínica — Entrega de turno">Entrega de turno / Handover</option>
+                    <option value="Administración Clínica — Cita/Lista de espera">Cita / Lista de espera / Referencia</option>
+                    <option value="Administración Clínica — Admisión/Egreso/Traslado">Admisión, Egreso o Traslado del paciente</option>
+                    <option value="Administración Clínica — Identificación del paciente">Identificación incorrecta del paciente</option>
+                    <option value="Administración Clínica — Consentimiento informado">Consentimiento informado</option>
+                    <option value="Administración Clínica — Asignación de tareas">Asignación de tareas / Respuesta a emergencias</option>
+                  </optgroup>
+                  <optgroup label="2. Proceso / Procedimiento Clínico">
+                    <option value="Proceso Clínico — Diagnóstico/Evaluación">Diagnóstico o evaluación incorrecta/tardía</option>
+                    <option value="Proceso Clínico — Procedimiento/Tratamiento">Procedimiento o tratamiento inadecuado</option>
+                    <option value="Proceso Clínico — Cuidado general">Cuidado general y seguimiento</option>
+                    <option value="Proceso Clínico — Pruebas/Estudios">Pruebas, estudios o especímenes</option>
+                    <option value="Proceso Clínico — Parte/Lado equivocado">Sitio, lado o parte del cuerpo equivocado</option>
+                    <option value="Proceso Clínico — Paciente equivocado">Paciente equivocado en el procedimiento</option>
+                  </optgroup>
+                  <optgroup label="3. Documentación">
+                    <option value="Documentación — Expediente/Historia clínica">Expediente clínico / Historia incompleta o errónea</option>
+                    <option value="Documentación — Órdenes/Solicitudes">Órdenes o solicitudes erróneas</option>
+                    <option value="Documentación — Listas de verificación">Listas de verificación / Checklists</option>
+                    <option value="Documentación — Formularios/Certificados">Formularios o certificados</option>
+                    <option value="Documentación — Etiquetas/Identificación">Etiquetas, brazaletes o identificaciones</option>
+                    <option value="Documentación — Resultados/Imágenes">Resultados, informes e imágenes</option>
+                  </optgroup>
+                  <optgroup label="4. Infección Asociada a la Atención de Salud (IAAS)">
+                    <option value="IAAS — Bacteriana">Infección bacteriana</option>
+                    <option value="IAAS — Viral">Infección viral</option>
+                    <option value="IAAS — Fúngica">Infección fúngica</option>
+                    <option value="IAAS — Otro microorganismo">Otro microorganismo / No identificado</option>
+                    <option value="IAAS — Torrente sanguíneo">Infección del torrente sanguíneo</option>
+                    <option value="IAAS — Sitio quirúrgico">Infección de sitio quirúrgico</option>
+                    <option value="IAAS — Neumonía">Neumonía asociada a ventilador / atención</option>
+                    <option value="IAAS — Vías urinarias">Infección de vías urinarias asociada a catéter</option>
+                    <option value="IAAS — Acceso vascular">Infección por acceso vascular / catéter</option>
+                    <option value="IAAS — Tejidos blandos">Infección de tejidos blandos</option>
+                  </optgroup>
+                  <optgroup label="5. Medicación / Fluidos IV">
+                    <option value="Medicación — Prescripción errónea">Prescripción errónea</option>
+                    <option value="Medicación — Preparación/Dispensación">Preparación o dispensación incorrecta</option>
+                    <option value="Medicación — Administración errónea">Administración errónea</option>
+                    <option value="Medicación — Paciente equivocado">Medicamento administrado a paciente equivocado</option>
+                    <option value="Medicación — Fármaco equivocado">Fármaco equivocado</option>
+                    <option value="Medicación — Dosis/Frecuencia errónea">Dosis, concentración o frecuencia errónea</option>
+                    <option value="Medicación — Vía errónea">Vía de administración errónea</option>
+                    <option value="Medicación — Omisión de dosis">Omisión de dosis o medicamento</option>
+                    <option value="Medicación — Contraindicación">Contraindicación / Alergia conocida</option>
+                    <option value="Medicación — Reacción adversa">Reacción adversa a medicamento (RAM)</option>
+                    <option value="Medicación — Medicamento caducado">Medicamento caducado o en mal estado</option>
+                  </optgroup>
+                  <optgroup label="6. Sangre / Hemoderivados">
+                    <option value="Sangre — Pruebas pretransfusionales">Pruebas pretransfusionales incorrectas</option>
+                    <option value="Sangre — Paciente equivocado">Transfusión a paciente equivocado</option>
+                    <option value="Sangre — Hemoderivado incorrecto">Hemoderivado incorrecto</option>
+                    <option value="Sangre — Administración errónea">Administración errónea de hemoderivado</option>
+                    <option value="Sangre — Reacción transfusional">Reacción transfusional adversa</option>
+                    <option value="Sangre — Producto caducado">Producto sanguíneo caducado o contaminado</option>
+                  </optgroup>
+                  <optgroup label="7. Nutrición">
+                    <option value="Nutrición — Dieta equivocada">Dieta equivocada o inadecuada para el paciente</option>
+                    <option value="Nutrición — Paciente equivocado">Dieta entregada a paciente equivocado</option>
+                    <option value="Nutrición — Preparación/Almacenamiento">Error en preparación o almacenamiento</option>
+                    <option value="Nutrición — Nutrición parenteral/enteral">Error en nutrición parenteral o enteral</option>
+                  </optgroup>
+                  <optgroup label="8. Oxígeno / Gas / Vapor">
+                    <option value="Gas — Administración errónea">Administración errónea de gas/oxígeno</option>
+                    <option value="Gas — Gas equivocado">Gas equivocado administrado</option>
+                    <option value="Gas — Falla en suministro">Falla o interrupción en suministro de gases</option>
+                    <option value="Gas — Contaminación">Contaminación de gas medicinal</option>
+                  </optgroup>
+                  <optgroup label="9. Dispositivo / Equipo Médico">
+                    <option value="Equipo — Falla/Mal funcionamiento">Falla o mal funcionamiento del equipo</option>
+                    <option value="Equipo — No disponible">Equipo no disponible cuando se necesitó</option>
+                    <option value="Equipo — Uso incorrecto">Uso incorrecto del dispositivo</option>
+                    <option value="Equipo — No estéril/Contaminado">Equipo no estéril o contaminado</option>
+                    <option value="Equipo — Desconexión/Desplazamiento">Desconexión o desplazamiento accidental</option>
+                  </optgroup>
+                  <optgroup label="10. Comportamiento">
+                    <option value="Comportamiento — Agresión verbal">Agresión verbal</option>
+                    <option value="Comportamiento — Agresión física">Agresión física</option>
+                    <option value="Comportamiento — Agresión sexual">Agresión sexual</option>
+                    <option value="Comportamiento — Autolesión/Suicidio">Autolesión o intento de suicidio del paciente</option>
+                    <option value="Comportamiento — Fuga/Abandono">Fuga o abandono del paciente</option>
+                    <option value="Comportamiento — Incumplimiento del paciente">Incumplimiento del tratamiento por el paciente</option>
+                    <option value="Comportamiento — Conducta inapropiada del personal">Conducta inapropiada del personal</option>
+                  </optgroup>
+                  <optgroup label="11. Accidentes de Pacientes">
+                    <option value="Accidente — Caída">Caída del paciente</option>
+                    <option value="Accidente — Quemadura">Quemadura (térmica, química, eléctrica)</option>
+                    <option value="Accidente — Exposición a sustancia tóxica">Exposición a sustancia tóxica o química</option>
+                    <option value="Accidente — Lesión por fuerza mecánica">Lesión por fuerza mecánica (golpe, corte)</option>
+                    <option value="Accidente — Obstrucción de vía aérea">Obstrucción de vía aérea / Ahogamiento</option>
+                    <option value="Accidente — Exposición eléctrica/radiación">Exposición a electricidad o radiación</option>
+                  </optgroup>
+                  <optgroup label="12. Infraestructura / Edificios / Instalaciones">
+                    <option value="Infraestructura — Instalación dañada/defectuosa">Instalación dañada, defectuosa o inadecuada</option>
+                    <option value="Infraestructura — No disponible">Infraestructura no disponible</option>
+                    <option value="Infraestructura — Falla en servicios">Falla en servicios (luz, agua, HVAC)</option>
+                  </optgroup>
+                  <optgroup label="13. Recursos / Gestión Organizacional">
+                    <option value="Recursos — Carga de trabajo excesiva">Carga de trabajo excesiva / Subdotación</option>
+                    <option value="Recursos — Disponibilidad de camas/servicios">Falta de disponibilidad de camas o servicios</option>
+                    <option value="Recursos — Organización de equipos">Problemas en organización de equipos</option>
+                    <option value="Recursos — Protocolos/Políticas">Falta o inadecuación de protocolos y políticas</option>
+                  </optgroup>
+                </select>
+                <span class="field-hint">Clasificación Internacional para la Seguridad del Paciente — OMS (ICPS v1.1, 2009)</span>
+              </div>
+
+              <!-- Nivel de daño -->
+              <div class="form-field span3">
+                <label>Resultado para el Paciente — Nivel de Daño <span class="req">*</span></label>
+                <select name="damage_level" required>
+                  <option value="">— Seleccionar —</option>
+                  <option value="Sin Daño">Sin Daño — El incidente no alcanzó al paciente o no produjo daño</option>
+                  <option value="Leve">Leve — Síntomas leves, recuperación rápida sin intervención mayor</option>
+                  <option value="Moderado">Moderado — Requirió intervención adicional; sin secuelas permanentes</option>
+                  <option value="Grave">Grave — Requirió intervención de rescate vital; posibles secuelas permanentes</option>
+                  <option value="Muerte">Muerte — El incidente contribuyó directa o indirectamente al fallecimiento</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 3. Descripción y Análisis ─────────────────────── -->
+        <div class="form-card">
+          <div class="form-card-head amber">
+            <i class="fa-solid fa-magnifying-glass"></i> Descripción y Análisis
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid col1">
+              <div class="form-field">
+                <label>Descripción del Incidente — ¿Qué pasó? <span class="req">*</span></label>
+                <textarea name="description" rows="4" required
+                  placeholder="Describa con detalle lo que ocurrió, incluyendo la secuencia de eventos, las circunstancias y el contexto clínico al momento del incidente."></textarea>
+              </div>
+              <div class="form-field">
+                <label>Causas — Análisis inicial (si se conocen)</label>
+                <textarea name="causes" rows="3"
+                  placeholder="¿A qué cree que se debió el incidente? Incluya causas directas e indirectas identificadas en el momento."></textarea>
+              </div>
+              <div class="form-field">
+                <label>Factores Contribuyentes</label>
+                <textarea name="contributing_factors" rows="3"
+                  placeholder="Factores que pudieron haber influido: carga de trabajo, comunicación, capacitación, diseño del proceso, entorno, etc."></textarea>
+              </div>
+              <div class="form-field">
+                <label>Factores Mitigantes / Acciones de Recuperación</label>
+                <textarea name="mitigating_factors" rows="3"
+                  placeholder="¿Qué impidió que el daño fuera mayor? ¿Qué acción o circunstancia detectó o detuvo la progresión del incidente?"></textarea>
+              </div>
+              <div class="form-field">
+                <label>Acciones Inmediatas Tomadas</label>
+                <textarea name="immediate_actions" rows="3"
+                  placeholder="Describa las medidas que se tomaron de inmediato para atender al paciente y contener el incidente."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 4. Datos del Notificante ──────────────────────── -->
+        <div class="form-card">
+          <div class="form-card-head violet">
+            <i class="fa-solid fa-user-nurse"></i> Datos del Notificante
+          </div>
+          <div class="form-card-body">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Nombre del Notificante</label>
+                <input type="text" name="reporter_name" placeholder="Opcional — puede ser anónimo">
+              </div>
+              <div class="form-field">
+                <label>Área / Servicio</label>
+                <input type="text" name="reporter_area" placeholder="Ej. Urgencias, UCI, Quirófano…">
+              </div>
+              <div class="form-field">
+                <label>Cargo / Categoría</label>
+                <select name="reporter_role">
+                  <option value="">— Seleccionar —</option>
+                  <option>Médico(a)</option>
+                  <option>Enfermero(a)</option>
+                  <option>Enfermero(a) Especialista</option>
+                  <option>Técnico(a) en Enfermería</option>
+                  <option>Residente / Interno(a)</option>
+                  <option>Químico(a) / Farmacéutico(a)</option>
+                  <option>Técnico(a) / Auxiliar</option>
+                  <option>Trabajo Social</option>
+                  <option>Administrativo(a)</option>
+                  <option>Otro</option>
+                  <option value="Anónimo">Prefiero no identificarme</option>
+                </select>
+              </div>
+            </div>
+            <p style="font-size:.75rem;color:var(--text-muted);margin-top:12px;margin-bottom:0">
+              <i class="fa-solid fa-lock" style="margin-right:4px"></i>
+              Los datos del notificante son confidenciales y sólo se usan para seguimiento del reporte. La notificación puede realizarse de forma anónima.
+            </p>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-reset" onclick="resetForm()">
+            <i class="fa-solid fa-rotate-left"></i> Limpiar formulario
+          </button>
+          <button type="submit" class="btn-submit" id="btn-submit">
+            <i class="fa-solid fa-paper-plane"></i> Enviar Notificación
+          </button>
+        </div>
+
+      </form><!-- /incident-form -->
+    </div><!-- /page-content -->
+  </main>
+</div><!-- /layout -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/sidebar.js"></script>
+<script>
+// ── Init ──────────────────────────────────────────────────────
+let _user = null
+
+async function init() {
+  const today = new Date()
+  document.getElementById('current-date').textContent =
+    today.toLocaleDateString('es-MX', { weekday:'long', day:'2-digit', month:'long', year:'numeric' })
+
+  const auth = await requireAuth()
+  if (!auth) return
+  _user = auth.user
+  document.getElementById('sb-user-name').textContent = auth.profile?.full_name || _user.email.split('@')[0]
+  document.getElementById('sb-user-role').textContent = auth.profile?.departments?.name || '—'
+
+  // Default: today's date and current time
+  const pad = n => String(n).padStart(2,'0')
+  document.querySelector('[name="incident_date"]').value =
+    `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`
+  document.querySelector('[name="incident_time"]').value =
+    `${pad(today.getHours())}:${pad(today.getMinutes())}`
+}
+
+// ── Tipo de incidente — pills ─────────────────────────────────
+const TYPE_HINTS = {
+  'Evento Adverso':    'Incidente que resultó en daño al paciente. Ejemplo: caída con fractura, administración de dosis incorrecta con consecuencias.',
+  'Evento Centinela':  'Incidente grave, inesperado e indeseable que resulta en muerte, daño permanente o pérdida de función. Requiere análisis de causa raíz inmediato.',
+  'Cuasi Falla':       'Incidente que no alcanzó al paciente o no causó daño gracias a la detección oportuna o el azar. También llamado "casi error".',
+  'Incidente sin Daño':'El incidente llegó al paciente pero no produjo daño perceptible. Importante para aprendizaje del sistema.',
+}
+
+function selectType(val, el) {
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
+  el.classList.add('selected')
+  document.getElementById('incident_type_val').value = val
+  const hint = document.getElementById('type-hint')
+  hint.textContent = TYPE_HINTS[val] || ''
+  hint.style.display = 'block'
+}
+
+// ── Form submit ───────────────────────────────────────────────
+document.getElementById('incident-form').addEventListener('submit', async e => {
+  e.preventDefault()
+  const form = e.target
+  const fd = new FormData(form)
+  const get = k => (fd.get(k) || '').trim()
+
+  // Required validation
+  const required = ['patient_name','patient_dob','patient_sex',
+    'incident_date','incident_time','location',
+    'incident_type','incident_subtype','damage_level','description']
+  for (const k of required) {
+    if (!get(k)) {
+      showToast('error', 'Por favor completa todos los campos obligatorios (*).')
+      return
+    }
+  }
+
+  const btn = document.getElementById('btn-submit')
+  btn.disabled = true
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
+
+  // Build notes with reporter data
+  const reporterNote = [
+    get('reporter_name') && `Notificante: ${get('reporter_name')}`,
+    get('reporter_area') && `Área: ${get('reporter_area')}`,
+    get('reporter_role') && `Cargo: ${get('reporter_role')}`,
+    get('patient_record') && `Expediente/NSS: ${get('patient_record')}`,
+  ].filter(Boolean).join(' | ')
+
+  const payload = {
+    reported_at:          new Date().toISOString(),
+    patient_name:         get('patient_name'),
+    patient_dob:          get('patient_dob') || null,
+    patient_sex:          get('patient_sex'),
+    incident_date:        get('incident_date'),
+    incident_time:        get('incident_time'),
+    location:             get('location'),
+    incident_type:        get('incident_type'),
+    incident_subtype:     get('incident_subtype'),
+    damage_level:         get('damage_level'),
+    description:          get('description'),
+    causes:               get('causes') || null,
+    contributing_factors: get('contributing_factors') || null,
+    mitigating_factors:   get('mitigating_factors') || null,
+    immediate_actions:    (get('immediate_actions') || '') +
+                          (reporterNote ? `\n\n[${reporterNote}]` : ''),
+  }
+
+  const { error } = await db.from('clinical_incidents').insert(payload)
+
+  btn.disabled = false
+  btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Notificación'
+
+  if (error) {
+    console.error(error)
+    showToast('error', `Error al enviar: ${error.message}`)
+    return
+  }
+
+  showToast('success', 'Notificación enviada correctamente. ¡Gracias por reportar!')
+  form.reset()
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
+  document.getElementById('incident_type_val').value = ''
+  document.getElementById('type-hint').style.display = 'none'
+
+  // Re-set date/time defaults
+  const now = new Date()
+  const pad = n => String(n).padStart(2,'0')
+  form.querySelector('[name="incident_date"]').value =
+    `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`
+  form.querySelector('[name="incident_time"]').value =
+    `${pad(now.getHours())}:${pad(now.getMinutes())}`
+})
+
+// ── Helpers ───────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('incident-form').reset()
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'))
+  document.getElementById('incident_type_val').value = ''
+  document.getElementById('type-hint').style.display = 'none'
+}
+
+let toastTimer
+function showToast(type, msg) {
+  const t = document.getElementById('toast')
+  t.className = type
+  t.innerHTML = `<i class="fa-solid fa-${type==='success'?'circle-check':'circle-exclamation'}"></i> ${msg}`
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => { t.style.display = 'none'; t.className = '' }, 5000)
+}
+
+function logout() { db.auth.signOut().then(() => { window.location.href = 'index.html' }) }
+
+init()
+</script>
+</body>
+</html>
