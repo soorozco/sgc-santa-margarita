@@ -35,29 +35,9 @@ async function initAC() {
 
 async function loadStaffOptions() {
   const { data } = await db.from('personal').select('nombre').order('nombre')
-  const names = (data || []).map(r => r.nombre)
-  ;['new-responsible-sel', 'd-responsible-sel'].forEach(id => {
-    const sel = document.getElementById(id)
-    if (!sel) return
-    sel.innerHTML = '<option value="">— Seleccionar personal —</option>' +
-      names.map(n => `<option value="${n}">${n}</option>`).join('') +
-      '<option value="__otro__">Otro (escribir manualmente)…</option>'
-  })
-}
-
-function onResponsibleChange(prefix) {
-  const sel      = document.getElementById(`${prefix}-responsible-sel`)
-  const otherInp = document.getElementById(`${prefix}-responsible-other`)
-  const hidden   = document.getElementById(`${prefix}-responsible`)
-  if (!sel) return
-  if (sel.value === '__otro__') {
-    otherInp.style.display = 'block'
-    otherInp.oninput = () => { hidden.value = otherInp.value.trim() }
-    hidden.value = otherInp.value.trim()
-  } else {
-    otherInp.style.display = 'none'
-    hidden.value = sel.value
-  }
+  const dl = document.getElementById('staff-list')
+  if (!dl) return
+  dl.innerHTML = (data || []).map(r => `<option value="${r.nombre}">`).join('')
 }
 
 function renderUserInfo() {
@@ -215,10 +195,6 @@ function openNewAC() {
   setVal('new-date',        new Date().toISOString().split('T')[0])
   setVal('new-source',      'Queja y/o sugerencia')
   setVal('new-responsible', '')
-  const newSel = document.getElementById('new-responsible-sel')
-  if (newSel) newSel.value = ''
-  const newOther = document.getElementById('new-responsible-other')
-  if (newOther) { newOther.value = ''; newOther.style.display = 'none' }
   setVal('new-description', '')
   setVal('new-rootcause',   '')
   openModal('modal-new')
@@ -293,18 +269,6 @@ async function openDetail(id) {
 
   setVal('d-status',        ac.status || 'abierto')
   setVal('d-responsible',   ac.responsible || '')
-  const dSel = document.getElementById('d-responsible-sel')
-  const dOther = document.getElementById('d-responsible-other')
-  if (dSel && ac.responsible) {
-    const opt = [...dSel.options].find(o => o.value === ac.responsible)
-    if (opt) {
-      dSel.value = ac.responsible
-      if (dOther) dOther.style.display = 'none'
-    } else {
-      dSel.value = '__otro__'
-      if (dOther) { dOther.value = ac.responsible; dOther.style.display = 'block' }
-    }
-  }
   setVal('d-description',   ac.nc_description || '')
   setVal('d-rootcause',     ac.root_cause || '')
   setVal('d-effectiveness', ac.effectiveness_verification || '')

@@ -227,12 +227,9 @@
         </div>
         <div class="field">
           <label>Responsable General <span class="req">*</span></label>
-          <select id="new-responsible-sel" onchange="onResponsibleChange('new')">
-            <option value="">— Seleccionar personal —</option>
-          </select>
-          <input type="text" id="new-responsible-other" placeholder="Escribir nombre o cargo…"
-            style="display:none;margin-top:6px">
-          <input type="hidden" id="new-responsible">
+          <input type="text" id="new-responsible" list="staff-list"
+            placeholder="Escribir nombre…" autocomplete="off">
+          <datalist id="staff-list"></datalist>
         </div>
       </div>
 
@@ -310,12 +307,8 @@
           </div>
           <div class="field">
             <label>Responsable General</label>
-            <select id="d-responsible-sel" onchange="onResponsibleChange('d')">
-              <option value="">— Seleccionar personal —</option>
-            </select>
-            <input type="text" id="d-responsible-other" placeholder="Escribir nombre o cargo…"
-              style="display:none;margin-top:6px">
-            <input type="hidden" id="d-responsible">
+            <input type="text" id="d-responsible" list="staff-list"
+              placeholder="Escribir nombre…" autocomplete="off">
           </div>
         </div>
 
