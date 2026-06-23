@@ -55,6 +55,14 @@ async function rrhhLogin(username, password) {
   return user
 }
 
+async function rrhhAutoLogin() {
+  const { data, error } = await db.rpc('rrhh_login_by_email')
+  if (error || !data) return null
+  const user = mapRrhhUser(data)
+  rrhhSaveSession(user)
+  return user
+}
+
 async function rrhhUpdatePassword(callerId, targetId, newPassword) {
   const { error } = await db.rpc('rrhh_update_password', {
     p_caller_id:    callerId,

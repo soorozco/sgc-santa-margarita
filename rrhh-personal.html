@@ -621,10 +621,17 @@ async function confirmDelete() {
 }
 
 // ── Start ─────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
   const session = rrhhLoadSession()
   if (session) {
     _user = session
+    document.getElementById('login-overlay').classList.remove('show')
+    init()
+    return
+  }
+  const auto = await rrhhAutoLogin()
+  if (auto) {
+    _user = auto
     document.getElementById('login-overlay').classList.remove('show')
     init()
   }
