@@ -34,8 +34,7 @@ async function initAC() {
 }
 
 async function loadStaffOptions() {
-  const { data } = await db.from('rrhh_staff')
-    .select('name').eq('is_active', true).order('name')
+  const { data } = await db.rpc('get_staff_names')
   const names = (data || []).map(r => r.name)
   ;['new-responsible-sel', 'd-responsible-sel'].forEach(id => {
     const sel = document.getElementById(id)
