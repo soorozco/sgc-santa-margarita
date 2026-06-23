@@ -538,15 +538,36 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (session) {
     _user = session
     document.getElementById('login-overlay').classList.remove('show')
-    init()
-    return
+    init(); return
   }
   const auto = await rrhhAutoLogin()
   if (auto) {
     _user = auto
     document.getElementById('login-overlay').classList.remove('show')
-    init()
+    init(); return
   }
+  try {
+    const auth = await requireAuth()
+    if (auth?.user) {
+      const sgcRole = auth.profile?.roles?.name || ''
+      const rrhhRole = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
+                     : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
+      _user = {
+        id: auth.user.id,
+        name: auth.profile?.full_name || auth.user.email.split('@')[0],
+        email: auth.user.email,
+        username: auth.user.email.split('@')[0],
+        role: rrhhRole,
+        area: auth.profile?.departments?.name || '',
+        position: '',
+        vacationDays: 12, sindicalDays: 1,
+        needsPasswordReset: false, authorizes: [],
+      }
+      rrhhSaveSession(_user)
+      document.getElementById('login-overlay').classList.remove('show')
+      init()
+    }
+  } catch(e) { /* sin sesión SGC → overlay manual */ }
 })
 </script>
 </body>
