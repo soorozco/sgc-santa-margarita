@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playground — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/documentos.css">
+  <link rel="stylesheet" href="css/solicitudes.css">
+</head>
+<body data-page="playground">
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+
+      <div class="sb-section">Principal</div>
+      <a class="nav-link" href="dashboard.html">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="sb-section">ISO 9001:2015</div>
+
+      <a class="nav-link" href="contexto.html">
+        <i class="fa-solid fa-building"></i>
+        <span>Contexto del SGC</span><small class="nav-clause">§ 4</small>
+      </a>
+
+      <a class="nav-link" href="liderazgo.html">
+        <i class="fa-solid fa-star"></i>
+        <span>Liderazgo y Política</span><small class="nav-clause">§ 5</small>
+      </a>
+
+      <a class="nav-link" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+
+      <a class="nav-link" href="informacion-documentada.html">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Información Documentada</span><small class="nav-clause">§ 7.5</small>
+      </a>
+
+      <a class="nav-link" href="riesgos.html">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small>
+      </a>
+
+      <a class="nav-link" href="noconformidades.html" id="nav-nc">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <span>No Conformidades</span><small class="nav-clause">§ 10.2</small>
+        <span class="nav-badge" id="badge-nc" style="display:none">0</span>
+      </a>
+      <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+
+      <a class="nav-link" href="indicadores.html">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Indicadores</span><small class="nav-clause">§ 9.1</small>
+      </a>
+
+      <a class="nav-link" href="auditorias-internas.html">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small>
+      </a>
+
+      <a class="nav-link" href="auditorias-externas.html">
+        <i class="fa-solid fa-award"></i>
+        <span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small>
+      </a>
+
+      <a class="nav-link" href="revision-direccion.html">
+        <i class="fa-solid fa-clipboard-list"></i>
+        <span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small>
+      </a>
+      <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Q, S y Felicitaciones</span><small class="nav-clause">§ 8.2.1</small></a>
+
+      <div class="sb-section">Otros</div>
+
+      <a class="nav-link" href="personal.html">
+        <i class="fa-solid fa-id-card"></i>
+        <span>Personal</span>
+      </a>
+      <a class="nav-link" href="satisfaccion.html">
+        <i class="fa-solid fa-face-smile"></i>
+        <span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small>
+      </a>
+
+      <a class="nav-link" href="comites.html">
+        <i class="fa-solid fa-users"></i>
+        <span>Comités</span>
+      </a>
+      <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Eventos Adversos</span></a>
+      <a class="nav-link active" href="playground.html">
+        <i class="fa-solid fa-flask"></i>
+        <span>Playground</span>
+      </a>
+      <a class="nav-link" href="configuracion.html" id="nav-config"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+
+    </nav>
+
+    <!-- User info -->
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div>
+          <div class="topbar-page-title" style="display:flex;align-items:center;gap:10px">
+            Información Documentada
+            <span style="background:#f59e0b;color:#fff;font-size:.6rem;font-weight:700;
+                         letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;
+                         border-radius:6px;line-height:1">
+              <i class="fa-solid fa-flask" style="margin-right:3px"></i>PLAYGROUND
+            </span>
+          </div>
+          <div class="topbar-sub">Entorno de pruebas — datos aislados, no afectan producción</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge" style="background:#f59e0b">
+          <i class="fa-solid fa-flask"></i>
+          Sandbox
+        </span>
+      </div>
+    </div>
+
+    <!-- Aviso de entorno sandbox -->
+    <div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;
+                padding:10px 16px;margin:16px 24px 0;display:flex;gap:10px;align-items:center">
+      <i class="fa-solid fa-triangle-exclamation" style="color:#d97706;font-size:1rem;flex-shrink:0"></i>
+      <span style="font-size:.82rem;color:#92400e;line-height:1.5">
+        <strong>Entorno Playground.</strong> Los documentos creados aquí están marcados como
+        <code style="background:#fef3c7;padding:1px 5px;border-radius:3px;font-size:.78rem">is_playground = true</code>
+        y son completamente independientes del catálogo de producción.
+        Solo tú puedes ver y modificar estos datos.
+      </span>
+    </div>
+
+    <!-- Page content -->
+    <div class="page-content">
+
+      <!-- ── Tabs principales §7.5 ──────────────────────── -->
+      <div class="infodoc-tabs">
+        <button class="infodoc-tab active" data-tab="docs">
+          <i class="fa-solid fa-file-lines"></i>
+          Documentos
+          <span class="infodoc-tab-sub">Procedimientos · Políticas · Instrucciones</span>
+        </button>
+        <button class="infodoc-tab" data-tab="regs">
+          <i class="fa-solid fa-table-list"></i>
+          Registros / Formatos
+          <span class="infodoc-tab-sub">Formatos · Bitácoras · Registros FT</span>
+        </button>
+        <button class="infodoc-tab" data-tab="solicitudes">
+          <i class="fa-solid fa-inbox"></i>
+          Solicitudes
+          <span class="infodoc-tab-sub">Alta · Baja · Historial</span>
+        </button>
+      </div>
+
+      <!-- ══════════════ ÁREA — Documentos/Registros ══════════════ -->
+      <div id="infodoc-docs-area">
+
+      <!-- ── Toolbar ──────────────────────────────── -->
+      <div class="toolbar">
+
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" class="search-input" id="search-input"
+                 placeholder="Buscar por código, nombre o custodia…">
+        </div>
+
+        <select class="filter-sel" id="f-dept">
+          <option value="">Todos los departamentos</option>
+        </select>
+
+        <div id="f-type-wrap">
+          <select class="filter-sel" id="f-type">
+            <option value="">Todos los tipos</option>
+          </select>
+        </div>
+
+        <select class="filter-sel" id="f-status">
+          <option value="">Todos los estados</option>
+          <option value="borrador">Borrador</option>
+          <option value="en_revision">En Revisión</option>
+          <option value="en_aprobacion">En Aprobación</option>
+          <option value="vigente">Vigente</option>
+          <option value="obsoleto">Obsoleto</option>
+        </select>
+
+        <div id="f-ret-wrap" style="display:none">
+          <select class="filter-sel" id="f-ret">
+            <option value="">Retención: todas</option>
+            <option value="sin">Sin retención definida</option>
+            <option value="con">Con retención definida</option>
+          </select>
+        </div>
+
+        <button class="btn-secondary" onclick="exportCSV()">
+          <i class="fa-solid fa-download"></i>
+          Exportar CSV
+        </button>
+
+        <button class="btn-primary" id="btn-new-doc" onclick="openNewDoc()" style="display:none">
+          <i class="fa-solid fa-plus"></i>
+          Nuevo Documento
+        </button>
+
+        <button class="btn-sol-clave" id="btn-sol-clave" onclick="openSolClave()" style="display:none">
+          <i class="fa-solid fa-key"></i>
+          Solicitar Clave Nueva
+        </button>
+
+      </div>
+
+      <!-- ── Panel solicitudes de clave (solo admin) ─────── -->
+      <div class="clave-requests-panel" id="clave-requests-panel" style="display:none">
+        <div class="clave-panel-hdr">
+          <span><i class="fa-solid fa-key"></i> Solicitudes de Clave Nueva</span>
+          <span class="clave-panel-badge" id="clave-panel-badge">0</span>
+        </div>
+        <div id="clave-requests-list">
+          <p style="text-align:center;padding:18px;color:var(--txt3);font-size:.857rem">Cargando…</p>
+        </div>
+      </div>
+
+      <!-- ── Estadísticas rápidas ───────────────────── -->
+      <div class="stats-bar" id="stats-bar" style="display:none">
+        <div class="stats-group" id="stats-status"></div>
+        <div class="stats-divider"></div>
+        <div class="stats-group" id="stats-type"></div>
+      </div>
+
+      <!-- ── Tabla de documentos ──────────────────── -->
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="table-count" id="doc-count">Cargando documentos…</span>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th id="th-tipo">Tipo</th>
+              <th class="center">Versión</th>
+              <th>Departamento</th>
+              <th id="th-custodio">Custodio</th>
+              <th id="th-ret" style="display:none" class="center">Retención</th>
+              <th id="th-cov" style="display:none" class="center">Cobertura</th>
+              <th class="center">Estado</th>
+              <th class="center">Solicitud de Baja</th>
+              <th class="center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="docs-tbody">
+            <tr>
+              <td colspan="9" class="table-empty">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <strong>Cargando…</strong>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      </div><!-- /infodoc-docs-area -->
+
+      <!-- ══════════════ PANEL — Solicitudes ══════════════ -->
+      <div id="infodoc-panel-solicitudes" style="display:none">
+
+        <!-- KPIs -->
+        <div class="sol-kpis">
+          <div class="sol-kpi sol-kpi--alta">
+            <div class="sol-kpi-icon"><i class="fa-solid fa-key"></i></div>
+            <div>
+              <div class="sol-kpi-value" id="kpi-alta-count">—</div>
+              <div class="sol-kpi-label">Solicitudes de Alta pendientes</div>
+            </div>
+          </div>
+          <div class="sol-kpi sol-kpi--baja">
+            <div class="sol-kpi-icon"><i class="fa-solid fa-arrow-down-to-line"></i></div>
+            <div>
+              <div class="sol-kpi-value" id="kpi-baja-count">—</div>
+              <div class="sol-kpi-label">Solicitudes de Baja pendientes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs principales -->
+        <div class="tabs sol-tabs-main">
+          <button class="tab-btn active" data-section="alta">
+            <i class="fa-solid fa-key"></i>
+            Solicitudes de Alta
+            <span class="tab-badge" id="badge-alta">0</span>
+          </button>
+          <button class="tab-btn" data-section="baja">
+            <i class="fa-solid fa-arrow-down-to-line"></i>
+            Solicitudes de Baja
+            <span class="tab-badge" id="badge-baja">0</span>
+          </button>
+        </div>
+
+        <!-- ══════════ SECCIÓN: ALTA ══════════ -->
+        <div class="sol-section active" id="section-alta">
+
+          <div class="tabs sol-tabs-sub">
+            <button class="tab-btn active" data-tab="alta-pending">
+              <i class="fa-solid fa-clock"></i> Pendientes
+              <span class="tab-badge" id="badge-alta-pending">0</span>
+            </button>
+            <button class="tab-btn" data-tab="alta-history">
+              <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+          </div>
+
+          <!-- Alta — Pendientes -->
+          <div class="tab-panel active" id="alta-pending">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código sugerido</th>
+                    <th>Nombre propuesto</th>
+                    <th>Tipo</th>
+                    <th>Departamento</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th>Justificación</th>
+                    <th class="center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-alta-pending">
+                  <tr><td colspan="8" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Alta — Historial -->
+          <div class="tab-panel" id="alta-history">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Código asignado</th>
+                    <th>Nombre propuesto</th>
+                    <th>Departamento</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th class="center">Estado</th>
+                    <th>Notas del revisor</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-alta-history">
+                  <tr><td colspan="7" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /section-alta -->
+
+        <!-- ══════════ SECCIÓN: BAJA ══════════ -->
+        <div class="sol-section" id="section-baja">
+
+          <div class="tabs sol-tabs-sub">
+            <button class="tab-btn active" data-tab="baja-pending">
+              <i class="fa-solid fa-clock"></i> Pendientes
+              <span class="tab-badge" id="badge-baja-pending">0</span>
+            </button>
+            <button class="tab-btn" data-tab="baja-history">
+              <i class="fa-solid fa-clock-rotate-left"></i> Historial
+            </button>
+          </div>
+
+          <!-- Baja — Pendientes -->
+          <div class="tab-panel active" id="baja-pending">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Área</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th>Motivo</th>
+                    <th class="center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-baja-pending">
+                  <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Baja — Historial -->
+          <div class="tab-panel" id="baja-history">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Documento</th>
+                    <th>Área</th>
+                    <th>Solicitado por</th>
+                    <th>Fecha</th>
+                    <th class="center">Estado</th>
+                    <th>Comentario del revisor</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-baja-history">
+                  <tr><td colspan="6" style="text-align:center;padding:2rem;color:#9ca3af">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Cargando…
+                  </td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div><!-- /section-baja -->
+
+      </div><!-- /infodoc-panel-solicitudes -->
+
+    </div><!-- /page-content -->
+  </main>
+
+</div><!-- /layout -->
+
+
+<!-- ═══ MODAL — Visor PDF (Registros) ═══ -->
+<div class="modal-overlay" id="modal-pdf" style="z-index:1100">
+  <div class="modal" style="max-width:900px;height:80vh;display:flex;flex-direction:column">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-file-pdf" style="color:#e53935"></i>
+        <span id="pdf-code-ttl">—</span>
+        <small id="pdf-name-ttl" style="font-weight:400;color:var(--txt3)"></small>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="btn-pdf-download" onclick="downloadPdf()" class="btn-secondary" style="display:none">
+          <i class="fa-solid fa-download"></i> Descargar
+        </button>
+        <button id="btn-pdf-print" onclick="printPdf()" class="btn-secondary" style="display:none">
+          <i class="fa-solid fa-print"></i> Imprimir
+        </button>
+        <button class="modal-x" onclick="closeModal('modal-pdf')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" style="flex:1;padding:0;overflow:hidden;position:relative">
+      <div id="pdf-loading" style="display:flex;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--txt3)">
+        <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+        <span>Cargando documento…</span>
+      </div>
+      <div id="pdf-empty" style="display:none;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:8px;color:var(--txt3)">
+        <i class="fa-solid fa-file-circle-question fa-3x"></i>
+        <strong>Sin archivo adjunto</strong>
+        <span>Este formato aún no tiene PDF cargado</span>
+      </div>
+      <iframe id="pdf-iframe" style="width:100%;height:100%;border:none;display:none"></iframe>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Nuevo Documento ═══════════════ -->
+<div class="modal-overlay" id="modal-new">
+  <div class="modal">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Nuevo Documento
+        <small>Complete los datos del documento a registrar</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-new')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Tipo de documento <span class="req">*</span></label>
+          <select id="new-type" onchange="updateCodePreview()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Departamento <span class="req">*</span></label>
+          <select id="new-dept" onchange="updateCodePreview()">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Código del documento <span class="req">*</span></label>
+          <input type="text" id="new-code" placeholder="Ej. PT-ADM-001"
+                 oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="field">
+          <label>Versión inicial</label>
+          <input type="text" id="new-version" value="1.0" placeholder="1.0">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del documento <span class="req">*</span></label>
+          <input type="text" id="new-name" placeholder="Ej. Procedimiento de Admisión de Pacientes">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Custodio responsable <span class="req">*</span></label>
+          <input type="text" id="new-custodian" placeholder="Nombre del responsable">
+        </div>
+        <div class="field">
+          <label>Vigencia (años)</label>
+          <input type="number" id="new-vigencia" value="2" min="1" max="10">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción / Alcance</label>
+          <textarea id="new-desc" rows="3"
+                    placeholder="Breve descripción del propósito y alcance del documento…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-row three">
+        <div class="field">
+          <label>Fecha de elaboración</label>
+          <input type="date" id="new-elab-date">
+        </div>
+        <div class="field">
+          <label>Elaborado por</label>
+          <input type="text" id="new-elaborated-by" placeholder="Nombre">
+        </div>
+        <div class="field">
+          <label>Revisado por</label>
+          <input type="text" id="new-reviewed-by" placeholder="Nombre">
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-new')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-new" onclick="submitNewDoc()">
+        <i class="fa-solid fa-floppy-disk"></i>
+        Guardar Documento
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Cargar PDF rápido (desde lápiz) ═══════════════ -->
+<div class="modal-overlay" id="modal-upload-pdf">
+  <div class="modal" style="max-width:480px">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Cargar PDF
+        <small id="upload-pdf-doc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-upload-pdf')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="file-drop" id="file-drop-pdf"
+           ondragover="fileDragOverPdf(event)" ondragleave="fileDragLeavePdf(event)"
+           ondrop="fileDropPdf(event)">
+        <i class="fa-solid fa-file-arrow-up" style="font-size:2rem;color:#0d9488"></i>
+        <p>Arrastra el PDF aquí o <strong>haz clic para seleccionar</strong></p>
+        <small>PDF — máximo 20 MB</small>
+        <input type="file" id="upload-pdf-file" accept=".pdf"
+               onchange="filePdfSelected(this)" style="opacity:0;position:absolute;inset:0;cursor:pointer">
+      </div>
+      <div class="file-selected" id="file-pdf-selected-info">
+        <i class="fa-solid fa-file-circle-check"></i>
+        <span id="file-pdf-selected-name">—</span>
+        <button class="btn-action red" onclick="clearPdfFile()" title="Quitar archivo">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="progress-bar" id="upload-pdf-progress">
+        <div class="progress-fill" id="progress-pdf-fill"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-upload-pdf')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-upload-pdf" onclick="submitUploadPdf()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Subir
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Subir Versión ═══════════════ -->
+<div class="modal-overlay" id="modal-upload">
+  <div class="modal">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Subir Nueva Versión
+        <small id="upload-doc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-upload')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field">
+          <label>Número de versión <span class="req">*</span></label>
+          <input type="text" id="upload-version" placeholder="Ej. 3.0">
+          <small id="upload-version-hint" style="display:block;margin-top:4px;font-size:.75rem;color:var(--txt3)"></small>
+        </div>
+        <div class="field">
+          <label>Fecha de versión</label>
+          <input type="date" id="upload-date">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Cambios realizados</label>
+          <textarea id="upload-changes" rows="3"
+                    placeholder="Describa brevemente los cambios respecto a la versión anterior…"></textarea>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:14px">
+        <label>Archivo (PDF o Word) <span class="req">*</span></label>
+        <div class="file-drop" id="file-drop"
+             ondragover="fileDragOver(event)" ondragleave="fileDragLeave(event)" ondrop="fileDrop(event)">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <p>Arrastra el archivo aquí o <strong>haz clic para seleccionar</strong></p>
+          <small>PDF, DOC, DOCX — máximo 20 MB</small>
+          <input type="file" id="upload-file" accept=".pdf,.doc,.docx"
+                 onchange="fileSelected(this)">
+        </div>
+        <div class="file-selected" id="file-selected-info">
+          <i class="fa-solid fa-file-circle-check"></i>
+          <span id="file-selected-name">—</span>
+          <button class="btn-action red" onclick="clearFile()" title="Quitar archivo">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <div class="progress-bar" id="upload-progress">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-upload')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-upload" onclick="submitUpload()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        Subir Versión
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Detalle del Documento ═══════════════ -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal modal-lg">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="detail-code-ttl">—</span>
+        <small id="detail-name-ttl">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-detail')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Workflow -->
+      <div class="workflow-bar" id="detail-workflow"></div>
+
+      <!-- Barra de aprobación / rechazo -->
+      <div id="detail-approval-bar"></div>
+
+      <!-- Info grid -->
+      <div class="info-grid">
+        <div class="info-item"><label>Código</label><span id="d-code">—</span></div>
+        <div class="info-item"><label>Tipo</label><span id="d-type">—</span></div>
+        <div class="info-item"><label>Versión actual</label><span id="d-version">—</span></div>
+        <div class="info-item"><label>Estado</label><span id="d-status">—</span></div>
+        <div class="info-item"><label>Departamento</label><span id="d-dept">—</span></div>
+        <div class="info-item"><label>Custodio</label><span id="d-custodian">—</span></div>
+        <div class="info-item">
+          <label>Elaboró</label><span id="d-elaborated">—</span>
+          <small id="d-elaborated-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item">
+          <label>Revisó</label><span id="d-reviewed">—</span>
+          <small id="d-reviewed-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item">
+          <label>Autorizó</label><span id="d-authorized">—</span>
+          <small id="d-authorized-cargo" class="info-sub"></small>
+        </div>
+        <div class="info-item"><label>Fecha elaboración</label><span id="d-elab-date">—</span></div>
+        <div class="info-item"><label>Vigencia</label><span id="d-vigencia">—</span></div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="info-item" style="margin-bottom:20px">
+        <label>Descripción / Alcance</label>
+        <span id="d-desc" style="display:block;line-height:1.6;color:var(--txt2)">—</span>
+      </div>
+
+      <!-- Historial de versiones -->
+      <div class="section-sep">
+        <i class="fa-solid fa-clock-rotate-left" style="margin-right:6px"></i>
+        Historial de Versiones
+      </div>
+      <div id="versions-wrap">
+        <table class="ver-table">
+          <thead>
+            <tr>
+              <th>Versión</th><th>Fecha</th><th>Subido por</th>
+              <th>Cambios</th><th class="center">Archivo</th>
+            </tr>
+          </thead>
+          <tbody id="versions-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--txt3)">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Vista previa PDF -->
+      <div id="detail-pdf-section" style="display:none;margin-top:16px">
+        <div class="section-sep">
+          <i class="fa-solid fa-file-pdf" style="margin-right:6px"></i>
+          Vista Previa del Documento
+        </div>
+        <div style="position:relative;min-height:180px;background:#f3f4f6;border-radius:8px;overflow:hidden">
+          <div id="detail-pdf-loading" style="display:flex;align-items:center;justify-content:center;
+               height:180px;gap:.6rem;color:#6b7280;font-size:.9rem">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando PDF…
+          </div>
+          <div id="detail-pdf-empty" style="display:none;align-items:center;justify-content:center;
+               height:180px;flex-direction:column;gap:.5rem;color:#9ca3af;font-size:.9rem">
+            <i class="fa-solid fa-file-circle-xmark" style="font-size:2rem"></i>
+            <span>Sin PDF subido para este documento</span>
+          </div>
+          <iframe id="detail-pdf-iframe" style="display:none;width:100%;height:520px;border:none"
+                  title="Vista previa PDF"></iframe>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot" id="detail-foot">
+      <button id="btn-detail-download" onclick="downloadDetailPdf()" class="btn-secondary" style="display:none">
+        <i class="fa-solid fa-download"></i> Descargar
+      </button>
+      <button id="btn-detail-print" onclick="printDetailPdf()" class="btn-secondary" style="display:none">
+        <i class="fa-solid fa-print"></i> Imprimir
+      </button>
+      <button class="btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+      <button class="btn-secondary" id="btn-upload-ver" onclick="openUploadFromDetail()" style="display:none">
+        <i class="fa-solid fa-cloud-arrow-up"></i> Subir Nueva Versión
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Editar Documento ═══════════════ -->
+<div class="modal-overlay" id="modal-edit">
+  <div class="modal">
+
+    <div class="modal-head">
+      <div class="modal-ttl">
+        Editar Documento
+        <small id="edit-doc-code">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-edit')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-row">
+        <div class="field"><label>Tipo de documento</label><select id="edit-type"></select></div>
+        <div class="field"><label>Departamento</label><select id="edit-dept"></select></div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Código del documento</label>
+          <input type="text" id="edit-code" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="field">
+          <label>Versión actual</label>
+          <input type="text" id="edit-version" placeholder="1.0">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre del documento <span class="req">*</span></label>
+          <input type="text" id="edit-name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Custodio responsable</label>
+          <input type="text" id="edit-custodian" placeholder="Nombre del responsable">
+        </div>
+        <div class="field">
+          <label>Estado</label>
+          <select id="edit-status">
+            <option value="borrador">Borrador</option>
+            <option value="en_revision">En Revisión</option>
+            <option value="en_aprobacion">En Aprobación</option>
+            <option value="vigente">Vigente</option>
+            <option value="obsoleto">Obsoleto</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Vigencia (años)</label>
+          <input type="number" id="edit-vigencia" min="1" max="10">
+        </div>
+        <div class="field">
+          <label>Fecha de elaboración</label>
+          <input type="date" id="edit-elab-date">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Elaboró</label>
+          <select id="edit-elaborated-by" onchange="updateCargo(this,'edit-elaboro-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-elaboro-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field">
+          <label>Revisó</label>
+          <select id="edit-reviewed-by" onchange="updateCargo(this,'edit-reviso-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-reviso-cargo" class="field-cargo"></small>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label>Autorizó</label>
+          <select id="edit-authorized-by" onchange="updateCargo(this,'edit-autorizo-cargo')">
+            <option value="">— Sin asignar —</option>
+          </select>
+          <small id="edit-autorizo-cargo" class="field-cargo"></small>
+        </div>
+        <div class="field"></div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Descripción / Alcance</label>
+          <textarea id="edit-desc" rows="3"></textarea>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-edit')">Cancelar</button>
+      <button class="btn-secondary" id="btn-edit-upload-pdf" onclick="openUploadFromEdit()"
+              style="color:#0d9488;border-color:#0d9488;gap:.4rem">
+        <i class="fa-solid fa-file-arrow-up"></i> Cargar PDF
+      </button>
+      <button class="btn-primary" id="btn-save-edit" onclick="submitEdit()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Contenido Digital ═══════════════ -->
+<div class="modal-overlay" id="modal-content">
+  <div class="modal modal-xl">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <span id="mc-code">—</span>
+        <small id="mc-name">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-content')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="doc-auth-strip" id="mc-auth-strip"></div>
+      <div id="mc-body">
+        <p style="text-align:center;padding:48px;color:var(--txt3)">
+          <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem"></i>
+        </p>
+      </div>
+    </div>
+    <div class="modal-foot" id="mc-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-content')">Cerrar</button>
+      <button class="btn-secondary" id="btn-content-edit" onclick="enterContentEditMode()" style="display:none">
+        <i class="fa-solid fa-pencil"></i> Editar Contenido
+      </button>
+      <button class="btn-secondary" id="btn-content-cancel" onclick="exitContentEditMode()" style="display:none">Cancelar</button>
+      <button class="btn-primary" id="btn-content-save" onclick="saveContentEdits()" style="display:none">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar Cambios
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Solicitar Baja ═══════════════ -->
+<div class="modal-overlay" id="modal-sol-baja">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-arrow-down-to-line"></i> Solicitar Baja de Documento
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-sol-baja')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.875rem;color:#374151;margin:0 0 1rem">
+        Documento: <strong id="sb-doc-name">—</strong>
+      </p>
+      <div class="field">
+        <label>Motivo de la solicitud <span class="req">*</span></label>
+        <textarea id="sb-reason" rows="4" placeholder="Explica por qué este documento debe darse de baja…"
+                  style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-sol-baja')">Cancelar</button>
+      <button class="btn-primary" id="btn-sb-submit" onclick="submitSolBaja()">
+        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Solicitar Clave Nueva ═══════════════ -->
+<div class="modal-overlay" id="modal-sol-clave">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-key" style="color:#009688;margin-right:6px"></i>
+        Solicitar Clave Nueva
+        <small>El área de Calidad asignará el código oficial</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-sol-clave')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field">
+          <label>Tipo de documento <span class="req">*</span></label>
+          <select id="sc-type" onchange="updateClavePreview()"><option value="">— Seleccionar —</option></select>
+        </div>
+        <div class="field">
+          <label>Departamento <span class="req">*</span></label>
+          <select id="sc-dept" onchange="updateClavePreview()"><option value="">— Seleccionar —</option></select>
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Código sugerido</label>
+          <div class="clave-preview" id="sc-code-preview">—</div>
+          <small style="font-size:.75rem;color:var(--txt3);margin-top:4px;display:block">
+            Generado automáticamente · Calidad podrá ajustarlo al aprobar
+          </small>
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Nombre propuesto del documento <span class="req">*</span></label>
+          <input type="text" id="sc-name" placeholder="Ej. Procedimiento de Admisión de Pacientes">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Justificación / Propósito <span class="req">*</span></label>
+          <textarea id="sc-justification" rows="3"
+            placeholder="¿Por qué se necesita este documento? ¿Qué proceso cubre?"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-sol-clave')">Cancelar</button>
+      <button class="btn-primary" id="btn-sc-submit" onclick="submitSolClave()">
+        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════ MODAL — Revisar Solicitud de Clave ═══════════════ -->
+<div class="modal-overlay" id="modal-review-clave">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-clipboard-check" style="color:#009688;margin-right:6px"></i>
+        Revisar Solicitud de Clave
+        <small id="rc-requester-info">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-review-clave')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="rc-info-box" id="rc-info-box"></div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Código a asignar <span class="req">*</span></label>
+          <input type="text" id="rc-code" oninput="this.value=this.value.toUpperCase()" placeholder="Ej. PT-ADM-012">
+        </div>
+      </div>
+      <div class="form-row one">
+        <div class="field">
+          <label>Notas / Comentarios</label>
+          <textarea id="rc-notes" rows="2" placeholder="Observaciones para el solicitante…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-review-clave')">Cancelar</button>
+      <button class="btn-reject-clave" id="btn-rc-reject" onclick="submitReviewClave('rejected')">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+      <button class="btn-primary" id="btn-rc-approve" onclick="submitReviewClave('approved')">
+        <i class="fa-solid fa-check"></i> Aprobar y Crear Documento
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ MODAL — Aprobar / Revisar Alta ═══ -->
+<div class="modal-overlay" id="modal-approve-alta">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-key" style="color:#009688;margin-right:6px"></i>
+        Revisar Solicitud de Alta
+        <small id="ma-subtitle">—</small>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-approve-alta')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="sol-info-box" id="ma-info-box"></div>
+      <div class="field" style="margin-bottom:14px">
+        <label>Código a asignar <span class="req">*</span></label>
+        <input type="text" id="ma-code" oninput="this.value=this.value.toUpperCase()"
+               placeholder="Ej. PT-UVE-05" style="font-family:monospace;font-weight:700">
+      </div>
+      <div class="field">
+        <label>Notas / Comentarios</label>
+        <textarea id="ma-notes" rows="2" placeholder="Observaciones para el solicitante…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-approve-alta')">Cancelar</button>
+      <button class="btn-secondary" id="btn-ma-reject" onclick="submitAltaReview('rejected')"
+              style="color:#991b1b;border-color:#fca5a5">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+      <button class="btn-primary" id="btn-ma-approve" onclick="submitAltaReview('approved')">
+        <i class="fa-solid fa-check"></i> Aprobar y Crear Documento
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL — Rechazar Baja ═══ -->
+<div class="modal-overlay" id="modal-reject">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head">
+      <div class="modal-ttl">
+        <i class="fa-solid fa-xmark" style="color:#dc2626"></i> Rechazar Solicitud de Baja
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-reject')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Motivo del rechazo <span class="req">*</span></label>
+        <textarea id="reject-comment" rows="4"
+                  placeholder="Explica por qué se rechaza esta solicitud de baja…"
+                  style="width:100%;resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="closeModal('modal-reject')">Cancelar</button>
+      <button class="btn-primary" id="btn-reject-submit" onclick="submitReject()"
+              style="background:#dc2626">
+        <i class="fa-solid fa-xmark"></i> Rechazar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- Scripts — Playground (datos aislados, acceso solo omar.orozco@gmail.com) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/pg-docs.js"></script>
+<script src="js/pg-solicitudes.js"></script>
+</body>
+</html>

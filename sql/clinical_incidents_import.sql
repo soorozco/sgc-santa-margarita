@@ -1,0 +1,1897 @@
+-- ============================================================
+--  Importar incidentes clínicos desde Google Forms (CSV)
+--  118 registros · Hospital Santa Margarita
+-- ============================================================
+
+-- [1] Ma. Dolores Galindo | 19/7/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-07-21 18:49:32+00', 'Ma. Dolores Galindo', '2025-07-19', 'Femenino',
+  '2025-07-19', '12:00', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'Se suministra inicialmente al paciente lácteos, pero el personal de nutrición se percata del error y cambian la dieta por un sándwich.', 'Falta de apego a las indicaciones medicas', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'El paciente o familiar alertó del error', 'Se notifica al área de nutrición para que revise el caso , especifico del paciente y las causas que provocaron la cuasifalla.', NULL
+);
+
+-- [2] Noemi Rodríguez | 22/7/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-07-24 17:18:16+00', 'Noemi Rodríguez', '2025-07-23', 'Femenino',
+  '2025-07-22', '22:30', 'Urgencias',
+  'Cuasi Falla', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'La hoja de consumo de urgencias que llena el personal de enfermería no detalla , la presentación de los medicamentos, lo cual es un obstáculo para la trazabilidad y verificación de la idoneidad de la terapéutica.', 'Datos incompletos en los registros clínicos', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se notifica al área de calidad , de la incidencia.', NULL
+);
+
+-- [3] MARIA TOSCANO HERNANDEZ | 29/7/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-07-30 09:07:38+00', 'MARIA TOSCANO HERNANDEZ', '1939-12-08', 'Femenino',
+  '2025-07-29', '22:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'El día de ayer a las 21:30 se reciben indicaciones nuevas para la paciente, indicándole rifampicina. Enfermeria no entiende la escritura y preguntan a médicos de guardia si es rifampicina o rifaximina, los cuales a las 23:39hrs se comunican con medico tratante via whatsapp y llamada para preguntarle pero no se obtiene respuesta. Medicos de guardia dan indicacion de rifaximina y a las 22:00hrs se le administra una tableta. Hoy a las 8:37hrs se comunica enfermeria para avisar que medico tratante esta en central y refiere que es rifampicina, asi mismo se comunica con nosotros via whatsapp para informarnos.', 'No se entendió la escritura del medico tratante', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Medico tratante solicita que se comience a administrar rifampicina y se descarte rifaximina', 'https://drive.google.com/open?id=1xkMGnXQ6XVnpOWPw7sypvcR8Lj-qEQq8, https://drive.google.com/open?id=1Ank420zk_T8GNJ0CULg8Qh2pEzzg5Z3n, https://drive.google.com/open?id=1RFFx1UOfNm4GBIz2fUg6pJtO1ekZmxh1, https://drive.google.com/open?id=1KByfgT-YAm_-VNXZz5bO_QT4RVmUHLO0'
+);
+
+-- [4] MORALES MERCADO HERMINIO | 30/7/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-07-31 09:10:58+00', 'MORALES MERCADO HERMINIO', '1945-08-11', 'Masculino',
+  '2025-07-30', '13:43', 'Hospitalización',
+  'Evento Adverso', 'Dispositivos / Equipos Médicos', 'Leve',
+  'DURANTE LA CURACION DEL PACIENTE HERMINIO CLINICA DE CATETERES REPORTA QUE EL CVC DEL PACIENTE ESTA FUERA, ESE DIA NO SE MOVILIZO EL PACIENTE Y LA ENFERMERA ENCARGADA DEL PACIENTE REFIERE QUE DESDE LA MAÑANA NOTO QUE SE ESTABA DIRANDO LA SOLUCION BASE PERO NO LO REPORTO. AL MOMENTO DE LA CURACION TODA LA CAMA ESTABA EMPAPADA Y CONTINUABAN PASANDOSE POR LA VIA LAS SOLUCIONES, MEDICAMENTOS Y NUTRICION PARENTERAL. EL MEDICO TRATANTE PIDIO RX DE TORAX Y SE SUSPENDIERON TODOS LOS MEDICAMENTOS HASTA LA RECOLOCACCION DEL CVC.', 'DESDE UN DIA ANTERIOR POR LA MOVILIZACION A REPOSET DEL PACIENTE PUDE SALIRSE EL CVC POR QUE TENIA UNA SUTURA ROTA.', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'RECOLOCACCION DEL CVC', 'https://drive.google.com/open?id=1jmTif3rDsc-6DlVS5U_5f0AnvW9H3fcb'
+);
+
+-- [5] FLORES LARA ALFREDO | 11/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-11 12:25:25+00', 'FLORES LARA ALFREDO', '1942-08-18', 'Masculino',
+  '2025-08-11', '04:00', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Leve',
+  '-QUIEN REALIZA REPORTE: DRA ELISA-
+
+-INGRESA PACIENTE EL DIA DE AYER POR URGENCIAS DIRECTAMENTE A HEMODIALISIS, AL SALIR DE HEMODIALISIS SE RECIBE PACIENTE EN PISO, AL ENTREGAR PACIENTE E INDICACIONES SE RECIBE POR PARTE DE ENFERMERIA CON INDICACIONES DE URGENCIAS, MEDICO DE GUARDIA TRANSCRIBE INDICACIONES DE URGENCIAS (LAS CUALES NO ERA LAS INDICADAS YA QUE MEDICO YA HABIA DEJADO INDIACIONES NUEVAS). 
+-EL DIA DE HOY AL RECIBIR AL PACIENTE, ME PONGO EN CONTACTO CON EL MEDICO TRATANTE PARA DARLE EVOLUCION DE SU PACIENTE Y PREGUNTA ACERCA DE UNA INDIACION, ME PERCATO QUE NO ESTA TRANSCRITA POR LO QUE ACUDE A REVISAR EL EXPEDIENTE Y ME DOY CUENTA QUE  NO ESTABAN TRANSCRITAS CORRECTAMENTE, ME ACERCO A ENFERMERIA Y LE COMENTO QUE QUE INDICACIONES LE ENTREGARON Y ME MENCIONA QUE LAS QUE ESTABAN MAL', 'ENFERMERIA:
+-FALTA DE ATENCION A LA HORA DE ENTREGA DE "INDICACIONES ACTUALIZADAS" POR PARTE DE MEDICO TRATANTE
+-A LA HORA DE ENTREGAR PACIENTE REVISAR QUE SEAN ADECUADAD LAS INDICACION
+
+MEDICO DE GUARDIA:
+-AL LLEGAR EL PACIENTE A HABITACION REVISAR TODO EL EXPEDIENTE PARA CORROBORAR LA TRASCRIPCION DE INDICACIONES MEDICAS, EN CASO DE DUDA COMUNICARSE CON MEDICO TRATANTE PARA EVITAR ERRORES EN TRANSCIPCION.', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', '-SOLUCION:
+ME COMUNICO CON MEDICO TRATANTE Y CORROBORO DIRECTAMENTE INDICACIONES, POR LO QUE SE CORRIGEN. AGREGANDO SOLUCION BASE Y GLUCONATO DE CALCIO
+SIN EVENTUALIDADES PARA EL PACIENTE.', NULL
+);
+
+-- [6] MARIA DE JESUS JIMENEZ MACIAS | 12/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-12 07:55:44+00', 'MARIA DE JESUS JIMENEZ MACIAS', '1935-02-21', 'Femenino',
+  '2025-08-12', '21:00', 'Hospitalización',
+  'Evento Adverso', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Sin Daño',
+  '--QUIEN REALIZA EL REPORTE: DRA ELISA VILLA--
+
+SE SOLICITA TAC DE CRANEO POR PARTE DEL DR JULIO BRIZUELA ( INTERCONSULTANTE DE LA PACIENTE YA QUE EL MEDICO TRATANTE ES EL DR LEOPOLDO LAMAS) YA QUE LA PACIENTE PRESENTA UN CUADRO DE HIPOTENSION Y ALTERACION DEL ESTADO NEUROLOGICO, SE ENVIA APROXIMADAMENTE A LAS 21 HRS,LA TAC ESTA REPORTADA EN EL SISTEMA A LAS 21:30 HRS; SIN EMBARGO SON LAS 7:40 DE LA MAÑANA DEL 12.08.25 Y AUN NO HAY REPORTE DE LA TAC, SIENDO UNA SOLICITUD DE "URGENCIA" POR EL ESTADO NEUROLOGICO DE LA PACIENTE.', 'YA HAN HABIDO VARIAS OCASIONES EN LAS QUE LOS EXAMENES DE GABINETE TARDAN >8HRS EN REPORTARSE.', 'Equipo no disponible o defectuoso',
+  'Intervención oportuna de otro personal', 'COMUNICARME CON DIRECCION MEDICA PARA QUE SOLICITE DIRECTAMENTE AL JEFE DE DEPARTAMENTO LA INTERPRETACION DEL ESTUDIO.', 'https://drive.google.com/open?id=1tKiaSXAoQrYtzjkQVd_qdYkYRLvhq-fi, https://drive.google.com/open?id=1S-Nb2UR_fQx2WIAUJ0Hd_3F-FLMdmDKy, https://drive.google.com/open?id=1kBlMmYiryhIPGpFzu7Klizxt5EeiCDjd'
+);
+
+-- [7] Ochoa González José Cristóbal | 13/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-13 11:36:36+00', 'Ochoa González José Cristóbal', '1938-01-12', 'Masculino',
+  '2025-08-13', '10:25', 'Hospitalización',
+  'Evento Adverso', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Leve',
+  'Se pinza la nefrostomia del paciente para una toma de EGO, al despinzar el gasto es hematurico. Se envía muestra a laboratorio que pide que se repita por qué solo es sangre. No se reporta a médicos tratantes hasta que la familiar se comunica directamente.', 'Omisión de reporte de eventualidad, mal toma de muestra', 'Barreras de comunicación (idioma, cognición)',
+  'El paciente o familiar alertó del error', 'Acude médico tratante a valoración del paciente', 'https://drive.google.com/open?id=1rjpD63gjQPYKRlVRsQsd8NLT2oG3wush, https://drive.google.com/open?id=1eqKAYoWk4U0jkIJnjN7DD309PFT5_N0j'
+);
+
+-- [8] Ocho González José Cristobal | 13/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-14 08:27:17+00', 'Ocho González José Cristobal', '1948-01-12', 'Masculino',
+  '2025-08-13', '12:00', 'Hospitalización',
+  'Cuasi Falla', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'Por la mañana el médico indica toma de EGO a un paciente portador de 2 nefrostomias y una sonda foley, su enfermera recibe la indicación. Pinza la nefrostomia derecha para toma de la muestra pero después al tomar la muestra es hematica, laboratorio la regresa por que no es posible procesarla. La enfermera a cargo le pregunta a su supervisora de piso, a su jefa de enseñanza y nadie le da respuesta o le presta atención. No se avisa a médico tratante ni a médicos de guardia, es interconsultate quien se comunica con médicos de guardia debido a que la familiar le avisó. Sin indicación, sin preguntar, la enfermera despinza nefrostomia derecha y vuelve a punzar nefrostomia izquierda para toma de muestra y se va a desayunar. En comedor le avisa a la supervisora de otro piso lo que está pasando y ella avisa a médicos de guardia, quien se entera en ese momento que pinzó las nefrostomias para la toma de muestra. Se comunica a médico tratante quien comenta que eso no se debe hacer. Se le indica a la enfermera cancelar toma de EGO pero médico interconsultate comenta que la muestra debía ser tomada de la sonda urinaria. Después de unas hora de despinzar, la orina vuelve a ser clara.', 'Falta de conocimiento de los procedimientos y de comunicación al no preguntar a tratantes o médicos encargados sobre cómo y de dónde querían que se tomara la muestra.', 'Barreras de comunicación (idioma, cognición), Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'El paciente o familiar alertó del error', 'Médico tratante dio indicación para evitar mal manipulación de las nefrostomias', 'https://drive.google.com/open?id=1jaE2act0Tu1KCxQvpjyAli5cPITBnuA7, https://drive.google.com/open?id=1Foqsxdib_in4ta06oJJQif0LAcceUq3N, https://drive.google.com/open?id=1KE9qNgzNIxVeq23uO9MikHOAyjTb6iS5'
+);
+
+-- [9] Maria Martha Ofelia Barragan | 7/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-14 16:16:58+00', 'Maria Martha Ofelia Barragan', '2025-08-07', 'Femenino',
+  '2025-08-07', '15:50', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Departamento de JP II Habitación 15 paciente Maria Martha Ofelia Barragan, se realizo el cambio de indicaciones suspender infusión de Amiodarona al termino y posteriormente dar inicio Amiodarona 200 mg VO c/24 la cual no se administro al paciente, la cual se corrobora con medico de guardia si habia presentado algún inconveniente por la omisión la cual responden desconocer el motivo de su administración.', 'No', 'Comunicación deficiente en el equipo',
+  'Doble chequeo por parte del personal', 'Ninguna', NULL
+);
+
+-- [10] BECERRA BARRAGAN, KAREN  NAYELI | 15/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-15 09:41:30+00', 'BECERRA BARRAGAN, KAREN  NAYELI', '1994-11-03', 'Femenino',
+  '2025-08-15', '09:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'EL DÍA DE HOY LA PACIENTE INGRESA A CARGO DEL DR. GERARDO HERRERA Y COMO INTERCONSULTANTE EL DR. ENRIQUE UREÑA, EL CUAL EN PREVIA VALORACIÓN MÉDICA LE DA SU HOJA DE INDICACIONES CON LA QUE SERÁ INGRESADA EL DÍA DE HOY. A SU ARRIBO LA HOJA DE INDICACIONES SE PIERDE POR LO QUE SE LLAMA AL DR. GERARDO HERRERA QUIEN DEJA NUEVAS INDICACIONES (OMEPRAZOL, CEFALOTINA Y BUTILHIOSCINA). SE INICIA CON OMEPRAZOL, POSTERIORMENTE LA CEFALOTINA LA CUAL GENERA REACCIÓN ALÉRGICA CON RASH, ERITEMA GENERALIZADO, DOLOR ABDOMINAL Y CEFALEA, LA PACIENTE LE NOTIFICA A LA ENFERMERA A CARGO (MARÍA MAGDALENA SILVA) LA CUAL JAMÁS NOTIFICA A MÉDICOS DE GUARDIA, Y ADMINISTRA BUTILHIOSCINA, CON APARENTE MEJORÍA DE LOS SÍNTOMAS PERO AUN SIN DESAPARECER DEL TODO. ACUDO A REALIZAR INGRESO Y LA PACIENTE ME COMENTA LO SUCEDIDO. MIENTRAS PERMANECÍA EN HABITACIÓN EXPLORANDO A LA PACIENTE, LLEGA EL DR.ENRIQUE UREÑA QUIEN SE PERCATA DEL EVENTO SUCEDIDO Y ACUDE A CORROBORAR QUE FUE LO QUE PASO.', 'NO REPORTA A MEDICO DE GUARDIA EVENTUALIDADES Y TAMPOCO SE COMUNICA CON MEDICO TRATANTE PARA RESOLVER LA EVENTUALIDAD, POR LO QUE PONE EN RIESGO EL ESTADO DEL PACIENTE.', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'SE COMUNICA CON MEDICO INTERCONSULTATE QUIEN DA INDICACIONES', NULL
+);
+
+-- [11] AVILA ESCOBEDO, ALFONSO | 25/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-08-26 07:24:13+00', 'AVILA ESCOBEDO, ALFONSO', '1947-08-10', 'Femenino',
+  '2025-08-25', '22:00', 'Hospitalización',
+  'Evento Adverso', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Moderado',
+  'SE SOLICITA RM DE CRANEO POR MEDICO TRATANTE POR SOSPECHA DE EVENTO CEREBROVASCULAR A LAS 20:30HRS, SE TOMA LA IMAGEN A LAS 21 HRS Y LO SUBEN A SISTEMA A LAS 21:29; DESDE ENTONCES NO HAY REPORTE POR PARTE DE MEDICO RADIOLOGO HASTA EL MOMENTO DEL REPORTE 7:22AM 26.08.25', '.', 'Comunicación deficiente en el equipo',
+  'Doble chequeo por parte del personal', 'HASTA EL DIA DE HOY A LA ENTREGA DE MEDICOS SE OBSERVA QUE NO HAY REPORTE', 'https://drive.google.com/open?id=1m28vDOI5BgQbAA7PY0K5_fasUT4g2qL1, https://drive.google.com/open?id=1HMi9rVAFy5mg7TcWekIdTXUSB85_tbSa'
+);
+
+-- [12] Salvador Huerta García | 1/9/0025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-02 13:14:20+00', 'Salvador Huerta García', '0054-05-23', 'Masculino',
+  '0025-09-01', '18:00', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'El equipo de dietas del hospital llegó a central de enfermería del área de Juan Pablo II para entrega de la cena unos minutos antes de las 18:00 hrs, y le pidió a la enfermera Angélica que les recibiera las dietas, en dicha recepción la enfermera asegura que el paciente de JP6, Salvador, fue dado de alta ya, por lo que ya no era necesario entregarle su cena, se firmo la hoja de dietas y se entregaron las dietas correspondientes. Posterior a ello, a las 19:30 hrs enfermeria se comunica al área de dietas para comentar que al paciente se le habia dejado sin cenar, por lo que se le explica a su enfermera que fue porque habia salido de alta segun la enfermera que recibió las cenas. Se resolvio y se le llevo en ese instante al paciente su dieta correspondiente.', 'Falta de cumplimiento en el proceso de recepción de dietas con los datos actualizados y confirmados de cada uno de los pacientes', 'Comunicación deficiente en el equipo, Equipo no disponible o defectuoso, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'El area de dietas hará incapie a enfermeria en que se confirmen los datos e indicaciones exactas de cada paciente con base en la información con la que cuenta la tabla de indicaciones y expediente', NULL
+);
+
+-- [13] GARCÍA HERNÁNDEZ GLORIA ANGELICA | 2/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-03 14:14:17+00', 'GARCÍA HERNÁNDEZ GLORIA ANGELICA', '1971-06-17', 'Femenino',
+  '2025-09-02', '23:00', 'Hospitalización',
+  'Cuasi Falla', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Paciente que ingresa a piso a las 22:33 con el diagnóstico de Pie Diabético, la indicación pide realizar RX de pie. Se toman laborotorios y se pasan medicamentos. A las 7am acude médico interconsultante y pide ver la Radiografía de la paciente ya que desea valorar probable osteomielitis para realizar cambios al tratamiento y poder valorar probable intervención quirúrgica. La radiografía no se tomó desde su ingreso en todo el turno nocturno. La doctora se tuvo que retirar sin poder realizar en ese momento cambios debido a la omisión de la toma de la radiografía por el enfermero en turno Irving y el supervisor de turno Jafet Meza.', 'Omisión de indicación', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se toma Radiografía lo más pronto posible y se envía a número personal de tratante para valoración', 'https://drive.google.com/open?id=1jc_b86OF9YsRmxSfz0s6gTNlJn0yRplD, https://drive.google.com/open?id=1KrMyTqmw7lNuP0_UxvkgQ9sITK1o_57h'
+);
+
+-- [14] JIMENEZ GOMEZ, REBECA | 6/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-06 16:04:34+00', 'JIMENEZ GOMEZ, REBECA', '1958-11-20', 'Femenino',
+  '2025-09-06', '16:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'SE INDICA SOLUCION HARTMANN 1000CC P/24HRS, Y SE ADMINISTRA APROX EN 3 HRS', '.', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'TOMA DE SIGNOS VITALES,', NULL
+);
+
+-- [15] SOLIS CASTILLO, SERGIO | 9/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-09 20:30:57+00', 'SOLIS CASTILLO, SERGIO', '1966-09-11', 'Masculino',
+  '2025-09-09', '11:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'En el turno vespertino se reportan signos vitales a Dra Niza Villaseñor, TA 169/61, FC 90, SAT 95, TEMP 37.2 GLUCEMIA 140. Cuestiona si se le administro el amlodipino PRN a lo que se responde que a las 11am (captura 1), ella menciona que estaba presente cuando le dieron la dosis extra de losartan que esta indicada (captura de indicaciones) pero no el amlodipino, losartan extra no marcado como administrado en hoja de enfermería pero si el amlodipino (foto de hoja de enfermería). 
+Dra Niza esta segura que se administro losartan dosis extra pero no estamos seguros que se administrara amlodipino.', 'Falta de atencion de parte de enfermeria, se pudo solucionar pero no es correcto marcar o no marcar como administrados los medicamentos. Porque en casos como este que necesitamos usar los PRN, no tenemos la certeza de que se le administrara en la mañana.', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'INFORMAR A MEDICA TRATANTE Y SUPERVISION DE ENFERMERIA', 'https://drive.google.com/open?id=1ESGMsGGGBg0LgSkVx3SKIk4sx2-qGaFw, https://drive.google.com/open?id=1drvqaIIuRnyqbo8dmAih9Fvc203LR93P, https://drive.google.com/open?id=1zqQNCdNpjMQ5ZPCSMO8vlUgpK7q7Ot8W, https://drive.google.com/open?id=1UWplt6oHiciJxX8UvTp_2rKKhLfBJjfb, https://drive.google.com/open?id=1B2O65S1TIyITLBc_s0ZLrIGP_nfHwvzs'
+);
+
+-- [16] Maria Guarro Gonzalez | 11/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-11 12:24:42+00', 'Maria Guarro Gonzalez', '1931-06-06', 'Femenino',
+  '2025-09-11', '01:40', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Error en la lectura de el medicamento escrito, lo que ocasiona administración de medicamento incorrecta, fluconazon en lugar de cilistazol', 'Mala práctica al llevar a cabo los 10 correctos de enfermería', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se notificación a médico tratante la situación y se continúa con medicación correcta', NULL
+);
+
+-- [17] Elena Torres Mosqueda | 3/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-12 12:46:40+00', 'Elena Torres Mosqueda', '0001-01-01', 'Femenino',
+  '2025-09-03', '00:00', 'Hospitalización',
+  'Evento Adverso', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Leve',
+  'lesion en dos dedos de la mano izquierda comenta la paciente que al salir del quirofano la golpearon en la puerta del quirofano', 'desconoce', 'Protocolos inadecuados o inexistentes',
+  'El paciente o familiar alertó del error', 'ninguna', NULL
+);
+
+-- [18] Rosalba Andrade Garcia | 29/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-12 12:51:36+00', 'Rosalba Andrade Garcia', '1956-08-23', 'Femenino',
+  '2025-08-29', '11:00', 'Hospitalización',
+  'Evento Adverso', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Leve',
+  'paciente recibe alimentacion por sonda nasograstrica alimento complementario viernes por la noche solo retiran bolsa mas no realizan limpieza y se obstruye la sonda', 'falta de capacitacion, decsuido del personal', 'Protocolos inadecuados o inexistentes',
+  'El paciente o familiar alertó del error', 'limpieza y destaponamiento sin lograr el objetivo', NULL
+);
+
+-- [19] xxxxxxx | 23/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-12 12:54:27+00', 'xxxxxxx', '0001-01-01', 'Masculino',
+  '2025-08-23', '09:20', 'Hospitalización',
+  'Evento Adverso', 'Caídas', 'Leve',
+  'entro a la cafeterioa y se me viene la puerta encima cayendo en la espalda y en el brazo izquierdo', 'falta de mamntenimiento', 'Equipo no disponible o defectuoso',
+  'Intervención oportuna de otro personal', '2 personas lo levantaron', NULL
+);
+
+-- [20] jose cristobal ochoa gonzalez | 19/8/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-12 13:04:51+00', 'jose cristobal ochoa gonzalez', '0001-01-01', 'Masculino',
+  '2025-08-19', '14:11', 'Hospitalización',
+  'Evento Adverso', 'Nutrición', 'Leve',
+  'error en dieta lo que le ocasiono vomito y diarrea, retraso en el vaciado de bolsa de orina', 'error en dieta', 'Comunicación deficiente en el equipo',
+  'El paciente o familiar alertó del error', 'cambio de dieta', NULL
+);
+
+-- [21] Garcia Garcia Maria Angelica | 17/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-23 09:53:48+00', 'Garcia Garcia Maria Angelica', '1962-12-20', 'Femenino',
+  '2025-09-17', '10:00', 'Hospitalización',
+  'Evento Adverso', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'Se aborda cateter portacat de manera incorrecta, no se realiza asepsia, medidas esteriles y se punziona de manera incorrecta', 'Desconocimiento al realizar procedimiento', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Retroalimentacion 
+Si no se tiene el conocimiento al realizar procedimiento, se tiene que comunicar a supervision de turno', NULL
+);
+
+-- [22] Margarita Sánchez Mendoza | 30/9/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-09-30 09:11:09+00', 'Margarita Sánchez Mendoza', '1964-06-10', 'Femenino',
+  '2025-09-30', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Nutrición', 'Sin Daño',
+  'Enfermería del turno nocturno se equivocaron de dieta con la paciente del 114 sigue siendo líquida y pusieron que ya pasaba a blanda cuando en el expediente no viene la indicación de cambiar la dieta.', 'No revisan los expedientes ni indicaciones médicas/nutricionales. Tampoco la supervisora del turno revisa ese tipo de indicaciones.', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, Uso de una lista de verificación (checklist), Doble chequeo por parte del personal', 'Cambio de la dieta', 'https://drive.google.com/open?id=1s_flINx9pDd5XCb20MuKPOVnKpb83QwF'
+);
+
+-- [23] Miguel Alvarado Hernández | 2/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-03 06:56:26+00', 'Miguel Alvarado Hernández', '0064-03-02', 'Masculino',
+  '2025-10-02', '13:00', 'Hospitalización',
+  'Cuasi Falla', 'Manejo de Vía Aérea / Ventilación', 'Leve',
+  'El paciente Miguel paso a piso procedente de terapia intensiva con uso de puntas nasales de alto flujo, se destetan el día 1/10/25 en turno matutino y se mantienen a 8 litros por minuto, sin datos de insuficiencia respiratoria y con buena saturación. El monitor del paciente tiene falla y no marca correctamente la saturación, hasta la noche se progresa a 15 litros la mascarilla. Por la mañana del 02/10/25, se recibe paciente con mascarilla a 15 litros, sin datos de dificultad respiratoria, buen llenado capilar y buena saturación, incluso se baja a 13 litros la mascarilla. Antes de entrega de turno, personal de inhalo terapia, sin indicación médica ni notificación a tratante o médico de guardia, coloca puntas de alto flujo “mientras el paciente come, por qué está insuficiente” (asi entregó a turno vespertino y eso le dijo a familiares el personal de inhaloterapia de turno matutino) y lo entrega a turno vespertino. A las 14:30 acude médico tratante y encuentra a su paciente con puntas de alto flujo por lo que reindica progresar a mascarilla y luego a puntas nasales. Por la tarde se coloca mascarilla reservorio y durante turno vespertino se corrabora que el paciente tolera mascarilla, sin algún dato de insuficiencia.
+
+*se adjunta foto de que el paciente tenía colocado mascarilla en turno matutino con buena saturación y de la indicación de tratante a las 14:30', 'Omisión de indicaciones y notificación a médico tratante.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Valoración médica y cambio nuevamente para progresar oxígeno.', 'https://drive.google.com/open?id=1jFB28C039AeUCeYFYSpVKxsnHogX6qHk, https://drive.google.com/open?id=1hbBskm853m4QnEGh6fIRfrmUTRJdHO_y'
+);
+
+-- [24] BUSHNELL, DARRELL LEE | 6/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-06 08:39:15+00', 'BUSHNELL, DARRELL LEE', '1949-08-13', 'Masculino',
+  '2025-10-06', '04:15', 'Hospitalización',
+  'Evento Adverso', 'Caídas', 'Moderado',
+  'El paciente se levantó al baño, se resbaló al pararse del inodoro, se llamó a camillería, se mencionó la situación de urgencia, llegó ya resuelto el incidente', 'Piso mojado, el paciente estaba descalzo', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Se apoyó al personal de enfermería por parte de medicos de guardia', NULL
+);
+
+-- [25] Bushnell Darrell Lee | 6/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-06 09:59:35+00', 'Bushnell Darrell Lee', '2025-10-06', 'Masculino',
+  '2025-10-06', '04:00', 'Hospitalización',
+  'Evento Adverso', 'Caídas', 'Sin Daño',
+  'El paciente se levanta de la cama al baño aún cuando se le indicó no levantarse, por referir debilidad en piernas, llega al baño y al levantarse de la taza pierde fuerza en las piernas y cae.', 'Falta de comunicación. El paciente no cuenta con familiar durante el turno, siendo una causa importante, ya que es una persona adulta mayor, y que necesita apoyo de familiar', 'Condición clínica compleja del paciente, Barreras de comunicación (idioma, cognición)',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Se le llama a camilleria y no obtenemos respuesta por lo que se le habla al médico de guardia quien ayudó a levantarlo y pasarlo a cama, se revisa al paciente por parte de enfermería que no exista algún daño al paciente.', NULL
+);
+
+-- [26] POLICARPIA CHAVEZ GAMBOA | 8/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-08 22:55:03+00', 'POLICARPIA CHAVEZ GAMBOA', '1952-01-26', 'Femenino',
+  '2025-10-08', '16:20', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'La paciente presentó un evento convulsivo, al no tener el apoyo de farmacia durante los eventos de urgencia para aplicación de medicamentos, en este caso anticonvulsivos, por falta de un protocolo adecuado, personal de enfermería vespertino recibe la indicación de abrir carrito rojo para utilización de dichos medicamentos, sin embargo, al no tener el filtro de farmacia, se comete el error de pasar midazolam y no diazepam, se hace omisión del registro de la aplicación de medicamento en la hoja de enfermería, el tratante está enterado de la situación y queda el paciente en vigilancia estrecha', 'Falta de apoyo de farmacia para procesos de uso de medicamentos en situaciones de urgencia con los paciente en área de hospitalización, omisión de enfermería de procesos ya implementados como doble verificación para aplicación de medicamentos, por parte de un compañero o supervisor en turno', 'Condición clínica compleja del paciente, Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Vigilancia', NULL
+);
+
+-- [27] LUZ ELENA AZPEITIA ÁVILA | 9/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-09 06:09:55+00', 'LUZ ELENA AZPEITIA ÁVILA', '1949-07-05', 'Femenino',
+  '2025-10-09', '05:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'Por características de la condición y padecimiento del paciente, se requiere de toma de estudios de laboratorio con horario definido según el inicio del tratamiento, por lo que se solicita toma de muestra y procesamiento para sodio sérico a las 2:30 hrs, sin embargo, al momento de solicitar los resultados, no se tiene disponibles para dar seguimiento al proceso de tratamiento, al momento de preguntar al personal de laboratorio el motivo, se menciona que por la carga laboral no le ha sido posible llevar el resultado y que en cuanto tenga oportunidad, lo llevará al expediente del paciente, se le informa de la situación pero hace caso omiso, hasta que se comunica la médico tratante del paciente pidiendo los resultados, es cuando se expiden y se notifican, esto a las 5:40 hrs', 'Exceso laboral para el personal de laboratorio, solo se cuenta con una persona para turno nocturno; falta de capacitación y conocimiento de la necesidad de tener disponibles los resultados de análisis clínicos y de imagen en tiempo y forma solicitadas', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Comunicación con personal de laboratorio solicitando los resultados', NULL
+);
+
+-- [28] Roberto Bernal Lopez | 11/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-11 19:06:32+00', 'Roberto Bernal Lopez', '1945-05-12', 'Masculino',
+  '2025-10-11', '19:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Grave',
+  'Pase un medicamento en horario incorrecto', 'No me fijé en la hoja de enfermería el horario', 'Formación o supervisión inadecuadas',
+  'Doble chequeo por parte del personal', 'Hablar al medico de guardia', NULL
+);
+
+-- [29] Felipe Ascencio Perez | 19/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-19 18:29:06+00', 'Felipe Ascencio Perez', '1938-02-05', 'Masculino',
+  '2025-10-19', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Dispositivos / Equipos Médicos', 'Grave',
+  'Después de la entrega de turno, el compañero de enfermería notifica a médicos de guardia que el paciente tuvo una eventualidad nocturna, ya que tenía dispositivo urinario (cistoclisis), presentando gasto urinario nulo en turno nocturno, lo cual no fue notificado en tiempo y forma a médicos de guardia ni a su tratante, por lo que su especialista, durante el pase matutino, realiza proceso de desobstrucción de la sonda, logrando buena funcionalidad nuevamente; el paciente pasó más de 8 horas sin gasto urinario por una sonda ocluida sin atención a la situación', 'Falta de revisión de funcionalidad de los equipos por parte del personal; falta de notificación al personal de médicos de guardia en tiempo y forma; equipos de aparente calidad deficiente ya que de forma continua se ocluyen por el tipo de material y la forma que presentan', 'Condición clínica compleja del paciente, Comunicación deficiente en el equipo, Equipo no disponible o defectuoso, Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Uso de una lista de verificación (checklist), Doble chequeo por parte del personal', 'Inmediatas ninguna, pasó un turno completo con dicha eventualidad', 'https://drive.google.com/open?id=1lM6Vst4LGHoCMX9QN7dL7AUOK3zyPwcd, https://drive.google.com/open?id=1O5TNl7oniPn1m2eE7YsVWBgrjYR2mcPM'
+);
+
+-- [30] Isabel valiente dominguez | 19/10/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-10-19 20:07:50+00', 'Isabel valiente dominguez', '1953-08-30', 'Femenino',
+  '2025-10-19', '19:05', 'Hospitalización',
+  'Evento Adverso', 'Caídas', 'Moderado',
+  'Se cae paciente en el baño y se notifica primero a medico tratante antes que a enfermeria', 'Paciente geriátrica se levanta al baño, sin avisar, no hay indicios de piso mojado, se desconoce si camino con calzado, no tiene medicamento de alto riesgo que altere su estado cognitivo, no existe vía periférica con soluciones que limite sus movimientos', 'Comunicación deficiente en el equipo',
+  'Uso de una lista de verificación (checklist)', 'Familiar se comunico directamente con el médico tratante y se realiza estudios de gabinete radiológicos', NULL
+);
+
+-- [31] MARÍA DE JESÚS ÍÑIGUEZ BRAVO | 3/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-03 15:51:31+00', 'MARÍA DE JESÚS ÍÑIGUEZ BRAVO', '1959-09-25', 'Femenino',
+  '2025-11-03', '15:30', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'SE INDICA ENEMA DE LACTULOSA EN PX, SIN EMBARGO ENFERMERIA INTERPETA COMO LACTOSA EN POLVO Y DESDE EL DIA 02/11/25, SE APLICA CADA 8HRS, ''''ENEMA'''' CON LACTOSA Y AGUA, RETRASANDO EL TRATAMIENTO PARA ENCEFALOPATIA DEL PACIENTE.', 'SE INDICA ENEMA DE LACTULOSA EN PX, SIN EMBARGO ENFERMERIA INTERPETA COMO LACTOSA EN POLVO Y DESDE EL DIA 02/11/25, SE APLICA CADA 8HRS, ''''ENEMA'''' CON LACTOSA Y AGUA, RETRASANDO EL TRATAMIENTO PARA ENCEFALOPATIA DEL PACIENTE.', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE CORROBORA INDICACION CON MEDICO TRATANTE, SE EXPLICA A ENFERMERIA, MOTIVO DEL PORQUE SE UTILIZA LACTULOSA Y NO LACTOSA Y EL COMO IMPACTA EN LA MEJORA DEL PX', NULL
+);
+
+-- [32] Adriana del Carmen Gomez Malta | 5/11/0025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-06 14:20:11+00', 'Adriana del Carmen Gomez Malta', '0061-10-18', 'Femenino',
+  '0025-11-05', '17:00', 'Hospitalización',
+  'Cuasi Falla', 'Comportamiento del Paciente', 'Sin Daño',
+  'El día miércoles 5 de noviembre del 2025, por parte de enfermería se pidió al área de dietas una dieta completa para las 17:00 hrs para la paciente Adriana, por lo cual se le entregó en tiempo y forma, pero, a la entrega de la misma, la paciente afirmaba que su medico tratante le habían indicado líquidos, se corroboró indicación medica prescrita y se confirmo que se había pedido específicamente la dieta COMPLETA, por lo cual se le dejó tal cual la indicación.', 'Falta de comunicación efectiva por parte de medico tratante', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Se verifico específicamente la indicación prescrita por el medico tratante', NULL
+);
+
+-- [33] Miguel Angel Moctezuma Aguilar | 2/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-06 14:48:47+00', 'Miguel Angel Moctezuma Aguilar', '0070-02-08', 'Masculino',
+  '2025-11-02', '19:30', 'Hospitalización',
+  'Evento Adverso', 'Comportamiento del Paciente', 'Leve',
+  'El domingo 2 de noviembre del 2025, el Dr Aldo, medico de guardia, se acercó a preguntar al área de dietas si se le habían llevado "cacahuates enchilados" al paciente Miguel de Gine 2, ya que los familiares aseguraron que se le habian llevado de aqui mismo, a lo que se respondió que absolutamente no, el area no cuenta con ese insumo para pacientes y además su indicacion medica-nutricional era solo líquidos claros.', 'Muy probablemente se le paso comida y botanas de fuera al paciente, como es constante con varios pacientes', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Por parte del área de dietas seguir las indicaciones medico-nutricionales correspondientes', 'https://drive.google.com/open?id=1vkFNROzzkM2vxdKyYv8JIf-jvfnb2FPP'
+);
+
+-- [34] J Asunción | 8/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-08 21:02:29+00', 'J Asunción', '1946-08-14', 'Masculino',
+  '2025-11-08', '17:00', 'Hospitalización',
+  'Evento Adverso', 'Manejo de Vía Aérea / Ventilación', 'Sin Daño',
+  'Paciente POS quirúrgico con Glasgow de 3, sianotoco, marmoleo y con apenas se pasa a habitación por indicación médica, se recibe; compañero le notifica a médico de guardia del mal estado de paciente, volvemos a pasar a habitación se le toman signos vitales su saturación estaba al rededor del 37% se le vuelve a notificar a la médico de guardia para que acuda a valorar al paciente comenta que ahorita no puede, hace caso omiso y cometa que le digamos a la otra médico de guardia la cual actúa oportunamente, se le notifica a médico de urgencias y de terapia las cuales acuden se le da tratamiento y el paciente vuelve a ventilar por el mismo', 'Hipoxia', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Monitorización, notificación a médicos, manejo de vía aérea, farmacoterapia y vigilancia', NULL
+);
+
+-- [35] González Alcalá J Asuncion | 8/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-08 22:36:26+00', 'González Alcalá J Asuncion', '1946-08-14', 'Masculino',
+  '2025-11-08', '15:30', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Grave',
+  '14:20 Recibí el paciente masculino en área de recuperación de quirófano en estado postquirurgico, el cual se encontraba con Glasgow 13 e hipertenso 166/90, el anestesiólogo compruebo signos vitales en monitor, procede a retirarse sin dejar indicaciones. 15:27 hrs presenta hipertensión de 210/108, y su deterioro neurologico aumenta presentando desaturación de 83%, se decide realizar la primera notificación por vía telefónica a las 15:33 a médico tratante, en la llamada se le comienza a explicar el estado hemodinámica del paciente pero médico tratante de manera cortante no permite una completa explicación del estado del paciente argumentando que era dolor, y dio la indicación de iniciar analgesia y junto con toma de presión arterial manualmente. Cuando en ningún momento se le notificó dolor de parte del paciente. 
+Se inicia infusión a las 15:50 de tramadol  y posteriormente toma de presión arterial manual comprobando que la hipertensión persistía, acompañando de taquicardia y desaturando, y más deterioro neurologico . 
+16:21 Después de no comprobar mejoría se realiza segunda llamada a médico tratante, el cual se le vuelve a notificar de aumento de presión arterial, y deterioro neurologico y la desaturacion. Nuevamente no permite que se le dé la explicación completa del estado del paciente, interrumpiendo mis palabras y argumentando nuevamente que era dolor, se me da la indicación de administrar clonixinato de lisina una ámpula y 1 gramo de paracetamol, le respondo a la indicación que se lo administro sin ningún problema porque todavía sigue en el área de recuperación de quirofano, a lo que el doctor responde “ya no le administres nada, mejor mándalo a su habitación y yo me comunico con los médicos de guardias”.  Se menciona nuevamente de la desaturacion del paciente, a lo que el doctor responde “súbelo a 5 litros”. Se coloca en sello de la  indicación de oxígeno a 5 litros, se plasma en hoja de enfermería a grosso modo los eventos detallados y se inicia el traslado habitacion tal como solicitó el médico tratante. 
+Se entrega paciente inestable hemodinamicamente a enfermero del área de hospitalización que refiero estar a cargo del paciente, se le explicó todo el anteriormente detallado y proceden a trasladar a su habitación.', 'Fallo de comunicación', 'Condición clínica compleja del paciente, Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Monitorización estricta de signos vitales, farmacoterapia, oxigenoterapia, evaluación neurologica (escala de Glasgow)', 'https://drive.google.com/open?id=1c7CvPgNzhhP5MHoe7fbOa-s3c3-KNG-q, https://drive.google.com/open?id=12dW4hcUk4WHt10SgkaVh7uTUql1s2E7T, https://drive.google.com/open?id=1XEQxgoGz5Lx30ANV_MnLN2LiUbnRlL1j, https://drive.google.com/open?id=1ep68crKRCZhm7I6c85qFoqqRQnxOYYkW, https://drive.google.com/open?id=1xS1OB8Xi2E9mLSwuf78BKmd4cCR_Yv6q'
+);
+
+-- [36] Ventura Sanchez Benita | 11/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-11 12:48:20+00', 'Ventura Sanchez Benita', '1949-03-17', 'Femenino',
+  '2025-11-11', '06:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Grave',
+  'El día de ayer por la noche sale paciente de bypass femoro-popitleo, como había estado sangrando se le manda evidencia en foto al medico tratante para informarle y comenta cambio de horario de heparina de las 8pm a las 12:00hrs, la dosis es: 5,000ui. 
+La enfermera del turno nocturno del día de ayer (Mayra Hernández) acude a farmacia por dos frascos de heparina de 5,000ui/ml, 10ml. Aplicando a las 12 hrs todo el frasco (50mil UI) y a las 6hrs el segundo frasco (50milUI). 
+El día de hoy al dar la 3ra dosis indicada se busca el frasco en farmacia y en refrigerador del piso, el cual no se encuentra. 
+Se inicia la corroboración de la eventualidad de la aplicación, comentando Itzel que supervisión nocturno confirma el error.', '.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Alarma de un dispositivo de monitoreo', '*NO HUBIERON FACTORES MITIGANTES PERO NO HAY OPCIONES DE PONER NADA Y NO PUEDO CONTINUAR SI NO SELECCIONO NADA POR LO QUE PONGO LA OPCIÓN DE LA ALARMA DE UN DISPOSITIVO PERO NO HUBIERON FACTORES MITIGANTES*
+
+
+
+acudo con su dirección a comentarle la eventualidad, y posteriormente me comunico con medico tratante para informarle de la eventualidad.', NULL
+);
+
+-- [37] DAVID NAVARRO GUTIERREZ | 14/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-14 08:42:40+00', 'DAVID NAVARRO GUTIERREZ', '1936-01-06', 'Masculino',
+  '2025-11-14', '08:00', 'Hospitalización',
+  'Cuasi Falla', 'Dispositivos / Equipos Médicos', 'Sin Daño',
+  'PACIENTE COMIENZA A "DESATURAR" POR LO QUE ACUDE INHALOTERAPIA AL CUARTO DE MEDICO PARA COMENTAR EL CASO. 
+ACUDE MEDICO DE GUARDIA A VALORAR AL PACIENTE Y SE PERCATA QUE EN EL OXIMETRO DEL MONITOR CARDIACON DEL PACIENTE REPORTABA SPO2 90%, SE COLOCA OXIMETRO DE PB SATURANDO87%, SE COLOCA OXIMETRO DE GINE SATURANDO 40%, SE COLOCA OXIMETRO NEGRO SATURANDO 86% Y SE COLOCA EXOMETRO DE INHALOTERAPIA REPORTANDO 82%.
+
+SE DECIDE COLOCACION DE PUNTAS NASALES POR MAYORIA DE SATURACIONES REPORTADAS <90%.', 'POR FAVOR SOLICITO LA REVISION DE TODOS LOS DISPOSITIVOS DEL HOSPITAL (BAUMANOMETROS, MONITOR CARDIACO, OXIMETROS, ETC)', 'Equipo no disponible o defectuoso',
+  'Alarma de un dispositivo de monitoreo, Doble chequeo por parte del personal', 'COLOCACION DE OXIGENO', 'https://drive.google.com/open?id=1nycVutC_sSZFV3AAOEMpq-q6Muin8gPH, https://drive.google.com/open?id=1vcsqaiZ3Wm7Kxm75QaK96_Ya-hN605tV, https://drive.google.com/open?id=1140mSMEoZ7kmDmNK69qrkX1dlAWiGedZ, https://drive.google.com/open?id=1C5leEQvJHhK3C9D17zFr2E3hUk06e6kY'
+);
+
+-- [38] Diego Armando Temblador R, José Armando González Rios, Cristóbal Conde Hernández | 15/11/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-11-15 13:36:21+00', 'Diego Armando Temblador R, José Armando González Rios, Cristóbal Conde Hernández', '1981-01-01', 'Masculino',
+  '2025-11-15', '13:00', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Leve',
+  'Las enfermeras del área de Juan Pablo segundo anotaron en las hojas de dietas a la mayoría de los Px’s, además de que se les preguntó si había alguno de aseguradora para contemplarlo y se digo que solo jp 5 y 18;si embargo al momento de llegar a central para entregar las dietas me comentan que 3 pacientes no se habían ido y que se les llevara comida por lo que se le tuvo que llevar a destiempo retrasando así su hora de comida, la cual tardó un poco más por que uno de los px tenía dieta para hepatopata y la comida no era adecuada para el por qué no se contempló en la elaboración de los alimentos por qué se había dicho que estaba de alta.', 'Mala comunicación de parte de enfermería', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Preparación extra de alimentos para esos pacientes', 'https://drive.google.com/open?id=1iJrJDCcjJLkAP5XCMYHppxyJ0MamblCS'
+);
+
+-- [39] Samuel Arturo Placito Briseño | 2/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-02 19:59:11+00', 'Samuel Arturo Placito Briseño', '1976-09-15', 'Masculino',
+  '2025-12-02', '14:30', 'Hospitalización',
+  'Cuasi Falla', 'Infraestructura / Recursos', 'Sin Daño',
+  'Desabasto de medicamento controlado se notifica al departamento de farmacia que se requiere del medicamento con anticipación sin tener respuesta durante el turno vespertino', 'Desconocido', 'Equipo no disponible o defectuoso',
+  'Intervención oportuna de otro personal', 'Se notifica con anticipación y se reporta', NULL
+);
+
+-- [40] JUAN CARLOS LOPEZ MONTES | 3/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-03 13:43:52+00', 'JUAN CARLOS LOPEZ MONTES', '1982-06-24', 'Femenino',
+  '2025-12-03', '13:15', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'Médico tratante solicita carbonato de calcio 1 gr VO cada 8 horas, se pone el sello con la indicación en la hora exacta, farmacia solicita receta por desabasto del material, se les informa que la indicación está anexa a expediente, acude auxiliar de farmacia y nos comenta que ellos ni químicos tienen autorización de llamar a médicos tratantes, que esa es nuestra obligación, durante el problema calla a medico de guardia, levantando la mano en la cara y dando la espalda, para dirigirse a otra médico. Cabe resaltar que no es la primera vez que químicos y personal de farmacia, no realiza sus obligaciones, comentando que solo nosotros podemos comunicarnos con médicos tratantes, aunque previamente se ha dado capacitaciones de la comunicación efectiva y como debe llevarse acabo.', 'Falta de comunicación y de responsabilidad', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Reporte de personal hacia calidad', NULL
+);
+
+-- [41] Maria Juana Zambrano Perez | 4/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-05 09:00:28+00', 'Maria Juana Zambrano Perez', '1967-02-08', 'Femenino',
+  '2025-12-04', '11:08', 'Hospitalización',
+  'Evento Adverso', 'Sangre / Productos Sanguíneos', 'Sin Daño',
+  'Se indica por sello de llamada telefónica, transfundir paquete globular a la paciente, posterior a los 30 minutos se cancela dicha indicación y se indica de igual manera por sello de llamada telefónica el iniciar solución *HARTAMANN 1000 PARA 2 HORAS*.', 'Se envían resultados de paciente errónea a médico tratante, cuando le médico de guardia se percata de el error en nombre de paciente, le informo y se cancela el paquete globular anteriormente indicado.', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Doble verificación', 'https://drive.google.com/open?id=1VQtuWx91_N7mz9hKJiLUnnM_ZemHJxnd'
+);
+
+-- [42] Vargas Portillo María de Loa Ángeles Adriana | 5/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-05 12:50:21+00', 'Vargas Portillo María de Loa Ángeles Adriana', '1960-09-19', 'Femenino',
+  '2025-12-05', '08:20', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Se indica ministrar Ceftriaxona 1gr IV como Dosis Única, por orden verbal en el área de quirofano, por parte de la anestesiologa Raquel Conchas, cuando al interrogatorio previo por parte de enfermería, la paciente informo que era alérgica al antibiótico antes mencionado. 
+Presenta reaccion durante evento quirúrgico, presenta reacción alérgica se administra hidrocortosona 500mg IV DU', 'La paciente presenta con reaccion', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Hidrocortisona 500mg DU', 'https://drive.google.com/open?id=1QDkqInZMk6WlCv4dEVyIa3K2uSI4lpi0, https://drive.google.com/open?id=1LDN_WTBGJxFh8ZF47EkudAdpJVnlw-Cy'
+);
+
+-- [43] GILBERTO GANDARILLA GANDARILLA | 8/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-08 17:04:35+00', 'GILBERTO GANDARILLA GANDARILLA', '1938-09-19', 'Masculino',
+  '2025-12-08', '16:45', 'Hospitalización',
+  'Cuasi Falla', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Leve',
+  'Laboratorio no realiza toma de muestras para estudios de laboratorio, solicitadas desde el ingreso del paciente que fue a las 12:48 pm, el cual tuvo que haber sido tomado por el turno matutino. Además de que se proceso en dos ocasiones las pruebas rápidas de COVID e influenza. Cabe resaltar que el paciente ingresa con insuficiencia respiratoria. No es la primera vez que laboratorio comete omisiones en la toma de muestras, que se procesan mal o que incluso cometen errores en el registro de los resultados de laboratorio, lo que causa retraso en el diagnostico y abordaje del paciente, además de que siempre cuentan con mala actitud, y ante errores como los ya mencionados no se comunican con médicos tratantes, dejando la responsabilidad de sus errores a médicos de guardia.', 'No realizan sus actividades en tiempo y forma', 'Formación o supervisión inadecuadas',
+  'Doble chequeo por parte del personal', 'Se solicita que se hagan los estudios lo más pronto posible. Algo que en mi opinión podría funcionar es que no solo firmen con la fecha, sino tambien con hora de toma y quien los realiza.', NULL
+);
+
+-- [44] Sabino Alejandro Nuñez Salcedo | 15/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-16 11:43:59+00', 'Sabino Alejandro Nuñez Salcedo', '1978-04-14', 'Masculino',
+  '2025-12-15', '18:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Se administra Kabivent central cuando esta indicado periférico, el paciente no cuenta con CVC, la doble verificación no está registrada correctamente, ya que en la etiqueta de la bolsa de alimentación dice un nombre y en hoja de enfermería otro.
+Cabe mencionar que es considerado medicamento de alto riesgo.', 'Enfermera a cargo de habitación Suite 03, no realiza una administración correcta de Kabivent, no realiza proceso correcto en doble verificación, el paciente presenta edema en brazo donde contaba con vía periférica.
+Se percata del el error hasta el dia 16 de diciembre a las 7:00 am', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Cambio de nutrición correctamente.', 'https://drive.google.com/open?id=10IY2ammmiAcuLlVot9SJBhoU05e5lvSb, https://drive.google.com/open?id=1GzUbqi2Sn8JiT6o4YMN_J3i-CaXvtDfj, https://drive.google.com/open?id=1djke4iWFrSceM6JYd_wpOvtKYHb_dwhB'
+);
+
+-- [45] JOSÉ FLORES MUÑOZ | 16/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-16 23:44:05+00', 'JOSÉ FLORES MUÑOZ', '1966-02-12', 'Masculino',
+  '2025-12-16', '22:00', 'Hospitalización',
+  'Cuasi Falla', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Sin Daño',
+  'EL MÉDICO TRATANTE SOLICITA UN ELECTROCARDIOGRAMA STAT CUANDO EL PACIENTE LLEGA A HOSPITALIZACIÓN, EL ELECTROCARDIOGRAFO DE PLANTA BAJA TIENE MÁS DE UN MES SIN FUNCIONAR POR LO QUE SE SOLICITA PRESTADO EL DE URGENCIAS PERO EL ELECTROCARDIOGRAFO DE URGENCIAS TIENE VARIOS DÍAS  SIN PAPEL PARA IMPRIMIR POR LO QUE AL FINAL ES NECESARIO PEDIR EL ELECTROCARDIOGRAFO DE TERAPIA INTENSIVA. EL MÉDICO TRATANTE AL NOTAR LA DEMORA DECIDE RETIRARSE SIN VER EL ELECTROCARDIOGRAMA IMPRESO Y SOLO TOMANDO FOTO DE LA PREVISUALIZACIÓN DEL APARATO.', '-NO CONTAR CON ELECTROCARDIÓGRAFO FUNCIONAL EN ÁREA DE HOSPITALIZACIÓN
+-NO CONTAR CON PAPEL PARA ELECTROCARDIÓGRAFO EN EL ÁREA DE URGENCIAS', 'Equipo no disponible o defectuoso, Protocolos inadecuados o inexistentes',
+  'Doble chequeo por parte del personal', 'PEDIR UN APARATO PRESTADO A OTRA ÁREA', NULL
+);
+
+-- [46] Ana María Escoto Villaseñor | 18/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-18 15:20:12+00', 'Ana María Escoto Villaseñor', '1934-12-31', 'Femenino',
+  '2025-12-18', '13:00', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'Se le entregó al paciente una Dieta blanda en la hora de la comida del día 18-12-25, la cual fue indicada y aceptada por enfermería. A la recolección de las charolas se notifica por médicos de guardia que la dieta de la paciente no había progresado. La paciente no consumió nada de su charola de la comida por lo que no tuvo ningún efecto ni daño.', 'Falta de comunicación, atención y confirmación de las indicaciones médicas por parte de enfermería.', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Personal insuficiente',
+  'El paciente o familiar alertó del error', 'Retirar la charola. 
+Hacer incapie a enfermería sobre la dieta del paciente.', NULL
+);
+
+-- [47] Juan Manuel Castañeda | 29/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-30 15:14:15+00', 'Juan Manuel Castañeda', '1983-11-19', 'Masculino',
+  '2025-12-29', '15:00', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'En la dieta de la comida de las 13 hrs se proporciono 1 gelatina la cual al percatarse el paciente como a las 15hrs se notifica a enfermería de que la gelatina tenía Moo muy visible.', 'Manejo del control de alimentos.', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'Cambio de aliemento', NULL
+);
+
+-- [48] juan manues castañeda | 29/12/2025
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2025-12-30 15:18:33+00', 'juan manues castañeda', '1983-11-19', 'Masculino',
+  '2025-12-29', '15:00', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'durante la comida el familiar notifico a enfermería a las 15:00 aproximadamente la gelatina proporcionada  manifestó hongo en aparente descomposición', 'pues hongo en la gelatina', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'se realizo cambio de alimento.', 'https://drive.google.com/open?id=1BnjDHC3BaUIklxVFmCK6dqUO6wzvkA8n'
+);
+
+-- [49] Juan seijas | 3/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-03 10:17:45+00', 'Juan seijas', '1946-10-10', 'Masculino',
+  '2026-01-03', '00:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Médico tratante acude a pase de visita el día 02/01/26 a las 19hrs y deja indicaciones anexas en foto donde indica último kabivent DC explicándoles a enfermería que al término del que tiene se suspende y ya no se reinicia. Termino de kabivent a las 24 hrs y enfermería hace caso omiso a indicación y reinicia un nuevo kabivent.', 'Falta de atención de parte de enfermería', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se le comunica a tratante y se vuelve a colocar indicación', 'https://drive.google.com/open?id=1OdBQirhzj29nxMgsmHK88OS7xsD_Lw8K, https://drive.google.com/open?id=14q8ac9ppgX1PW_eCVmj3KWdlw7cnFHhN'
+);
+
+-- [50] Estela contreras pulido | 4/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-05 00:43:17+00', 'Estela contreras pulido', '1947-01-21', 'Femenino',
+  '2026-01-04', '20:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se administra metoxlopramida, la cual según informes de familiar, es alérgica, no tuvo ninguna reacción.', 'Al ingresar, los familiares, solo mencionaron alergia a metamizol, pero el familiar que estaba el dia de hoy mencionó que tambien es alérgica a la metoclopramida', 'Comunicación deficiente en el equipo',
+  'El paciente o familiar alertó del error', 'Se aviso a su medico tratante y se estuvo vijalando posible reacción. 
+No presento ninguna reacción, no se alteraron signos vitales.', NULL
+);
+
+-- [51] MANJARREZ ALFARO, MA. TOMASA AZUCENA | 13/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-13 18:35:47+00', 'MANJARREZ ALFARO, MA. TOMASA AZUCENA', '1937-03-07', 'Femenino',
+  '2026-01-13', '16:00', 'Hospitalización',
+  'Cuasi Falla', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'DR FARID RODRIGUEZ A SU PASE DE VISITA A LAS 14:05HRS INDICA SOL. SALINA 0.9% + 60MEQ DE KPO4 PP IV EN BIC A 20ML/HR.
+A LAS 17:03HRS ENFERMERO JONATHAN SE COMUNICA CON MEDICOS DE GUARDIA PARA INFORMAR QUE PREPARO LA SOLUCION CON 60MEQ PERO DE KCL, LA INICIO A LAS 16:00HRS Y SE DIO CUENTA A LAS 17:00HRS Y LA PAUSO. 
+SE LE COMUNICA AL DR FARID LA EVENTUALIDAD Y SOLICITA QUE DE INMEDIATO SE COLOQUE LA INFUSION CORRECTA.', 'PACIENTE CON NAUSEAS Y VOMITOS QUE FUERON EN AUMENTO, SE DESCONOCE SI AUMENTARON POR LA ADMINISTRACION DE KCL.', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'SUSPENDER SOLUCION', 'https://drive.google.com/open?id=1AJ-bBASs0lTXoUXDkifLm4hJaTjIzkPP'
+);
+
+-- [52] González Vásquez Everardo | 22/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-22 21:56:11+00', 'González Vásquez Everardo', '1953-04-30', 'Masculino',
+  '2026-01-22', '17:50', 'Hospitalización',
+  'Cuasi Falla', 'Sangre / Productos Sanguíneos', 'Leve',
+  'Paciente al cual se le indica paquete globular para 4 horas, se le inicia a las 15:33 y se termina a las 17:50. Posterior a ellos paciente comienza con fibrilacion auricular.', 'Sobrecarga al paciente', 'Condición clínica compleja del paciente, Fatiga / Sobrecarga de trabajo del personal',
+  'Intervención oportuna de otro personal', 'Se le informa a médico tratante, toma de electrocardiograma', 'https://drive.google.com/open?id=1TETxPKH6IwgxEvCX_kOQTz3wk-cXZEgl, https://drive.google.com/open?id=1mz9se6fo6prClVko3kKwX_aSGamW2EJR'
+);
+
+-- [53] Espinoza Sanchez Ernesto | 21/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-23 08:26:40+00', 'Espinoza Sanchez Ernesto', '1961-08-17', 'Masculino',
+  '2026-01-21', '22:30', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Se omite la aplicación de medicación de analegesia', 'Se indica parche soloro ya que el paciente estaba con dolor constate, por la mañana se percata en enlace de turno que no se había colocado dicho parche', 'Formación o supervisión inadecuadas',
+  'El paciente o familiar alertó del error', 'Se coloca en el momento', 'https://drive.google.com/open?id=1-_LmGezdAAdOBG1VJcW_NbS6DQqMv1MU, https://drive.google.com/open?id=1sB37WalM1Y9jATTbELBXscdwkZ3O8K0B, https://drive.google.com/open?id=1P3L8GEWEmMr0Sgfvl9AckYJpNJBnmJZ-'
+);
+
+-- [54] ALVAREZ MUÑOZ MIGUEL | 29/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-30 12:20:52+00', 'ALVAREZ MUÑOZ MIGUEL', '1968-02-09', 'Masculino',
+  '2026-01-29', '12:07', 'Hospitalización',
+  'Cuasi Falla', 'Manejo de Vía Aérea / Ventilación', 'Leve',
+  'Paciente con dificultad respiratoria, portador de puntas de alto flujo a 30 litros y 90 de fio. Al chechar signos vitales en hoja de enfemeria tiene FR de 17, cuando evidentemente el paciente tiene taquipnea y en hoja de enfermeria se registra una FC de 17. Al tomarla por medico de guardia (aproximadamente a las 10 am) se corrabora una FC de 26, se avisa a enfermeria quien no registra signos nuevamente y se molesta con la observacion. Es importante la buena toma de signos en un paciente con soporte ventilatorio para poder estadificar el fracaso ventilatorio y la mortalidad del paciente, asi como saber si es momento de progresar la via ventilatoria.', 'mal toma de signos vitales y no registro', 'Comunicación deficiente en el equipo, Personal insuficiente',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Se aviso a medico tratante del error quien corrabora taquipnea y debido a condicion del paciente ofreció ventilación mecánica a paciente quien firma consentimiento de no intubación.', 'https://drive.google.com/open?id=1g7SDL626Hy1SNWDQKc9D5aqOyF59EwdY'
+);
+
+-- [55] BARAJAS RAMOS, CAMILA MONSERRAT | 30/1/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-01-30 15:42:01+00', 'BARAJAS RAMOS, CAMILA MONSERRAT', '2010-12-03', 'Femenino',
+  '2026-01-30', '09:40', 'Hospitalización',
+  'Cuasi Falla', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'SE REALIZAN CAMBIOS EN INDICACIONES A LA PACIENTE POR ORDEN DE SU MEDICO TRATANTE, SE ACUDE A COLOCAR SELLO Y SE ESPECIFICA ESTUDIOS DE GABINETE PARA EL DIA DE MAÑANA 31/01/26, ENFERMERIA HACE CASO OMISO A DICHA INDICACION Y SOLICITA LA TAC Y LOS LABORATORIALES PARA EL DIA DE HOY. FAMILIARES LE COMUNICAN A MEDICO TRATANTE QUE SE LLEVARAN A LA PACIENTE A TAC Y ESTA MISMA SE COMUNICA CON NOSOTROS PARA INTERVENIR, SE LOGRO INTERVENIR CON TIEMPO Y NO SE REALIZO LA TAC PERO PARTE DE LOS LABORATORIALES SI SE PROCESARON.', 'COBROS EXTRAS AL PACIENTE', 'Fatiga / Sobrecarga de trabajo del personal, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'SE SUSPENDE Y SE METE INCIDENCIA, SE VUELVE A ACLARAR QUE SON PARA MAÑANA', 'https://drive.google.com/open?id=15LUZELlcv3LHTnys7fC3iA58F_38m8I8'
+);
+
+-- [56] Gloria coronel bernal | 12/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-13 06:42:24+00', 'Gloria coronel bernal', '1935-04-10', 'Femenino',
+  '2026-02-12', '22:00', 'Hospitalización',
+  'Consulta', 'Comportamiento del Paciente', 'Sin Daño',
+  'Los familiares de la persona se han portado de manera hostil, ignorando peticiones y exigiendo las cosas, también se quedaron 2 personas cuando se les dijo que sólo podía estar 1, dijo que se quedó para ayudar a movilizar, cosa que no es cierto puesto que me hablaron a mí en repetidas veces para lo mismo', 'Descontento al solicitar que sólo hubiera una sola persona en habitacion', 'Condición clínica compleja del paciente',
+  'Doble chequeo por parte del personal', 'Le informe a mi superior directa (jefa alma)', NULL
+);
+
+-- [57] GARCIA YEPIZ, AMANDA DEL ROSARIO | 18/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-18 14:00:28+00', 'GARCIA YEPIZ, AMANDA DEL ROSARIO', '1950-11-12', 'Femenino',
+  '2026-02-18', '13:50', 'Hospitalización',
+  'Cuasi Falla', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'PACIENTE PASA A CIRUGIA DE CADERA EL DIA 17/02/26 DURANTE CIRUGIA PRESENTA ABUNDANTES EVACUACIONES  POR LO CUAL POR HIGIENE MEDICO TRATANTE SOLICITA COLORACION DE GASA EN ANO, SOLICITA RETIRO DE LA MISMA AL PASAR A RECUPERACION. 
+EL DIA DE HOY 18/02/26 PACIENTE YA DE EGRESO REFIERE SENTIR ALGO EN ZONA ANAL, MEDICO DE GUARDIA EN TURNO REVISA Y OBSERVA QUE AUN TIENE GASA INCERTADA, SE RETIRA.', 'ENFERMERIA REPORTA EVACUACIONES DURANTE TURNO, SI HUBIERA PRESENTADO EVACUACIONES SE HUBIERAN DADO CUENTA DE DICHA GASA.', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'RETIRAR GASA E INFORMAR', NULL
+);
+
+-- [58] Garcia Yepis Amanda Rosario | 18/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-19 13:03:00+00', 'Garcia Yepis Amanda Rosario', '1950-11-12', 'Femenino',
+  '2026-02-18', '12:30', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Leve',
+  'Paciente refiere dolor abdominal y en ano, por que enfermería notofica a medico de guardia para valoración, después de valoración se informa a médico tratante el cual menciona que antes de iniciar cirugía se coloco un tapón de gasa en ano, porque la paciente estaba evacuando mucho, se da la indicación  verbal a enfermería que al egreso del paciente se retire, lo cual se omite y no se realiza un entrega de paciente correcta, se retira tapón 22 horas después de que se colocó.', 'Tapón de gasa en ano, se omite el retiro por parte de enfermería.', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'Se retira el tapón de gasa al momento que el médico informo que lo tenía.', NULL
+);
+
+-- [59] Stephanie Garcia Gutierrez | 18/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-19 13:16:54+00', 'Stephanie Garcia Gutierrez', '1993-03-04', 'Femenino',
+  '2026-02-18', '07:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Leve',
+  'No se proporciono desayuno a paciente hospitalizada.', 'Enfermería omite el registro en hoja de dieta, de paciente hospitalizada en JP 09, la cual era de aseguradora, contaba con alta a domicilio, pero aún su aseguradora no daba respuesta.
+No solo se omite el registrar dieta que esto causó que no se le entregara desayuno, sino también se omitió el pase a habitación de enfermería en turno nocturno, no signos vitales, no reporte de enfermería.', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'Se notifica al medico para recibir indicaciones médicas nuevas, toma de signos vitales y cuidados de enfermería en turno matutino.', 'https://drive.google.com/open?id=1cn4kJN2TCjU6OjKWErx8dUz0WJpQioGK, https://drive.google.com/open?id=1s2jC4xRINdmco4R0sYC1BxUK8u1d3B1V'
+);
+
+-- [60] PARRA CAMAÑO, ALMA GABRIELA | 20/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-20 09:08:08+00', 'PARRA CAMAÑO, ALMA GABRIELA', '1969-03-09', 'Femenino',
+  '2026-02-20', '08:56', 'Hospitalización',
+  'Cuasi Falla', 'Sangre / Productos Sanguíneos', 'Sin Daño',
+  'MEDICO ACUDE A VALORACION EN LA MADRUGADA E INDICA LABORATORIALES A LAS 5AM TOMADOS POR EL PICC, A LAS 8:00 AM MEDICO SOLICITA LOS LABORATORIALES Y AL REVISAR EN SISTEMA NO SALEN POR LO CUAL MEDICO DE GUARDIA ACUDE A REVISAR QUE SE HAYAN TOMADO Y NO ESTAN FIRMADOS. SUPERVISION DE ENFERMERIA MENCIONA QUE TURNO NOCTURNO JUSTIFICA QUE NO SE TOMARON PORQUE SE ESTABA TRANSFUNDIENDO. 
+JUSTIFICACION NO VALIDA, PORQUE NO ES CONTRAINDICACION PARA TOMA DE LABORATORIALES.', 'MEDICO INTERCONSULTANTE SOLICITA LABORATORIALES Y NO PUEDE REALIZAR AJUSTES', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'SE SOLICITA QUE SE TOMEN LABORATORIALES', 'https://drive.google.com/open?id=1qmIiejrHk9_m04Gf8DS6XWvfQkV5Eyvw'
+);
+
+-- [61] María Del socorro Barajas Zamora | 20/2/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-02-20 19:09:40+00', 'María Del socorro Barajas Zamora', '1961-12-17', 'Femenino',
+  '2026-02-20', '13:45', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'Recibí paciente en transoperatio, se hace entrega del turno, corroborando datos del paciente enfermedades crónicas y alergias. Me percato que se administró paciente antibióticos ceftriaxona siendo alérgica a las cefalosporinas. Sale paciente del procedimiento área de recuperación, el cual médico anestesióloga no esperó a que se monitorización de signos vitales, paciente con Glasgow de 6, sin tener respuesta a estímulos. médico anestesióloga hace caso omiso. Posteriormente se realizan acciones inmediatas por mi parte colocando oxígeno en puntas nasales. Refiere paciente sentirse ahogarse, posteriormente miembro del equipo médico se comunica con anestesióloga y se hace indicación de medicamento (8 mg de dexametasona). Se la ministra y se mantiene en observación continua durante estancia en recuperación. Ya recuperada la paciente, confirma que es alérgica a las cefalosporinas.', 'Enfermería coloca en hoja de enfermería que es alérgica a las cefalosporinas, médico anestesióloga coloca en su hoja que es alérgica a las sulfas, Médico tratante le refiere anestesióloga porque administró ceftriaxona siendo alérgica a las cefalosporinas, cuando se corrobora vuelve hacer mención que es alérgica a las sulfas. Poster', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Al presentar la reacción se aplicó 8 mg dexametasona', NULL
+);
+
+-- [62] ZEPEDA OLMOS, DELIA | 4/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-04 11:13:51+00', 'ZEPEDA OLMOS, DELIA', '1977-04-28', 'Femenino',
+  '2026-03-04', '06:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'PACIENTE FEMENINA QUE SE ENCUENTRA EN TRATAMIENTO CON NOREPINEFRINA EN BOMBA DE INFUSION CONTINUA, ENFERMERO ERICK TURNO NOCTURNO B A LAS 6 AM ACUDE A APLICARLE DOSIS DE ALBUMINA INDICADA Y DECIDE ADMINISTRARLA POR LA VIA DE LA NOREPINEFRINA CON EL MISMO EQUIPO DE VENOCLISIS, POSTERIOR A ELLO SE HIPERTENSA A 160/100 Y TAQUICARDIA A 140. 
+SE REPORTA A MEDICO DE GUARDIA EPISODIO DE HIPERTENSION Y ACUDEN A VALORACION ENCONTRANDO A LA PACIENTE CON TENSION ARTERIAL DE 55/30 CON NOREPINEFRINA A 7ML/HR, POR LO CUAL SE AUMENTA LA DOSIS A 8ML/HR PERO NO HAY MEJORIA, POR LO CUAL MEDICO DE GUARDIA ACUDE CON ENFERMERIA A PREGUNTAR SI LA VIA ES VIABLE Y ES CUANDO COMENTA ENFERMERO QUE ADMINISTRO ALBUMINA POR LA VIA MISMA DE LA NOREPINEFRINA. 
+DANDO COMO RESULTADO HIPERTENSION PORQUE SE ADMINISTRO BOLO DE NOREPINEFRINA Y POSTERIOR A LA ALBUMINA NO SE LAVO LA VIA Y QUEDO VENOCLISIS CON RESTOS DE ALBUMINA Y NO SE ADMINISTRA NOREPINEFRINA DANDO COMO RESULTADO HIPOTENSION. 
+ESTO SIENDO ALTAMENTE MORTAL PARA LA PACIENTE POR CAMBIOS TAN SUBIDOS Y EXTREMOS DE PRESION ARTERIAL.', 'DESCONOCIMIENTO DEL PERSONAL SOBRE MEDICAMENTOS, POCO COMPROMISO CON LOS PACIENTES', 'Fatiga / Sobrecarga de trabajo del personal, Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'El paciente o familiar alertó del error, Alarma de un dispositivo de monitoreo', 'SE SOLICITA LAVADO DE VIAS Y MANEJO ADECUADO DE MEDICAMENTOS', NULL
+);
+
+-- [63] VILLALVAN ALCAZAR MA DE LA LUZ OFELIA | 5/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-06 07:38:52+00', 'VILLALVAN ALCAZAR MA DE LA LUZ OFELIA', '1943-07-03', 'Femenino',
+  '2026-03-05', '22:00', 'Hospitalización',
+  'No es un evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'PACIENTE Y FAMILIAR DE DIFICIL TRATO, FAMILIAR NO QUIERE HACERSE CARGO DE LA PACIENTE Y ES GROSERO CON ENFERMERIA SOLICITANDO COSAS QUE NO LES CORRESPONDEN COMO ALIMENTARLA. 
+PACIENTE DURANTE LA NOCHE EXIGE MEDICAMENTOS QUE NO ESTAN INDICADOS Y SE RETIRA OXIGENO SUPLEMENTARIO A PESAR DE MEDICO DE GUARDIA ESTARLE EXPLICANDO Y SOLICITANDO SU USO. 
+DESDE EL SERVICIO DE URGENCIAS SE MANTIENEN QUEJANDOSE Y AMENAZANDO QUE MEJOR SE IRAN DE REGRESO AL PUERTA DE HIERRO.', 'EDAD AVANZADA DEL FAMILIAR, SIN APOYO DE OTROS FAMILIARES, CARACTER ESPECIAL.', 'Condición clínica compleja del paciente',
+  'Intervención oportuna de otro personal', 'SE LES MENCIONA QUE EN CASO DE NEGARSE A TRATAMIENTOS DEBEN FIRMAR Y SE LE INFORMA A MEDICO TRATANTE', NULL
+);
+
+-- [64] ZEPEDA OLMOS, DELIA | 6/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-06 13:30:12+00', 'ZEPEDA OLMOS, DELIA', '1977-04-28', 'Femenino',
+  '2026-03-06', '13:15', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'enfermeria se equivoca al pasarle la albumina al paciente por la misma via donde tiene la norepinefrina', 'paciente se hipertenso dando como consecuencias cefalea y nauseas', 'Personal insuficiente',
+  'Intervención oportuna de otro personal', 'limpiar la via', NULL
+);
+
+-- [65] Medina Silosonchil Arcadio | 5/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-07 12:30:14+00', 'Medina Silosonchil Arcadio', '1941-01-12', 'Masculino',
+  '2026-03-05', '19:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se hace omisión de medicamento.
+No se administración 2da dosis de dexametasona a las 19:00 del día 05 de marzo, cuando la primera se había aplicado a las 07:00 am', 'No se revisa correctamente hojas de enfermería y horarios.', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se detecta omisión y se ministra medicamento al momento de la detección', 'https://drive.google.com/open?id=1Yx9eUB6vjsITf0J1Gedn62jFfyTZEUgC, https://drive.google.com/open?id=1AYkiDEskG8bMyRZmZpefsriVF1Rqvl_O'
+);
+
+-- [66] Pardo Magallon Baltazar | 5/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-07 12:35:38+00', 'Pardo Magallon Baltazar', '1957-09-15', 'Masculino',
+  '2026-03-05', '16:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se indica por médico tratante, omeprazo vía oral 40mg
+Se administración Esomeprazol.', 'No se verifica de manera correcta el cargo de medicamento, siendo este un cargo extra a paciente. 
+Se comunica con médico tratante sobre el error y se continúa con tratamiento de esomeprazol', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Aviso a médico tratante', 'https://drive.google.com/open?id=1Fj3wag8nUGCYOHUuSmNDHIAhNpSt6mGL'
+);
+
+-- [67] Delia Zepeda Olmos | 6/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-07 12:40:37+00', 'Delia Zepeda Olmos', '1977-04-28', 'Femenino',
+  '2026-03-06', '18:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se omite la aplicación de Eritropoyetina', 'Eritropoyetina 4000 ui indicadas cada 48 hrs, se omite la aplicación del día 06 de marzo, siendo la aplicación anterior el 04 de marzo a las 18:00', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'Se administración a la detección', 'https://drive.google.com/open?id=1UUDASl0smCUtJwAZ2O2iTJHW7SlNw9xQ, https://drive.google.com/open?id=1wDoweX3NjhDyratoAScdIRGaqLDdPMDz, https://drive.google.com/open?id=1k-cL5tXlfl9v3HNpxsXFrOhj29ruUro2'
+);
+
+-- [68] ZARATE ORTIZ, OFELIA | 8/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-08 07:44:40+00', 'ZARATE ORTIZ, OFELIA', '1949-07-17', 'Femenino',
+  '2026-03-08', '07:40', 'Hospitalización',
+  'Evento Adverso', 'Sangre / Productos Sanguíneos', 'Sin Daño',
+  'PACIENTE TIENE INDICADA BH DE CONTROL A LAS 6:00AM, ACUDE LABORATORIO A TOMAR MUESTRA A LAS 7:30AM', 'SE DESCONOCE SI ENFERMERIA LLAMO A TIEMPO Y LABORATORIO NO ACUDIO O SERVICIO DE ENFERMERIA NO LLAMO A TIEMPO', 'Fatiga / Sobrecarga de trabajo del personal, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE LLAMA A LABORATORIO PARA SOLICITAR PROCESEN MUESTRA', NULL
+);
+
+-- [69] LOZA HERNANDEZ MARIA ENRIQUETA | 11/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-11 13:57:46+00', 'LOZA HERNANDEZ MARIA ENRIQUETA', '1946-07-15', 'Femenino',
+  '2026-03-11', '13:23', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Moderado',
+  'PACIENTE FEMENINA CON ANTECEDENTE DE ENFERMEDAD RENAL CRONICA QUE INGRESO POR EL SERVICIO DE URGENCIAS POR DESEQUILIBRIO HIDROELECTROLITICO Y DESHIDRATACION. SE INGRESA PARA APORTE DE LIQUIDOS PARA MEJORAR LA FUNCION RENAL DE LA PACIENTE. 
+FAMILIAR MENCIONA QUE DESDE LAS 22 HORAS QUE LE CAMBIARON LA SOLUCION, NO LE HAN VUELTO A COLOCAR SOLUCION NUEVA, QUE SOLO LE CAMBIARON LA CINTA DE HORARIOS. 
+AL REVISAR SOLUCION ACTUAL QUE SE LE COLOCO A LAS 6 AM Y DEBIA TERMINAR A LAS 14HRS SE OBSERVA (ANEXAMOS FOTOS) SOLUCION CASI COMPLETA.
+PACIENTE CON MEJORIA CLINICA SIN NAUSEAS O DIARREA POR TRATAMIENTO MEDICO.', 'PACIENTE CON HIDRATACION DEFICIENTE', 'Fatiga / Sobrecarga de trabajo del personal, Comunicación deficiente en el equipo, Personal insuficiente',
+  'Intervención oportuna de otro personal', 'SE CUESTIONA A ENFEMERIA SOBRE LA SOLUCION Y SE SOLICITA AJUSTEN LIQUIDOS.', 'https://drive.google.com/open?id=1tBNRqGu6YhXZQqVVNKNKY_lN_aJdFxIy'
+);
+
+-- [70] Jose Sebastián carapia gonzalez | 13/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-13 15:39:23+00', 'Jose Sebastián carapia gonzalez', '1947-09-16', 'Masculino',
+  '2026-03-13', '14:15', 'Hospitalización',
+  'No es un evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'Recibí al paciente en espera de entrega del pase de salida, mientras recibía mis demás pacientes, el paciente se retira, sin enseñar pase de salida y sin avisar a enfermería y sin camillero, aún contaba con via periferia en brazo derecho a la altura del codo y faltaba entregarle la copia de sus laboratoriales, al regresar a su habitación me percate que ya no estaba, marque a admisión y mencionaron que ya habían realizado el pago.', 'Se informa al paciente y familiar los pasos a seguir para su egreso, pero se retiran sin avisar a enfermería', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Marcar a admisión para preguntar si el paciente y familiar se encontraban ahí y saber el estado del pago', NULL
+);
+
+-- [71] VAZQUEZ CASILLAS, J. FELICIANO | 14/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-14 20:10:41+00', 'VAZQUEZ CASILLAS, J. FELICIANO', '1957-05-02', 'Masculino',
+  '2026-03-14', '08:30', 'Hospitalización',
+  'Evento Adverso', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Leve',
+  'EL MÉDICO TRATANTE DEL PACIENTE EN EL PASE DE VISITA DE AYER POR LA NOCHE INDICA QUE SE LE TOMEN ESTUDIOS DE LABORATORIO EL DÍA DE HOY POR LA MAÑANA A LAS 5 AM (BH Y ES), SOLICITANDO EL RESULTADO A LAS 8 AM.
+SE REVISA EL SISTEMA DE REPORTE DE ESTUDIOS DE LABORATORIO Y AL NO ENCONTRAR RESULTADOS, SE LLAMA DIRECTAMENTE A LABORATORIO EN DONDE CONTESTA LA SECRETARÍA NEYDE Y COMENTA QUE CUALES SON LOS RESULTADOS QUE NECESITO, AL DECIRLE QUE SE REQUEREN TODOS, RESPONDE QUE VA A REVISAR PORQUE NO ESTÁN REPORTADOS, PERO NUNCA COMENTA QUE LOS ESTUDIOS NO FUERON TOMADOS POR EL PERSONAL DE LABORATORIO A PESAR DE QUE SE FIRMARON COMO TOMADOS POR PARTE DE LA QUIMICA ANDREA. AL ACERCARME A VER LAS INDICACIONES ME COMENTA LA QUIMICA QUE ELLA LOS FIRMO PORQUE VIÓ QUE HACÍA FALTA LA FIRMA DE SU COMPAÑERO CRISTIAN DEL TURNO NOCTURNO A, EL CUAL LES DIJO QUE SUPUESTAMENTE HABÍAN SIDO TOMADOS. 
+SE LE COMENTA AL MÉDICO TRATANTE DEL ERROR Y NOS COMENTA QUE LOS ESTUDIOS LOS NECESITA LO MÁS PRONTO POSIBLE YA QUE EL PACIENTE DEPENDÍA DE ELLOS SU ALTA PARA TRASLADO A HOSPITAL CIVIL.', 'DISTRACCIÓN Y OMISIÓN, LA MAYORÍA DE LAS OCASIONES QUE SE SOLICITA LA TOMA DE ESTUDIOS DE LABORATORIO, EL PERSONAL SUELE TARDAR HASTA 30 MINUTOS EN ACUDIR A LA TOMA DE LOS MISMOS, ASÍ COMO TARDANZA EN REPORTARLOS Y ANEXARLOS A EXPEDIENTE CLÍNICO POR PARTE DE LA SECRETARÍA. 
+ESTE ES UN ERROR MUY FRECUENTE POR PARTE DEL TURNO VESPERTINO.', 'Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE SOLICITAN LOS ESTUDIOS URGENTES PARA REPORTAR A MÉDCO TRATANTE.', NULL
+);
+
+-- [72] ROSA TORRES ALVAREZ | 15/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-15 06:14:01+00', 'ROSA TORRES ALVAREZ', '2056-04-14', 'Femenino',
+  '2026-03-15', '03:00', 'Urgencias',
+  'No es un evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'Enfermera no responde a la urgencia se queda sentada cuando se requiere vía para una paciente de  edema pulmonar agudo se pone a hacer hojas  enfermera Dolores nocturno B', 'No sigue indicaciones médicas', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Reporte a jefe directo', NULL
+);
+
+-- [73] Luis Ignacio Delgadillo Medina | 16/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-16 15:53:37+00', 'Luis Ignacio Delgadillo Medina', '1959-09-03', 'Masculino',
+  '2026-03-16', '16:00', 'Hospitalización',
+  'No es un evento Adverso', 'Comportamiento del Paciente', 'Sin Daño',
+  'El paciente está muy aprensivo con enfermería 
+Donde se molesta si se le va a tomar signos vitales 
+Parece  adrede porque nos metemos a la habitación y justo va constestar una llamada y nos dice q si le permitimos y dura mucho en la llamada sin permitirnos tomarle signos 
+Nos pone horarios para tender su cama y recoger lo que ensucia de sábanas 
+Como orden nos habla 
+El paciente lleva 5 días de estancia y compañeras  de intendencia y enfermera han referido incomodidad al momento de atenderlo ya que refieren la mirada pervertida 
+Cuando timbra ala central de enfermería y vamos a su orden contesta molesto', 'Paciente con muchos días de estancia', 'Condición clínica compleja del paciente',
+  'Intervención oportuna de otro personal', '.', NULL
+);
+
+-- [74] GARCIA RAMOS, LUZ ELVIA | 18/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-18 15:22:23+00', 'GARCIA RAMOS, LUZ ELVIA', '1961-01-05', 'Femenino',
+  '2026-03-18', '15:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'MEDICO TRATANTE SOLICITA SODIO EN ORINA Y CREATININA, ENTRE OTROS LABORATORIALES COMO EGO Y LABS EN SANGRE
+LABORATORIO NO PROCESA SODIO EN ORINA Y CREATININA,  MEDICO TRATANTE LOS SOLICITA Y ES CUANDO SE DESCUBRE QUE NO SE PROCESARON.
+MEDICO TRATANTE SOLICITA QUE QUEDE ANTECEDENTE QUE POR DICHO ERROR, TRATAMIENTO DE LA PACIENTE SE VERA RETRASADO.', 'RETRASO EN EL TRATAMIENTO DE LA PACIENTE', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE SOLICITA NUEVA MUESTRA Y SE SOLICITA A LABORATORIO RESULTADO URGENTE', 'https://drive.google.com/open?id=1Bjrec1Is87ZJQG-GT5hcS9XbH1cctPMk'
+);
+
+-- [75] MARIA GUADALUPE HERRERA HERNANDEZ | 17/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 10:36:16+00', 'MARIA GUADALUPE HERRERA HERNANDEZ', '1951-09-10', 'Femenino',
+  '2026-03-17', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'OMISIÓN DE GLICEMIA CADA 4 HORAS POR TURNO MATUTINO
+OMISIÓN DE MEDICAMENTOS VIA ORAL TURNO MATUTINO Y VESPERTINO', 'NO SE ENCUENTRAN REGISTRADOS LA TOMA DE GLICEMIA CAPILAR CADA 4 HORAS
+
+MEDICAMENTOS VIA ORAL CONCILIADOS POR FARMACIA CLINICA, NO SE ADMINISTRAN A PACIENTE, REGISTRADOS EN HOJAS DE ENFERMERÍA "MPF" MANEJADO POR FAMILIAR, NO SE ECONTRO CARTA DE DESLINDE DE MEDICAMENTOS, POR LO TANTO ES UN ERROR AL TRASCRIBIR INDICACIÓN MEDICA EN HOJA DE ENFERMERIA, Y DERIVA ESO A LA OMISION DE TURNO VEPERTINO', 'Condición clínica compleja del paciente, Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'REEINICIO DE TRATAMIENTO', 'https://drive.google.com/open?id=1c6BkE4cCdjGFUBN8Qraw7Sch_TMsads6, https://drive.google.com/open?id=1gALmz7thHNIhc2OKx3Je5few0AMT4od1'
+);
+
+-- [76] EMILIA GAMEZ LUJANO | 18/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 11:25:13+00', 'EMILIA GAMEZ LUJANO', '1947-12-06', 'Femenino',
+  '2026-03-18', '12:00', 'Hospitalización',
+  'No es un evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'SE OMITE LA ADMINISTRACIÓN DE', 'SE CONFUNDE LA DOSIS DE ADMINISTRACIÓN 12:00AM POR 12:00PM', 'Barreras de comunicación (idioma, cognición)',
+  'Intervención oportuna de otro personal', 'SE NOTIFICA A MEDICO TRATANTE', 'https://drive.google.com/open?id=1t2nkiSlfYvk-CGCCVv_X5DeR5fwaOzN_, https://drive.google.com/open?id=1_u7hBhBtLNwjXdU4cr4zf6CdTzO9GKDY'
+);
+
+-- [77] HERNANDEZ HERNANDEZ MARIA GUADALUPE | 18/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 11:31:32+00', 'HERNANDEZ HERNANDEZ MARIA GUADALUPE', '1951-09-10', 'Femenino',
+  '2026-03-18', '22:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'SE ADMINISTRA MEDICAMENTO SUSPENDIDO', 'ENFERMERÍA TURNO VESPERTINO MENCIONO VERBAL QUE EL MEDICAMENTO YA NO ESTABA SUSPENDIDO, NO SE COTEJA LA INDICACIÓN POR ESCRITO Y DE ADMINISTRA MEDICAMENTO, POSTERIOR SE COMUNICA A MEDICO TRATANTE Y SE CONFIRMA DE SUSPENDIDO', 'Barreras de comunicación (idioma, cognición)',
+  'Intervención oportuna de otro personal', 'RETROALIMENTACION A PERSONAL', 'https://drive.google.com/open?id=1YTiqVRYk8_y4_C_mH7P1Rdkfs9mdFk6h, https://drive.google.com/open?id=1Nxa6JbMCuZWKagl8T6y5UKH6nkL4r4C3'
+);
+
+-- [78] MARIA GUADALUPE GOMEZ VALDIVIA | 13/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 12:03:21+00', 'MARIA GUADALUPE GOMEZ VALDIVIA', '1931-09-12', 'Femenino',
+  '2026-03-13', '20:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'OMISION DE MEDICAMENTO', 'NO SE ADMINISTRA ANTIBITICO DE LAS 20:00HRS', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE ADMINISTRA DOSIS A LA BREVEDAD', 'https://drive.google.com/open?id=1_fnFLFfZ2YEDH9ETu9oILNSMDGhrtY12'
+);
+
+-- [79] Valdez Romero Lorenzo | 12/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 13:11:13+00', 'Valdez Romero Lorenzo', '1944-05-10', 'Masculino',
+  '2026-03-12', '10:30', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'no se realiza correctamente el llenado de el sello de indicaciones por llamda telefonica', 'no cueta con datos completo y concretos sobre la indicacion medica, lo cual puede interpretarse de diferentes formas, saber si es "calcio como medicamento o toma de laboratorio"', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'confirmacion de indicacion con medico', 'https://drive.google.com/open?id=17_0mh8mrHOICjoeLNz3HO15UQhs13Yd7'
+);
+
+-- [80] Herrera Zuñuga Martha Leticia | 21/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 13:14:53+00', 'Herrera Zuñuga Martha Leticia', '1954-07-28', 'Femenino',
+  '2026-03-21', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'no se trascribe correctamente los laboratoriales', 'se indican toma de laboratoriales toma a las 06 am, se trascribe solo AM, llega medico tratante y no se encuentra con resultados porque la toma se realizo a las 08:00', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal, El paciente o familiar alertó del error', 'toma en el momento de la deteccion', 'https://drive.google.com/open?id=1VUOLwm2GPlVyKaH0ibx5mc6VuB2EdyZF, https://drive.google.com/open?id=1NYWyAWWLjxZHWsrCH5RZvU-y-1OeB9iS'
+);
+
+-- [81] santiago Vargas María del Socorro | 21/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 13:17:44+00', 'santiago Vargas María del Socorro', '1945-02-19', 'Femenino',
+  '2026-03-21', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'no se trascribe indicación "en caso de fiebre tomar hemocultivos perifericos"', 'no se realiza una correcta trascripcion, lo cual retra parte de el tratamiento y diagnostico', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'se notfica a medico', 'https://drive.google.com/open?id=1xGP0hjF-ad8CGW2NK_f7tZO7YVDKwpbi'
+);
+
+-- [82] Guerrero Cervantes Josue Isacc | 18/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-21 13:56:02+00', 'Guerrero Cervantes Josue Isacc', '1989-10-25', 'Masculino',
+  '2026-03-18', '09:25', 'Urgencias',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'se envia por error resultado de rx a paciente incorrecto', 'Se envia radiografia con nombre incorrecto, lo cual puede afectar al diagnostico de el paciente', 'Barreras de comunicación (idioma, cognición)',
+  'El paciente o familiar alertó del error', 'se informa al momento al personal de rx secretaria', NULL
+);
+
+-- [83] MA IRENE RODRIGUEZ CURIEL | 25/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-25 10:21:01+00', 'MA IRENE RODRIGUEZ CURIEL', '1947-03-13', 'Masculino',
+  '2026-03-25', '09:00', 'Hospitalización',
+  'Cuasi Falla', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Enfermera a cargo prepara antibiótico LASA Cefotaxima, cuando el medicamento indicado fue Cefuroxima, se percatan del error, se le avisa a médico tratante el cual, menciona que se administre medicamento indicado y el erroneo se deseche, lo cual se procede a hacer por enfermería.', 'Medicamento LASA, Cefotaxima por Cefuroxima', 'Fatiga / Sobrecarga de trabajo del personal',
+  'Intervención oportuna de otro personal', 'No pasar medicamento, Avisar a médico tratante, corroborar indicación y administrar medicamento correcto.', NULL
+);
+
+-- [84] Gallardo Torres Alicia | 25/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-25 13:18:45+00', 'Gallardo Torres Alicia', '1957-09-18', 'Femenino',
+  '2026-03-25', '23:30', 'Hospitalización',
+  'No es un evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'En nuevas indicaciones se encuentra que hay indicado toma de laboratoriales', 'No se realiza la correcta trascripcion de indicaciones, ya que la toma de laboratoriales no estaba en hojas de indicaciones anteriores.', 'Comunicación deficiente en el equipo',
+  'Doble chequeo por parte del personal', 'Se verifica a medico tratante lo cual menciono que lo solicita con medicos de guardia via whatsapp y no se coloca sello', 'https://drive.google.com/open?id=1YWMAWqDXEeW9wQnfqyz06y9evueozwNj, https://drive.google.com/open?id=14_IPILWBbfHzPQMy6mObswhlCi5bLa6e, https://drive.google.com/open?id=1VlDgpA--LGuSckF5FYxCrkd8UzTElZmQ, https://drive.google.com/open?id=1XdRquptQ8iJD6jxqne3B4tzLzGMXLOvj'
+);
+
+-- [85] Vazquez Garcia Victoria | 25/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-25 13:28:15+00', 'Vazquez Garcia Victoria', '1940-11-02', 'Femenino',
+  '2026-03-25', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'Se encuentra en sello de llamada telefonica al pase de visita de medico tratante, lo cual menciona que el nunca dio la indicación, sobre suspender Dotbal hasta laboratorio de PCR', 'No se verifica información correctamente', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Medico tratante corrige indicación al pase de visita y se solicita el medicamento', 'https://drive.google.com/open?id=1CKgadoFN6Uxf5Avzq4j5unhI3BmUsORg, https://drive.google.com/open?id=14lpNs68KuL1EesLasANR9zKF9g5Nzxwt, https://drive.google.com/open?id=1ewXuYvUHayEk8D9qSTK02nx9vcQK0SZ-'
+);
+
+-- [86] LEON HUERTA, JOSE LUIS | 26/3/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-03-27 07:56:16+00', 'LEON HUERTA, JOSE LUIS', '1946-05-05', 'Masculino',
+  '2026-03-26', '00:00', 'Hospitalización',
+  'Evento Adverso', 'Manejo de Vía Aérea / Ventilación', 'Muerte',
+  'PACIENTE: LEON HUERTA, JOSE LUIS MASCULINO DE 79 AÑOS QUE SE ENCONTRABA CON FIRMA DE RCP3 CON CUIDADOS PALIATIVOS, VENTILACION MECANICA INVASIVA CON ALTO FLUJO. EL 26/03/26  A LAS 23:55 APROXIMADAMENTE LLAMAN A MEDICOS DE GUARDIA PARA REVISION DEL PACIENTE, ENCUENTRAN AL PACIENTE CON SU MONITOR CARDIACO MARCANDO FR 5-7, FC 80-100, SIN PRESION ARTERIAL NI SATURACION DETECTADA. A LA EXPLORACION PACIENTE CON PULSO DEBIL, TIRAJE Y CIANOSIS PERIFERICA. 
+POR LO CUAL LES MENCIONAN EL ESTADO CRITICO DEL PACIENTE A FAMILIARES Y LOS DEJAN ACOMPAÑARLO PARA QUE SE DESPIDAN. REPORTANDOLE A MEDICOS TRATANTES ESTADO DEL PACIENTE. 
+EL 27/03/26 A LAS 00:05 APROXIMADAMENTE MEDICO INTERCONSULTANTE SE COMUNICA CON MEDICOS DE GUARDIA Y LES MENCIONA QUE HABLO POR TELEFONO CON ENFERMERA SANDY TURNO NOCTURNO B Y LA ENFERMERA LE MENCIONABA QUERER APAGAR EL VENTILADOR, POR LO CUAL EL DR SOLICITABA QUE MEDICOS DE GUARDIA SE ASEGURARAN QUE YA NO HABIA NINGUN SIGNO VITAL PARA REALIZAR ESTA ACCION Y EN SINCRONIA DE ESTA LLAMADA  ENFERMERA SUPERVISORA LUISA LLAMA A MEDICOS DE GUARDIA PARA INFORMAR QUE ENFERMERA SANDY HABIA APAGADO VENTILADOR. 
+MEDICOS DE GUARDIA YA EN CAMINO A REVISION DE PACIENTE, ENCUENTRAN A PACIENTE CON VENTILADOR APAGADO Y SIN SIGNOS VITALES EN MONITOR. SE CUESTIONA A ENFERMERA SANDY DEL PORQUE APAGA VENTILADOR Y MENCIONA QUE MEDICO INTERCONSULTANTE EN LA LLAMADA LE DIJO QUE APAGARA EL VENTILADOR Y COMO YA NO MARCABA PRESION Y SATURACION, LO APAGO. 
+ 
+SE HACE ESTA INCIDENCIA HACIENDO ENFASIS EN QUE PACIENTE AUN CONTABA CON PULSO Y FRECUENCIA CARDIACA Y RESPIRATORIA CON TRAZO EN MONITOR.', 'MUERTE DEL PACIENTE', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Alarma de un dispositivo de monitoreo', 'NADA EVITO QUE EL DAÑO FUERA PEOR, DEFUNCION DEL PACIENTE MARCADA CON TRAZO A LAS 00:07
+SE INFORMA A FAMILIARES, SE INFORMA A TRATANTES Y SE REALIZA PAPALERIA PERTINENTE', NULL
+);
+
+-- [87] AVALOS LOPEZ, MARGARITA | 1/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-01 08:07:21+00', 'AVALOS LOPEZ, MARGARITA', '1962-03-01', 'Femenino',
+  '2026-04-01', '04:30', 'Hospitalización',
+  'Cuasi Falla', 'Dispositivos / Equipos Médicos', 'Leve',
+  'PACIENTE FEMENINA DE 64 AÑOS QUE INGRESA INESTABLE AL SERVICIO DE URGENCIAS, CAQUEXICA, ACUDE MEDICO TRATANTE A COLOCARLE CATETER TUNELIZADO PARA HEMODIALISIS Y CVC Y SUPERVISION DE ENFERMERIA SE NIEGA A AUTORIZAR USO DE SALA DE RAYOS X Y NO ESTABA DISPONIBLE QUIROFANO. PACIENTE EN URGENCIA DIALITICA Y SIN VIAS PERIFERICAS NECESARIAS. MEDICO TRATANTE TIENE QUE INSISTIR HASTA QUE LE AUTORIZAN SALA DE RAYOS X. 
+
+PACIENTE PASA A SESION DE HEMODIALISIS APROXIMADAMENTE A LAS 4 AM, DONDE PRESENTO TA DE 49/20 SEGUN MAQUINA DE HEMODIALISIS, SE CORROBORA CON BAUMA MANUAL Y DA RESULTADO TA 79/50, PERO A LAS POSTERIORES TOMAS DE TENSION ARTERIAL NO MARCA POR LO CUAL SE SOLICITA A ENFERMERIA UN BAUMANOMETRO PEDIATRICO Y REFIEREN ESTAR BAJO CUIDADO DE SUPERVISION DE ENFERMERIA, LAS CUALES NUNCA RESPONDEN EL TELEFONO. 
+ENFERMERA EN TURNO REFIERE "POR LA HORA,VA SER MUY DIFICIL CONSEGUIRLO PORQUE ESTAN DORMIDAS",SE DECIDE INICIAR NOREPINEFRINA 8MG EN 100CC EN BOMBA DE INFUSION CONTINUA. NUNCA SE CONSIGUE BAUMANOMETRO PEDIATRICO.
+
+PACIENTE PASA A PISO DEPENDIENTE DE NOREPINEFRINA A 2ML/HR SIN TOMA DE SIGNOS VITALES POR ENFERMERIA, SE SOLICITA COLOCAR MONITOR CARDIACO Y SUPERVISION DE ENFERMERIA REFIERE "PARA QUE COLOCARSELO SI NO LE QUEDA EL BRAZALETE", SE SOLICITA QUE COLOQUEN EL MONITOR.  NO REPORTAN SIGNOS VITALES A LAS 6 AM, PACIENTE YA EN PISO. 
+8:06 AM, MONITOR CARDIACO COLOCADO PERO APAGADO', 'PACIENTE INESTABLE CON TRABAS PARA EL TRATAMIENTO POR PARTE DEL SERVICIO DE ENFERMERIA Y SUPERVISION DE ENFERMERIA. 
+
+SE HACE ESTE REPORTE SOLICITANDO REVISION DE LOS PROTOCOLOS PARA SALAS DE COLOCACION DE CATETERES EN PACIENTES INESTABLES, YA QUE SIEMPRE HAY PROBLEMAS CON ENFERMERIA PARA DECIDIR DONDE VAN A AUTORIZAR COLOCACION Y SON PACIENTES INESTABLES CON NECESIDAD DE TRATAMIENTO INMEDIATO. 
+
+TAMBIEN HACIENDO ENFASIS EN QUE ES UN TURNO NOCTURNO Y DORMIR ES UN PRIVILEGIO, NO UNA LEY Y ES UN HOSPITAL CON URGENCIAS 24 HORAS, TODO EL PERSONAL DEBE ESTAR A LA DISPOCISION DE LAS NECESIDADES DEL PACIENTE. 
+
+POR ULTIMO Y NO MENOS IMPORTANTE, ENFERMERIA NO TENDRIA PORQUE CUESTIONAR DESICIONES DE MEDICO TRATANTE, UN MONITOR CARDIACO NO SOLO TOMA TENSION ARTERIAL Y AL SER PACIENTE INESTABLE SE DEBEN VALORAR TODOS LOS SIGNOS VITALES.', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'MEDICO TRATANTE ENTERADO DE TODAS LAS EVENTUALIDADES', 'https://drive.google.com/open?id=11Z3g9sDTxugtSJEYbWdgUGEx-rut2B3a'
+);
+
+-- [88] AVALOS LOPEZ, MARGARITA | 1/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-01 14:58:28+00', 'AVALOS LOPEZ, MARGARITA', '1962-03-01', 'Femenino',
+  '2026-04-01', '14:45', 'Hospitalización',
+  'Cuasi Falla', 'Sangre / Productos Sanguíneos', 'Sin Daño',
+  'SE INDICA A LAS 14:11 TOMA DE LABORATORIALES CON TOMA DE MUESTRA POR CVC Y SE LES MENCIONA A ENFERMERIA TANTO DEL TURNO MATUTINO COMO DEL TURNO VESPERTINO DE DICHA INDICACION. 
+A LAS 14:45 SE ACUDE A PREGUNTAR SI YA SE TOMARON LAS MUESTRAS Y ENFERMERO DEL TURNO VESPERTINO REFIERE QUE NO PORQUE ESO LE TOCABA AL TURNO MATUTINO.', 'SE REQUIEREN LABORATORIALES PARA AJUSTE DE MANEJO Y VALORAR NUEVA SESION DE HEMODIALSIS
+DICHAS ACCIONES AFECTAN AL TRATAMIENTO DE LOS PACIENTES
+PACIENTE QUE POR LA MAÑANA TAMBIEN SE TUVO EVENTUALIDADES CON EL PERSONAL DE ENFERMERIA. 
+AUN DELICADA Y EN VIGILANCIA ESTRECHA.', 'Protocolos inadecuados o inexistentes, Personal insuficiente, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE LE MENCIONA DICHA ACCION A SUPERVISION DE ENFERMERIA VESPERTINA PARA QUE SOLICITE DIRECTAMENTE AL ENFERMERO LA TOMA DE ESOS LABORATORIALES DE INMEDIATO.', NULL
+);
+
+-- [89] J. Isaac Pérez García | 3/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-03 10:01:58+00', 'J. Isaac Pérez García', '1960-01-17', 'Masculino',
+  '2026-04-03', '11:30', 'Hospitalización',
+  'Evento Adverso', 'Dispositivos / Equipos Médicos', 'Sin Daño',
+  'Paciente con CVC y fuga por el sitio de inserción, por comunicación efectiva indican retiro de aposito y colocar gasa; enfermería argumenta que tiene carga laboral, médico de guardia se ofrece a realizar el manejo, enfermeria proporciona el material inadecuado e incompleto a médico de guardia, quien realiza el manejo sin técnica de barrera maxima, sin limpieza adecuada de sitio de inserción, coloca gasa y tela adhesiva para fijarla.', 'Mala organización del personal y de tiempos. Desconocimiento de la NOM 022', 'Barreras de comunicación (idioma, cognición), Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'Se corrobora indicación con médico tratante, se realiza manejo de sitio de inserción acordé a protocolo, colocando gasa y aposito tegaderm film.', 'https://drive.google.com/open?id=1AVjJCjJJmWU0I_z05YvbLUEzdJbz-KYS'
+);
+
+-- [90] JARAMILLO BRAVO, SALUD CRECENCIANA | 6/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-06 13:46:16+00', 'JARAMILLO BRAVO, SALUD CRECENCIANA', '1944-08-14', 'Femenino',
+  '2026-04-06', '11:45', 'Hospitalización',
+  'Cuasi Falla', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'Medico tratante solicita usg abdominal, renal y de miembro pelvico izquierdo y enfermeria lo pograma, a las 9:15 el medico tratante descarta el usg abdominal y de miembro pelvico. enfermeria no se da cuenta y no le avisa a rayos x, pasan a paciente para usg y medico de imagen procede a iniciar con usg abdominal, cuando secretaria administrativa revisa indicaciones, observa que estaban descartados.', 'En caso de que se le cobre al paciente y este objete , que quede de antecedente que fue por error del personal y no debe ser cobrado.', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'se solicita a rayos x que no se cobre usg abdominal al paciente, porque no es un estudio que se haya solicitado.', NULL
+);
+
+-- [91] CHAVEZ LOPEZ, MONICA  GABRIELA | 6/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-06 13:59:33+00', 'CHAVEZ LOPEZ, MONICA  GABRIELA', '1997-12-19', 'Femenino',
+  '2026-04-06', '12:51', 'Hospitalización',
+  'Cuasi Falla', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'paciente con indicacion de eritropoyetina 4000ui sc lunes, miercoles y viernes. Se le administra en hemodialisis pero el dia de hoy no tiene sesion de hemodialisis, medica tratante confirma que si se le aplica aunque no haya sesion de hemo. 
+Se le informa a enfermeria y farmacia acude a preguntar si es eritropoyetina alfa o humana, se le pregunta a medico tratante y menciona no acordarse pero que pues la paciente la tiene, al revisar indicaciones se menciona que farmacia la tiene en resguardo, por lo tanto farmacia deberia saber que tipo de eritropoyetina es.
+Personal de farmacia se pone a revisar BIEN, se dan cuenta que tienen guardada eritropoyetina humana de la paciente. Acuden a administracion con dicha informacion para corregir indicacion, sin antes aclarar con medicos de guardia que ya sabian que tipo de eritropoyetina es. 
+
+Dicho esto, nos hace ver que farmacia NO tiene conocimiento de que medicamentos tienen en resguardo de nuestros pacientes.', 'No hay un control adecuado de medicamentos, con que confianza nuestros pacientes nos dan en resguardo sus medicamentos.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Doble chequeo por parte del personal', 'se corrige indicacion para aclarar que es humana', NULL
+);
+
+-- [92] MONTES VALENZUELA, TERESA DE JESUS | 7/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-07 12:08:54+00', 'MONTES VALENZUELA, TERESA DE JESUS', '1982-10-15', 'Femenino',
+  '2026-04-07', '10:50', 'Hospitalización',
+  'Cuasi Falla', 'Comportamiento del Paciente', 'Leve',
+  'El día de hoy a las 9 am me reportan que la paciente presenta fiebre con una temperatura de 38.5° c, se le había administrado el paracetamol a las 6 am y el metamizol tenía un horario hasta las 12 pm, motivo por el cual se le intenta contactar a medico tratante (Dr. Jose Jaime Preciado) el cual no contesta llamadas ni mensajes, por lo que se solicita que se coloquen medios físicos en lo que tenemos respuesta por parte del doctor. Posteriormente a las 10:45 am se notifica que la paciente tiene dolor abdominal EVA 10/10, por lo que se acude a valorar a la paciente, la cual se encuentra molesta y refiere que tiene 30 minutos con dolor y nadie le hace nada, lo que es mentira, debido a que la familiar de la paciente acababa de notificar a enfermería del dolor, por lo que se le da aviso a interconsultante de medicina del dolor (Dr. Lubin) por medio de mensaje y llamada sin obtener respuesta del mismo. Médico tratante se molesta y nos manda mensaje de porque no se ha hecho nada por su paciente, se le llama y se le explica lo que estaba pasando, así como el hecho de que nosotros no podemos indicar nada sin su autorización y que no teníamos respuesta por parte de el como médico tratante ni de su interconsultante, nos dice que lo resolvamos y busquemos al Dr. Lubin, y que el no va a indicar nada porque no es el algologo y el no dará ese manejo. Se le informa al paciente y al familiar, las cuales se molestan. La única opción que se toma es adelantar medicamento analgésico (Metamizol), con la intención de disminuir un poco los síntomas de la paciente.', 'Falta de atención de atención por médico tratante e interconsultantes.', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Se adelanta medicamento analgésico por indicación de médico de guardia.', 'https://drive.google.com/open?id=1hAm5uNpsFHmbLTVLY69YeII32MuAZ_EO, https://drive.google.com/open?id=1Kv_LR9ECYINW7oVUtpsXmDrfx1Vew6sr'
+);
+
+-- [93] CASTAÑEDA VALENCIA, DORA | 7/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-07 15:01:28+00', 'CASTAÑEDA VALENCIA, DORA', '1978-09-06', 'Femenino',
+  '2026-04-07', '14:00', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'PACIENTE QUE INGRESA A AREA DE HOSPITALIZACION ANUNCIADA EN GRUPO DE ADMISION A LAS 13:05 HORAS, MEDICO DE GUARDIA ACUDE A INTERROGATORIO Y POSTERIOR SOLICITA A ENFERMERIA LAS INDICACIONES. ENFERMERIA REFIERE QUE MEDICOS DE GUARDIA LAS VAN A PROPORCIONAR A LO CUAL SE CUESTIONA PORQUE DICEN ESO, MENCIONAN QUE ADMISION AL ENTREGAR AL PACIENTE EN PISO DIJERON QUE MEDICOS DE GUARDIA IBAN A PROPORCIONAR INDICACIONES.
+
+MEDICOS DE GUARDIA SIN CONOCIMIENTO DE ESTO, AL PARECER ADMISION SE COMUNICO CON MEDICO TRATANTE Y LE SOLICITARON QUE MANDARA LAS INDICACIONES AL WHATSAPP DE MEDICOS DE GUARDIA. 
+ADMISION NUNCA INFORMO A MEDICOS DE GUARDIA DE QUE EL MEDICO IBA A MANDAR LAS INDICACIONES Y MEDICO NUNCA SE COMUNICO CON MEDICOS DE GUARDIA.', 'PACIENTE SIN INDICACIONES Y SIN ABORDAJE PARA CIRUGIA. 
+
+SE REALIZA ESTA INCIDENCIA YA QUE SI NO QUIEREN QUE INTERVENGAMOS EN SUS PROCESOS, LOS HAGAN CORRECTAMENTE.', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'MEDICOS DE GUARDIA SE COMUNICAN CON MEDICO TRATANTE PARA SOLICITAR INDICACIONES. 
+14:10 SE PROPORCIONAN INDICACIONES A ENFERMERIA', 'https://drive.google.com/open?id=1SFxHb7qt_7x6IjmOZfu0eF0xBUsfh9UE, https://drive.google.com/open?id=1rWpkDa7m-Pg7Lkez_Qm5Juvx50cNOGaK, https://drive.google.com/open?id=199rpW7m5ZmRgLMQ7oBa7CMIZ5LIW_6dc'
+);
+
+-- [94] SANTANA SANTANA, JOSE  MARIA | 8/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-08 13:54:41+00', 'SANTANA SANTANA, JOSE  MARIA', '1942-09-07', 'Masculino',
+  '2026-04-08', '11:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'PACIENTE CON QUE TIENE INDICADO NIFEDIPINO 30MG VO CADA 12HRS DESDE EL DIA DE AYER 
+EL DIA DE HOY SE ENCUENTRA CAJA DE NIFEDIPINO SIN 4 CAPSULAS, ENFERMERIA REPORTA DOS TOMAS EL DIA DE AYER A LAS 11 HRS Y A LAS 23HRS. DEBERIAN FALTAR 6 CAPSULAS. 
+SE INTERROGA A PACIENTE Y MENCIONA QUE POR LA NOCHE SOLO LE DIERON UNA CAPSULA, SE LE PIDE A ENFERMERIA TURNO MATUTINO QUE SIGA LAS INDICACIONES Y LE ADMINISTREN SUS 30MG (3 CAPSULAS)
+SIGNOS VITALES NOCTURNO DEL DIA DE AYER 
+A LAS 22 HRS: TA 140/73, FC 85, FR 16, TEMP 36.5, SAT 93
+A LAS 6 AM: TA 139/73, FC 75, FR 17, TEMP 36.3, SAT 92
+SIGNOS VITALES MATUTINO DEL DIA DE HOY
+A LAS 8 AM: TA 161/60, FC 78, FR 19, TEMP 36, SAT 94', 'PACIENTE PUEDE PRESENTAR TENDENCIAS HIPERTENSAS POR LA MALA ADMINISTRACION DE MEDICAMENTOS.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'SE LEVANTA ESTA INCIDENCIA Y SE SOLICITA A ENFERMERIA QUE SIGAN LAS INDICACIONES COMO DEBEN DE SER.', 'https://drive.google.com/open?id=1aDKjozNL1ffZ-MSzpobNdloL3v68VA5g, https://drive.google.com/open?id=1jOIiNWWxfCoPV6-ioRjEsohfxs46ScHe, https://drive.google.com/open?id=1MfqIOV4hayE4KEYOG0CgELzYp_rcNkED, https://drive.google.com/open?id=1Ppw3ieSAJ0aIo_Gs5OaxtZhNfJLGMw6R'
+);
+
+-- [95] VILLEGAS FRANCO, MARIA DEL CARMEN | 8/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-08 20:29:00+00', 'VILLEGAS FRANCO, MARIA DEL CARMEN', '1942-11-16', 'Femenino',
+  '2026-04-08', '17:15', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'PACIENTE FEMENINA DE 83 AÑOS DE EDAD LA CUAL SE ENCUTRA CURSANDO EL DIA DE SU 6TO DIA DE ESTANCIA HOSPITALARIA EL DIA DE HOY A LAS 17:15 SE NOS REPORTA QUE LA SOLUCION GLUCOSADA AL 5% DE 500 ML CON 5 AMPULAS DE GLUCONADO DE CALCIO PARA ADMINISTRARSE EN 24 HORAS INDICADA A LAS 13:40  POR EL DR MANUEL GOMEZ MEDICO TRATANTE DE LA PACIENTE, SE INICIA LA ADMINISTRACION A LAS 14:00 HORAS SIN EMBARGO EL PERSONAL DE ENFERMERIA ADMINISTRO LA TOTALIDAD DE LA SOLUCION EN PERIODO DE 3 HORAS LO QUE RESEPRESENTA UNA VELOCIDAD DE INFUSION MAYOR A LA INDICADA', 'MAL PROGRAMACION DE LA BIC POR PARTE DE ENFEREMERIA DEL TURNO MATUTINO Y FALTA DE SUPERVICION POR PARTE DE ENFERMERIA DEL TURNO VESPERTINO', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Alarma de un dispositivo de monitoreo', 'AVISO A MEDICO TRATANTE 
+VIGILACIA DE EFECTOS ADVERSOS', NULL
+);
+
+-- [96] Julieta valadez Alvarez | 9/4/0026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-09 16:42:05+00', 'Julieta valadez Alvarez', '0026-06-27', 'Femenino',
+  '0026-04-09', '15:49', 'Hospitalización',
+  'Evento Adverso', 'Dispositivos / Equipos Médicos', 'Leve',
+  'El paciente salio de quirofano cuando se traslado a la habitacion para pasarla a la cama su bata estaba mojada la revise y no tenia la sonda gastrica', 'No conozco', 'Condición clínica compleja del paciente',
+  'Doble chequeo por parte del personal', 'Notificacion al medico', NULL
+);
+
+-- [97] Hector González Herrera | 17/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-20 12:31:00+00', 'Hector González Herrera', '1960-02-22', 'Masculino',
+  '2026-04-17', '07:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Al recibir turno nos percatamos de que la solución base del paciente, se encontraba cristalizada, ya que la solución indicada por médico tratante era una hartmann de 1000cc más 40 MEq de fosfato de potasio iniciada por la tarde, el cual ya investigando nos dimos cuenta que solo puede diluirse en solución salina al 0.9%, se pausó la solución, se notificó a médicos de guardia, farmacovigilancia, se habló con el médico tratante el cual hace cambio en la indicación por Solución salina al 0.9 % de 500cc más 40 MEq de fosfato de potasio, el paciente no tuvo daño alguno, se educó al personal de enfermería sobre la correcta dilación del fosfato de potasio, para en próximas ocasiones que un médico lo indique con hartamann se le haga saber que no es posible realizar esa dilucion.', 'Desconocimiento por parte del personal, tanto médico tratante, como médico de guardia, enfermeria,  farmacovigilancia etc.', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Pausar la solución, notificar el incidente con su médico tratante para que cambie la indicación sobre la dilucion del fosfato de potasio, valoración del paciente, sin daños.', 'https://drive.google.com/open?id=1aqn3_AS5yM2uV4ZkqjH_FMnSdRYw_rFK, https://drive.google.com/open?id=1e2o5POin_u8QCpwMlOQoa2c62euo6Qe3'
+);
+
+-- [98] Lopez ortiz pedro | 17/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-20 12:39:38+00', 'Lopez ortiz pedro', '1937-06-28', 'Masculino',
+  '2026-04-17', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se indica solucion hartmann 1000 mas 40 meq de fosfato de potasio se prepara a las 23:00 del dia 16/04/ 26 al pase de visita a las 08:00 am del 17/04/26 nos percatamos que la solucion con fosfato estaba cristalizada se suspende en ese momento la solucion y se le da aviso al personal de farmacovigilancia y a medico tratante', 'Desconocimiento de la compatibilidad por parte del personal', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Informar al medico tratante', NULL
+);
+
+-- [99] DIAZ ORTIZ, MA. ELIA | 20/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-21 14:32:11+00', 'DIAZ ORTIZ, MA. ELIA', '1937-09-15', 'Masculino',
+  '2026-04-20', '18:53', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'INGRESA PACIENTE A NOMBRE DEL DR. FIDEL RAMOS POR CONFUSION, SE SOLICITA A ADMISION QUE CAMBIE EL NOMBRE AL DR JORGE ARCE ROSAS Y REALIZAN EL CAMBIO A JORGE ARCE GONZALEZ, DANDONOS CUENTA HASTA LA IMPRESION DE CONSENTIMIENTOS.', 'DOCUMENTACION CON INFORMACION INCORRECTA', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'SE LES VUELVE A SOLICITAR EL CAMBIO AL NOMBRE CORRECTO', NULL
+);
+
+-- [100] AGUIRRE JAIME, ESTELA | 21/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-21 14:47:47+00', 'AGUIRRE JAIME, ESTELA', '1939-06-24', 'Femenino',
+  '2026-04-21', '14:42', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'NOS ANUNCIAN INGRESO POR EL GRUPO PACIENTE A CARGO DEL DR JOSE GONZALEZ Y MENCIONAN QUE YA SE LE NOTIFICO SU INGRESO.
+NOS COMUNICAMOS CON EL PARA DUDAS DE LAS INDICACIONES Y EL DR MENCIONA QUE EL NO SOLICITO LA HOSPITALIZACION DE LA PACIENTE, SE REVISA LA RECETA DE INDICACIONES Y VIENE A NOMBRE DE UNA DOCTORA.
+ADMISION REFIERE QUE NO PUEDEN INGRESAR A LA PACIENTE A NOMBRE DE LA DOCTORA POR NO TENER CEDULA DE ESPECIALIDAD, TAMPOCO SE PUEDE INGRESAR A LA PACIENTE A NOMBRE DEL MEDICO QUE SEA, SIN QUE EL ESTE INFORMADO. 
+PACIENTE CON HEMOGLOBINA DE 11.2 Y NO TENEMOS QUIEN NOS DIGA SI SI SERA NECESARIA LA TRANSFUSION O NO.
+PACIENTE AB+ Y SOLO TENEMOS A+ , NO TENEMOS QUIEN NOS AUTORICE GRUPO ALTERNO', 'DOCUMENTACION MAL, NO TENEMOS QUIEN SE HAGA CARGO DE LA PACIENTE.', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'SE SOLICITA A ADMISION QUE SOLUCIONEN EL TEMA DEL MEDICO TRATANTE', 'https://drive.google.com/open?id=1uV3EJNYa5nIbyuzKlG4GGvfcq-pYE2Eg, https://drive.google.com/open?id=1vXycQyqCUpgD6qCX1pD51GSBD5UHFgcJ, https://drive.google.com/open?id=1oIcgIp4XrbOhWLrereAhTE5WWWiO9fhG, https://drive.google.com/open?id=1g7mfr-xtpfDNdk_10tOtBhEJjs1nsQAu'
+);
+
+-- [101] NAZARIO TORRES, MARTIN  JONATHAN | 21/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 07:15:51+00', 'NAZARIO TORRES, MARTIN  JONATHAN', '1989-11-14', 'Masculino',
+  '2026-04-21', '23:47', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'SE INGRESA PACIENTE A NOMBRE DE OTRO TRATANTE, SE SOLICITA QUE SE CAMBIE EN SISTEMA Y NO LO CAMBIAN, SE SOLICITA NUEVAMENTE A LAS 7:08 AM', 'DOCUMENTACION MAL', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'SE LES SOLICITA NUEVAMENTE QUE LO CAMBIEN', 'https://drive.google.com/open?id=1HTEJuE6yNf8YWA-eZtziX6SnrGTI6HCB'
+);
+
+-- [102] JOSE MARIA SANTANA SANTANA | 7/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 16:07:43+00', 'JOSE MARIA SANTANA SANTANA', '1942-09-07', 'Masculino',
+  '2026-04-07', '23:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'ENFERMERÍA TURNO NOCTURNO B NO ADMINISTRA LA DOSIS CORRECTA DE MEDICAMENTOS', 'PACIENTE TIENE INDICADO NIFEDIPINO 30 MG VO CADA 12 HORAS, TABLETAS VIENEN DE 10 MG Y SOLO SE ENTREGA UNA TABLETA COMO TRATAMIENTO', 'Barreras de comunicación (idioma, cognición)',
+  'El paciente o familiar alertó del error', 'VERIFICACION CORRECTA DE MEDICAMENTOS', NULL
+);
+
+-- [103] JOSE MARIA SANTANA SANTANA | 8/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 16:11:11+00', 'JOSE MARIA SANTANA SANTANA', '1942-09-07', 'Masculino',
+  '2026-04-08', '23:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'ENFERMERÍA DE TURNO NOCTURNO A, ADMINISTRA DOSIS INCORRECTA DE MEDICAMENTO VIA ORAL', 'PACIENTE TIENE INDICADO NIFEDIPINO 30MG VIA ORA CADA 12 HORAS, TABLETAS VIENE EN PRESENTACION DE 10 MG CADA UNA, SOLO DE ADMINISTRA 1 TABLETA EN LA DOSIS CORRESPONDIENTE', 'Barreras de comunicación (idioma, cognición)',
+  'El paciente o familiar alertó del error', 'RETROALIMENTACION EN VERIFICAR MEDICAMENTOS PREVIAMENTE A LA ADMINISTRACIÓN', NULL
+);
+
+-- [104] J. ISAAC PEREZ GARCIA | 5/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 16:16:57+00', 'J. ISAAC PEREZ GARCIA', '1960-01-17', 'Masculino',
+  '2026-04-05', '11:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'NO SE ADMINISTRA DOSIS DE OMEPRAZOL CORRESPONDIENTE', 'SE REALIZA CAMBIO DE INDICACIÓN OMEPRAZOL CADA 12, ESTANDO INDICADO CADA 24 Y NO SE ADMISITRA DOSIS CORRESPONDIENTE,
+LA ULTIMA SE ADMINISTRO DIA PREVIO A LAS  23:00', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'VERIFICACION CORRECTA', NULL
+);
+
+-- [105] ESTRADA PEÑA EDMUNDO EZEQUIEL | 22/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 16:21:48+00', 'ESTRADA PEÑA EDMUNDO EZEQUIEL', '1954-04-26', 'Masculino',
+  '2026-04-22', '13:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'NO SE REALIZA EL LLENADO CORRECTO DE INDICACIONES POR MEDICO DE GUARDIA', 'OMITEN DATOS IMPORTANTES COMO IDENTIFICACIO CORRECTA DEL PACIENTE, EL SELLO NO CUENTA CON NOMBRE DE PACIENTE', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'REALIZAR PROCESOS CORRECTAMENTE', 'https://drive.google.com/open?id=1qa8GmNhkJPhaWsGPxKgxCSSr2jZpt566'
+);
+
+-- [106] ESTRADA PEÑA EDMUNDO EZEQUIEL | 22/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 16:32:40+00', 'ESTRADA PEÑA EDMUNDO EZEQUIEL', '1954-04-26', 'Masculino',
+  '2026-04-22', '05:00', 'Hospitalización',
+  'Evento Adverso', 'Documentación / Comunicación', 'Sin Daño',
+  'PACIENTE PASA A QUIROFANO, SE TRANFUNDE, SE LE COLOCA CVC Y NO SE SOLICITA LA FIRMA DE CONCENTIMIENTOS CORRESPONDIENTES PREVIOS', 'NO SE REALIZAN CONSETNIMIENTOS DE COLOCACION DE CVC NI TRANSFUSION DE PACIENTE', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal', 'RETROALIMENTACION PARA BANCO DE SANGRE, ENFERMERIA', 'https://drive.google.com/open?id=1C55ssvmLas9QldBX6sVE5I6KhJ5H5iJ1, https://drive.google.com/open?id=1fqibiU9dquIE3VIwhJ0Yyxcb1ytGK9IT'
+);
+
+-- [107] FILOMENO CASTRO RAMIREZ | 20/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-22 17:13:42+00', 'FILOMENO CASTRO RAMIREZ', '1957-07-05', 'Masculino',
+  '2026-04-20', '06:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'NO SE ADMINISTRA DOSIS DE CEFTRIAXONA 1GR CADA 12 HORAS', 'SE HACE OMISION DE CEFTRIAXONA, LA ULTIMA DOSIS SE ADMINISTRO EL DÍA 20 04 2026 A LAS 18:00 HRS', 'Barreras de comunicación (idioma, cognición), Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'INCIDENCIA Y RETROALIMENTACION A PERSONAL', NULL
+);
+
+-- [108] ZARAGOZA GONZALEZ, RAUL  IGNACIO | 29/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-29 07:49:43+00', 'ZARAGOZA GONZALEZ, RAUL  IGNACIO', '1945-10-07', 'Masculino',
+  '2026-04-29', '07:15', 'Hospitalización',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Leve',
+  'SE INGRESA AL PACIENTE A SU HABITACIÓN SIN DOCUMENTACIÓN COMPLETA, DESDE SU INGRESO TIENE ESPECIFICADO EN LAS INDICACIONES QUE SE LE SOLICITE EL CRUCE DE UN CONCENTRADO ERITROCITARIO. ADMISIÓN LO PASA SIN CONSENTIMIENTOS Y AL SOLICITARLO SE LES PIDE QUE LO LLEVEN A FIRMAR Y SE NIEGAN, A PESAR DE QUE ES ERROR DEL DEPARTAMENTO DE ADMISIÓN Y ESTO RETRASA EL PROCEDIMIENTO DEL CRUCE EN BANCO DE SANGRE.
+EL PACIENTE LLEGA A HABITACIÓN A LAS 7:15 AM Y SE TIENE PROGRAMADO EVENTO QUIRÚRGICO A LAS 8 AM, EN DONDE SE DEBERIA DE TENER DISPONIBLE EL CONCENTRADO ERITROCITARIO.', 'RETRASO EN EL CRUCE DEL CONCENTRADO ERITROCITARIO QUE DEBE ESTAR DISPONIBLE PARA EL EVENTO QUIRÚRGICO.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Uso de una lista de verificación (checklist), Doble chequeo por parte del personal', 'SE SOLICITA EL CONSENTIMIENTO Y SE LLEVA A FIRMAR POR MEDICOS DE GUARDIA, A PESAR DE QUE EL PROCESO DICE QUE EL PACIENTE DEBE INGRESAR CON CONSENTIMIENTOS FIRMADOS EN BASE A REQUERIMIENTOS DE INDICACIONES.', NULL
+);
+
+-- [109] ORTIZ GUTIERREZ, MIGUEL  ARTURO | 29/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-29 07:55:06+00', 'ORTIZ GUTIERREZ, MIGUEL  ARTURO', '1946-07-24', 'Masculino',
+  '2026-04-29', '01:02', 'Urgencias',
+  'Cuasi Falla', 'Documentación / Comunicación', 'Sin Daño',
+  'PACIENTE QUE INGRESA A LA 1:00 Y NUNCA ES ANUNCIADO SU INGRESO', 'SE DESCONOCIO DE LA ESTANCIA DEL PACIENTE, PACIENTE GRAVE', 'Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'SE ABORDA AL PACIENTE PARA REALIZAR LA DOCUMENTACION Y VALORACION PERTIENENTE', 'https://drive.google.com/open?id=1_DPJpeuOERUkbauC9EYWqNxiPKtm0E-h'
+);
+
+-- [110] Ortiz Gutierrez Miguel Arturo | 29/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-29 15:59:07+00', 'Ortiz Gutierrez Miguel Arturo', '1946-07-27', 'Masculino',
+  '2026-04-29', '06:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Leve',
+  'Se desconecta infusión de Norepinefrina para administrar ceftriaxona', 'Paciente con infusión de Norepinefrina, a 6ml/hr, pocedente de hemodialisis, con 1 sola via periferica, enfermería desconecta equipo de infusión para administrar antibiotico, mencionando que lavo la via antes y despues, accion que no es correcta.', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Se canaliza una via periferica para medicamentos para evitar situaciones similares', NULL
+);
+
+-- [111] Baltazar Lopez Sergio Hugo | 29/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-04-29 16:03:37+00', 'Baltazar Lopez Sergio Hugo', '1976-05-15', 'Masculino',
+  '2026-04-29', '07:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se administran medicamentos en misma via periferica que el Kabivent', 'Se omite colocar un acceso venoso para administración de medicamentos aparte de Kabivent, y se administra por mismaa via, durante el turno nocturno medicamentos a la par.
+Se detecta al enlace de turno.', 'Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'Via periferica nueva exclusiva para  medicamentos', NULL
+);
+
+-- [112] Sergio Llamas Cuevas | 6/5/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-06 12:43:34+00', 'Sergio Llamas Cuevas', '2013-08-27', 'Masculino',
+  '2026-05-06', '11:15', 'Hospitalización',
+  'Evento Adverso', 'Nutrición', 'Sin Daño',
+  'La enfermera Andrea del turno matutino solicita dieta para el paciente de gn7 Sergio Llamas Cuevas y se le entrega a dicho paciente, a las 12:29 marca de nuevo la misma enfermera a decir que se necesita una dieta para gn7 por qué el paciente en realidad estaba en ayuno y el paciente que la necesitaba era el paciente de gn6 Luis Ricardo Guzmán González por lo que la dieta anterior se la retiró de habitación y se la cambió al otro paciente y ahorita solicita que solo tachemos la dieta de las 11 y que le pongamos los datos del paciente de ahorita.', 'Descuido de la petición de la toma de indicios médica', 'Comunicación deficiente en el equipo, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'La enfermera cambió la dieta ya dejada en la habitación a la otra', 'https://drive.google.com/open?id=1EoKvUBU0NhNuwpZ6YGrE3NT3xpZuMAk4'
+);
+
+-- [113] MEDICOS DE GUARDIA | 8/5/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-08 11:17:28+00', 'MEDICOS DE GUARDIA', '0001-01-01', 'Masculino',
+  '2026-05-08', '10:00', 'Evento Centinela',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'HACEMOS ESTA INCIDENCIA LOS MÉDICOS DE GUARDIA DEBIDO A QUE LA CALIDAD Y CANTIDAD DE LOS ALIMENTOS QUE SE NOS BRINDAN CUANDO SE SOLICITAN NO SON LOS ADECUADOS. ADEMÁS DE QUE INCLUSO SE NOS HAN NEGADO LOS ALIMENTOS POR PARTE DEL PERSONAL, CABE RESALTAR QUE EL TURNO MATUTINO DEJO DE ASISTIR A DESAYUNAR DEBIDO A ESTA SITUACIÓN Y CUANDO POR ALGUNA EMERGENCIA SE ACUDE A PEDIR ALGUN ALIMENTO, SE ENTREGA DE MALA GANA. EL DÍA DE HOY SE DA QUESADILLAS CON LA PANELA EN MAL ESTADO, AL SOLICITAR UN SANDWICH SE MOLESTAN. 
+LA MAYORÍA DE LAS OCASIONES LA PRIMER PERSONA EN RENEGAR ES ELISA. 
+EN UNA OCASIÓN NOS DIERON EL AGUA ECHADA A PERDER Y AL COMENTARLES SOLO SE RIERON Y NOS DIJERON QUE AGARRARAMOS AGUA NATURAL SI QUERIAMOS. 
+PERO CUANDO ACUDEN MEDICOS TRATANTES SE LES DA LA MEJOR ATENCIÓN E INCLUSO LE PREPARAN FRUTA PICADA, LICUADOS Y LO QUE SOLICITE PARA EL Y INCLUSO PARA PERSONAL AJENO AL HOSPITAL, COMO PROVEEDORES Y EN OCASIONES A REPRESENTANTES MEDICOS QUE ACUDEN CON EL MISMO. 
+EN UNA OCASIÓN NO HICIERON COMIDA PARA EL TURNO VESPERTINO Y AL PREGUNTARLES NOS DIJERON QUE NO HABÍA NADA, Y QUE LO UNICO QUE PODIAN HACER ERA DAR ATÚN.', 'NOSOTROS SOLO ESTAMOS SOLICITANDO QUE SE NOS BRINDE ALIMENTOS CUANDO SE SOLICITAN, QUE NO ES TODOS LOS DÍAS.', 'Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Doble chequeo por parte del personal', 'NA', NULL
+);
+
+-- [114] Esther Perez Perez | 9/4/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-09 11:00:23+00', 'Esther Perez Perez', '1951-04-30', 'Femenino',
+  '2026-04-09', '01:00', 'Hospitalización',
+  'Cuasi Falla', 'Proceso de Diagnóstico (Ej: retraso diagnóstico)', 'Sin Daño',
+  'Acudimos a radiología e imagen con paciente bajo sedación y ventilación mecánica y tuvimos que retirarnos y regresarnos al área de choque nuevamente porque la técnico radiólogo no estaba lista para realizar una angiotac con contraste a pesar de comentarle que podíamos colocar la paciente en el tomógrafo acomodarla y monitorizarla en lo que ella preparaba el medio de contraste', 'Retraso en el diagnóstico y movilización innecesario de paciente grave.', 'Condición clínica compleja del paciente, Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal', 'Nos regresamos con la paciente al área de choque para evitar deterioro de la misma y evitar que el tanque de oxígeno se terminara pero pudimos instalarla en el tomógrafo dado que contábamos con personal de inhalo terapia y camellería suficiente.', 'https://drive.google.com/open?id=1Y0MFY901n0LNbSzUN1QBvPWrYnJqxrYz'
+);
+
+-- [115] Luis Ricardo Guzman | 6/5/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-09 11:48:16+00', 'Luis Ricardo Guzman', '2007-06-07', 'Masculino',
+  '2026-05-06', '11:15', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'Según la información en central de enfermería, se trataba de pacientes ambulatorios. 
+El paciente Sergio Llamas Cuevas sale de quirofano y se lleva a la habitación de gine 7, posteriormente se solicita dieta de liquidos claros para el, pero el paciente se removio a la habitación de gn6 sin que la central ni el área de dietas se percatará del movimiento, ingresando entonces a gine7 al paciente Luis Ricardo Guzmán,  también ambulatorio, pero la charola de los líquidos se queda en la habitación de gine 7, según la enfermera Andrea, ella se percata del cambio y mueve la charola de gine 7 a gine 6, para ofrecer los liquidos al paciente correcto. Posteriormente, se solicita dieta de liquidos para Luis Ricardo, pero en gine 6, por lo que al ingresar a dicha habitación el area de dietas confirma datos y el paciente niega ser Luis Ricardo, se vuelve a enfermeria y comentan que es para la habitacion de gine 7 no gine 6. Por último se solicita dieta blanda para Sergio Llamas pero de nuevo para la habitacion de gine 7, por lo que se corrobora de nuevo con central cada uno de los datos, ya que confundieron de nuevo nombres y habitacion. Enfermería comenta que es un problema que viene desde la entrega de los pacientes en quirofano, ya que en central no cuentan con la papelería de ninguno de los pacientes por lo que es sencillo confundirlos, además al parecer las dietas se solicitaban tanto del área de quirofano como también de la central de gine, por lo que se triangulaba informacion errónea sin que ellos se percatarsen. Al final enfermería confirma dieta blanda para Sergio Llamas cuevas en gine 6.', 'Teisngulacion de información y falta de papeleria y entrega correcta de pacientes con comunicación efectiva', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes',
+  'Intervención oportuna de otro personal, Uso de una lista de verificación (checklist), Doble chequeo por parte del personal', 'Se corrobora exactamente en donde se encuentra cada paciente y cada uno de sus datos e indicación, ademas de corroborar con psciente y familiares datos personales al ingresar con la dieta.', 'https://drive.google.com/open?id=1E1YP4Ve5fNT-TRYBRF8VePiX8SoTPXaG, https://drive.google.com/open?id=15PvnfjLi8pgsmE5SusnCMD7DgZTJJUpY, https://drive.google.com/open?id=1piVTZ2kc8RmySpNP3QTChLZYuzN_KaIi, https://drive.google.com/open?id=1UJuRr8V4ap29ja2vBGYA6sbmpMJdHwKP, https://drive.google.com/open?id=1bWEIG0rzW8iLZm6IOysN7X3tjhEzQ1Lr'
+);
+
+-- [116] Emilia Gamez Lujano | 13/5/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-14 14:21:14+00', 'Emilia Gamez Lujano', '1947-12-06', 'Femenino',
+  '2026-05-13', '08:00', 'Hospitalización',
+  'Evento Adverso', 'Medicación / Fluidos IV (Ej: dosis incorrecta, omisión)', 'Sin Daño',
+  'Se dio doble dosis', 'Indicaciones mal desglosadas', 'Fatiga / Sobrecarga de trabajo del personal',
+  'Intervención oportuna de otro personal', 'Ningunas', NULL
+);
+
+-- [117] Juan Carlos Gonzalez Jimenez | 15/5/2026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-15 13:46:16+00', 'Juan Carlos Gonzalez Jimenez', '1987-05-06', 'Masculino',
+  '2026-05-15', '13:20', 'Hospitalización',
+  'Cuasi Falla', 'Nutrición', 'Sin Daño',
+  'Al repartir la comida del día por parte del área de dietas, se encuentran las charolas del desayuno y de la cena de un dia anterior en habitación, por lo que se le comenta al paciente que el personal de intendencia pasara a retirarlas, puesto que se trata de utensilios desechables que requieren desecharse vía RPBI. 
+Se le comenta al personal de intendencia y ella refiere que el paciente no ha querido que se le retiren las charolas, ya que dice qhe el quiere consumir esa comida, por lo que solicita que se hable con el paciente para comentarle la necesidad del porque se le deben de retirar. 
+Se le comenta al paciente que se le retiraran las charolas de tiempos de comida anteriores ya que por el calor es posible que la comida ya se encuentre en mal estado y que no se le recomienda consumirla ya puesto que es riesgoso para su salud. El paciente acepta, de mala gana. 
+Ya el área de nutrición esta tomando en cuenta sus requerimientos energéticos, por lo que se le estan entregando porciones adecuadas para su edad y necesidades.', 'Falta de comunicación asertiva del personal hacia el paciente', 'Comunicación deficiente en el equipo',
+  'Intervención oportuna de otro personal, Doble chequeo por parte del personal', 'El área de nutrición habló con el paciente para concientizar respecto al tema', 'https://drive.google.com/open?id=1XJlW9on4v7wJNVkCzRfIe1_h4z5kkbTY'
+);
+
+-- [118] GUTIERREZ GONZALEZ,  MAURICIO | 19/5/0026
+INSERT INTO clinical_incidents (
+  reported_at, patient_name, patient_dob, patient_sex,
+  incident_date, incident_time, location,
+  incident_type, incident_subtype, damage_level,
+  description, causes, contributing_factors,
+  mitigating_factors, immediate_actions, attachments)
+VALUES (
+  '2026-05-19 16:57:20+00', 'GUTIERREZ GONZALEZ,  MAURICIO', '1971-07-02', 'Masculino',
+  '0026-05-19', '16:45', 'Hospitalización',
+  'Cuasi Falla', 'Procedimiento Clínico / Invasivo (Ej: cirugía en sitio equivocado)', 'Sin Daño',
+  'ENFEREMERIA CANALIZO A UN PACIENTE EL CUAL NO TENIA NINGUNA INDICACION DE SER CANALIZADO, ASI COMO COLOCAR LA VIA NO INDICADA DEL LADO DERECHO EN PACIENTE QUE IBA A PASAR A HEMODINAMIA PARA CATETERISMO DONDE  LA VIA DE ACCESO ES ATRAVEZ DEL BRAZO DERECHO', 'NO SEGUIR INIDCACIONES MEDICAS Y ACTUAR POR CUENTA PROPIA', 'Comunicación deficiente en el equipo, Protocolos inadecuados o inexistentes, Formación o supervisión inadecuadas',
+  'Intervención oportuna de otro personal', 'REPORTE CON SUPERVICION DE ENFERMERIA', NULL
+);
+
+-- Verificación
+SELECT COUNT(*) AS total FROM clinical_incidents;
