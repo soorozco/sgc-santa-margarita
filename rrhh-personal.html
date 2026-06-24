@@ -72,10 +72,6 @@
     .confirm-box { background:#fff;border-radius:14px;padding:24px;max-width:380px;width:100% }
 
     /* Login */
-    #login-overlay { display:none;position:fixed;inset:0;
-      background:linear-gradient(135deg,#0d3d38 0%,#009688 100%);
-      z-index:500;align-items:center;justify-content:center;padding:20px }
-    #login-overlay.show { display:flex }
     .login-card { background:#fff;border-radius:20px;padding:36px 32px;width:100%;max-width:380px }
     .login-logo { display:flex;align-items:center;gap:12px;margin-bottom:28px }
     .login-logo-ico { width:48px;height:48px;background:#009688;border-radius:14px;
@@ -132,26 +128,6 @@
 <body>
 
 <!-- LOGIN -->
-<div id="login-overlay" class="show">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-ico"><i class="fa-solid fa-people-roof"></i></div>
-      <div><h2>RRHH — HSM</h2><p>Hospital Santa Margarita</p></div>
-    </div>
-    <div id="login-err" style="display:none;background:#fee2e2;color:#991b1b;border-radius:8px;
-      padding:8px 12px;margin-bottom:12px;font-size:.82rem;font-weight:600"></div>
-    <div class="form-row">
-      <label>No. Trabajador / Usuario</label>
-      <input id="li-user" type="text" placeholder="ej. 10567 o jperez">
-    </div>
-    <div class="form-row">
-      <label>Contraseña</label>
-      <input id="li-pass" type="password" placeholder="••••••••">
-    </div>
-    <button class="btn-primary" style="width:100%;padding:12px;font-size:.95rem;margin-top:4px"
-      onclick="doLogin()" id="btn-login">Ingresar</button>
-  </div>
-</div>
 
 <div class="layout">
   <!-- SIDEBAR -->
@@ -385,24 +361,6 @@ const AREAS_POSITIONS = {
   'Dirección Médica':     ['Director Médico','Subdirector Médico'],
 }
 
-// ── Auth ──────────────────────────────────────────────────────────
-async function doLogin() {
-  const u = document.getElementById('li-user').value.trim()
-  const p = document.getElementById('li-pass').value
-  const btn = document.getElementById('btn-login')
-  const err = document.getElementById('login-err')
-  err.style.display = 'none'
-  btn.textContent = 'Verificando...'; btn.disabled = true
-  try {
-    _user = await rrhhLogin(u, p)
-    document.getElementById('login-overlay').classList.remove('show')
-    init()
-  } catch(e) {
-    err.textContent = e.message || 'Credenciales incorrectas'
-    err.style.display = 'block'
-  } finally { btn.textContent = 'Ingresar'; btn.disabled = false }
-}
-document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin() })
 function doLogout() { rrhhClearSession(); location.reload() }
 
 // ── Init ──────────────────────────────────────────────────────────
@@ -626,13 +584,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   const session = rrhhLoadSession()
   if (session) {
     _user = session
-    document.getElementById('login-overlay').classList.remove('show')
     init(); return
   }
   const auto = await rrhhAutoLogin()
   if (auto) {
     _user = auto
-    document.getElementById('login-overlay').classList.remove('show')
     init(); return
   }
   try {
@@ -653,10 +609,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         needsPasswordReset: false, authorizes: [],
       }
       rrhhSaveSession(_user)
-      document.getElementById('login-overlay').classList.remove('show')
       init()
     }
-  } catch(e) { /* sin sesión SGC → overlay manual */ }
+  } catch(e) { window.location.href = 'index.html' }
 })
 </script>
 </body>
