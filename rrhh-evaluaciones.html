@@ -273,13 +273,14 @@
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/rrhh-api.js"></script>
+<script src="js/sidebar.js"></script>
 <script>
 let _user = null
 const _nomAnswers  = {}
 const _climAnswers = {}
 const _perfScores  = {}
 
-function doLogout() { rrhhClearSession(); location.reload() }
+function doLogout() { rrhhClearSession(); logout() }
 
 function init() {
   document.getElementById('sb-user-name').textContent = _user.name
@@ -498,6 +499,7 @@ async function submitPerformance() {
 
 // ── Start ─────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  rrhhClearSession()  // clear any stale RRHH-specific session
   const auth = await requireAuth()
   if (!auth?.user) return
   requirePermission(auth.profile, 'rrhh_evaluaciones')
