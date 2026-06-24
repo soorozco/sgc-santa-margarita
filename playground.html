@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Playground — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -12,6 +13,7 @@
   <link rel="stylesheet" href="css/solicitudes.css">
 </head>
 <body data-page="playground">
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
 <div class="layout">
 
   <!-- ═══════════════ SIDEBAR ═══════════════ -->
@@ -132,6 +134,7 @@
 
     <!-- Top bar -->
     <div class="topbar">
+      <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div style="display:flex;align-items:center;gap:12px">
         <div>
           <div class="topbar-page-title" style="display:flex;align-items:center;gap:10px">

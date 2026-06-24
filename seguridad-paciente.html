@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Notificación de Incidentes — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -278,6 +279,7 @@
   </style>
 </head>
 <body>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
 <div class="layout">
 
   <!-- ═══════════ SIDEBAR ═══════════ -->
@@ -352,6 +354,7 @@
   <!-- ═══════════ MAIN ═══════════ -->
   <main class="main">
     <div class="topbar">
+      <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
         <div class="topbar-page-title">Seguridad del Paciente</div>
         <div class="topbar-sub">Notificación de eventos adversos, eventos centinela y cuasi fallas</div>

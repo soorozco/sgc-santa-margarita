@@ -30,6 +30,30 @@
         }
       })
     })
+
+    // ── Mobile hamburger ─────────────────────────────────────────
+    const sidebar  = document.getElementById('sidebar')
+    const overlay  = document.getElementById('sidebar-overlay')
+    const hamburger = document.getElementById('btn-hamburger')
+
+    function openSidebar() {
+      if (sidebar)  sidebar.classList.add('open')
+      if (overlay)  overlay.classList.add('show')
+    }
+    function closeSidebar() {
+      if (sidebar)  sidebar.classList.remove('open')
+      if (overlay)  overlay.classList.remove('show')
+    }
+
+    if (hamburger) hamburger.addEventListener('click', openSidebar)
+    if (overlay)   overlay.addEventListener('click', closeSidebar)
+
+    // Close sidebar when a nav link is clicked on mobile
+    document.querySelectorAll('.sb-nav .nav-link').forEach(a => {
+      a.addEventListener('click', () => {
+        if (window.innerWidth <= 700) closeSidebar()
+      })
+    })
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
