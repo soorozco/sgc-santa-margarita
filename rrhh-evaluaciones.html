@@ -498,37 +498,23 @@ async function submitPerformance() {
 
 // ── Start ─────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  const session = rrhhLoadSession()
-  if (session) {
-    _user = session
-    init(); return
+  const auth = await requireAuth()
+  if (!auth?.user) return
+  const sgcRole = auth.profile?.roles?.name || ''
+  const rrhhRole = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
+                 : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
+  _user = {
+    id: auth.user.id,
+    name: auth.profile?.full_name || auth.user.email.split('@')[0],
+    email: auth.user.email,
+    username: auth.user.email.split('@')[0],
+    role: rrhhRole,
+    area: auth.profile?.departments?.name || '',
+    position: '',
+    vacationDays: 12, sindicalDays: 1,
+    needsPasswordReset: false, authorizes: [],
   }
-  const auto = await rrhhAutoLogin()
-  if (auto) {
-    _user = auto
-    init(); return
-  }
-  try {
-    const auth = await requireAuth()
-    if (auth?.user) {
-      const sgcRole = auth.profile?.roles?.name || ''
-      const rrhhRole = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
-                     : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
-      _user = {
-        id: auth.user.id,
-        name: auth.profile?.full_name || auth.user.email.split('@')[0],
-        email: auth.user.email,
-        username: auth.user.email.split('@')[0],
-        role: rrhhRole,
-        area: auth.profile?.departments?.name || '',
-        position: '',
-        vacationDays: 12, sindicalDays: 1,
-        needsPasswordReset: false, authorizes: [],
-      }
-      rrhhSaveSession(_user)
-      init()
-    }
-  } catch(e) { window.location.href = 'index.html' }
+  init()
 })
 </script>
 </body>
