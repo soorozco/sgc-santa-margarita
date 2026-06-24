@@ -526,6 +526,9 @@ const MODULES = [
   { key: 'satisfaccion',         label: 'Satisfacción y Comentarios', icon: 'fa-face-smile',      group: 'Otros' },
   { key: 'comites',              label: 'Comités',                    icon: 'fa-users',           group: 'Otros' },
   { key: 'eventos_adversos',     label: 'Eventos Adversos',           icon: 'fa-hospital-user',   group: 'Otros' },
+  { key: 'rrhh_solicitudes',     label: 'Solicitudes de Personal',    icon: 'fa-file-signature',  group: 'Recursos Humanos' },
+  { key: 'rrhh_personal',        label: 'Directorio RRHH',            icon: 'fa-people-roof',     group: 'Recursos Humanos' },
+  { key: 'rrhh_evaluaciones',    label: 'Evaluaciones de Personal',   icon: 'fa-star-half-stroke', group: 'Recursos Humanos' },
 ]
 
 // Roles con acceso total (no se pueden restringir)

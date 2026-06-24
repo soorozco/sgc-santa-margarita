@@ -367,7 +367,7 @@ function doLogout() { rrhhClearSession(); location.reload() }
 // ── Init ──────────────────────────────────────────────────────────
 async function init() {
   document.getElementById('sb-user-name').textContent = _user.name
-  document.getElementById('sb-user-role').textContent = _user.role
+  document.getElementById('sb-user-role').textContent = _user.displayRole
   document.getElementById('mob-user-name').textContent = _user.name
   document.getElementById('mob-avatar').textContent    = _user.name.charAt(0).toUpperCase()
   document.getElementById('mob-bottom-nav').style.display = ''
@@ -390,7 +390,7 @@ async function init() {
     filterSel.innerHTML += `<option value="${a}">${a}</option>`
   })
 
-  if (_user.role === 'WORKER') {
+  if (_user.rrhhLevel === 'WORKER') {
     document.getElementById('access-denied').style.display = 'block'
   } else {
     document.getElementById('main-content').style.display = 'block'
@@ -584,15 +584,18 @@ async function confirmDelete() {
 window.addEventListener('DOMContentLoaded', async () => {
   const auth = await requireAuth()
   if (!auth?.user) return
+  requirePermission(auth.profile, 'rrhh_personal')
   const sgcRole = auth.profile?.roles?.name || ''
-  const rrhhRole = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
-                 : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
+  const rrhhLevel = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
+                  : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
   _user = {
     id: auth.user.id,
     name: auth.profile?.full_name || auth.user.email.split('@')[0],
     email: auth.user.email,
     username: auth.user.email.split('@')[0],
-    role: rrhhRole,
+    role: sgcRole,
+    displayRole: auth.profile?.roles?.display_name || sgcRole,
+    rrhhLevel,
     area: auth.profile?.departments?.name || '',
     position: '',
     vacationDays: 12, sindicalDays: 1,

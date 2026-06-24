@@ -444,7 +444,7 @@ async function init() {
 
   // Update header
   document.getElementById('sb-user-name').textContent = _user.name
-  document.getElementById('sb-user-role').textContent = _user.role
+  document.getElementById('sb-user-role').textContent = _user.displayRole
   document.getElementById('mob-user-name').textContent = _user.name
   document.getElementById('mob-avatar').textContent    = _user.name.charAt(0).toUpperCase()
 
@@ -452,13 +452,13 @@ async function init() {
   document.getElementById('mob-bottom-nav').style.display = ''
 
   // Show/hide views based on role
-  const isManager = _user.role === 'MANAGER' || _user.role === 'ADMIN_RH'
+  const isManager = _user.rrhhLevel === 'MANAGER' || _user.rrhhLevel === 'ADMIN_RH'
   document.getElementById('worker-view').style.display  = isManager ? 'none' : 'block'
   document.getElementById('manager-view').style.display = isManager ? 'block' : 'none'
-  if (_user.role === 'MANAGER') {
+  if (_user.rrhhLevel === 'MANAGER') {
     document.getElementById('mob-pending-title').textContent = 'Pendientes de mi aprobación'
     document.getElementById('d-pending-title').textContent = 'Pendientes de mi aprobación'
-  } else if (_user.role === 'ADMIN_RH') {
+  } else if (_user.rrhhLevel === 'ADMIN_RH') {
     document.getElementById('mob-pending-title').textContent = 'Aprobadas por encargado (pendientes RH)'
     document.getElementById('d-pending-title').textContent = 'Aprobadas por encargado (pendientes RH)'
   }
@@ -472,7 +472,7 @@ async function init() {
 
 async function loadData() {
   _requests = await rrhhGetRequests(_user.id)
-  if (_user.role === 'WORKER') renderWorker()
+  if (_user.rrhhLevel === 'WORKER') renderWorker()
   else renderManager()
 }
 
@@ -538,11 +538,11 @@ function renderWorker() {
 
 // ── Manager render ────────────────────────────────────────────────
 function renderManager() {
-  const needsMyApproval = _user.role === 'MANAGER'
+  const needsMyApproval = _user.rrhhLevel === 'MANAGER'
     ? _requests.filter(r => r.status === 'PENDING')
     : _requests.filter(r => r.status === 'APPROVED_MANAGER')
 
-  const approveStatus = _user.role === 'MANAGER' ? 'APPROVED_MANAGER' : 'APPROVED_HR'
+  const approveStatus = _user.rrhhLevel === 'MANAGER' ? 'APPROVED_MANAGER' : 'APPROVED_HR'
 
   // Desktop stats
   ;['d-pending'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = needsMyApproval.length })
@@ -735,15 +735,18 @@ function exportXLSX() {
 window.addEventListener('DOMContentLoaded', async () => {
   const auth = await requireAuth()
   if (!auth?.user) return
+  requirePermission(auth.profile, 'rrhh_solicitudes')
   const sgcRole = auth.profile?.roles?.name || ''
-  const rrhhRole = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
-                 : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
+  const rrhhLevel = ['administrador','responsable_calidad'].includes(sgcRole) ? 'ADMIN_RH'
+                  : sgcRole === 'jefe' ? 'MANAGER' : 'WORKER'
   _user = {
     id: auth.user.id,
     name: auth.profile?.full_name || auth.user.email.split('@')[0],
     email: auth.user.email,
     username: auth.user.email.split('@')[0],
-    role: rrhhRole,
+    role: sgcRole,
+    displayRole: auth.profile?.roles?.display_name || sgcRole,
+    rrhhLevel,
     area: auth.profile?.departments?.name || '',
     position: '',
     vacationDays: 12, sindicalDays: 1,
