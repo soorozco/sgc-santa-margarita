@@ -12,6 +12,7 @@ let _currentDocId = null
 let _pendingReqs  = new Set() // IDs de docs con solicitud pendiente
 let _activeTab    = 'docs'   // 'docs' | 'regs'
 let _coverage     = {}       // cobertura FT: { 'FT-XX-01': { count, refs } }
+let _showVerifCol = false    // columna "Vigencia verificada" (solo externos)
 
 // ── Init ────────────────────────────────────────────────────────
 async function initDocuments() {
@@ -230,6 +231,11 @@ function applyFilters() {
   if (subtipoWrap) subtipoWrap.style.display = (origen === 'externo') ? 'inline-block' : 'none'
   const subtipo = (origen === 'externo') ? (document.getElementById('f-subtipo')?.value || '') : ''
 
+  // Columna "Vigencia verificada" — solo al ver documentos externos
+  _showVerifCol = (_activeTab === 'docs' && origen === 'externo')
+  const thVerif = document.getElementById('th-verif')
+  if (thVerif) thVerif.style.display = _showVerifCol ? '' : 'none'
+
   _filteredDocs = _allDocs.filter(d => {
     const isFT = d.document_types?.code_prefix === 'FT'
     // Filtrado por tab activo
@@ -352,6 +358,7 @@ function renderTable(docs) {
       ${isRegs ? `<td class="center">${retLabel}</td>` : ''}
       ${isRegs ? `<td class="center">${covBadge(doc.code)}</td>` : ''}
       <td class="center"><span class="pill ${sPill(doc.status)}">${sLabel(doc.status)}</span></td>
+      ${_showVerifCol ? `<td class="center">${verifCell(doc)}</td>` : ''}
       <td class="center">
         ${canRequest
           ? `<button onclick="openSolBaja('${doc.id}')" class="btn-sol-baja">
@@ -2339,6 +2346,30 @@ async function submitReviewClave(action) {
   showToast(msg, action === 'approved' ? 'green' : 'red')
   closeModal('modal-review-clave')
   await Promise.all([loadCodeRequests(), loadDocuments()])
+}
+
+// ── Celda "Vigencia verificada" en la tabla (documentos externos) ─
+function verifCell(doc) {
+  const isExterno = (doc.code || '').toUpperCase().startsWith('DE-')
+  if (!isExterno) return '<span style="color:var(--txt3)">—</span>'
+
+  if (!doc.last_verified_at) {
+    return pill('red', 'fa-circle-exclamation', 'Sin verificar')
+  }
+
+  const months = (new Date() - new Date(doc.last_verified_at)) / (1000 * 60 * 60 * 24 * 30.5)
+  let badge
+  if (doc.is_current === false)  badge = pill('red', 'fa-circle-xmark', 'Desactualizada')
+  else if (months <= 12)         badge = pill('green', 'fa-circle-check', 'Vigente')
+  else if (months <= 24)         badge = pill('yellow', 'fa-triangle-exclamation', 'Por vencer')
+  else                           badge = pill('red', 'fa-circle-exclamation', 'Vencida')
+
+  const by = doc.verified_by ? ` · ${esc(doc.verified_by)}` : ''
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+    ${badge}
+    <span style="font-size:.72rem;color:var(--txt3);white-space:nowrap"
+          title="Última verificación${by}">${fmtDate(doc.last_verified_at)}</span>
+  </div>`
 }
 
 // ── Verificación de vigencia (documentos externos DE) ────────────
