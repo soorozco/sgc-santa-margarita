@@ -2369,7 +2369,22 @@ function verifCell(doc) {
     ${badge}
     <span style="font-size:.72rem;color:var(--txt3);white-space:nowrap"
           title="Última verificación${by}">${fmtDate(doc.last_verified_at)}</span>
+    ${robotLine(doc)}
   </div>`
+}
+
+// Línea con el resultado del robot verificador (GitHub Actions semanal)
+function robotLine(doc) {
+  if (!doc.auto_check_at) return ''
+  const icons = {
+    vigente:        { i: '🟢', t: 'Robot: fuente oficial confirma vigencia' },
+    no_verificado:  { i: '🟡', t: 'Robot: no se pudo verificar en la fuente oficial' },
+    desactualizada: { i: '🔴', t: 'Robot: se detectó una versión más reciente o cancelación' },
+  }
+  const s = icons[doc.auto_check_status] || icons.no_verificado
+  const note = doc.auto_check_note ? ` — ${esc(doc.auto_check_note)}` : ''
+  return `<span style="font-size:.7rem;color:var(--txt3);white-space:nowrap;cursor:help"
+    title="${s.t}${note}">🤖 ${s.i} ${fmtDate(doc.auto_check_at)}</span>`
 }
 
 // ── Verificación de vigencia (documentos externos DE) ────────────
@@ -2411,6 +2426,41 @@ function renderVerificationStatus(doc) {
   if (label) label.textContent = labelText
   if (date)  date.textContent  = `Verificada el ${fmtDate(doc.last_verified_at)}`
   if (byEl)  byEl.textContent  = doc.verified_by ? `por ${doc.verified_by}` : ''
+
+  renderRobotStatus(doc)
+}
+
+// Bloque del robot verificador en el panel de detalle
+function renderRobotStatus(doc) {
+  const wrap = document.getElementById('d-robot-wrap')
+  if (!wrap) return
+  wrap.style.display = 'flex'
+
+  const label = document.getElementById('d-robot-label')
+  const note  = document.getElementById('d-robot-note')
+  const date  = document.getElementById('d-robot-date')
+
+  if (!doc.auto_check_at) {
+    if (label) label.textContent = 'Verificación automática: sin ejecutar'
+    if (note)  note.textContent  = 'El robot semanal aún no ha revisado este documento'
+    if (date)  date.textContent  = ''
+    return
+  }
+
+  const labels = {
+    vigente:        '🟢 Robot: vigente según la fuente oficial',
+    no_verificado:  '🟡 Robot: no se pudo verificar automáticamente',
+    desactualizada: '🔴 Robot: posible versión más reciente o cancelación',
+  }
+  if (label) label.textContent = labels[doc.auto_check_status] || labels.no_verificado
+  if (note) {
+    note.innerHTML = esc(doc.auto_check_note || '')
+    if (doc.auto_check_url) {
+      note.innerHTML += ` — <a href="${esc(doc.auto_check_url)}" target="_blank"
+        rel="noopener noreferrer" style="color:var(--blue)">fuente</a>`
+    }
+  }
+  if (date) date.textContent = `Revisado el ${fmtDate(doc.auto_check_at)}`
 }
 
 function pill(color, icon, text) {

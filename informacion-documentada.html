@@ -798,6 +798,24 @@
             <i class="fa-solid fa-circle-check"></i> Marcar verificado
           </button>
         </div>
+        <!-- Resultado del robot verificador (GitHub Actions semanal) -->
+        <div id="d-robot-wrap" style="display:none;margin-top:8px;align-items:center;justify-content:space-between;gap:12px;
+                    padding:10px 14px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:1.2rem">🤖</span>
+            <div>
+              <div style="font-size:.857rem;font-weight:600;color:var(--txt)" id="d-robot-label">—</div>
+              <div style="font-size:.75rem;color:var(--txt3);margin-top:2px" id="d-robot-note"></div>
+              <div style="font-size:.75rem;color:var(--txt3)" id="d-robot-date"></div>
+            </div>
+          </div>
+          <a href="https://github.com/soorozco/sgc-santa-margarita/actions/workflows/verificar-normas.yml"
+             target="_blank" rel="noopener noreferrer" class="btn-secondary"
+             style="font-size:.786rem;padding:6px 12px;white-space:nowrap;flex-shrink:0;text-decoration:none"
+             title="Abre GitHub Actions; pulsa 'Run workflow' para ejecutar el robot ahora">
+            <i class="fa-solid fa-robot"></i> Verificar ahora
+          </a>
+        </div>
       </div>
 
       <!-- Historial de versiones -->
