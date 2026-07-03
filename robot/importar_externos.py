@@ -10,7 +10,7 @@
 #   SUPABASE_SERVICE_KEY="<service_role key>" \
 #   python3 robot/importar_externos.py "/ruta/al/archivo.csv"
 #
-# Requiere: pip3 install requests
+# No requiere instalar nada (usa solo la librería estándar de Python)
 # Antes ejecuta en Supabase la migración sql/add_external_meta.sql
 # ══════════════════════════════════════════════════════════════════
 
@@ -19,7 +19,10 @@ import os
 import re
 import sys
 
-import requests
+import json
+import urllib.request
+import urllib.parse
+import urllib.error
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://tdxkvvmdxnbarjsaknse.supabase.co").rstrip("/")
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY")
@@ -83,10 +86,29 @@ def to_date(v):
     return v  # otro formato: se guarda como texto
 
 
+def api(method, table, params=None, payload=None):
+    """Llama al REST de Supabase con la librería estándar. Devuelve (status, body)."""
+    url = f"{SUPABASE_URL}/rest/v1/{table}"
+    if params:
+        url += "?" + urllib.parse.urlencode(params)
+    data = json.dumps(payload).encode() if payload is not None else None
+    req = urllib.request.Request(url, data=data, method=method)
+    for k, v in HEADERS.items():
+        req.add_header(k, v)
+    if method in ("POST", "PATCH"):
+        req.add_header("Prefer", "return=minimal")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.status, resp.read().decode()
+    except urllib.error.HTTPError as e:
+        return e.code, e.read().decode()
+
+
 def fetch(table, params):
-    r = requests.get(f"{SUPABASE_URL}/rest/v1/{table}", headers=HEADERS, params=params, timeout=30)
-    r.raise_for_status()
-    return r.json()
+    status, body = api("GET", table, params)
+    if status >= 400:
+        sys.exit(f"Error {status} leyendo {table}: {body[:300]}")
+    return json.loads(body)
 
 
 def main():
@@ -143,26 +165,18 @@ def main():
                     payload["verified_by"] = capturo
 
             if code.upper() in existing:
-                r = requests.patch(
-                    f"{SUPABASE_URL}/rest/v1/documents",
-                    headers={**HEADERS, "Prefer": "return=minimal"},
-                    params={"id": f"eq.{existing[code.upper()]}"},
-                    json=payload, timeout=30,
-                )
+                status, body = api("PATCH", "documents",
+                                   {"id": f"eq.{existing[code.upper()]}"}, payload)
                 action = "actualizado"
                 updated += 1
             else:
                 payload["current_version"] = "1.0"
-                r = requests.post(
-                    f"{SUPABASE_URL}/rest/v1/documents",
-                    headers={**HEADERS, "Prefer": "return=minimal"},
-                    json=payload, timeout=30,
-                )
+                status, body = api("POST", "documents", None, payload)
                 action = "creado"
                 created += 1
 
-            if r.status_code >= 400:
-                print(f"  ✗ {code}: ERROR {r.status_code} — {r.text[:200]}")
+            if status >= 400:
+                print(f"  ✗ {code}: ERROR {status} — {body[:200]}")
                 if action == "creado":
                     created -= 1
                 else:
