@@ -545,12 +545,15 @@ function openNewDoc() {
   setVal('new-vigencia', '2')
   // Set today as elab date
   setVal('new-elab-date', new Date().toISOString().split('T')[0])
+  toggleExtSection('new', false)
   openModal('modal-new')
 }
 
 function updateCodePreview() {
   const typeId = document.getElementById('new-type')?.value
   const deptId = document.getElementById('new-dept')?.value
+  // Ficha externa: mostrar si el tipo seleccionado es DE
+  toggleExtSection('new', newDocIsExterno())
   if (!typeId || !deptId) return
 
   const type = _types.find(t => t.id === typeId)
@@ -611,6 +614,13 @@ async function submitNewDoc() {
   if (elabDate)     payload.elaboration_date  = elabDate
   if (elaboratedBy) payload.elaborated_by     = elaboratedBy
   if (reviewedBy)   payload.reviewed_by       = reviewedBy
+
+  // Ficha de documento externo (si el tipo es DE)
+  const extMeta = collectExtMeta('new')
+  if (extMeta) {
+    payload.external_meta = extMeta
+    if (extMeta.url_fuente) payload.source_url = extMeta.url_fuente
+  }
 
   const { data, error } = await db.from('documents').insert(payload).select().single()
 
@@ -683,6 +693,11 @@ function openEdit(docId) {
   setVal('edit-reviewed-by',   doc.reviewed_by    || '')
   setVal('edit-authorized-by', doc.authorized_by  || '')
 
+  // Ficha de documento externo (si el código es DE-*)
+  toggleExtSection('edit',
+    (doc.code || '').toUpperCase().startsWith('DE-'),
+    doc.external_meta, doc.source_url)
+
   // Mostrar cargo al abrir
   const _cargoMap = {
     'edit-elaborated-by': 'edit-elaboro-cargo',
@@ -736,6 +751,14 @@ async function submitEdit() {
     updated_at:        new Date().toISOString()
   }
 
+  // Ficha de documento externo (si la sección está visible)
+  const extWrap = document.getElementById('edit-ext-wrap')
+  if (extWrap && extWrap.style.display !== 'none' && extWrap.dataset.built) {
+    const extMeta = collectExtMeta('edit')
+    payload.external_meta = extMeta
+    if (extMeta?.url_fuente) payload.source_url = extMeta.url_fuente
+  }
+
   let { error } = await db.from('documents')
     .update(payload)
     .eq('id', _currentDocId)
@@ -747,6 +770,16 @@ async function submitEdit() {
       .update(payloadFallback)
       .eq('id', _currentDocId)
     error = err2
+  }
+
+  // Si external_meta no existe aún en la tabla, reintentar sin la ficha
+  if (error && error.message.includes('external_meta')) {
+    const { external_meta: _e, ...payloadFallback } = payload
+    const { error: err3 } = await db.from('documents')
+      .update(payloadFallback)
+      .eq('id', _currentDocId)
+    error = err3
+    if (!err3) showToast('Guardado, pero falta ejecutar la migración SQL de la ficha externa (add_external_meta.sql).', 'yellow')
   }
 
   if (error) {
@@ -1094,6 +1127,9 @@ async function openDetail(docId) {
       verWrap.style.display = 'none'
     }
   }
+
+  // Ficha de documento externo (§ 7.5.3.2)
+  renderExtFicha(doc)
 
   // Elaboró / Revisó / Autorizó con cargo desde personal
   const elaboroPerson   = _personal.find(p => p.nombre === doc.elaborated_by)
@@ -1643,8 +1679,9 @@ function showToast(msg, color = 'green') {
   const old = document.getElementById('sgc-toast')
   if (old) old.remove()
 
-  const bg = color === 'green' ? '#16a34a'
-           : color === 'red'   ? '#dc2626'
+  const bg = color === 'green'  ? '#16a34a'
+           : color === 'red'    ? '#dc2626'
+           : color === 'yellow' ? '#d97706'
            : '#2563eb'
 
   const t = document.createElement('div')
@@ -2346,6 +2383,155 @@ async function submitReviewClave(action) {
   showToast(msg, action === 'approved' ? 'green' : 'red')
   closeModal('modal-review-clave')
   await Promise.all([loadCodeRequests(), loadDocuments()])
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Ficha de Documento Externo (ISO 9001:2015 § 7.5.3.2)
+// Campos de la matriz de control de documentos externos.
+// Se guardan en la columna JSONB documents.external_meta
+// ══════════════════════════════════════════════════════════════════
+const EXT_FIELDS = [
+  { key: 'proceso',            label: 'Proceso asociado',                    type: 'text',     ph: 'Ej. Normatividad aplicable' },
+  { key: 'emisor',             label: 'Origen / Emisor externo',             type: 'text',     ph: 'Ej. Secretaría de Salud, ISO, COFEPRIS' },
+  { key: 'codigo_externo',     label: 'Código / folio / versión externa',    type: 'text',     ph: 'Ej. NOM-004-SSA3-2012' },
+  { key: 'fecha_emision',      label: 'Fecha de emisión',                    type: 'date' },
+  { key: 'fecha_recepcion',    label: 'Fecha de recepción',                  type: 'date' },
+  { key: 'medio',              label: 'Medio de soporte',                    type: 'select',   options: ['Electrónico', 'Físico', 'Físico y electrónico'] },
+  { key: 'ubicacion',          label: 'Ubicación / ruta / carpeta',          type: 'text',     ph: 'Ej. Drive institucional / ISO' },
+  { key: 'url_fuente',         label: 'URL de la fuente oficial',            type: 'text',     ph: 'https://… (la usa el robot verificador)' },
+  { key: 'uso_previsto',       label: 'Uso previsto en el servicio',         type: 'textarea' },
+  { key: 'resp_uso',           label: 'Responsable de uso',                  type: 'text' },
+  { key: 'resp_resguardo',     label: 'Responsable de resguardo',            type: 'text' },
+  { key: 'aplica_sgc',         label: '¿Aplica para el SGC?',                type: 'select',   options: ['Sí', 'No'] },
+  { key: 'requisito_iso',      label: 'Requisito ISO 9001:2015 relacionado', type: 'text',     def: '7.5.3.2 Control de información documentada externa' },
+  { key: 'met_identificacion', label: 'Método de identificación',            type: 'text',     ph: 'Ej. Leyenda "Documento Externo" + emisor + fecha' },
+  { key: 'met_control_cambios',label: 'Método de control de cambios / actualización', type: 'text', ph: 'Ej. Revisión del sitio oficial y actualización en matriz' },
+  { key: 'periodicidad',       label: 'Periodicidad de revisión',            type: 'select',   options: ['Cada nueva versión', 'Anual', 'Semestral', 'Cuando aplique'] },
+  { key: 'retencion',          label: 'Retención documental',                type: 'text',     ph: 'Ej. Mientras se encuentre vigente + 5 años' },
+  { key: 'disposicion',        label: 'Disposición final',                   type: 'text',     ph: 'Ej. No aplica / Conservación permanente' },
+  { key: 'acceso',             label: 'Acceso / confidencialidad',           type: 'select',   options: ['Uso interno', 'Uso interno / restringido', 'Público'] },
+  { key: 'evidencia_difusion', label: 'Evidencia de distribución / difusión', type: 'text',    ph: 'Ej. Lista de difusión y acuse electrónico' },
+  { key: 'proxima_revision',   label: 'Próxima revisión',                    type: 'text',     ph: 'Fecha o "No aplica"' },
+  { key: 'riesgo',             label: 'Riesgo por uso de documento obsoleto / no controlado', type: 'textarea' },
+  { key: 'barreras',           label: 'Barreras de control establecidas',    type: 'textarea' },
+  { key: 'observaciones',      label: 'Observaciones',                       type: 'textarea' },
+]
+
+// Genera el HTML del bloque de campos externos para un modal (prefix: 'new' | 'edit')
+function buildExtSection(prefix) {
+  const fields = EXT_FIELDS.map(f => {
+    const id = `${prefix}-ext-${f.key}`
+    let input
+    if (f.type === 'select') {
+      const opts = f.options.map(o => `<option value="${esc(o)}">${esc(o)}</option>`).join('')
+      input = `<select id="${id}"><option value="">— Seleccionar —</option>${opts}</select>`
+    } else if (f.type === 'textarea') {
+      input = `<textarea id="${id}" rows="2"></textarea>`
+    } else {
+      input = `<input type="${f.type}" id="${id}" placeholder="${esc(f.ph || '')}">`
+    }
+    return `<div class="field"><label>${esc(f.label)}</label>${input}</div>`
+  })
+
+  // Agrupar en filas de 2 (los textarea van solos)
+  let html = `
+    <div class="section-sep" style="margin-top:8px">
+      <i class="fa-solid fa-file-import" style="margin-right:6px"></i>
+      Ficha de Documento Externo · ISO 9001:2015 § 7.5.3.2
+    </div>`
+  let i = 0
+  while (i < fields.length) {
+    const isArea = EXT_FIELDS[i].type === 'textarea'
+    if (isArea) {
+      html += `<div class="form-row one">${fields[i]}</div>`
+      i += 1
+    } else if (i + 1 < fields.length && EXT_FIELDS[i + 1].type !== 'textarea') {
+      html += `<div class="form-row two">${fields[i]}${fields[i + 1]}</div>`
+      i += 2
+    } else {
+      html += `<div class="form-row one">${fields[i]}</div>`
+      i += 1
+    }
+  }
+  return html
+}
+
+// Muestra/oculta y llena la ficha externa en un modal
+function toggleExtSection(prefix, isExterno, meta, sourceUrl) {
+  const wrap = document.getElementById(`${prefix}-ext-wrap`)
+  if (!wrap) return
+  if (!isExterno) { wrap.style.display = 'none'; return }
+
+  if (!wrap.dataset.built) {
+    wrap.innerHTML = buildExtSection(prefix)
+    wrap.dataset.built = '1'
+  }
+  wrap.style.display = ''
+
+  const m = meta || {}
+  EXT_FIELDS.forEach(f => {
+    const el = document.getElementById(`${prefix}-ext-${f.key}`)
+    if (!el) return
+    if (f.key === 'url_fuente') el.value = m.url_fuente || sourceUrl || ''
+    else el.value = m[f.key] ?? f.def ?? ''
+  })
+}
+
+// Recolecta la ficha externa de un modal → objeto para external_meta (o null)
+function collectExtMeta(prefix) {
+  const wrap = document.getElementById(`${prefix}-ext-wrap`)
+  if (!wrap || wrap.style.display === 'none') return null
+  const meta = {}
+  EXT_FIELDS.forEach(f => {
+    const v = document.getElementById(`${prefix}-ext-${f.key}`)?.value.trim()
+    if (v) meta[f.key] = v
+  })
+  return Object.keys(meta).length ? meta : null
+}
+
+// ¿El tipo seleccionado en el modal "nuevo" es externo (prefijo DE)?
+function newDocIsExterno() {
+  const typeId = document.getElementById('new-type')?.value
+  const type = _types.find(t => t.id === typeId)
+  const code = (document.getElementById('new-code')?.value || '').toUpperCase()
+  return type?.code_prefix === 'DE' || code.startsWith('DE-')
+}
+
+// Ficha externa en el panel de detalle
+function renderExtFicha(doc) {
+  const box = document.getElementById('d-ext-ficha')
+  if (!box) return
+  const isExterno = (doc.code || '').toUpperCase().startsWith('DE-')
+  const m = doc.external_meta || {}
+  if (!isExterno) { box.style.display = 'none'; return }
+  box.style.display = ''
+
+  const rows = EXT_FIELDS
+    .filter(f => m[f.key] || (f.key === 'url_fuente' && doc.source_url))
+    .map(f => {
+      let val = m[f.key] || ''
+      if (f.key === 'url_fuente') {
+        const url = m.url_fuente || doc.source_url
+        val = `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer"
+                 style="color:var(--blue);word-break:break-all">${esc(url)}</a>`
+      } else {
+        val = esc(val)
+      }
+      return `<div class="info-item"><label>${esc(f.label)}</label>
+        <span style="display:block;line-height:1.5;color:var(--txt2)">${val}</span></div>`
+    })
+
+  box.innerHTML = `
+    <div class="section-sep">
+      <i class="fa-solid fa-file-import" style="margin-right:6px"></i>
+      Ficha de Documento Externo · § 7.5.3.2
+    </div>
+    ${rows.length
+      ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px">${rows.join('')}</div>`
+      : `<div style="font-size:.82rem;color:var(--txt3);padding:6px 0">
+           Sin datos capturados — edita el documento para llenar la ficha de control externo.
+         </div>`}
+  `
 }
 
 // ── Celda "Vigencia verificada" en la tabla (documentos externos) ─
