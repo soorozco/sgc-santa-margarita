@@ -2392,6 +2392,7 @@ async function submitReviewClave(action) {
 // ══════════════════════════════════════════════════════════════════
 const EXT_FIELDS = [
   { key: 'proceso',            label: 'Proceso asociado',                    type: 'text',     ph: 'Ej. Normatividad aplicable' },
+  { key: 'tipo_doc_externo',   label: 'Tipo de documento externo',           type: 'select',   options: ['Norma oficial / ley / reglamento', 'Certificado / constancia externa', 'Guía / lineamiento', 'Manual de equipo', 'Otro'] },
   { key: 'emisor',             label: 'Origen / Emisor externo',             type: 'text',     ph: 'Ej. Secretaría de Salud, ISO, COFEPRIS' },
   { key: 'codigo_externo',     label: 'Código / folio / versión externa',    type: 'text',     ph: 'Ej. NOM-004-SSA3-2012' },
   { key: 'fecha_emision',      label: 'Fecha de emisión',                    type: 'date' },
