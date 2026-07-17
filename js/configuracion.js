@@ -533,6 +533,7 @@ const MODULES = [
   { key: 'farmacia_controlados', label: 'Conteo de Controlados',      icon: 'fa-tablets',          group: 'Farmacia' },
   { key: 'farmacia_dispensacion', label: 'Dispensación de Controlados', icon: 'fa-prescription-bottle-medical', group: 'Farmacia' },
   { key: 'farmacia_clinica',     label: 'Bitácora Farmacia Clínica',  icon: 'fa-bed-pulse',        group: 'Farmacia' },
+  { key: 'libros_electronicos',  label: 'Libros Electrónicos',        icon: 'fa-book-medical',     group: 'Libros Electrónicos' },
 ]
 
 // Roles con acceso total (no se pueden restringir)

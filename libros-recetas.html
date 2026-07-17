@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bitácora Entrega de Turno — Farmacia Central — SGC Hospital Santa Margarita</title>
+  <title>Registro de Recetas — Libros Electrónicos — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -193,8 +193,8 @@
     <div class="topbar">
       <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
-        <div class="topbar-page-title">Bitácora de Entrega de Turno — Farmacia Central</div>
-        <div class="topbar-sub">Control de temperaturas, inventario crítico, traspasos y pendientes</div>
+        <div class="topbar-page-title">Registro de Recetas de Medicamentos Controlados</div>
+        <div class="topbar-sub">Se alimenta automáticamente con las salidas de los libros por medicamento</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -204,135 +204,36 @@
 
     <div class="page-content">
 
-      <!-- ══ 1. Datos del turno ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-right-left"></i> Datos de la entrega de turno</div>
-        <div class="form-card-body">
-          <div class="form-grid">
-            <div class="form-field">
-              <label>Fecha <span style="color:#dc2626">*</span></label>
-              <input type="date" id="f-fecha">
-            </div>
-            <div class="form-field">
-              <label>Turno <span style="color:#dc2626">*</span></label>
-              <select id="f-turno">
-                <option value="">— Seleccionar —</option>
-                <option>Matutino</option>
-                <option>Vespertino</option>
-                <option>Nocturno</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>Entrega <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-entrega" placeholder="Quien entrega el turno">
-            </div>
-            <div class="form-field">
-              <label>Recibe <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-recibe" placeholder="Quien recibe el turno">
-            </div>
-          </div>
+        <div class="form-card-head violet" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <span><i class="fa-solid fa-receipt"></i> Registro de Recetas — <span id="reg-titulo">Grupo I</span></span>
+          <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select id="f-grupo" onchange="renderRegistro()"
+              style="padding:6px 12px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:.8rem;font-family:inherit;background:#fff;color:#6d28d9;font-weight:600">
+              <option value="I">Grupo I</option>
+              <option value="II">Grupo II</option>
+              <option value="III">Grupo III</option>
+            </select>
+            <input type="month" id="f-mes" onchange="renderRegistro()"
+              style="padding:6px 12px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:.8rem;font-family:inherit;background:#fff;color:#6d28d9;font-weight:600">
+            <button class="btn-reset" style="padding:7px 14px;font-size:.78rem" onclick="exportCSV()">
+              <i class="fa-solid fa-file-csv"></i> Exportar CSV
+            </button>
+          </span>
         </div>
-      </div>
-
-      <!-- ══ 2. Temperaturas y humedad ══ -->
-      <div class="form-card">
-        <div class="form-card-head blue"><i class="fa-solid fa-temperature-half"></i> Control de temperaturas y humedad</div>
-        <div class="form-card-body">
-          <div class="form-grid">
-            <div class="form-field">
-              <label>T° Refrigerador A <span class="rango">(2°C – 8°C)</span></label>
-              <input type="number" step="0.1" id="t-refa" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>T° Refrigerador B <span class="rango">(2°C – 8°C)</span></label>
-              <input type="number" step="0.1" id="t-refb" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>T° Farmacia <span class="rango">(15°C – 25°C)</span></label>
-              <input type="number" step="0.1" id="t-farm" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>% Humedad relativa <span class="rango">(menos de 65%)</span></label>
-              <input type="number" step="0.1" id="t-hum" placeholder="%">
-            </div>
-          </div>
-          <div id="temp-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
-            <i class="fa-solid fa-triangle-exclamation"></i> Hay lecturas fuera de rango — revisa y reporta según el procedimiento.
-          </div>
+        <div class="form-card-body" style="padding:14px 22px;font-size:.8rem;color:#64748b">
+          Este registro se alimenta automáticamente con las <strong>salidas</strong> capturadas en los
+          Libros por Medicamento del grupo seleccionado. No se captura nada aquí.
         </div>
-      </div>
-
-      <!-- ══ 3. Inventario y medicamentos críticos ══ -->
-      <div class="form-card">
-        <div class="form-card-head amber"><i class="fa-solid fa-boxes-stacked"></i> Estado del inventario y medicamentos críticos</div>
-        <div class="form-card-body">
-          <label class="chk-row" id="row-controlados">
-            <input type="checkbox" id="c-controlados">
-            <span><strong>Controlados</strong><small>Conteo físico coincide con sistema.</small></span>
-          </label>
-          <label class="chk-row" id="row-altocosto">
-            <input type="checkbox" id="c-altocosto">
-            <span><strong>Alto costo</strong><small>Identificados, coincide con sistema a conteo físico.</small></span>
-          </label>
-          <label class="chk-row" id="row-caducados">
-            <input type="checkbox" id="c-caducados">
-            <span><strong>Caducados</strong><small>Medicamentos con vigencia menor a 1 mes reportados y/o separados.</small></span>
-          </label>
-          <label class="chk-row" id="row-antibioticos">
-            <input type="checkbox" id="c-antibioticos">
-            <span><strong>Antibióticos</strong><small>Registro en bitácora y resguardo de receta de venta de antibióticos al público.</small></span>
-          </label>
-          <div class="form-field" style="margin-top:12px">
-            <label>Observaciones de inventario</label>
-            <textarea id="c-obs" placeholder="Anota cualquier diferencia, faltante o situación relevante"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ 4. Traspasos y pedidos ══ -->
-      <div class="form-card">
-        <div class="form-card-head violet"><i class="fa-solid fa-truck-ramp-box"></i> Traspasos y pedidos</div>
-        <div class="form-card-body" style="overflow-x:auto">
-          <table class="tras-table">
-            <thead>
-              <tr><th>Servicio</th><th style="width:110px;text-align:center">Verificación</th><th style="width:180px">Folio</th></tr>
-            </thead>
-            <tbody id="tras-body"><!-- filas generadas por JS --></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ══ 5. Pendientes ══ -->
-      <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-list-check"></i> Pendientes operativos generales</div>
-        <div class="form-card-body">
-          <div class="form-field">
-            <textarea id="f-pendientes" rows="4"
-              placeholder='Ej. "Se prestó X medicamento a Urgencias y deben devolverlo", "Pendiente de llegar medicamento para la cama 304"…'></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-reset" onclick="resetForm()">Limpiar</button>
-        <button class="btn-submit" id="btn-guardar" onclick="guardarBitacora()">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar entrega de turno
-        </button>
-      </div>
-
-      <!-- ══ Historial ══ -->
-      <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de entregas de turno</div>
         <div class="form-card-body" style="overflow-x:auto;padding:0">
-          <table class="hist-table">
+          <table class="hist-table" style="min-width:860px">
             <thead>
               <tr>
-                <th>Fecha</th><th>Turno</th><th>Entrega</th><th>Recibe</th>
-                <th style="text-align:center">Temperaturas</th><th style="text-align:center">Inventario</th>
-                <th style="text-align:center">Acciones</th>
+                <th>Folio (Receta)</th><th>Fecha</th><th>Paciente</th><th>F. Nacimiento</th>
+                <th>Uso</th><th style="text-align:center">Cantidad</th><th>Medicamento</th>
               </tr>
             </thead>
-            <tbody id="hist-body">
+            <tbody id="reg-body">
               <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
             </tbody>
           </table>
@@ -359,7 +260,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/farmacia-bitacora.js"></script>
+<script src="js/libros-catalogo.js"></script>
+<script src="js/libros-recetas.js"></script>
 <script src="js/sidebar.js"></script>
 </body>
 </html>
