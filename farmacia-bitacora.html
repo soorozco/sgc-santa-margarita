@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitácora Entrega de Turno — Farmacia Central — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .form-card { background:#fff;border:1px solid #e2e8f0;border-radius:14px;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05) }
+    .form-card-head { display:flex;align-items:center;gap:10px;padding:14px 22px;font-size:.85rem;font-weight:700;letter-spacing:.02em }
+    .form-card-head i { width:22px;text-align:center;font-size:1rem }
+    .form-card-head.teal  { background:#f0fdfa;color:#0f766e;border-bottom:2px solid #5eead4 }
+    .form-card-head.blue  { background:#eff6ff;color:#1d4ed8;border-bottom:2px solid #bfdbfe }
+    .form-card-head.amber { background:#fffbeb;color:#92400e;border-bottom:2px solid #fde68a }
+    .form-card-head.violet{ background:#f5f3ff;color:#6d28d9;border-bottom:2px solid #ddd6fe }
+    .form-card-body { padding:22px }
+
+    .form-grid { display:grid;gap:16px;grid-template-columns:repeat(4,1fr) }
+    .form-grid.col2 { grid-template-columns:repeat(2,1fr) }
+    @media (max-width:900px){ .form-grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:560px){ .form-grid,.form-grid.col2{grid-template-columns:1fr} }
+
+    .form-field { display:flex;flex-direction:column;gap:6px }
+    .form-field label { font-size:.75rem;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em }
+    .form-field .rango { font-size:.7rem;color:#64748b;font-weight:500;text-transform:none }
+    .form-field input, .form-field select, .form-field textarea {
+      width:100%;padding:10px 13px;border:1.5px solid #cbd5e1;border-radius:8px;background:#f8fafc;
+      color:#1e293b;font-size:.9rem;font-family:inherit;transition:.15s }
+    .form-field input:focus,.form-field select:focus,.form-field textarea:focus {
+      outline:none;border-color:#009688;background:#fff;box-shadow:0 0 0 3px rgba(0,150,136,.15) }
+    .form-field textarea { resize:vertical;min-height:80px }
+    .form-field input.fuera-rango { border-color:#dc2626;background:#fef2f2;color:#991b1b;font-weight:700 }
+
+    /* Checklist de inventario */
+    .chk-row { display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;margin-bottom:10px;background:#f8fafc;cursor:pointer;transition:.15s }
+    .chk-row:hover { border-color:#009688 }
+    .chk-row input[type=checkbox]{ width:19px;height:19px;margin-top:2px;accent-color:#009688;cursor:pointer;flex-shrink:0 }
+    .chk-row.checked { border-color:#009688;background:#f0fdfa }
+    .chk-row strong { display:block;font-size:.86rem;color:#1e293b }
+    .chk-row small { font-size:.76rem;color:#64748b;line-height:1.4 }
+
+    /* Traspasos */
+    .tras-table { width:100%;border-collapse:collapse;font-size:.86rem }
+    .tras-table th { text-align:left;padding:8px 10px;font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #f0f0f0 }
+    .tras-table td { padding:8px 10px;border-bottom:1px solid #f5f5f5;vertical-align:middle }
+    .tras-table input[type=checkbox]{ width:18px;height:18px;accent-color:#009688;cursor:pointer }
+    .tras-table input[type=text]{ width:100%;padding:7px 10px;border:1.5px solid #cbd5e1;border-radius:7px;background:#f8fafc;font-size:.85rem;font-family:inherit }
+    .tras-table input[type=text]:focus{ outline:none;border-color:#009688;background:#fff }
+
+    .form-actions { display:flex;justify-content:flex-end;gap:12px;margin:4px 0 26px }
+    .btn-submit { display:inline-flex;align-items:center;gap:8px;padding:12px 26px;border:none;border-radius:8px;
+      background:linear-gradient(135deg,#0d3d38,#009688);color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,150,136,.3);transition:.18s }
+    .btn-submit:hover { transform:translateY(-1px) }
+    .btn-submit:disabled { opacity:.6;cursor:not-allowed;transform:none }
+    .btn-reset { padding:12px 22px;border:1.5px solid #cbd5e1;border-radius:8px;background:#fff;color:#64748b;font-size:.875rem;cursor:pointer }
+    .btn-reset:hover { background:#f1f5f9 }
+
+    /* Historial */
+    .hist-table { width:100%;border-collapse:collapse;font-size:.86rem;background:#fff }
+    .hist-table th { background:#f9fafb;padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #f0f0f0 }
+    .hist-table td { padding:11px 14px;border-bottom:1px solid #f5f5f5;color:#374151 }
+    .hist-table tr:hover td { background:#fafafa }
+    .pill-turno { display:inline-block;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700 }
+    .pill-mat { background:#fef9c3;color:#854d0e }
+    .pill-ves { background:#ffedd5;color:#9a3412 }
+    .pill-noc { background:#e0e7ff;color:#3730a3 }
+    .pill-ok   { background:#d1fae5;color:#065f46;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700 }
+    .pill-alert{ background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700 }
+    .btn-action { background:none;border:none;cursor:pointer;padding:6px 8px;border-radius:8px;font-size:.85rem;color:#009688;background:#e0f2f1 }
+    .btn-action.del { color:#ef4444;background:#fee2e2;margin-left:6px }
+
+    /* Modal detalle */
+    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px }
+    .modal-overlay.open { display:flex }
+    .modal-box { background:#fff;border-radius:16px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2) }
+    .modal-head { padding:18px 24px 14px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff }
+    .modal-head h3 { font-size:1rem;font-weight:700;color:#111;margin:0 }
+    .modal-x { background:none;border:none;font-size:1.1rem;color:#9ca3af;cursor:pointer;padding:4px 8px }
+    .modal-body { padding:20px 24px }
+    .det-sep { font-size:.72rem;font-weight:800;color:#0f766e;text-transform:uppercase;letter-spacing:.08em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid #e2e8f0 }
+    .det-grid { display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:.86rem }
+    .det-grid label { font-size:.7rem;font-weight:700;color:#9ca3af;text-transform:uppercase;display:block }
+  </style>
+</head>
+<body>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a class="nav-link" href="dashboard.html">
+        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+      <button class="nav-group-btn" data-target="group-iso">
+        <i class="icon fa-solid fa-certificate"></i>
+        <span class="nav-group-label">ISO 9001:2015</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-iso">
+        <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span><small class="nav-clause">§ 4</small></a>
+        <a class="nav-link" href="liderazgo.html"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span><small class="nav-clause">§ 5</small></a>
+        <a class="nav-link" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+        <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+        <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small></a>
+        <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+        <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+        <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+        <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
+        <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Q, S y Felicitaciones</span><small class="nav-clause">§ 8.2.1</small></a>
+        <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small></a>
+        <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+        <a class="nav-link" href="configuracion.html"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-sp">
+        <i class="icon fa-solid fa-shield-heart"></i>
+        <span class="nav-group-label">Seguridad del Paciente</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-sp">
+        <a class="nav-link" href="seguridad-paciente.html"><i class="fa-solid fa-file-medical"></i><span>Notificar Incidente</span></a>
+        <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Dashboard de Incidentes</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-rrhh">
+        <i class="icon fa-solid fa-people-roof"></i>
+        <span class="nav-group-label">Recursos Humanos</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-rrhh">
+        <a class="nav-link" href="personal.html"><i class="fa-solid fa-id-card"></i><span>Directorio de Personal</span></a>
+        <a class="nav-link" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+        <a class="nav-link" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+        <a class="nav-link" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-farmacia">
+        <i class="icon fa-solid fa-pills"></i>
+        <span class="nav-group-label">Farmacia</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-farmacia">
+        <a class="nav-link" href="farmacia-bitacora.html"><i class="fa-solid fa-clipboard-check"></i><span>Bitácora Entrega de Turno</span></a>
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <div class="topbar">
+      <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <div>
+        <div class="topbar-page-title">Bitácora de Entrega de Turno — Farmacia Central</div>
+        <div class="topbar-sub">Control de temperaturas, inventario crítico, traspasos y pendientes</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="current-date"></div>
+        <span class="iso-badge"><i class="fa-solid fa-pills"></i> Farmacia</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- ══ 1. Datos del turno ══ -->
+      <div class="form-card">
+        <div class="form-card-head teal"><i class="fa-solid fa-right-left"></i> Datos de la entrega de turno</div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Fecha <span style="color:#dc2626">*</span></label>
+              <input type="date" id="f-fecha">
+            </div>
+            <div class="form-field">
+              <label>Turno <span style="color:#dc2626">*</span></label>
+              <select id="f-turno">
+                <option value="">— Seleccionar —</option>
+                <option>Matutino</option>
+                <option>Vespertino</option>
+                <option>Nocturno</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Entrega <span style="color:#dc2626">*</span></label>
+              <input type="text" id="f-entrega" placeholder="Quien entrega el turno">
+            </div>
+            <div class="form-field">
+              <label>Recibe <span style="color:#dc2626">*</span></label>
+              <input type="text" id="f-recibe" placeholder="Quien recibe el turno">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 2. Temperaturas y humedad ══ -->
+      <div class="form-card">
+        <div class="form-card-head blue"><i class="fa-solid fa-temperature-half"></i> Control de temperaturas y humedad</div>
+        <div class="form-card-body">
+          <div class="form-grid">
+            <div class="form-field">
+              <label>T° Refrigerador A <span class="rango">(2°C – 8°C)</span></label>
+              <input type="number" step="0.1" id="t-refa" placeholder="°C">
+            </div>
+            <div class="form-field">
+              <label>T° Refrigerador B <span class="rango">(2°C – 8°C)</span></label>
+              <input type="number" step="0.1" id="t-refb" placeholder="°C">
+            </div>
+            <div class="form-field">
+              <label>T° Farmacia <span class="rango">(15°C – 25°C)</span></label>
+              <input type="number" step="0.1" id="t-farm" placeholder="°C">
+            </div>
+            <div class="form-field">
+              <label>% Humedad relativa <span class="rango">(menos de 65%)</span></label>
+              <input type="number" step="0.1" id="t-hum" placeholder="%">
+            </div>
+          </div>
+          <div id="temp-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
+            <i class="fa-solid fa-triangle-exclamation"></i> Hay lecturas fuera de rango — revisa y reporta según el procedimiento.
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 3. Inventario y medicamentos críticos ══ -->
+      <div class="form-card">
+        <div class="form-card-head amber"><i class="fa-solid fa-boxes-stacked"></i> Estado del inventario y medicamentos críticos</div>
+        <div class="form-card-body">
+          <label class="chk-row" id="row-controlados">
+            <input type="checkbox" id="c-controlados">
+            <span><strong>Controlados</strong><small>Conteo físico coincide con sistema.</small></span>
+          </label>
+          <label class="chk-row" id="row-altocosto">
+            <input type="checkbox" id="c-altocosto">
+            <span><strong>Alto costo</strong><small>Identificados, coincide con sistema a conteo físico.</small></span>
+          </label>
+          <label class="chk-row" id="row-caducados">
+            <input type="checkbox" id="c-caducados">
+            <span><strong>Caducados</strong><small>Medicamentos con vigencia menor a 1 mes reportados y/o separados.</small></span>
+          </label>
+          <label class="chk-row" id="row-antibioticos">
+            <input type="checkbox" id="c-antibioticos">
+            <span><strong>Antibióticos</strong><small>Registro en bitácora y resguardo de receta de venta de antibióticos al público.</small></span>
+          </label>
+          <div class="form-field" style="margin-top:12px">
+            <label>Observaciones de inventario</label>
+            <textarea id="c-obs" placeholder="Anota cualquier diferencia, faltante o situación relevante"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 4. Traspasos y pedidos ══ -->
+      <div class="form-card">
+        <div class="form-card-head violet"><i class="fa-solid fa-truck-ramp-box"></i> Traspasos y pedidos</div>
+        <div class="form-card-body" style="overflow-x:auto">
+          <table class="tras-table">
+            <thead>
+              <tr><th>Servicio</th><th style="width:110px;text-align:center">Verificación</th><th style="width:180px">Folio</th></tr>
+            </thead>
+            <tbody id="tras-body"><!-- filas generadas por JS --></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ 5. Pendientes ══ -->
+      <div class="form-card">
+        <div class="form-card-head teal"><i class="fa-solid fa-list-check"></i> Pendientes operativos generales</div>
+        <div class="form-card-body">
+          <div class="form-field">
+            <textarea id="f-pendientes" rows="4"
+              placeholder='Ej. "Se prestó X medicamento a Urgencias y deben devolverlo", "Pendiente de llegar medicamento para la cama 304"…'></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-reset" onclick="resetForm()">Limpiar</button>
+        <button class="btn-submit" id="btn-guardar" onclick="guardarBitacora()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar entrega de turno
+        </button>
+      </div>
+
+      <!-- ══ Historial ══ -->
+      <div class="form-card">
+        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de entregas de turno</div>
+        <div class="form-card-body" style="overflow-x:auto;padding:0">
+          <table class="hist-table">
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Turno</th><th>Entrega</th><th>Recibe</th>
+                <th style="text-align:center">Temperaturas</th><th style="text-align:center">Inventario</th>
+                <th style="text-align:center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="hist-body">
+              <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══ Modal detalle ══ -->
+<div class="modal-overlay" id="modal-det">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="det-title">Bitácora</h3>
+      <button class="modal-x" onclick="document.getElementById('modal-det').classList.remove('open')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="modal-body" id="det-body"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/farmacia-bitacora.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>
