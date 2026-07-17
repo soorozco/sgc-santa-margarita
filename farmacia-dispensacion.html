@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conteo de Controlados — Farmacia Central — SGC Hospital Santa Margarita</title>
+  <title>Dispensación de Controlados — Farmacia Central — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -183,8 +183,8 @@
     <div class="topbar">
       <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
-        <div class="topbar-page-title">Conteo de Controlados — Farmacia Central</div>
-        <div class="topbar-sub">Registro por turno de medicamentos controlados · Grupos I, II y III</div>
+        <div class="topbar-page-title">Bitácora de Control de Dispensación de Medicamentos Controlados</div>
+        <div class="topbar-sub">Kardex por medicamento: entradas, salidas, balance, receta y personal que dispensa</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -194,9 +194,19 @@
 
     <div class="page-content">
 
-      <!-- ══ 1. Datos del conteo ══ -->
+      <!-- ══ 1. Balances actuales ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clipboard-list"></i> Datos del conteo</div>
+        <div class="form-card-head blue"><i class="fa-solid fa-scale-balanced"></i> Balance actual por medicamento</div>
+        <div class="form-card-body">
+          <div id="balances-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">
+            <div style="color:#9ca3af;font-size:.86rem">Cargando…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ 2. Registrar movimiento ══ -->
+      <div class="form-card">
+        <div class="form-card-head teal"><i class="fa-solid fa-prescription-bottle-medical"></i> Registrar movimiento</div>
         <div class="form-card-body">
           <div class="form-grid">
             <div class="form-field">
@@ -204,98 +214,92 @@
               <input type="date" id="f-fecha">
             </div>
             <div class="form-field">
-              <label>Turno <span style="color:#dc2626">*</span></label>
-              <select id="f-turno">
-                <option value="">— Seleccionar —</option>
-                <option>Matutino</option>
-                <option>Vespertino</option>
-                <option>Nocturno</option>
+              <label>Medicamento <span style="color:#dc2626">*</span></label>
+              <select id="f-med" onchange="updateBalancePreview()"></select>
+            </div>
+            <div class="form-field">
+              <label>Tipo de movimiento <span style="color:#dc2626">*</span></label>
+              <select id="f-tipo" onchange="toggleTipo()">
+                <option value="salida">Salida (dispensación)</option>
+                <option value="entrada">Entrada (abasto)</option>
               </select>
             </div>
             <div class="form-field">
-              <label>Grupo <span style="color:#dc2626">*</span></label>
-              <select id="f-grupo" onchange="buildConteo()">
-                <option value="">— Seleccionar —</option>
-                <option value="I">Grupo I</option>
-                <option value="II">Grupo II</option>
-                <option value="III">Grupo III</option>
-              </select>
+              <label>Cantidad <span style="color:#dc2626">*</span></label>
+              <input type="number" min="1" id="f-cantidad" oninput="updateBalancePreview()" placeholder="Piezas / ampolletas">
+            </div>
+          </div>
+
+          <div id="balance-preview" style="display:none;margin-top:14px;padding:10px 14px;border-radius:8px;font-size:.85rem;font-weight:600"></div>
+
+          <!-- Datos de dispensación (solo salidas) -->
+          <div id="salida-wrap" style="margin-top:16px">
+            <div class="form-grid">
+              <div class="form-field">
+                <label>Paciente <span style="color:#dc2626">*</span></label>
+                <input type="text" id="f-paciente" placeholder="Nombre del paciente">
+              </div>
+              <div class="form-field">
+                <label>Médico tratante <span style="color:#dc2626">*</span></label>
+                <input type="text" id="f-medico" placeholder="Nombre del médico">
+              </div>
+              <div class="form-field">
+                <label>Cédula profesional <span style="color:#dc2626">*</span></label>
+                <input type="text" id="f-cedula" placeholder="Cédula del médico">
+              </div>
+              <div class="form-field">
+                <label>No. de receta <span style="color:#dc2626">*</span></label>
+                <input type="text" id="f-receta" placeholder="Folio de la receta">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top:16px">
+            <div class="form-field">
+              <label>Lote</label>
+              <input type="text" id="f-lote" placeholder="Lote">
             </div>
             <div class="form-field">
-              <label>Responsable del conteo <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-responsable" placeholder="Nombre de quien realiza el conteo">
+              <label>Caducidad</label>
+              <input type="month" id="f-cad">
+            </div>
+            <div class="form-field" style="grid-column:span 2">
+              <label>Personal que dispensa / registra <span style="color:#dc2626">*</span></label>
+              <input type="text" id="f-personal" placeholder="Nombre de quien realiza el movimiento">
             </div>
           </div>
+
+          <div class="form-actions" style="margin-bottom:0;margin-top:18px">
+            <button class="btn-reset" onclick="resetForm()">Limpiar</button>
+            <button class="btn-submit" id="btn-guardar" onclick="guardarMovimiento()">
+              <i class="fa-solid fa-floppy-disk"></i> Registrar movimiento
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- ══ 2. Tabla de conteo ══ -->
+      <!-- ══ 3. Kardex / historial ══ -->
       <div class="form-card">
-        <div class="form-card-head blue"><i class="fa-solid fa-tablets"></i>
-          <span id="conteo-titulo">Conteo — selecciona un grupo</span>
+        <div class="form-card-head violet" style="justify-content:space-between">
+          <span><i class="fa-solid fa-clock-rotate-left"></i> Kardex de movimientos</span>
+          <select id="filtro-med" onchange="renderHist()"
+            style="padding:6px 12px;border:1.5px solid #ddd6fe;border-radius:8px;font-size:.8rem;font-family:inherit;background:#fff;color:#6d28d9;font-weight:600">
+            <option value="">Todos los medicamentos</option>
+          </select>
         </div>
-        <div class="form-card-body" style="overflow-x:auto">
-          <div id="conteo-vacio" style="color:#9ca3af;font-size:.86rem;padding:6px 0">
-            Selecciona el grupo para desplegar la lista de medicamentos.
-          </div>
-          <table class="tras-table" id="conteo-table" style="display:none;min-width:760px">
-            <thead>
-              <tr>
-                <th style="min-width:230px">Medicamento</th>
-                <th style="width:82px" title="Cantidad recibida del turno anterior">RE (Recibe)</th>
-                <th style="width:82px" title="Ingresos durante el turno">IN (Ingresa)</th>
-                <th style="width:82px" title="Salidas durante el turno">SA (Salida)</th>
-                <th style="width:82px" title="Cantidad que se entrega al siguiente turno">EN (Entrega)</th>
-                <th style="width:110px">Lote</th>
-                <th style="width:110px">Caducidad</th>
-              </tr>
-            </thead>
-            <tbody id="conteo-body"></tbody>
-          </table>
-          <button type="button" class="btn-reset" id="btn-add-med" onclick="addMedRow()" style="display:none;margin-top:12px">
-            <i class="fa-solid fa-plus"></i> Agregar otro medicamento
-          </button>
-          <div id="conteo-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
-            <i class="fa-solid fa-triangle-exclamation"></i> Hay diferencias: en las filas marcadas, EN no coincide con RE + IN − SA. Verifica el conteo físico.
-          </div>
-          <div style="margin-top:12px;font-size:.74rem;color:#64748b;line-height:1.5">
-            <strong>RE:</strong> Recibe &nbsp;·&nbsp; <strong>IN:</strong> Ingresa &nbsp;·&nbsp;
-            <strong>SA:</strong> Salida &nbsp;·&nbsp; <strong>EN:</strong> Entrega (se calcula RE + IN − SA, puedes corregirlo con el conteo físico)
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ 3. Observaciones ══ -->
-      <div class="form-card">
-        <div class="form-card-head amber"><i class="fa-solid fa-pen"></i> Observaciones</div>
-        <div class="form-card-body">
-          <div class="form-field">
-            <textarea id="f-obs" rows="3" placeholder="Diferencias encontradas, medicamentos en resguardo, notas del turno…"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-reset" onclick="resetForm()">Limpiar</button>
-        <button class="btn-submit" id="btn-guardar" onclick="guardarConteo()">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar conteo
-        </button>
-      </div>
-
-      <!-- ══ Historial ══ -->
-      <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de conteos</div>
         <div class="form-card-body" style="overflow-x:auto;padding:0">
-          <table class="hist-table">
+          <table class="hist-table" style="min-width:900px">
             <thead>
               <tr>
-                <th>Fecha</th><th>Turno</th><th>Grupo</th><th>Responsable</th>
-                <th style="text-align:center">Conteo</th>
+                <th>Fecha</th><th>Medicamento</th>
+                <th style="text-align:center">Entrada</th><th style="text-align:center">Salida</th>
+                <th style="text-align:center">Balance</th>
+                <th>Paciente</th><th>Receta</th><th>Lote</th><th>Dispensó</th>
                 <th style="text-align:center">Acciones</th>
               </tr>
             </thead>
             <tbody id="hist-body">
-              <tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
+              <tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -321,7 +325,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/farmacia-controlados.js"></script>
+<script src="js/farmacia-dispensacion.js"></script>
 <script src="js/sidebar.js"></script>
 </body>
 </html>
