@@ -17,7 +17,16 @@
       }
     })
 
-    // Toggle on click
+    // Auto-open nested sub-group (e.g. Libros Electrónicos) with active link
+    document.querySelectorAll('.nav-sub-body').forEach(body => {
+      if (body.querySelector('.nav-link.active')) {
+        body.classList.add('open')
+        const btn = document.querySelector(`.nav-sub-btn[data-target="${body.id}"]`)
+        if (btn) btn.classList.add('open')
+      }
+    })
+
+    // Toggle on click (main groups — accordion)
     document.querySelectorAll('.nav-group-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const body = document.getElementById(btn.dataset.target)
@@ -28,6 +37,17 @@
           body.classList.add('open')
           btn.classList.add('open')
         }
+      })
+    })
+
+    // Toggle on click (nested sub-groups — independent, no acordeón)
+    document.querySelectorAll('.nav-sub-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation()
+        const body = document.getElementById(btn.dataset.target)
+        if (!body) return
+        body.classList.toggle('open')
+        btn.classList.toggle('open')
       })
     })
 

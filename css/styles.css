@@ -316,6 +316,23 @@ button { cursor: pointer; font-family: var(--font); border: none; outline: none;
 .nav-group-body.open { max-height: 2000px; }
 .nav-group-body .nav-link { padding-left: 30px; font-size: 0.814rem; }
 
+/* ── Sub-grupo anidado (ej. Libros Electrónicos dentro de Farmacia) ── */
+.nav-sub-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 8px 18px 8px 30px;
+  background: none; border: none; cursor: pointer;
+  color: var(--sidebar-txt); font-size: 0.814rem; font-weight: 500;
+  text-align: left; transition: var(--ease);
+  border-left: 3px solid transparent;
+}
+.nav-sub-btn i.icon { width: 17px; font-size: 12px; text-align: center; flex-shrink: 0; }
+.nav-sub-btn:hover { background: var(--sidebar-hover); color: #fff; }
+.nav-sub-btn.open { color: #fff; }
+.nav-sub-btn.open .nav-chevron { transform: rotate(180deg); }
+.nav-sub-body { overflow: hidden; max-height: 0; transition: max-height .3s ease; }
+.nav-sub-body.open { max-height: 600px; }
+.nav-sub-body .nav-link { padding-left: 46px; font-size: 0.786rem; }
+
 .sb-footer {
   padding: 14px 18px;
   border-top: 1px solid rgba(255,255,255,0.07);
