@@ -530,6 +530,7 @@ const MODULES = [
   { key: 'rrhh_personal',        label: 'Directorio RRHH',            icon: 'fa-people-roof',     group: 'Recursos Humanos' },
   { key: 'rrhh_evaluaciones',    label: 'Evaluaciones de Personal',   icon: 'fa-star-half-stroke', group: 'Recursos Humanos' },
   { key: 'farmacia_bitacora',    label: 'Bitácora Entrega de Turno',  icon: 'fa-clipboard-check',  group: 'Farmacia' },
+  { key: 'farmacia_controlados', label: 'Conteo de Controlados',      icon: 'fa-tablets',          group: 'Farmacia' },
 ]
 
 // Roles con acceso total (no se pueden restringir)

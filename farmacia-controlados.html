@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bitácora Entrega de Turno — Farmacia Central — SGC Hospital Santa Margarita</title>
+  <title>Conteo de Controlados — Farmacia Central — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -182,8 +182,8 @@
     <div class="topbar">
       <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
-        <div class="topbar-page-title">Bitácora de Entrega de Turno — Farmacia Central</div>
-        <div class="topbar-sub">Control de temperaturas, inventario crítico, traspasos y pendientes</div>
+        <div class="topbar-page-title">Conteo de Controlados — Farmacia Central</div>
+        <div class="topbar-sub">Registro por turno de medicamentos controlados · Grupos I, II y III</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -193,9 +193,9 @@
 
     <div class="page-content">
 
-      <!-- ══ 1. Datos del turno ══ -->
+      <!-- ══ 1. Datos del conteo ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-right-left"></i> Datos de la entrega de turno</div>
+        <div class="form-card-head teal"><i class="fa-solid fa-clipboard-list"></i> Datos del conteo</div>
         <div class="form-card-body">
           <div class="form-grid">
             <div class="form-field">
@@ -212,117 +212,89 @@
               </select>
             </div>
             <div class="form-field">
-              <label>Entrega <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-entrega" placeholder="Quien entrega el turno">
+              <label>Grupo <span style="color:#dc2626">*</span></label>
+              <select id="f-grupo" onchange="buildConteo()">
+                <option value="">— Seleccionar —</option>
+                <option value="I">Grupo I</option>
+                <option value="II">Grupo II</option>
+                <option value="III">Grupo III</option>
+              </select>
             </div>
             <div class="form-field">
-              <label>Recibe <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-recibe" placeholder="Quien recibe el turno">
+              <label>Responsable del conteo <span style="color:#dc2626">*</span></label>
+              <input type="text" id="f-responsable" placeholder="Nombre de quien realiza el conteo">
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ══ 2. Temperaturas y humedad ══ -->
+      <!-- ══ 2. Tabla de conteo ══ -->
       <div class="form-card">
-        <div class="form-card-head blue"><i class="fa-solid fa-temperature-half"></i> Control de temperaturas y humedad</div>
-        <div class="form-card-body">
-          <div class="form-grid">
-            <div class="form-field">
-              <label>T° Refrigerador A <span class="rango">(2°C – 8°C)</span></label>
-              <input type="number" step="0.1" id="t-refa" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>T° Refrigerador B <span class="rango">(2°C – 8°C)</span></label>
-              <input type="number" step="0.1" id="t-refb" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>T° Farmacia <span class="rango">(15°C – 25°C)</span></label>
-              <input type="number" step="0.1" id="t-farm" placeholder="°C">
-            </div>
-            <div class="form-field">
-              <label>% Humedad relativa <span class="rango">(menos de 65%)</span></label>
-              <input type="number" step="0.1" id="t-hum" placeholder="%">
-            </div>
-          </div>
-          <div id="temp-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
-            <i class="fa-solid fa-triangle-exclamation"></i> Hay lecturas fuera de rango — revisa y reporta según el procedimiento.
-          </div>
+        <div class="form-card-head blue"><i class="fa-solid fa-tablets"></i>
+          <span id="conteo-titulo">Conteo — selecciona un grupo</span>
         </div>
-      </div>
-
-      <!-- ══ 3. Inventario y medicamentos críticos ══ -->
-      <div class="form-card">
-        <div class="form-card-head amber"><i class="fa-solid fa-boxes-stacked"></i> Estado del inventario y medicamentos críticos</div>
-        <div class="form-card-body">
-          <label class="chk-row" id="row-controlados">
-            <input type="checkbox" id="c-controlados">
-            <span><strong>Controlados</strong><small>Conteo físico coincide con sistema.</small></span>
-          </label>
-          <label class="chk-row" id="row-altocosto">
-            <input type="checkbox" id="c-altocosto">
-            <span><strong>Alto costo</strong><small>Identificados, coincide con sistema a conteo físico.</small></span>
-          </label>
-          <label class="chk-row" id="row-caducados">
-            <input type="checkbox" id="c-caducados">
-            <span><strong>Caducados</strong><small>Medicamentos con vigencia menor a 1 mes reportados y/o separados.</small></span>
-          </label>
-          <label class="chk-row" id="row-antibioticos">
-            <input type="checkbox" id="c-antibioticos">
-            <span><strong>Antibióticos</strong><small>Registro en bitácora y resguardo de receta de venta de antibióticos al público.</small></span>
-          </label>
-          <div class="form-field" style="margin-top:12px">
-            <label>Observaciones de inventario</label>
-            <textarea id="c-obs" placeholder="Anota cualquier diferencia, faltante o situación relevante"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ 4. Traspasos y pedidos ══ -->
-      <div class="form-card">
-        <div class="form-card-head violet"><i class="fa-solid fa-truck-ramp-box"></i> Traspasos y pedidos</div>
         <div class="form-card-body" style="overflow-x:auto">
-          <table class="tras-table">
+          <div id="conteo-vacio" style="color:#9ca3af;font-size:.86rem;padding:6px 0">
+            Selecciona el grupo para desplegar la lista de medicamentos.
+          </div>
+          <table class="tras-table" id="conteo-table" style="display:none;min-width:760px">
             <thead>
-              <tr><th>Servicio</th><th style="width:110px;text-align:center">Verificación</th><th style="width:180px">Folio</th></tr>
+              <tr>
+                <th style="min-width:230px">Medicamento</th>
+                <th style="width:82px" title="Cantidad recibida del turno anterior">RE (Recibe)</th>
+                <th style="width:82px" title="Ingresos durante el turno">IN (Ingresa)</th>
+                <th style="width:82px" title="Salidas durante el turno">SA (Salida)</th>
+                <th style="width:82px" title="Cantidad que se entrega al siguiente turno">EN (Entrega)</th>
+                <th style="width:110px">Lote</th>
+                <th style="width:110px">Caducidad</th>
+              </tr>
             </thead>
-            <tbody id="tras-body"><!-- filas generadas por JS --></tbody>
+            <tbody id="conteo-body"></tbody>
           </table>
+          <button type="button" class="btn-reset" id="btn-add-med" onclick="addMedRow()" style="display:none;margin-top:12px">
+            <i class="fa-solid fa-plus"></i> Agregar otro medicamento
+          </button>
+          <div id="conteo-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
+            <i class="fa-solid fa-triangle-exclamation"></i> Hay diferencias: en las filas marcadas, EN no coincide con RE + IN − SA. Verifica el conteo físico.
+          </div>
+          <div style="margin-top:12px;font-size:.74rem;color:#64748b;line-height:1.5">
+            <strong>RE:</strong> Recibe &nbsp;·&nbsp; <strong>IN:</strong> Ingresa &nbsp;·&nbsp;
+            <strong>SA:</strong> Salida &nbsp;·&nbsp; <strong>EN:</strong> Entrega (se calcula RE + IN − SA, puedes corregirlo con el conteo físico)
+          </div>
         </div>
       </div>
 
-      <!-- ══ 5. Pendientes ══ -->
+      <!-- ══ 3. Observaciones ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-list-check"></i> Pendientes operativos generales</div>
+        <div class="form-card-head amber"><i class="fa-solid fa-pen"></i> Observaciones</div>
         <div class="form-card-body">
           <div class="form-field">
-            <textarea id="f-pendientes" rows="4"
-              placeholder='Ej. "Se prestó X medicamento a Urgencias y deben devolverlo", "Pendiente de llegar medicamento para la cama 304"…'></textarea>
+            <textarea id="f-obs" rows="3" placeholder="Diferencias encontradas, medicamentos en resguardo, notas del turno…"></textarea>
           </div>
         </div>
       </div>
 
       <div class="form-actions">
         <button class="btn-reset" onclick="resetForm()">Limpiar</button>
-        <button class="btn-submit" id="btn-guardar" onclick="guardarBitacora()">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar entrega de turno
+        <button class="btn-submit" id="btn-guardar" onclick="guardarConteo()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar conteo
         </button>
       </div>
 
       <!-- ══ Historial ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de entregas de turno</div>
+        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de conteos</div>
         <div class="form-card-body" style="overflow-x:auto;padding:0">
           <table class="hist-table">
             <thead>
               <tr>
-                <th>Fecha</th><th>Turno</th><th>Entrega</th><th>Recibe</th>
-                <th style="text-align:center">Temperaturas</th><th style="text-align:center">Inventario</th>
+                <th>Fecha</th><th>Turno</th><th>Grupo</th><th>Responsable</th>
+                <th style="text-align:center">Conteo</th>
                 <th style="text-align:center">Acciones</th>
               </tr>
             </thead>
             <tbody id="hist-body">
-              <tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
+              <tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -348,7 +320,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/farmacia-bitacora.js"></script>
+<script src="js/farmacia-controlados.js"></script>
 <script src="js/sidebar.js"></script>
 </body>
 </html>
