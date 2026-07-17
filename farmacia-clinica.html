@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conteo de Controlados — Farmacia Central — SGC Hospital Santa Margarita</title>
+  <title>Bitácora de Pacientes — Farmacia Clínica — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -184,8 +184,8 @@
     <div class="topbar">
       <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
-        <div class="topbar-page-title">Conteo de Controlados — Farmacia Central</div>
-        <div class="topbar-sub">Registro por turno de medicamentos controlados · Grupos I, II y III</div>
+        <div class="topbar-page-title">Bitácora de Pacientes — Farmacia Clínica</div>
+        <div class="topbar-sub">Censo por habitación: diagnóstico, alergias, conciliación, RAM y enlace por turno</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -195,108 +195,34 @@
 
     <div class="page-content">
 
-      <!-- ══ 1. Datos del conteo ══ -->
+      <!-- ══ Censo de pacientes ══ -->
       <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clipboard-list"></i> Datos del conteo</div>
-        <div class="form-card-body">
-          <div class="form-grid">
-            <div class="form-field">
-              <label>Fecha <span style="color:#dc2626">*</span></label>
-              <input type="date" id="f-fecha">
-            </div>
-            <div class="form-field">
-              <label>Turno <span style="color:#dc2626">*</span></label>
-              <select id="f-turno">
-                <option value="">— Seleccionar —</option>
-                <option>Matutino</option>
-                <option>Vespertino</option>
-                <option>Nocturno</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>Grupo <span style="color:#dc2626">*</span></label>
-              <select id="f-grupo" onchange="buildConteo()">
-                <option value="">— Seleccionar —</option>
-                <option value="I">Grupo I</option>
-                <option value="II">Grupo II</option>
-                <option value="III">Grupo III</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>Responsable del conteo <span style="color:#dc2626">*</span></label>
-              <input type="text" id="f-responsable" placeholder="Nombre de quien realiza el conteo">
-            </div>
-          </div>
+        <div class="form-card-head teal" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <span><i class="fa-solid fa-bed-pulse"></i> Censo de pacientes — <span id="censo-count">…</span></span>
+          <span style="display:flex;gap:10px;align-items:center">
+            <label style="display:flex;align-items:center;gap:6px;font-size:.76rem;color:#0f766e;cursor:pointer;font-weight:600">
+              <input type="checkbox" id="chk-altas" onchange="renderCenso()" style="accent-color:#009688">
+              Ver dados de alta
+            </label>
+            <button class="btn-submit" style="padding:8px 16px;font-size:.8rem" onclick="openPaciente()">
+              <i class="fa-solid fa-plus"></i> Ingresar paciente
+            </button>
+          </span>
         </div>
-      </div>
-
-      <!-- ══ 2. Tabla de conteo ══ -->
-      <div class="form-card">
-        <div class="form-card-head blue"><i class="fa-solid fa-tablets"></i>
-          <span id="conteo-titulo">Conteo — selecciona un grupo</span>
-        </div>
-        <div class="form-card-body" style="overflow-x:auto">
-          <div id="conteo-vacio" style="color:#9ca3af;font-size:.86rem;padding:6px 0">
-            Selecciona el grupo para desplegar la lista de medicamentos.
-          </div>
-          <table class="tras-table" id="conteo-table" style="display:none;min-width:760px">
-            <thead>
-              <tr>
-                <th style="min-width:230px">Medicamento</th>
-                <th style="width:82px" title="Cantidad recibida del turno anterior">RE (Recibe)</th>
-                <th style="width:82px" title="Ingresos durante el turno">IN (Ingresa)</th>
-                <th style="width:82px" title="Salidas durante el turno">SA (Salida)</th>
-                <th style="width:82px" title="Cantidad que se entrega al siguiente turno">EN (Entrega)</th>
-                <th style="width:110px">Lote</th>
-                <th style="width:110px">Caducidad</th>
-              </tr>
-            </thead>
-            <tbody id="conteo-body"></tbody>
-          </table>
-          <button type="button" class="btn-reset" id="btn-add-med" onclick="addMedRow()" style="display:none;margin-top:12px">
-            <i class="fa-solid fa-plus"></i> Agregar otro medicamento
-          </button>
-          <div id="conteo-alerta" style="display:none;margin-top:12px;padding:10px 14px;background:#fef2f2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;font-size:.82rem;color:#991b1b">
-            <i class="fa-solid fa-triangle-exclamation"></i> Hay diferencias: en las filas marcadas, EN no coincide con RE + IN − SA. Verifica el conteo físico.
-          </div>
-          <div style="margin-top:12px;font-size:.74rem;color:#64748b;line-height:1.5">
-            <strong>RE:</strong> Recibe &nbsp;·&nbsp; <strong>IN:</strong> Ingresa &nbsp;·&nbsp;
-            <strong>SA:</strong> Salida &nbsp;·&nbsp; <strong>EN:</strong> Entrega (se calcula RE + IN − SA, puedes corregirlo con el conteo físico)
-          </div>
-        </div>
-      </div>
-
-      <!-- ══ 3. Observaciones ══ -->
-      <div class="form-card">
-        <div class="form-card-head amber"><i class="fa-solid fa-pen"></i> Observaciones</div>
-        <div class="form-card-body">
-          <div class="form-field">
-            <textarea id="f-obs" rows="3" placeholder="Diferencias encontradas, medicamentos en resguardo, notas del turno…"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-reset" onclick="resetForm()">Limpiar</button>
-        <button class="btn-submit" id="btn-guardar" onclick="guardarConteo()">
-          <i class="fa-solid fa-floppy-disk"></i> Guardar conteo
-        </button>
-      </div>
-
-      <!-- ══ Historial ══ -->
-      <div class="form-card">
-        <div class="form-card-head teal"><i class="fa-solid fa-clock-rotate-left"></i> Historial de conteos</div>
         <div class="form-card-body" style="overflow-x:auto;padding:0">
-          <table class="hist-table">
+          <table class="hist-table" style="min-width:1000px">
             <thead>
               <tr>
-                <th>Fecha</th><th>Turno</th><th>Grupo</th><th>Responsable</th>
-                <th style="text-align:center">Conteo</th>
+                <th>Hab.</th><th>Paciente</th><th>Ingreso</th><th>Diagnóstico</th>
+                <th>Alergias</th>
+                <th style="text-align:center">Conciliación</th>
+                <th style="text-align:center">RAM</th>
+                <th style="text-align:center">Enlace hoy (M·V·N)</th>
                 <th style="text-align:center">Acciones</th>
               </tr>
             </thead>
-            <tbody id="hist-body">
-              <tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
+            <tbody id="censo-body">
+              <tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -306,14 +232,102 @@
   </main>
 </div>
 
-<!-- ══ Modal detalle ══ -->
+<!-- ══ Modal paciente (ingreso / edición) ══ -->
+<div class="modal-overlay" id="modal-pac">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="pac-title">Ingresar paciente</h3>
+      <button class="modal-x" onclick="closeM('modal-pac')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="grid-template-columns:1fr 1fr">
+        <div class="form-field">
+          <label>Habitación <span style="color:#dc2626">*</span></label>
+          <input type="text" id="p-hab" placeholder="Ej. JP01, GIN-03, PB104" style="text-transform:uppercase">
+        </div>
+        <div class="form-field">
+          <label>Fecha de ingreso <span style="color:#dc2626">*</span></label>
+          <input type="date" id="p-ingreso">
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label>Paciente <span style="color:#dc2626">*</span></label>
+        <input type="text" id="p-nombre" placeholder="Apellidos, Nombre">
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label>Diagnóstico</label>
+        <input type="text" id="p-dx" placeholder="Diagnóstico principal">
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label>Comorbilidades</label>
+        <input type="text" id="p-comorb" placeholder="Ej. HAS + ERC + Hipotiroidismo">
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label>Alergias</label>
+        <input type="text" id="p-alergias" placeholder="Ej. Cefalosporinas, metamizol sódico — o 'Negadas'">
+      </div>
+      <div class="form-grid" style="grid-template-columns:1fr 1fr;margin-top:14px">
+        <label class="chk-row" style="margin-bottom:0">
+          <input type="checkbox" id="p-conciliacion">
+          <span><strong>Conciliación realizada</strong><small>Conciliación de medicamentos al ingreso</small></span>
+        </label>
+        <div class="form-field">
+          <label>RAM (reacciones adversas)</label>
+          <input type="text" id="p-ram" placeholder="Sin RAM / describir">
+        </div>
+      </div>
+      <div class="form-actions" style="margin:18px 0 0">
+        <button class="btn-reset" onclick="closeM('modal-pac')">Cancelar</button>
+        <button class="btn-submit" id="btn-save-pac" onclick="guardarPaciente()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal enlace de turno ══ -->
+<div class="modal-overlay" id="modal-nota">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-head">
+      <h3 id="nota-title">Enlace de turno</h3>
+      <button class="modal-x" onclick="closeM('modal-nota')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="grid-template-columns:1fr 1fr">
+        <div class="form-field">
+          <label>Fecha</label>
+          <input type="date" id="n-fecha">
+        </div>
+        <div class="form-field">
+          <label>Turno <span style="color:#dc2626">*</span></label>
+          <select id="n-turno">
+            <option value="M">Matutino</option>
+            <option value="V">Vespertino</option>
+            <option value="N">Nocturno</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label>Nota de enlace <span style="color:#dc2626">*</span></label>
+        <textarea id="n-nota" rows="4" placeholder="Seguimiento farmacoterapéutico, intervenciones, pendientes del paciente…"></textarea>
+      </div>
+      <div class="form-actions" style="margin:18px 0 0">
+        <button class="btn-reset" onclick="closeM('modal-nota')">Cancelar</button>
+        <button class="btn-submit" id="btn-save-nota" onclick="guardarNota()">
+          <i class="fa-solid fa-floppy-disk"></i> Guardar enlace
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal detalle / historial del paciente ══ -->
 <div class="modal-overlay" id="modal-det">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 id="det-title">Bitácora</h3>
-      <button class="modal-x" onclick="document.getElementById('modal-det').classList.remove('open')">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <h3 id="det-title">Paciente</h3>
+      <button class="modal-x" onclick="closeM('modal-det')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body" id="det-body"></div>
   </div>
@@ -322,7 +336,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/farmacia-controlados.js"></script>
+<script src="js/farmacia-clinica.js"></script>
 <script src="js/sidebar.js"></script>
 </body>
 </html>
