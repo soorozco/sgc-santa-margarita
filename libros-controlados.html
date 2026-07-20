@@ -278,8 +278,8 @@
           </select>
         </div>
         <div class="form-field">
-          <label>Cantidad <span style="color:#dc2626">*</span></label>
-          <input type="number" min="1" id="m-cantidad" placeholder="Piezas / amp.">
+          <label id="lbl-cantidad">Cantidad <span style="color:#dc2626">*</span></label>
+          <input type="number" min="1" id="m-cantidad" placeholder="Cajas">
         </div>
       </div>
 
@@ -306,7 +306,11 @@
           </div>
           <div class="form-field">
             <label>Médico <span style="color:#dc2626">*</span></label>
-            <input type="text" id="m-medico" placeholder="Nombre del médico">
+            <select id="m-medico" onchange="fillCedula()">
+              <option value="">— Seleccionar médico —</option>
+              <option value="DR. ROGELIO MONTOYA DEL CAMPO">DR. ROGELIO MONTOYA DEL CAMPO</option>
+              <option value="DR. JOSÉ GONZALO VÁZQUEZ CAMACHO">DR. JOSÉ GONZALO VÁZQUEZ CAMACHO</option>
+            </select>
           </div>
           <div class="form-field">
             <label>No. de receta <span style="color:#dc2626">*</span></label>

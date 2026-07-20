@@ -97,7 +97,7 @@ function exportCSV() {
 
   const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`
   const filas = [
-    ['Folio (Receta)', 'Fecha', 'Paciente', 'Fecha nacimiento', 'Uso', 'Cantidad', 'Medicamento', 'Médico', 'Cédula'].map(q).join(','),
+    ['Folio (Receta)', 'Fecha', 'Paciente', 'Fecha nacimiento', 'Uso', 'Cantidad (cajas)', 'Medicamento', 'Médico', 'Cédula'].map(q).join(','),
     ...lista.map(s => [
       s.receta, s.fecha, s.paciente_proveedor, s.fecha_nacimiento || '',
       s.uso || '', s.salida, s.medicamento, s.medico || '', s.cedula_factura || '',

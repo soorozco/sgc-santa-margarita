@@ -5,6 +5,19 @@ let _profile = null
 let _role    = null
 let _movs    = []   // movimientos del medicamento seleccionado (ascendente)
 
+// Médicos autorizados para recetar controlados (con su cédula profesional)
+const MEDICOS = {
+  'DR. ROGELIO MONTOYA DEL CAMPO':      '3174322',
+  'DR. JOSÉ GONZALO VÁZQUEZ CAMACHO':   '677658',
+}
+
+// Autollenar la cédula al elegir el médico (salidas)
+function fillCedula() {
+  const med = document.getElementById('m-medico')?.value
+  const cedEl = document.getElementById('m-cedula')
+  if (cedEl && MEDICOS[med]) cedEl.value = MEDICOS[med]
+}
+
 // ── Init ────────────────────────────────────────────────────────
 async function init() {
   const auth = await requireAuth()
@@ -86,7 +99,7 @@ async function renderLibro() {
   if (balCard) {
     balCard.style.display = 'block'
     balCard.innerHTML = `Existencia actual de <strong>${esc(med)}</strong>:
-      <strong style="font-size:1.2rem;${total < 0 ? 'color:#dc2626' : ''}">${total}</strong>
+      <strong style="font-size:1.2rem;${total < 0 ? 'color:#dc2626' : ''}">${total}</strong> caja${total === 1 ? '' : 's'}
       &nbsp;·&nbsp; ${_movs.length} movimiento${_movs.length !== 1 ? 's' : ''} en el libro`
   }
 
@@ -145,15 +158,21 @@ function toggleTipoMov() {
   if (salidaWrap) salidaWrap.style.display = tipo === 'salida' ? '' : 'none'
   const lblPac = document.getElementById('lbl-pac')
   const lblCed = document.getElementById('lbl-cedula')
+  const lblCant = document.getElementById('lbl-cantidad')
   const pac = document.getElementById('m-pacprov')
+  const cant = document.getElementById('m-cantidad')
   if (tipo === 'salida') {
     if (lblPac) lblPac.innerHTML = 'Paciente <span style="color:#dc2626">*</span>'
     if (lblCed) lblCed.textContent = 'Cédula profesional'
+    if (lblCant) lblCant.innerHTML = 'Cantidad (cajas) <span style="color:#dc2626">*</span>'
     if (pac) pac.placeholder = 'Nombre del paciente'
+    if (cant) cant.placeholder = 'Cajas'
   } else {
     if (lblPac) lblPac.innerHTML = 'Proveedor <span style="color:#dc2626">*</span>'
     if (lblCed) lblCed.textContent = 'No. de factura'
+    if (lblCant) lblCant.innerHTML = 'Cantidad (cajas) <span style="color:#dc2626">*</span>'
     if (pac) pac.placeholder = 'Ej. Laboratorios PISA S.A. de C.V.'
+    if (cant) cant.placeholder = 'Cajas'
   }
 }
 
