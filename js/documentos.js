@@ -192,7 +192,7 @@ function switchTab(tab) {
 // ── Solicitudes de baja pendientes ──────────────────────────────
 async function loadPendingReqs() {
   const { data } = await db.from('document_deactivation_requests')
-    .select('document_id').eq('status', 'pending')
+    .select('document_id, status').in('status', ['pending', 'aceptada'])
   _pendingReqs = new Set((data || []).map(r => r.document_id))
   applyFilters()
 }
@@ -1703,22 +1703,92 @@ function openSolBaja(id) {
   _currentDocId = id
   const doc = _allDocs.find(d => d.id === id)
   if (!doc) return
-  setText('sb-doc-name', doc.name)
+  setText('sb-doc-name', `${doc.code} — ${doc.name}`)
   setVal('sb-reason', '')
+  setVal('sb-motivo', '')
+  setVal('sb-norma', '')
+
+  // Formatos vigentes que pueden sustituir (FT, excepto el actual)
+  const formatos = _allDocs
+    .filter(d => d.document_types?.code_prefix === 'FT' && d.status === 'vigente' && d.id !== id)
+    .sort((a, b) => a.code.localeCompare(b.code))
+  const repl = document.getElementById('sb-replacement')
+  if (repl) repl.innerHTML = `<option value="">— Seleccionar formato —</option>` +
+    formatos.map(d => `<option value="${d.id}">${esc(d.code)} — ${esc(d.name)}</option>`).join('')
+
+  // Procedimientos vigentes (todo lo que no es formato ni externo)
+  const procs = _allDocs
+    .filter(d => {
+      const pre = d.document_types?.code_prefix
+      return pre && pre !== 'FT' && pre !== 'DE' && d.status === 'vigente' && d.id !== id
+    })
+    .sort((a, b) => a.code.localeCompare(b.code))
+  const proc = document.getElementById('sb-procedure')
+  if (proc) proc.innerHTML = `<option value="">— Seleccionar procedimiento —</option>` +
+    procs.map(d => `<option value="${d.id}">${esc(d.code)} — ${esc(d.name)}</option>`).join('')
+
+  onSbMotivo()
   openModal('modal-sol-baja')
 }
 
+// Muestra/oculta campos según el motivo elegido
+function onSbMotivo() {
+  const m = document.getElementById('sb-motivo')?.value
+  const show = (id, on) => { const el = document.getElementById(id); if (el) el.style.display = on ? '' : 'none' }
+  show('sb-sustitucion-wrap', m === 'sustitucion')
+  show('sb-norma-wrap',       m === 'normativo')
+  show('sb-proc-wrap',        !!m)   // procedimiento vinculado para cualquier motivo
+  show('sb-aviso',            !!m)
+}
+
 async function submitSolBaja() {
-  const reason = document.getElementById('sb-reason')?.value.trim() || null
-  if (!reason) { showToast('Escribe el motivo de la solicitud.', 'red'); return }
+  const motivo = document.getElementById('sb-motivo')?.value
+  const detalle = document.getElementById('sb-reason')?.value.trim()
+  if (!motivo) { showToast('Selecciona el motivo de la baja.', 'red'); return }
+
+  const replSel = document.getElementById('sb-replacement')
+  const procSel = document.getElementById('sb-procedure')
+  const norma   = document.getElementById('sb-norma')?.value.trim()
+  const replacementId = replSel?.value || null
+  const procedureId   = procSel?.value || null
+
+  if (motivo === 'sustitucion' && !replacementId) { showToast('Selecciona el formato que lo sustituye.', 'red'); return }
+  if (motivo === 'normativo'   && !norma)         { showToast('Indica la norma que aplica al cambio.', 'red'); return }
+  if (!procedureId)                                { showToast('Selecciona el procedimiento vinculado.', 'red'); return }
+
+  // Texto legible (compatibilidad con vistas de historial)
+  const replTxt = replacementId ? replSel.options[replSel.selectedIndex].text : ''
+  const procTxt = procSel.options[procSel.selectedIndex].text
+  const motLabel = { sustitucion: 'Sustitución por otro formato', normativo: 'Cambio normativo', no_util: 'Ya no es útil' }[motivo]
+  let reason = `${motLabel}.`
+  if (motivo === 'sustitucion') reason += ` Sustituido por: ${replTxt}.`
+  if (motivo === 'normativo')   reason += ` Norma: ${norma}.`
+  reason += ` Procedimiento vinculado: ${procTxt}.`
+  if (detalle) reason += ` ${detalle}`
+
   const btn = document.getElementById('btn-sb-submit')
   btn.disabled = true
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando…'
-  const { error } = await db.from('document_deactivation_requests').insert({
+
+  const payload = {
     document_id:  _currentDocId,
     requested_by: _user.id,
-    reason
-  })
+    reason,
+    motivo_tipo:  motivo,
+    replacement_document_id: replacementId,
+    norma:        motivo === 'normativo' ? norma : null,
+    linked_procedure_id: procedureId,
+  }
+
+  let { error } = await db.from('document_deactivation_requests').insert(payload)
+  // Si aún no existen las columnas nuevas, reintentar con lo básico
+  if (error && (error.message?.includes('motivo_tipo') || error.message?.includes('column'))) {
+    const r2 = await db.from('document_deactivation_requests')
+      .insert({ document_id: _currentDocId, requested_by: _user.id, reason })
+    error = r2.error
+    if (!error) showToast('Enviada, pero falta ejecutar la migración SQL (deactivation_reasons_upgrade.sql).', 'yellow')
+  }
+
   btn.disabled = false
   btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Solicitud'
   if (error) { showToast('Error al enviar solicitud.', 'red'); return }

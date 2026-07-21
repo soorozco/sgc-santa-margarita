@@ -301,15 +301,28 @@ async function submitAltaReview(action) {
 // ── SOLICITUDES DE BAJA ───────────────────────────────────────────
 async function loadBajaReqs() {
   try {
-    const { data, error } = await db
+    let { data, error } = await db
       .from('document_deactivation_requests')
       .select(`
         id, reason, status, created_at, reviewer_comment, reviewed_at,
+        motivo_tipo, norma,
         document:document_id(id, code, name, departments(name)),
+        replacement:replacement_document_id(code, name),
+        procedimiento:linked_procedure_id(code, name),
         requester:requested_by(full_name),
         reviewer:reviewed_by(full_name)
       `)
       .order('created_at', { ascending: false })
+
+    // Respaldo si aún no existen las columnas nuevas (migración pendiente)
+    if (error && (error.message?.includes('motivo_tipo') || error.message?.includes('replacement_document_id') || error.message?.includes('linked_procedure_id'))) {
+      const r2 = await db.from('document_deactivation_requests')
+        .select(`id, reason, status, created_at, reviewer_comment, reviewed_at,
+          document:document_id(id, code, name, departments(name)),
+          requester:requested_by(full_name), reviewer:reviewed_by(full_name)`)
+        .order('created_at', { ascending: false })
+      data = r2.data; error = r2.error
+    }
 
     if (error) {
       console.error('[Solicitudes] loadBajaReqs error:', error)
@@ -338,10 +351,29 @@ async function loadBajaReqs() {
   }
 }
 
+const MOTIVO_LABEL = {
+  sustitucion: 'Sustitución por otro formato',
+  normativo:   'Cambio normativo',
+  no_util:     'Ya no es útil',
+}
+
+// Detalle estructurado del motivo de baja (para la vista del revisor)
+function bajaDetalle(req) {
+  const parts = []
+  if (req.motivo_tipo) {
+    parts.push(`<span style="display:inline-block;background:#eef2ff;color:#4338ca;font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:6px">${esc(MOTIVO_LABEL[req.motivo_tipo] || req.motivo_tipo)}</span>`)
+  }
+  if (req.replacement) parts.push(`<div style="font-size:.78rem;margin-top:4px"><strong>Sustituye por:</strong> ${esc(req.replacement.code)} — ${esc(req.replacement.name)}</div>`)
+  if (req.norma)       parts.push(`<div style="font-size:.78rem;margin-top:4px"><strong>Norma:</strong> ${esc(req.norma)}</div>`)
+  if (req.procedimiento) parts.push(`<div style="font-size:.78rem;margin-top:4px"><strong>Procedimiento vinculado:</strong> ${esc(req.procedimiento.code)} — ${esc(req.procedimiento.name)}</div>`)
+  if (!parts.length) return esc(req.reason || '—')  // solicitudes antiguas
+  return parts.join('')
+}
+
 function renderBajaPending() {
   const tbody = document.getElementById('tbody-baja-pending')
   if (!tbody) return
-  const pending = _bajaReqs.filter(r => r.status === 'pending')
+  const pending = _bajaReqs.filter(r => r.status === 'pending' || r.status === 'aceptada')
 
   const badge = document.getElementById('badge-baja-pending')
   if (badge) { badge.textContent = pending.length; badge.style.display = pending.length ? 'inline-flex' : 'none' }
@@ -351,7 +383,25 @@ function renderBajaPending() {
     return
   }
 
-  tbody.innerHTML = pending.map(req => `
+  tbody.innerHTML = pending.map(req => {
+    const aceptada = req.status === 'aceptada'
+    const acciones = aceptada
+      ? `<div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+           <span class="pill" style="background:#fef3c7;color:#92400e">Aceptada · falta nuevo proceso</span>
+           <button onclick="completeBaja('${req.id}')" class="btn-action blue" style="white-space:nowrap"
+                   title="Se recibió el procedimiento actualizado sin el formato — completar baja">
+             <i class="fa-solid fa-file-circle-check"></i> Recibí el nuevo proceso
+           </button>
+           <button onclick="openRejectBaja('${req.id}')" class="btn-action red" title="Rechazar / revertir">
+             <i class="fa-solid fa-xmark"></i></button>
+         </div>`
+      : `<div class="action-btns">
+           <button onclick="acceptBaja('${req.id}')" class="btn-action green"
+                   title="Aceptar la baja (queda pendiente del procedimiento actualizado)"><i class="fa-solid fa-check"></i></button>
+           <button onclick="openRejectBaja('${req.id}')" class="btn-action red"
+                   title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
+         </div>`
+    return `
     <tr>
       <td>
         <span class="doc-code">${esc(req.document?.code || '—')}</span><br>
@@ -360,22 +410,16 @@ function renderBajaPending() {
       <td>${esc(req.document?.departments?.name || '—')}</td>
       <td>${esc(req.requester?.full_name || '—')}</td>
       <td style="white-space:nowrap">${fmtDate(req.created_at)}</td>
-      <td style="max-width:220px;white-space:pre-wrap;font-size:.82rem">${esc(req.reason || '—')}</td>
-      <td class="center">
-        <div class="action-btns">
-          <button onclick="approveBaja('${req.id}')" class="btn-action green"
-                  title="Aprobar — dar de baja"><i class="fa-solid fa-check"></i></button>
-          <button onclick="openRejectBaja('${req.id}')" class="btn-action red"
-                  title="Rechazar"><i class="fa-solid fa-xmark"></i></button>
-        </div>
-      </td>
-    </tr>`).join('')
+      <td style="max-width:260px">${bajaDetalle(req)}</td>
+      <td class="center">${acciones}</td>
+    </tr>`
+  }).join('')
 }
 
 function renderBajaHistory() {
   const tbody = document.getElementById('tbody-baja-history')
   if (!tbody) return
-  const done = _bajaReqs.filter(r => r.status !== 'pending')
+  const done = _bajaReqs.filter(r => r.status === 'approved' || r.status === 'rejected')
 
   if (!done.length) {
     tbody.innerHTML = emptyRow(6, 'Sin historial')
@@ -403,21 +447,38 @@ function renderBajaHistory() {
   }).join('')
 }
 
-async function approveBaja(reqId) {
-  if (!confirm('¿Confirmas aprobar esta solicitud? El documento pasará a estado Obsoleto.')) return
+// Paso 1: aceptar la baja (el documento sigue vigente hasta recibir el nuevo proceso)
+async function acceptBaja(reqId) {
   const req = _bajaReqs.find(r => r.id === reqId)
   if (!req) return
+  const proc = req.procedimiento ? `${req.procedimiento.code} — ${req.procedimiento.name}` : 'el procedimiento vinculado'
+  if (!confirm(`¿Aceptar la baja de "${req.document?.code}"?\n\nEl documento seguirá vigente hasta que se reciba ${proc} actualizado sin este formato. Después usa "Recibí el nuevo proceso" para completar la baja.`)) return
+
+  const { error } = await db.from('document_deactivation_requests')
+    .update({ status: 'aceptada', reviewed_by: _solUser.id, reviewed_at: new Date().toISOString() })
+    .eq('id', reqId)
+  if (error) { showToast('Error al aceptar la solicitud.', 'red'); return }
+  showToast('Baja aceptada. Falta recibir el procedimiento actualizado.', 'green')
+  await loadBajaReqs()
+}
+
+// Paso 2: se recibió el procedimiento actualizado → completar baja (documento obsoleto)
+async function completeBaja(reqId) {
+  const req = _bajaReqs.find(r => r.id === reqId)
+  if (!req) return
+  if (!confirm(`¿Confirmas que se recibió el procedimiento actualizado sin el formato "${req.document?.code}" (o con el nuevo)?\n\nSe completará la baja y el documento pasará a estado Obsoleto.`)) return
 
   const { error: e1 } = await db.from('documents')
     .update({ status: 'obsoleto' }).eq('id', req.document?.id)
   if (e1) { showToast('Error al actualizar el documento.', 'red'); return }
 
   const { error: e2 } = await db.from('document_deactivation_requests')
-    .update({ status: 'approved', reviewed_by: _solUser.id, reviewed_at: new Date().toISOString() })
+    .update({ status: 'approved', reviewed_by: _solUser.id, reviewed_at: new Date().toISOString(),
+              reviewer_comment: 'Procedimiento actualizado recibido — baja completada.' })
     .eq('id', reqId)
   if (e2) { showToast('Error al actualizar la solicitud.', 'red'); return }
 
-  showToast('Solicitud aprobada. Documento dado de baja.', 'green')
+  showToast('Baja completada. Documento dado de baja.', 'green')
   await loadBajaReqs()
 }
 
@@ -451,7 +512,7 @@ async function submitReject() {
 // ── KPIs y badges ─────────────────────────────────────────────────
 function updateKPIs() {
   const pendingAlta = _altaReqs.filter(r => r.status === 'pending').length
-  const pendingBaja = _bajaReqs.filter(r => r.status === 'pending').length
+  const pendingBaja = _bajaReqs.filter(r => r.status === 'pending' || r.status === 'aceptada').length
 
   setText('kpi-alta-count', pendingAlta)
   setText('kpi-baja-count', pendingBaja)
@@ -515,7 +576,9 @@ document.addEventListener('DOMContentLoaded', () => {
 window.initSolicitudesTab = initSolicitudesTab
 window.openAltaReview     = openAltaReview
 window.submitAltaReview   = submitAltaReview
-window.approveBaja        = approveBaja
+window.acceptBaja         = acceptBaja
+window.completeBaja       = completeBaja
+window.onSbMotivo         = onSbMotivo
 window.openRejectBaja     = openRejectBaja
 window.submitReject       = submitReject
 

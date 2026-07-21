@@ -1101,9 +1101,46 @@
       <p style="font-size:.875rem;color:#374151;margin:0 0 1rem">
         Documento: <strong id="sb-doc-name">—</strong>
       </p>
+
       <div class="field">
-        <label>Motivo de la solicitud <span class="req">*</span></label>
-        <textarea id="sb-reason" rows="4" placeholder="Explica por qué este documento debe darse de baja…" style="width:100%;resize:vertical"></textarea>
+        <label>Motivo de la baja <span class="req">*</span></label>
+        <select id="sb-motivo" onchange="onSbMotivo()" style="width:100%">
+          <option value="">— Seleccionar motivo —</option>
+          <option value="sustitucion">Se sustituye por otro formato</option>
+          <option value="normativo">Cambio normativo</option>
+          <option value="no_util">Ya no es útil (no aplica ni es normativo)</option>
+        </select>
+      </div>
+
+      <!-- Sustitución -->
+      <div class="field" id="sb-sustitucion-wrap" style="display:none">
+        <label>Formato que lo sustituye <span class="req">*</span></label>
+        <select id="sb-replacement" style="width:100%"></select>
+        <small style="color:#6b7280;font-size:.72rem">Solo formatos ya dados de alta y vigentes.</small>
+      </div>
+
+      <!-- Normativo -->
+      <div class="field" id="sb-norma-wrap" style="display:none">
+        <label>Norma que aplica al cambio <span class="req">*</span></label>
+        <input type="text" id="sb-norma" placeholder="Ej. NOM-004-SSA3-2012, actualización 2024" style="width:100%">
+      </div>
+
+      <!-- Procedimiento vinculado (siempre) -->
+      <div class="field" id="sb-proc-wrap" style="display:none">
+        <label>Procedimiento vinculado <span class="req">*</span></label>
+        <select id="sb-procedure" style="width:100%"></select>
+        <small style="color:#6b7280;font-size:.72rem">Procedimiento donde se usa este formato (dados de alta).</small>
+      </div>
+
+      <!-- Aviso -->
+      <div id="sb-aviso" style="display:none;background:#fffbeb;border-left:4px solid #d97706;border-radius:0 8px 8px 0;padding:10px 14px;margin:12px 0;font-size:.8rem;color:#92400e;line-height:1.5">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Para completar la baja se debe <strong>modificar el procedimiento vinculado</strong> y entregarlo sin este formato (o con el nuevo). La solicitud quedará <strong>aceptada</strong> hasta que calidad reciba el procedimiento actualizado.
+      </div>
+
+      <div class="field">
+        <label>Detalle / observaciones</label>
+        <textarea id="sb-reason" rows="3" placeholder="Información adicional (opcional)…" style="width:100%;resize:vertical"></textarea>
       </div>
     </div>
     <div class="modal-foot">
