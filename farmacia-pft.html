@@ -186,6 +186,7 @@
             <label style="display:flex;align-items:center;gap:6px;font-size:.76rem;color:#0f766e;cursor:pointer;font-weight:600">
               <input type="checkbox" id="chk-egresados" onchange="renderCenso()" style="accent-color:#009688"> Ver egresados
             </label>
+            <button class="btn-reset" style="padding:8px 14px;font-size:.8rem" onclick="abrirManagerInt()"><i class="fa-solid fa-diagram-project"></i> Base de interacciones</button>
             <button class="btn-submit" style="padding:8px 16px;font-size:.8rem" onclick="nuevoPFT()"><i class="fa-solid fa-plus"></i> Nuevo perfil</button>
           </span>
         </div>
@@ -239,6 +240,52 @@
       <div style="margin-top:12px;font-size:.74rem;color:#9ca3af">
         <i class="fa-solid fa-circle-check dot-ok"></i> Administrado &nbsp;·&nbsp; <i class="fa-regular fa-circle dot-pend"></i> Pendiente — clic para marcar. Se guarda al instante.
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal base de interacciones ══ -->
+<div class="modal-overlay" id="modal-int">
+  <div class="modal-box" style="max-width:900px">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-diagram-project"></i> Base de interacciones medicamentosas</h3>
+      <button class="modal-x" onclick="closeM('modal-int')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+        <input type="text" id="int-buscar" oninput="renderIntManager()" placeholder="Buscar por sustancia…"
+          style="flex:1;min-width:180px;padding:8px 12px;border:1.5px solid #cbd5e1;border-radius:8px;font-family:inherit;font-size:.85rem">
+        <button class="btn-submit" id="btn-int-nueva" style="padding:8px 14px;font-size:.8rem" onclick="nuevaInt()"><i class="fa-solid fa-plus"></i> Agregar</button>
+      </div>
+      <div id="int-form" style="display:none;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:14px">
+        <div class="grid g3" style="margin-bottom:12px">
+          <div class="fld"><label>Principio activo A *</label><input id="i-a" placeholder="ej. tramadol"></div>
+          <div class="fld"><label>Principio activo B *</label><input id="i-b" placeholder="ej. ondansetron"></div>
+          <div class="fld"><label>Severidad *</label>
+            <select id="i-sev"><option value="contraindicada">Contraindicada</option><option value="mayor">Mayor</option><option value="moderada" selected>Moderada</option><option value="menor">Menor</option></select></div>
+        </div>
+        <div class="fld" style="margin-bottom:10px"><label>Efecto</label><input id="i-efecto"></div>
+        <div class="grid g2" style="margin-bottom:10px">
+          <div class="fld"><label>Mecanismo</label><input id="i-mec"></div>
+          <div class="fld"><label>Recomendación</label><input id="i-rec"></div>
+        </div>
+        <div class="grid g2" style="margin-bottom:12px">
+          <div class="fld"><label>Fuente (cita)</label><input id="i-fuente" placeholder="ej. DDInter 2.0 / FDA"></div>
+          <div class="fld"><label>URL de la fuente</label><input id="i-url" placeholder="https://…"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px">
+          <button class="btn-reset" style="padding:8px 16px;font-size:.82rem" onclick="cancelInt()">Cancelar</button>
+          <button class="btn-submit" style="padding:8px 16px;font-size:.82rem" onclick="guardarInt()"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="hist-table" style="min-width:720px">
+          <thead><tr><th>Sustancias</th><th style="text-align:center">Severidad</th><th>Efecto / recomendación</th><th>Fuente</th><th style="text-align:center">Acc.</th></tr></thead>
+          <tbody id="int-body"><tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:22px">Cargando…</td></tr></tbody>
+        </table>
+      </div>
+      <div style="font-size:.72rem;color:#9ca3af;margin-top:10px"><i class="fa-solid fa-circle-info"></i>
+        Base curada de partida (DDInter 2.0 / FDA). Soporte a la decisión; no sustituye el juicio clínico ni es exhaustiva. Revísala y complétala según tu vademécum.</div>
     </div>
   </div>
 </div>

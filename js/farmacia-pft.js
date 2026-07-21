@@ -5,7 +5,10 @@ let _profile = null
 let _role    = null
 let _pfts    = []
 let _catalogo = []          // catálogo maestro de medicamentos
-let _catByName = {}         // nombre → {atc, alto_riesgo}
+let _catByName = {}         // nombre → {atc, alto_riesgo, ingrediente}
+let _interacciones = []     // base de interacciones medicamentosas
+let _intMap = {}            // "ing_a|ing_b" (ordenado) → interacción
+let _editInt = null         // interacción en edición (manager)
 let _edit    = null         // PFT en edición (objeto)
 let _adminPft = null        // PFT del modal de administración
 
@@ -43,6 +46,7 @@ async function init() {
   if (d) d.textContent = new Date().toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long', year:'numeric' })
 
   await loadCatalogo()
+  await loadInteracciones()
   await loadPFTs()
 }
 
@@ -59,9 +63,56 @@ async function loadCatalogo() {
   const { data } = await db.from('pharmacy_med_catalog').select('*').eq('activo', true).order('nombre')
   _catalogo = data || []
   _catByName = {}
-  _catalogo.forEach(m => { _catByName[m.nombre.toUpperCase()] = { atc: m.atc, alto_riesgo: m.alto_riesgo } })
+  _catalogo.forEach(m => { _catByName[m.nombre.toUpperCase()] = { atc: m.atc, alto_riesgo: m.alto_riesgo, ingrediente: m.ingrediente } })
   const dl = document.getElementById('dl-meds')
   if (dl) dl.innerHTML = _catalogo.map(m => `<option value="${esc(m.nombre)}">`).join('')
+}
+
+// ── Interacciones medicamentosas ────────────────────────────────
+async function loadInteracciones() {
+  const { data } = await db.from('pharmacy_interactions').select('*').eq('activo', true)
+  _interacciones = data || []
+  _intMap = {}
+  _interacciones.forEach(it => {
+    const key = [it.ingrediente_a, it.ingrediente_b].map(s => (s||'').toLowerCase().trim()).sort().join('|')
+    _intMap[key] = it
+  })
+}
+
+const SEV = {
+  contraindicada: { rank: 4, label: 'Contraindicada', bg: '#7f1d1d', soft: '#fef2f2', txt: '#7f1d1d', bd: '#fecaca' },
+  mayor:          { rank: 3, label: 'Mayor',          bg: '#dc2626', soft: '#fef2f2', txt: '#991b1b', bd: '#fecaca' },
+  moderada:       { rank: 2, label: 'Moderada',       bg: '#d97706', soft: '#fffbeb', txt: '#92400e', bd: '#fde68a' },
+  menor:          { rank: 1, label: 'Menor',          bg: '#2563eb', soft: '#eff6ff', txt: '#1d4ed8', bd: '#bfdbfe' },
+}
+
+// Principio activo de un medicamento (catálogo o, si no está, se deduce del nombre)
+function ingredienteDe(medNombre) {
+  const info = _catByName[String(medNombre || '').toUpperCase()]
+  if (info?.ingrediente) return info.ingrediente.toLowerCase().trim()
+  // fallback: texto antes del primer paréntesis
+  return String(medNombre || '').split('(')[0].toLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+// Detecta interacciones entre los medicamentos activos (no suspendidos)
+function checkInteracciones(meds) {
+  const activos = (meds || []).filter(m => m.categoria !== 'suspendidos')
+  const items = activos.map(m => ({ med: m.medicamento, ing: ingredienteDe(m.medicamento) }))
+  const found = []
+  const vistos = new Set()
+  for (let i = 0; i < items.length; i++) {
+    for (let j = i + 1; j < items.length; j++) {
+      const a = items[i].ing, b = items[j].ing
+      if (!a || !b || a === b) continue
+      const key = [a, b].sort().join('|')
+      const it = _intMap[key]
+      if (it && !vistos.has(key + '#' + items[i].med + items[j].med)) {
+        vistos.add(key + '#' + items[i].med + items[j].med)
+        found.push({ ...it, medA: items[i].med, medB: items[j].med })
+      }
+    }
+  }
+  return found.sort((x, y) => (SEV[y.severidad]?.rank||0) - (SEV[x.severidad]?.rank||0))
 }
 
 // ── Cálculos automáticos ────────────────────────────────────────
@@ -132,12 +183,15 @@ function renderCenso() {
     const riesgo = activos.filter(m => m.alto_riesgo).length
     const alta = p.activo === false
     const conflicto = activos.some(m => medConflictoAlergia(m.medicamento, p.alergias))
+    const inter = checkInteracciones(meds)
+    const interGraves = inter.filter(x => ['contraindicada','mayor'].includes(x.severidad)).length
     return `<tr style="${alta ? 'opacity:.55' : ''}">
       <td><strong>${esc(p.paciente)}</strong></td>
       <td>${esc(p.folio_exp || '—')}</td>
       <td>${fmtF(p.fecha_ingreso)}</td>
       <td style="max-width:160px">${esc(p.medico_tratante || '—')}</td>
-      <td style="text-align:center">${activos.length}</td>
+      <td style="text-align:center">${activos.length}${inter.length
+        ? ` <span title="${inter.length} interacción(es) detectada(s)${interGraves ? `, ${interGraves} grave(s)` : ''}" style="cursor:help;background:${interGraves ? '#fee2e2' : '#fffbeb'};color:${interGraves ? '#991b1b' : '#92400e'};font-size:.62rem;font-weight:800;padding:2px 6px;border-radius:5px"><i class="fa-solid fa-diagram-project"></i> ${inter.length}</span>` : ''}</td>
       <td style="text-align:center">${riesgo ? `<span class="badge-riesgo">${riesgo}</span>` : '<span style="color:#9ca3af">0</span>'}</td>
       <td style="max-width:150px">${p.alergias
         ? `<span style="color:#b91c1c;font-weight:600">${esc(p.alergias)}</span>${conflicto ? ' <i class="fa-solid fa-triangle-exclamation" title="Hay un medicamento en conflicto con la alergia" style="color:#dc2626"></i>' : ''}`
@@ -206,6 +260,7 @@ function buildEditor() {
 
   box.innerHTML = `
     <div id="pft-alerta" class="alerta" style="display:none"></div>
+    <div id="pft-interacciones"></div>
 
     <div class="pft-card">
       <div class="pft-head h-teal"><i class="fa-solid fa-id-card"></i> Datos generales del paciente</div>
@@ -339,6 +394,43 @@ function recalc() {
         <span><strong>Conflicto con alergias:</strong> hay ${conflictos.length} medicamento(s) que coinciden con lo que el paciente reporta como alergia. Revisa antes de continuar.</span>`
     } else { al.style.display = 'none' }
   }
+
+  renderInteraccionesPanel(collectMeds())
+}
+
+// Panel de interacciones dentro del editor
+function renderInteraccionesPanel(meds) {
+  const box = document.getElementById('pft-interacciones')
+  if (!box) return
+  const found = checkInteracciones(meds)
+  if (!found.length) {
+    box.innerHTML = `<div class="pft-card"><div class="pft-head h-teal"><i class="fa-solid fa-diagram-project"></i>
+      Interacciones medicamentosas</div>
+      <div class="pft-body" style="font-size:.85rem;color:#0f766e"><i class="fa-solid fa-circle-check"></i>
+      Sin interacciones detectadas entre los medicamentos activos, según la base del hospital.</div></div>`
+    return
+  }
+  const cards = found.map(it => {
+    const s = SEV[it.severidad] || SEV.moderada
+    return `<div style="border:1.5px solid ${s.bd};background:${s.soft};border-radius:10px;padding:12px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <span style="background:${s.bg};color:#fff;font-size:.66rem;font-weight:800;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.03em">${s.label}</span>
+        <strong style="color:${s.txt};font-size:.9rem">${esc(it.medA)} ↔ ${esc(it.medB)}</strong>
+      </div>
+      <div style="font-size:.85rem;color:#374151;line-height:1.5">${esc(it.efecto||'')}</div>
+      ${it.mecanismo ? `<div style="font-size:.78rem;color:#6b7280;margin-top:4px"><strong>Mecanismo:</strong> ${esc(it.mecanismo)}</div>` : ''}
+      ${it.recomendacion ? `<div style="font-size:.78rem;color:#374151;margin-top:4px"><strong>Recomendación:</strong> ${esc(it.recomendacion)}</div>` : ''}
+      ${it.fuente ? `<div style="font-size:.72rem;color:#9ca3af;margin-top:6px"><i class="fa-solid fa-book"></i> ${esc(it.fuente)}${it.fuente_url ? ` · <a href="${esc(it.fuente_url)}" target="_blank" rel="noopener" style="color:#0f766e">ver fuente</a>` : ''}</div>` : ''}
+    </div>`
+  }).join('')
+  const graves = found.filter(f => ['contraindicada','mayor'].includes(f.severidad)).length
+  box.innerHTML = `<div class="pft-card"><div class="pft-head h-red" style="justify-content:space-between">
+      <span><i class="fa-solid fa-diagram-project"></i> Interacciones medicamentosas — ${found.length} detectada(s)${graves ? ` · ${graves} grave(s)` : ''}</span></div>
+    <div class="pft-body">
+      ${cards}
+      <div style="font-size:.72rem;color:#9ca3af;margin-top:2px"><i class="fa-solid fa-circle-info"></i>
+        Soporte a la decisión; no sustituye el juicio clínico ni es exhaustivo. Las alertas se basan en la base curada del hospital (validada por farmacia).</div>
+    </div></div>`
 }
 
 async function guardarPFT() {
@@ -459,6 +551,101 @@ async function toggleAdmin(mid, hora) {
   const idx = _pfts.findIndex(p => p.id === _adminPft.id)
   if (idx >= 0) _pfts[idx].administraciones = adm
   renderSched()
+}
+
+// ── Manager de la base de interacciones ─────────────────────────
+function canEditInt() { return ['administrador', 'responsable_calidad'].includes(_role) }
+
+function abrirManagerInt() {
+  const btn = document.getElementById('btn-int-nueva')
+  if (btn) btn.style.display = canEditInt() ? '' : 'none'
+  cancelInt()
+  renderIntManager()
+  openM('modal-int')
+}
+
+function renderIntManager() {
+  const tb = document.getElementById('int-body')
+  if (!tb) return
+  const q = (document.getElementById('int-buscar')?.value || '').toLowerCase().trim()
+  const lista = _interacciones
+    .filter(it => !q || (it.ingrediente_a + ' ' + it.ingrediente_b).toLowerCase().includes(q))
+    .sort((a, b) => (SEV[b.severidad]?.rank||0) - (SEV[a.severidad]?.rank||0))
+  if (!lista.length) {
+    tb.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:22px">Sin interacciones${q ? ' para la búsqueda' : ''}.</td></tr>`
+    return
+  }
+  const edit = canEditInt()
+  tb.innerHTML = lista.map(it => {
+    const s = SEV[it.severidad] || SEV.moderada
+    return `<tr>
+      <td><strong>${esc(it.ingrediente_a)}</strong> ↔ <strong>${esc(it.ingrediente_b)}</strong></td>
+      <td style="text-align:center"><span style="background:${s.bg};color:#fff;font-size:.64rem;font-weight:800;padding:2px 8px;border-radius:6px;text-transform:uppercase">${s.label}</span></td>
+      <td style="max-width:280px;font-size:.8rem">${esc(it.efecto||'')}${it.recomendacion ? `<div style="color:#6b7280;margin-top:2px">${esc(it.recomendacion)}</div>` : ''}</td>
+      <td style="font-size:.74rem;color:#6b7280">${esc(it.fuente||'—')}${it.fuente_url ? ` · <a href="${esc(it.fuente_url)}" target="_blank" rel="noopener" style="color:#0f766e">↗</a>` : ''}</td>
+      <td style="text-align:center;white-space:nowrap">${edit
+        ? `<button class="btn-action" onclick="editInt('${it.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+           <button class="btn-action del" onclick="delInt('${it.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>`
+        : '<span style="color:#9ca3af">—</span>'}</td>
+    </tr>`
+  }).join('')
+}
+
+function nuevaInt() {
+  _editInt = null
+  ;['i-a','i-b','i-efecto','i-mec','i-rec','i-fuente','i-url'].forEach(id => setVal(id, ''))
+  setVal('i-sev', 'moderada')
+  document.getElementById('int-form').style.display = 'block'
+}
+function editInt(id) {
+  const it = _interacciones.find(x => x.id === id); if (!it) return
+  _editInt = it
+  setVal('i-a', it.ingrediente_a); setVal('i-b', it.ingrediente_b); setVal('i-sev', it.severidad)
+  setVal('i-efecto', it.efecto || ''); setVal('i-mec', it.mecanismo || '')
+  setVal('i-rec', it.recomendacion || ''); setVal('i-fuente', it.fuente || ''); setVal('i-url', it.fuente_url || '')
+  document.getElementById('int-form').style.display = 'block'
+}
+function cancelInt() { const f = document.getElementById('int-form'); if (f) f.style.display = 'none'; _editInt = null }
+
+async function guardarInt() {
+  const a = val('i-a').trim().toLowerCase(), b = val('i-b').trim().toLowerCase()
+  if (!a || !b) { toast('Indica ambos principios activos.', 'red'); return }
+  if (a === b) { toast('Deben ser dos sustancias distintas.', 'red'); return }
+  const [ia, ib] = [a, b].sort()
+  const payload = {
+    ingrediente_a: ia, ingrediente_b: ib,
+    severidad: val('i-sev'),
+    efecto: val('i-efecto').trim() || null,
+    mecanismo: val('i-mec').trim() || null,
+    recomendacion: val('i-rec').trim() || null,
+    fuente: val('i-fuente').trim() || null,
+    fuente_url: val('i-url').trim() || null,
+    updated_at: new Date().toISOString(),
+  }
+  let error
+  if (_editInt) {
+    ;({ error } = await db.from('pharmacy_interactions').update(payload).eq('id', _editInt.id))
+  } else {
+    payload.created_by = _user.id
+    ;({ error } = await db.from('pharmacy_interactions').insert(payload))
+  }
+  if (error) { toast('Error al guardar: ' + error.message, 'red'); return }
+  toast(_editInt ? 'Interacción actualizada.' : 'Interacción agregada.', 'green')
+  cancelInt()
+  await loadInteracciones()
+  renderIntManager()
+  if (document.getElementById('editor').classList.contains('open')) recalc()
+  renderCenso()
+}
+
+async function delInt(id) {
+  if (!confirm('¿Eliminar esta interacción de la base?')) return
+  const { error } = await db.from('pharmacy_interactions').delete().eq('id', id)
+  if (error) { toast('Error al eliminar: ' + error.message, 'red'); return }
+  toast('Interacción eliminada.', 'green')
+  await loadInteracciones(); renderIntManager()
+  if (document.getElementById('editor').classList.contains('open')) recalc()
+  renderCenso()
 }
 
 // ── Toast ───────────────────────────────────────────────────────
