@@ -263,7 +263,7 @@ function buildEditor() {
     <div class="pft-card">
       <div class="pft-head ${cat.cls}"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</div>
       <div class="pft-body" style="padding:0;overflow-x:auto">
-        <table class="med-table" style="min-width:1320px">
+        <table class="med-table" style="width:100%;min-width:1180px">
           <thead><tr>
             <th style="min-width:230px">Medicamento</th><th style="min-width:90px">Dosis</th><th style="min-width:150px">Vía</th>
             <th style="min-width:130px">Inicio</th><th style="min-width:130px">Término</th><th style="min-width:150px">Frecuencia</th><th style="min-width:100px">Horario</th><th style="min-width:170px">ATC</th><th style="min-width:130px">Obs.</th><th style="min-width:74px"></th>
