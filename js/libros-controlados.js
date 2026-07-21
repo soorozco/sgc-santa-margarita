@@ -112,7 +112,7 @@ async function renderLibro() {
 
   const canDelete = ['administrador', 'responsable_calidad'].includes(_role)
 
-  tbody.innerHTML = rows.slice().reverse().map(m => `<tr>
+  tbody.innerHTML = rows.map(m => `<tr>
     <td>${fmtFecha(m.fecha)}</td>
     <td style="max-width:190px">${esc(m.paciente_proveedor || '—')}
       ${m.medico ? `<div style="font-size:.7rem;color:#9ca3af">Dr(a). ${esc(m.medico)}</div>` : ''}</td>
