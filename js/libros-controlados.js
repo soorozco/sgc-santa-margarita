@@ -4,6 +4,7 @@ let _user    = null
 let _profile = null
 let _role    = null
 let _movs    = []   // movimientos del medicamento seleccionado (ascendente)
+let _editMovId = null   // id del movimiento en edición (null = nuevo)
 
 // Médicos autorizados para recetar controlados (con su cédula profesional)
 const MEDICOS = {
@@ -127,8 +128,9 @@ async function renderLibro() {
       ? `<span style="color:#b91c1c;font-weight:700">−${m.salida}</span>` : '—'}</td>
     <td style="text-align:center;font-weight:800;${m._total < 0 ? 'color:#dc2626' : ''}">${m._total}</td>
     <td style="max-width:140px;font-size:.75rem">${esc(m.observaciones || '')}</td>
-    <td style="text-align:center">${canDelete
-      ? `<button class="btn-action del" onclick="eliminar('${m.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>`
+    <td style="text-align:center;white-space:nowrap">${canDelete
+      ? `<button class="btn-action" onclick="editarMov('${m.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button>
+         <button class="btn-action del" onclick="eliminar('${m.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button>`
       : '—'}</td>
   </tr>`).join('')
 }
@@ -143,12 +145,48 @@ function fmtFecha(f) {
 function openMov() {
   const med = document.getElementById('f-med')?.value
   if (!med) return
+  _editMovId = null
   setText('mov-title', `Registrar movimiento — ${med}`)
   ;['m-cantidad','m-pacprov','m-nacimiento','m-medico','m-receta',
     'm-direccion','m-cedula','m-lote','m-cad','m-obs'].forEach(id => setVal(id, ''))
   setVal('m-fecha', hoy())
   setVal('m-tipo', 'salida')
   toggleTipoMov()
+  const btn = document.getElementById('btn-save-mov')
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar en libro'
+  document.getElementById('modal-mov').classList.add('open')
+}
+
+// Editar un movimiento existente (reutiliza el modal)
+function editarMov(id) {
+  const m = _movs.find(x => x.id === id)
+  if (!m) return
+  _editMovId = id
+  setText('mov-title', `Editar movimiento — ${m.medicamento}`)
+  const tipo = m.entrada != null ? 'entrada' : 'salida'
+  setVal('m-tipo', tipo)
+  setVal('m-fecha', m.fecha || hoy())
+  setVal('m-cantidad', tipo === 'entrada' ? m.entrada : m.salida)
+  setVal('m-pacprov', m.paciente_proveedor || '')
+  setVal('m-nacimiento', m.fecha_nacimiento || '')
+  setVal('m-receta', m.receta || '')
+  setVal('m-direccion', m.direccion || '')
+  setVal('m-cedula', m.cedula_factura || '')
+  setVal('m-lote', m.lote || '')
+  setVal('m-cad', m.cad || '')
+  setVal('m-obs', m.observaciones || '')
+  if (m.uso) setVal('m-uso', m.uso)
+  // Médico: si el guardado no está en el catálogo, agregarlo como opción temporal
+  const medSel = document.getElementById('m-medico')
+  if (medSel) {
+    if (m.medico && ![...medSel.options].some(o => o.value === m.medico)) {
+      medSel.insertAdjacentHTML('beforeend', `<option value="${esc(m.medico)}">${esc(m.medico)}</option>`)
+    }
+    medSel.value = m.medico || ''
+  }
+  toggleTipoMov()
+  const btn = document.getElementById('btn-save-mov')
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios'
   document.getElementById('modal-mov').classList.add('open')
 }
 
@@ -202,8 +240,8 @@ async function guardarMov() {
     lote: document.getElementById('m-lote')?.value.trim() || null,
     cad:  document.getElementById('m-cad')?.value || null,
     observaciones: document.getElementById('m-obs')?.value.trim() || null,
-    created_by: _user.id,
-    created_by_name: _profile?.full_name || _user.email,
+    // Al editar una entrada, limpiar los campos de salida (y viceversa)
+    fecha_nacimiento: null, medico: null, receta: null, uso: null,
   }
 
   if (tipo === 'salida') {
@@ -215,20 +253,29 @@ async function guardarMov() {
     if (!payload.receta) { toast('Indica el número de receta.', 'red'); return }
   }
 
-  // Verificar balance
+  // Verificar balance (excluyendo el propio movimiento si se está editando)
   let total = 0
-  _movs.forEach(m => { total += (m.entrada || 0) - (m.salida || 0) })
+  _movs.forEach(m => { if (m.id !== _editMovId) total += (m.entrada || 0) - (m.salida || 0) })
   const nuevo = total + (payload.entrada || 0) - (payload.salida || 0)
   if (nuevo < 0 && !confirm(`La existencia quedaría en ${nuevo} (negativa). ¿Registrar de todos modos?`)) return
 
   const btn = document.getElementById('btn-save-mov')
   btn.disabled = true
-  const { error } = await db.from('pharmacy_ledger_entries').insert(payload)
+
+  let error
+  if (_editMovId) {
+    ;({ error } = await db.from('pharmacy_ledger_entries').update(payload).eq('id', _editMovId))
+  } else {
+    payload.created_by = _user.id
+    payload.created_by_name = _profile?.full_name || _user.email
+    ;({ error } = await db.from('pharmacy_ledger_entries').insert(payload))
+  }
   btn.disabled = false
 
   if (error) { toast('Error al guardar: ' + error.message, 'red'); return }
-  toast('Movimiento registrado en el libro.', 'green')
+  toast(_editMovId ? 'Movimiento actualizado.' : 'Movimiento registrado en el libro.', 'green')
   document.getElementById('modal-mov').classList.remove('open')
+  _editMovId = null
   await renderLibro()
 }
 
