@@ -22,15 +22,32 @@ const CATEGORIAS = [
 
 const VIAS = ['Intravenosa', 'Subcutánea', 'Vía oral', 'Transdérmica', 'Intramuscular']
 const FRECUENCIAS = ['Cada 4hrs', 'Cada 6hrs', 'Cada 8hrs', 'Cada 12hrs', 'Cada 24hrs', 'PVM', 'PRN', 'Dosis respuesta']
+// [código, descripción completa, etiqueta corta (para el select del renglón)]
 const ATC = [
-  ['A','Tracto alimentario y metabolismo'],['B','Sangre y órganos hematopoyéticos'],
-  ['C','Sistema cardiovascular'],['D','Dermatológicos'],
-  ['G','Sistema genitourinario y hormonas sexuales'],['H','Preparados hormonales sistémicos'],
-  ['J','Antiinfecciosos de uso sistémico'],['L','Antineoplásicos e inmunomoduladores'],
-  ['M','Sistema musculoesquelético'],['N','Sistema nervioso'],
-  ['P','Antiparasitarios, insecticidas y repelentes'],['R','Sistema respiratorio'],
-  ['S','Órganos de los sentidos'],['V','Varios'],['W','Cosméticos'],['X','Alimentos y dietéticos'],
+  ['A','Tracto alimentario y metabolismo','Alimentario/metab.'],['B','Sangre y órganos hematopoyéticos','Sangre'],
+  ['C','Sistema cardiovascular','Cardiovascular'],['D','Dermatológicos','Dermatológicos'],
+  ['G','Sistema genitourinario y hormonas sexuales','Genitourinario'],['H','Preparados hormonales sistémicos','Hormonal'],
+  ['J','Antiinfecciosos de uso sistémico','Antiinfecciosos'],['L','Antineoplásicos e inmunomoduladores','Antineoplásicos'],
+  ['M','Sistema musculoesquelético','Musculoesquelético'],['N','Sistema nervioso','Sist. nervioso'],
+  ['P','Antiparasitarios, insecticidas y repelentes','Antiparasitarios'],['R','Sistema respiratorio','Respiratorio'],
+  ['S','Órganos de los sentidos','Sentidos'],['V','Varios','Varios'],['W','Cosméticos','Cosméticos'],['X','Alimentos y dietéticos','Alimentos/dietéticos'],
 ]
+
+// Vía de administración por defecto según la forma (fallback si no está en el catálogo)
+function viaDefaultDe(medNombre) {
+  const info = _catByName[String(medNombre || '').toUpperCase()]
+  if (info?.via) return info.via
+  const n = String(medNombre || '').toUpperCase()
+  if (/ENOXAPARINA/.test(n)) return 'Subcutánea'
+  if (/\bTAB\b|TABLETA|GRAGEA|C[AÁ]PSULA|COMPRIMIDO|GOTAS/.test(n)) return 'Vía oral'
+  if (/PARCHE/.test(n)) return 'Transdérmica'
+  if (/\bINY\b|SOL\.?\s*INY|AMPOLLETA|VIAL/.test(n)) return 'Intravenosa'
+  return ''
+}
+// ¿Es una forma oral (para alertar si se marca IV/IM/SC)?
+function esFormaOral(medNombre) {
+  return /\bTAB\b|TABLETA|GRAGEA|C[AÁ]PSULA|COMPRIMIDO|GOTAS/.test(String(medNombre || '').toUpperCase())
+}
 
 // ── Init ────────────────────────────────────────────────────────
 async function init() {
@@ -63,7 +80,7 @@ async function loadCatalogo() {
   const { data } = await db.from('pharmacy_med_catalog').select('*').eq('activo', true).order('nombre')
   _catalogo = data || []
   _catByName = {}
-  _catalogo.forEach(m => { _catByName[m.nombre.toUpperCase()] = { atc: m.atc, alto_riesgo: m.alto_riesgo, ingrediente: m.ingrediente } })
+  _catalogo.forEach(m => { _catByName[m.nombre.toUpperCase()] = { atc: m.atc, alto_riesgo: m.alto_riesgo, ingrediente: m.ingrediente, via: m.via_default } })
   const dl = document.getElementById('dl-meds')
   if (dl) dl.innerHTML = _catalogo.map(m => `<option value="${esc(m.nombre)}">`).join('')
 }
@@ -232,8 +249,8 @@ function optionList(arr, sel) {
   return arr.map(o => `<option value="${esc(o)}"${o === sel ? ' selected' : ''}>${esc(o)}</option>`).join('')
 }
 function atcOptions(sel) {
-  return `<option value="">—</option>` + ATC.map(([c,t]) =>
-    `<option value="${c}"${c === sel ? ' selected' : ''}>${c} · ${esc(t)}</option>`).join('')
+  return `<option value="">—</option>` + ATC.map(([c,t,short]) =>
+    `<option value="${c}"${c === sel ? ' selected' : ''} title="${esc(t)}">${c} — ${esc(short)}</option>`).join('')
 }
 
 function buildEditor() {
@@ -246,10 +263,10 @@ function buildEditor() {
     <div class="pft-card">
       <div class="pft-head ${cat.cls}"><i class="fa-solid ${cat.icon}"></i> ${cat.label}</div>
       <div class="pft-body" style="padding:0;overflow-x:auto">
-        <table class="med-table" style="min-width:1040px">
+        <table class="med-table" style="min-width:1320px">
           <thead><tr>
-            <th style="min-width:230px">Medicamento</th><th>Dosis</th><th>Vía</th>
-            <th>Inicio</th><th>Término</th><th>Frecuencia</th><th>Horario</th><th>ATC</th><th>Obs.</th><th></th>
+            <th style="min-width:230px">Medicamento</th><th style="min-width:90px">Dosis</th><th style="min-width:150px">Vía</th>
+            <th style="min-width:130px">Inicio</th><th style="min-width:130px">Término</th><th style="min-width:150px">Frecuencia</th><th style="min-width:100px">Horario</th><th style="min-width:170px">ATC</th><th style="min-width:130px">Obs.</th><th style="min-width:74px"></th>
           </tr></thead>
           <tbody id="tb-${cat.key}">${rows.map(m => medRowHtml(cat.key, m)).join('')}</tbody>
         </table>
@@ -307,12 +324,12 @@ function medRowHtml(catKey, m) {
     <td><input list="dl-meds" class="m-nombre" value="${esc(m.medicamento||'')}" oninput="onMedName(this)" placeholder="Buscar medicamento…">
         <span class="m-flags" style="display:block;margin-top:3px"></span></td>
     <td><input class="m-dosis" value="${esc(m.dosis||'')}" style="min-width:70px" placeholder="mg / mEq"></td>
-    <td><select class="m-via"><option value="">—</option>${optionList(VIAS, m.via)}</select></td>
+    <td><select class="m-via" onchange="recalc()" style="min-width:135px"><option value="">—</option>${optionList(VIAS, m.via)}</select></td>
     <td><input type="date" class="m-inicio" value="${esc(m.inicio||'')}"></td>
     <td><input type="date" class="m-termino" value="${esc(m.termino||'')}"></td>
-    <td><select class="m-frec"><option value="">—</option>${optionList(FRECUENCIAS, m.frecuencia)}</select></td>
+    <td><select class="m-frec" style="min-width:135px"><option value="">—</option>${optionList(FRECUENCIAS, m.frecuencia)}</select></td>
     <td><input class="m-horario" value="${esc(m.horario||'')}" style="min-width:90px" placeholder="8, 16, 24"></td>
-    <td><select class="m-atc" style="min-width:70px">${atcOptions(m.atc)}</select></td>
+    <td><select class="m-atc" style="min-width:155px">${atcOptions(m.atc)}</select></td>
     <td><input class="m-obs" value="${esc(m.observaciones||'')}" style="min-width:120px"></td>
     <td style="white-space:nowrap">${medActions(catKey)}</td>
   </tr>`
@@ -358,14 +375,18 @@ function reactivarMed(btn) {
   recalc()
 }
 
-// Autollenar ATC y alto riesgo al elegir del catálogo + chequeo de alergias
+// Autollenar ATC, vía y alto riesgo al elegir del catálogo + chequeo de alergias
 function onMedName(inp) {
-  const nombre = inp.value.trim().toUpperCase()
-  const info = _catByName[nombre]
+  const nombre = inp.value.trim()
+  const info = _catByName[nombre.toUpperCase()]
   const tr = inp.closest('tr')
-  if (info) {
-    const atcSel = tr.querySelector('.m-atc')
-    if (atcSel && info.atc && !atcSel.value) atcSel.value = info.atc
+  const atcSel = tr.querySelector('.m-atc')
+  const viaSel = tr.querySelector('.m-via')
+  if (info && atcSel && info.atc && !atcSel.value) atcSel.value = info.atc
+  // Vía por defecto según la forma (solo si aún está vacía)
+  if (viaSel && !viaSel.value) {
+    const vd = viaDefaultDe(nombre)
+    if (vd) viaSel.value = vd
   }
   recalc()
 }
@@ -410,11 +431,16 @@ function recalc() {
     const conf = tr.dataset.cat !== 'suspendidos' ? medConflictoAlergia(nombre, alergias) : null
     tr.classList.toggle('row-riesgo', riesgo && !conf)
     tr.classList.toggle('row-alergia', !!conf)
+    // Vía incoherente: forma oral marcada como parenteral
+    const via = tr.querySelector('.m-via')?.value || ''
+    const viaMala = esFormaOral(nombre) && ['Intravenosa', 'Intramuscular', 'Subcutánea'].includes(via)
+    tr.classList.toggle('row-viamala', viaMala)
     const flags = tr.querySelector('.m-flags')
     if (flags) {
       let h = ''
       if (riesgo) h += '<span class="badge-riesgo">ALTO RIESGO</span> '
-      if (conf) h += `<span class="badge-riesgo" style="background:#dc2626;color:#fff">⚠ ALERGIA: ${esc(conf)}</span>`
+      if (conf) h += `<span class="badge-riesgo" style="background:#dc2626;color:#fff">⚠ ALERGIA: ${esc(conf)}</span> `
+      if (viaMala) h += `<span class="badge-riesgo" style="background:#b45309;color:#fff">⚠ Vía: forma oral marcada como ${esc(via)}</span>`
       flags.innerHTML = h
     }
     if (conf && nombre) conflictos.push(nombre)
