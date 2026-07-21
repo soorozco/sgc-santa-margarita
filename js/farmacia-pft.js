@@ -314,8 +314,16 @@ function medRowHtml(catKey, m) {
     <td><input class="m-horario" value="${esc(m.horario||'')}" style="min-width:90px" placeholder="8, 16, 24"></td>
     <td><select class="m-atc" style="min-width:70px">${atcOptions(m.atc)}</select></td>
     <td><input class="m-obs" value="${esc(m.observaciones||'')}" style="min-width:120px"></td>
-    <td><button class="btn-row-x" onclick="delMed(this)" title="Quitar"><i class="fa-solid fa-trash"></i></button></td>
+    <td style="white-space:nowrap">${medActions(catKey)}</td>
   </tr>`
+}
+
+// Botones de acción del renglón según la categoría
+function medActions(catKey) {
+  const susp = catKey === 'suspendidos'
+    ? `<button class="btn-row-susp" onclick="reactivarMed(this)" title="Reactivar medicamento"><i class="fa-solid fa-rotate-left"></i></button>`
+    : `<button class="btn-row-susp" onclick="suspenderMed(this)" title="Suspender medicamento"><i class="fa-solid fa-ban"></i></button>`
+  return `${susp} <button class="btn-row-x" onclick="delMed(this)" title="Quitar"><i class="fa-solid fa-trash"></i></button>`
 }
 
 function addMed(catKey) {
@@ -323,6 +331,32 @@ function addMed(catKey) {
   if (tb) { tb.insertAdjacentHTML('beforeend', medRowHtml(catKey, {})); recalc() }
 }
 function delMed(btn) { btn.closest('tr').remove(); recalc() }
+
+// Mover un medicamento a "Medicamentos suspendidos"
+function suspenderMed(btn) {
+  const tr = btn.closest('tr')
+  const tb = document.getElementById('tb-suspendidos')
+  if (!tb || !tr) return
+  tr.dataset.prevCat = tr.dataset.cat   // recordar de dónde venía
+  tr.dataset.cat = 'suspendidos'
+  tb.appendChild(tr)
+  tr.lastElementChild.innerHTML = medActions('suspendidos')
+  recalc()
+}
+
+// Regresar un medicamento suspendido a su categoría anterior
+function reactivarMed(btn) {
+  const tr = btn.closest('tr')
+  if (!tr) return
+  const target = (tr.dataset.prevCat && tr.dataset.prevCat !== 'suspendidos') ? tr.dataset.prevCat : 'conciliados'
+  const tb = document.getElementById('tb-' + target)
+  if (!tb) return
+  tr.dataset.cat = target
+  delete tr.dataset.prevCat
+  tb.appendChild(tr)
+  tr.lastElementChild.innerHTML = medActions(target)
+  recalc()
+}
 
 // Autollenar ATC y alto riesgo al elegir del catálogo + chequeo de alergias
 function onMedName(inp) {
