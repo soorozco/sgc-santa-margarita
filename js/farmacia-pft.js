@@ -64,6 +64,7 @@ async function init() {
 
   await loadCatalogo()
   await loadInteracciones()
+  fillFiltroArea()
   await loadPFTs()
 }
 
@@ -167,13 +168,46 @@ function medConflictoAlergia(medNombre, alergiasTxt) {
   return hit || null
 }
 
+// ── Filtros de área / habitación ────────────────────────────────
+function fillFiltroArea() {
+  const sel = document.getElementById('f-area')
+  if (!sel) return
+  sel.innerHTML = '<option value="">Todas las áreas</option>' +
+    HSM_AREAS.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('')
+  fillFiltroHab()
+}
+
+// Las habitaciones del filtro dependen del área elegida
+function fillFiltroHab() {
+  const sel = document.getElementById('f-hab')
+  if (!sel) return
+  const area = document.getElementById('f-area')?.value || ''
+  const rooms = area ? (HSM_ROOMS_BY_AREA[area] || []) : HSM_ALL_ROOMS
+  // Al cambiar de área la habitación se reinicia (las habitaciones dependen del área)
+  sel.innerHTML = '<option value="">Todas las habitaciones</option>' +
+    rooms.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('')
+  sel.value = ''
+}
+
+function onFiltroArea() { fillFiltroHab(); renderCenso() }
+
+// Habitaciones sugeridas en el editor según el área elegida
+function onAreaEditor() {
+  const area = val('e-area')
+  const dl = document.getElementById('dl-habs')
+  const rooms = area ? (HSM_ROOMS_BY_AREA[area] || []) : HSM_ALL_ROOMS
+  if (dl) dl.innerHTML = rooms.map(r => `<option value="${esc(r)}">`).join('')
+  const hab = document.getElementById('e-hab')
+  if (hab) hab.placeholder = area ? 'Seleccionar habitación…' : 'Selecciona área primero…'
+}
+
 // ── Cargar PFTs ─────────────────────────────────────────────────
 async function loadPFTs() {
   const { data, error } = await db.from('pharmacy_pft').select('*')
     .order('activo', { ascending: false }).order('fecha_ingreso', { ascending: false })
   const tbody = document.getElementById('censo-body')
   if (error) {
-    if (tbody) tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#991b1b;padding:22px">
+    if (tbody) tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#991b1b;padding:22px">
       Error: ${esc(error.message)}${error.message.includes('pharmacy_pft') ? ' — falta ejecutar la migración sql/farmacia_pft_setup.sql en Supabase' : ''}</td></tr>`
     return
   }
@@ -185,12 +219,19 @@ function renderCenso() {
   const tbody = document.getElementById('censo-body')
   if (!tbody) return
   const verEg = document.getElementById('chk-egresados')?.checked
-  const lista = _pfts.filter(p => verEg ? true : p.activo !== false)
-  setText('pft-count', `${_pfts.filter(p => p.activo !== false).length} activos`)
+  const fArea = document.getElementById('f-area')?.value || ''
+  const fHab  = document.getElementById('f-hab')?.value  || ''
+  const lista = _pfts.filter(p =>
+    (verEg ? true : p.activo !== false) &&
+    (!fArea || p.area === fArea) &&
+    (!fHab  || (p.habitacion || '').toUpperCase() === fHab.toUpperCase()))
+  const totalAct = _pfts.filter(p => p.activo !== false).length
+  const filtrando = !!(fArea || fHab)
+  setText('pft-count', filtrando ? `${lista.length} de ${totalAct} activos` : `${totalAct} activos`)
 
   if (!lista.length) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:26px">
-      Sin perfiles — usa "Nuevo perfil" para registrar el primero.</td></tr>`
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:26px">
+      ${filtrando ? 'Sin perfiles para el área/habitación seleccionada.' : 'Sin perfiles — usa "Nuevo perfil" para registrar el primero.'}</td></tr>`
     return
   }
   const canDel = ['administrador', 'responsable_calidad'].includes(_role)
@@ -205,6 +246,8 @@ function renderCenso() {
     return `<tr style="${alta ? 'opacity:.55' : ''}">
       <td><strong>${esc(p.paciente)}</strong></td>
       <td>${esc(p.folio_exp || '—')}</td>
+      <td>${p.habitacion ? `<strong>${esc(p.habitacion)}</strong>` : '<span style="color:#9ca3af">—</span>'}
+        ${p.area ? `<div style="font-size:.7rem;color:#9ca3af">${esc(p.area)}</div>` : ''}</td>
       <td>${fmtF(p.fecha_ingreso)}</td>
       <td style="max-width:160px">${esc(p.medico_tratante || '—')}</td>
       <td style="text-align:center">${activos.length}${inter.length
@@ -285,6 +328,13 @@ function buildEditor() {
         <div class="grid g4">
           <div class="fld"><label>Nombre del paciente *</label><input id="e-paciente" value="${esc(p.paciente||'')}"></div>
           <div class="fld"><label>Folio de expediente</label><input id="e-folio" value="${esc(p.folio_exp||'')}"></div>
+          <div class="fld"><label>Área / Servicio</label>
+            <select id="e-area" onchange="onAreaEditor()">
+              <option value="">— Seleccionar área —</option>
+              ${HSM_AREAS.map(a => `<option value="${esc(a)}"${a===(p.area||'')?' selected':''}>${esc(a)}</option>`).join('')}
+            </select></div>
+          <div class="fld"><label>Habitación</label>
+            <input id="e-hab" list="dl-habs" value="${esc(p.habitacion||'')}" placeholder="Selecciona área primero…" autocomplete="off"></div>
           <div class="fld"><label>Fecha de nacimiento</label><input type="date" id="e-fnac" value="${esc(p.fecha_nacimiento||'')}" oninput="recalc()"></div>
           <div class="fld"><label>Edad</label><div class="auto" id="e-edad">—</div></div>
           <div class="fld"><label>Fecha de ingreso</label><input type="date" id="e-ingreso" value="${esc(p.fecha_ingreso||hoy())}"></div>
@@ -314,6 +364,7 @@ function buildEditor() {
 
     ${catBlocks}
   `
+  onAreaEditor()   // cargar habitaciones sugeridas del área del paciente
   recalc()
 }
 
@@ -501,6 +552,8 @@ async function guardarPFT() {
   const payload = {
     paciente,
     folio_exp: val('e-folio').trim() || null,
+    area: val('e-area') || null,
+    habitacion: val('e-hab').trim().toUpperCase() || null,
     fecha_nacimiento: val('e-fnac') || null,
     fecha_ingreso: val('e-ingreso') || null,
     fecha_egreso: val('e-egreso') || null,

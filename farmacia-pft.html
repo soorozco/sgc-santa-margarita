@@ -185,7 +185,15 @@
       <div class="pft-card">
         <div class="pft-head h-teal" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
           <span><i class="fa-solid fa-notes-medical"></i> Perfiles activos — <span id="pft-count">…</span></span>
-          <span style="display:flex;gap:10px;align-items:center">
+          <span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <select id="f-area" onchange="onFiltroArea()" title="Filtrar por área / servicio"
+              style="padding:6px 12px;border:1.5px solid #5eead4;border-radius:8px;font-size:.8rem;font-family:inherit;background:#fff;color:#0f766e;font-weight:600">
+              <option value="">Todas las áreas</option>
+            </select>
+            <select id="f-hab" onchange="renderCenso()" title="Filtrar por habitación"
+              style="padding:6px 12px;border:1.5px solid #5eead4;border-radius:8px;font-size:.8rem;font-family:inherit;background:#fff;color:#0f766e;font-weight:600">
+              <option value="">Todas las habitaciones</option>
+            </select>
             <label style="display:flex;align-items:center;gap:6px;font-size:.76rem;color:#0f766e;cursor:pointer;font-weight:600">
               <input type="checkbox" id="chk-egresados" onchange="renderCenso()" style="accent-color:#009688"> Ver egresados
             </label>
@@ -197,7 +205,7 @@
           <table class="hist-table" style="min-width:960px">
             <thead>
               <tr>
-                <th>Paciente</th><th>Folio</th><th>Ingreso</th><th>Médico</th>
+                <th>Paciente</th><th>Folio</th><th>Ubicación</th><th>Ingreso</th><th>Médico</th>
                 <th style="text-align:center">Medicamentos</th>
                 <th style="text-align:center">Alto riesgo</th>
                 <th>Alergias</th>
@@ -206,7 +214,7 @@
               </tr>
             </thead>
             <tbody id="censo-body">
-              <tr><td colspan="9" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
+              <tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:26px">Cargando…</td></tr>
             </tbody>
           </table>
         </div>
@@ -294,10 +302,12 @@
 </div>
 
 <datalist id="dl-meds"></datalist>
+<datalist id="dl-habs"></datalist>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/areas-catalogo.js"></script>
 <script src="js/farmacia-pft.js"></script>
 <script src="js/sidebar.js"></script>
 </body>
