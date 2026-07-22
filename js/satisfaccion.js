@@ -198,7 +198,6 @@ function applyFilters() {
 
   _page = 1
   renderTable()
-  renderComments()
   document.getElementById('enc-count').textContent =
     _filtered.length + ' encuesta' + (_filtered.length !== 1 ? 's' : '') + ' encontrada' + (_filtered.length !== 1 ? 's' : '')
 }
@@ -328,50 +327,6 @@ function updateChart() {
       }
     }
   })
-}
-
-// ── Comments panel ────────────────────────────────────────────
-function renderComments() {
-  const ctype = document.getElementById('f-ctype')?.value || ''
-
-  // Expand surveys into individual comment entries for display
-  let pool = []
-  _surveys.forEach(s => {
-    getCommentsList(s).forEach(c => {
-      if (!c.text || !c.text.trim()) return
-      const ct = ctypeNorm(c.type)
-      if (ctype && ct !== ctype) return
-      pool.push({ survey: s, comment: c })
-    })
-  })
-  pool = pool.slice(0, 12)
-
-  const list = document.getElementById('comment-list')
-  if (!list) return
-
-  if (pool.length === 0) {
-    list.innerHTML = '<div style="text-align:center;color:var(--txt3);padding:20px">Sin comentarios para mostrar</div>'
-    return
-  }
-
-  list.innerHTML = pool.map(({ survey: s, comment: c }) => {
-    const ct   = ctypeNorm(c.type)
-    const cls  = ctypeClass(ct)
-    const bcls = ctypeBadge(ct)
-    const icon = ctypeIcon(ct)
-    return `
-    <div class="comment-card ${cls}">
-      <div class="comment-head">
-        ${ct ? `<span class="comment-badge ${bcls}">${icon} ${ctypeLabel(ct)}</span>` : ''}
-        ${c.category ? `<span class="badge-categoria">${esc(c.category)}</span>` : ''}
-        <span class="comment-patient">${esc(s.patient_name||'Anónimo')}</span>
-        ${s.room_number ? `<span class="comment-room">· ${esc(s.room_number)}</span>` : ''}
-        <span class="comment-meta">${fmtDate(s.survey_date)}</span>
-      </div>
-      <div class="comment-txt">${esc(c.text)}</div>
-      ${s.area ? `<div class="comment-area"><i class="fa-solid fa-location-dot"></i> ${esc(s.area)}</div>` : ''}
-    </div>`
-  }).join('')
 }
 
 // ── Table ─────────────────────────────────────────────────────

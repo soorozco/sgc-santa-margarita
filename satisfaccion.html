@@ -176,33 +176,6 @@
         </div>
       </div>
 
-      <!-- ── Últimos comentarios ── -->
-      <div class="panel" style="margin-bottom:22px">
-        <div class="panel-head">
-          <div class="panel-ttl"><i class="fa-solid fa-comments"></i> Comentarios Recientes</div>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <select class="filter-sel" id="f-ctype" onchange="applyFilters()" style="font-size:.786rem;padding:5px 28px 5px 10px">
-              <option value="">Todos los tipos</option>
-              <option value="NEGATIVO">Negativos</option>
-              <option value="POSITIVO">Positivos</option>
-            </select>
-            <select class="filter-sel" id="exp-pos-month" style="font-size:.786rem;padding:5px 28px 5px 10px">
-              <option value="">Todos los meses</option>
-            </select>
-            <button class="btn-secondary" onclick="exportPositivos()"
-                    title="Exportar comentarios positivos del mes seleccionado"
-                    style="font-size:.786rem;padding:5px 14px;color:#16a34a;border-color:#86efac;white-space:nowrap;gap:6px">
-              <i class="fa-solid fa-download"></i> Exportar positivos
-            </button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="comment-list" id="comment-list">
-            <div style="text-align:center;color:var(--txt3);padding:20px">Cargando comentarios…</div>
-          </div>
-        </div>
-      </div>
-
       <!-- ── Toolbar encuestas ── -->
       <div class="toolbar">
         <div class="search-wrap">
@@ -221,6 +194,11 @@
           <option value="SI">✅ Sí recomendaría</option>
           <option value="NO">❌ No recomendaría</option>
         </select>
+        <select class="filter-sel" id="f-ctype" onchange="applyFilters()">
+          <option value="">Todos los comentarios</option>
+          <option value="NEGATIVO">Con comentario negativo</option>
+          <option value="POSITIVO">Con comentario positivo</option>
+        </select>
         <button class="btn-primary" id="btn-new-enc" onclick="openNewSurvey()" style="display:none">
           <i class="fa-solid fa-plus"></i> Nueva Encuesta
         </button>
@@ -230,9 +208,19 @@
       <div class="table-wrap">
         <div class="table-head-bar">
           <span class="table-count" id="enc-count">Cargando encuestas…</span>
-          <button class="btn-secondary" onclick="exportCSV()" style="font-size:.786rem;padding:6px 12px">
-            <i class="fa-solid fa-download"></i> Exportar CSV
-          </button>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select class="filter-sel" id="exp-pos-month" style="font-size:.786rem;padding:5px 28px 5px 10px">
+              <option value="">Todos los meses</option>
+            </select>
+            <button class="btn-secondary" onclick="exportPositivos()"
+                    title="Exportar comentarios positivos del mes seleccionado"
+                    style="font-size:.786rem;padding:6px 12px;color:#16a34a;border-color:#86efac;white-space:nowrap;gap:6px">
+              <i class="fa-solid fa-download"></i> Exportar positivos
+            </button>
+            <button class="btn-secondary" onclick="exportCSV()" style="font-size:.786rem;padding:6px 12px">
+              <i class="fa-solid fa-download"></i> Exportar CSV
+            </button>
+          </div>
         </div>
         <table class="data-table">
           <thead>
