@@ -110,7 +110,10 @@ async function renderLibro() {
     return
   }
 
+  // Editar/eliminar: administración, calidad o quien tenga el permiso
+  // "Libros — editar / eliminar movimientos" (Configuración → Usuarios y Permisos)
   const canDelete = ['administrador', 'responsable_calidad'].includes(_role)
+                 || _profile?.permissions?.libros_acciones === true
 
   tbody.innerHTML = rows.map(m => `<tr>
     <td>${fmtFecha(m.fecha)}</td>

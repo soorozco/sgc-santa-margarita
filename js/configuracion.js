@@ -534,6 +534,7 @@ const MODULES = [
   { key: 'farmacia_dispensacion', label: 'Dispensación de Controlados', icon: 'fa-prescription-bottle-medical', group: 'Farmacia' },
   { key: 'farmacia_clinica',     label: 'Bitácora Farmacia Clínica',  icon: 'fa-bed-pulse',        group: 'Farmacia' },
   { key: 'libros_electronicos',  label: 'Libros Electrónicos',        icon: 'fa-book-medical',     group: 'Farmacia' },
+  { key: 'libros_acciones',      label: 'Libros — editar / eliminar movimientos', icon: 'fa-pen-to-square', group: 'Farmacia', optIn: true },
   { key: 'farmacia_pft',         label: 'Perfil Farmacoterapéutico',  icon: 'fa-notes-medical',    group: 'Farmacia' },
 ]
 
@@ -705,7 +706,7 @@ function openPermPanel(userId) {
         <div class="perm-group-label">${escHtml(groupName)}</div>
         <div class="perm-module-grid">
           ${mods.map(m => {
-            const isOn = _currentPerms[m.key] !== false
+            const isOn = m.optIn ? _currentPerms[m.key] === true : _currentPerms[m.key] !== false
             return `
               <label class="perm-toggle-row" for="perm-${m.key}">
                 <div class="perm-module-info">
@@ -742,6 +743,13 @@ function openPermPanel(userId) {
 
 // ── Toggle individual ───────────────────────────────────────────
 function togglePerm(key, value) {
+  const mod = MODULES.find(m => m.key === key)
+  if (mod?.optIn) {
+    // Permisos opt-in: negados por defecto, se guardan solo si se activan
+    if (value) _currentPerms[key] = true
+    else delete _currentPerms[key]
+    return
+  }
   if (value) {
     // Si es true, eliminar la clave (default = acceso)
     delete _currentPerms[key]
@@ -753,9 +761,10 @@ function togglePerm(key, value) {
 // ── Activar / bloquear todas ────────────────────────────────────
 function setAllPerms(value) {
   _currentPerms = {}
-  if (!value) {
-    MODULES.forEach(m => { _currentPerms[m.key] = false })
-  }
+  MODULES.forEach(m => {
+    if (m.optIn) { if (value) _currentPerms[m.key] = true }
+    else if (!value) _currentPerms[m.key] = false
+  })
   // Re-renderizar los checkboxes
   MODULES.forEach(m => {
     const cb = document.getElementById('perm-' + m.key)
