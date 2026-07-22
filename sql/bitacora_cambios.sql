@@ -125,25 +125,36 @@ SELECT count(DISTINCT event_object_table) AS tablas_con_bitacora
 FROM information_schema.triggers
 WHERE trigger_schema = 'public' AND trigger_name = 'trg_bitacora';
 
--- Prueba real: crea, modifica y borra un departamento de prueba y
--- muestra lo que quedó anotado. No deja rastro en los datos.
+-- Prueba real sobre una tabla desechable, creada y eliminada aquí
+-- mismo. No toca ninguna tabla de datos ni depende de sus columnas
+-- obligatorias.
 DO $$
 DECLARE v_id UUID;
 BEGIN
-  INSERT INTO public.departments (name) VALUES ('ZZZ Prueba bitácora')
+  CREATE TABLE public.zzz_prueba_bitacora (
+    id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nombre TEXT
+  );
+  CREATE TRIGGER trg_bitacora
+    AFTER INSERT OR UPDATE OR DELETE ON public.zzz_prueba_bitacora
+    FOR EACH ROW EXECUTE FUNCTION public.registrar_en_bitacora();
+
+  INSERT INTO public.zzz_prueba_bitacora (nombre) VALUES ('antes')
     RETURNING id INTO v_id;
-  UPDATE public.departments SET name = 'ZZZ Prueba bitácora (editado)' WHERE id = v_id;
-  DELETE FROM public.departments WHERE id = v_id;
+  UPDATE public.zzz_prueba_bitacora SET nombre = 'después' WHERE id = v_id;
+  DELETE FROM public.zzz_prueba_bitacora WHERE id = v_id;
+
+  DROP TABLE public.zzz_prueba_bitacora;
 END $$;
 
-SELECT action, table_name,
-       old_values ->> 'name' AS antes,
-       new_values ->> 'name' AS despues,
+SELECT action,
+       old_values ->> 'nombre' AS antes,
+       new_values ->> 'nombre' AS despues,
+       user_id IS NOT NULL AS identifico_usuario,
        created_at
 FROM public.audit_log
-WHERE table_name = 'departments'
-ORDER BY created_at DESC
-LIMIT 3;
+WHERE table_name = 'zzz_prueba_bitacora'
+ORDER BY created_at DESC;
 
 
 -- ══════════════════════════════════════════════════════════════════
