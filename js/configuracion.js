@@ -533,6 +533,7 @@ const MODULES = [
   { key: 'farmacia_controlados', label: 'Conteo de Controlados',      icon: 'fa-tablets',          group: 'Farmacia' },
   { key: 'farmacia_dispensacion', label: 'Dispensación de Controlados', icon: 'fa-prescription-bottle-medical', group: 'Farmacia' },
   { key: 'farmacia_clinica',     label: 'Bitácora Farmacia Clínica',  icon: 'fa-bed-pulse',        group: 'Farmacia' },
+  { key: 'farmacia_dependencias', label: 'Salidas a Madres y Casas',  icon: 'fa-house-medical',    group: 'Farmacia' },
   { key: 'libros_electronicos',  label: 'Libros Electrónicos',        icon: 'fa-book-medical',     group: 'Farmacia' },
   { key: 'libros_acciones',      label: 'Libros — editar / eliminar movimientos', icon: 'fa-pen-to-square', group: 'Farmacia', optIn: true },
   { key: 'farmacia_pft',         label: 'Perfil Farmacoterapéutico',  icon: 'fa-notes-medical',    group: 'Farmacia' },

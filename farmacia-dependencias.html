@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salidas a Madres y Casas — SGC Hospital Santa Margarita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .kpi-row { display:grid;gap:14px;grid-template-columns:repeat(4,1fr);margin-bottom:18px }
+    @media (max-width:1000px){ .kpi-row{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:520px){ .kpi-row{grid-template-columns:1fr} }
+    .kpi { background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);position:relative;overflow:hidden }
+    .kpi::before { content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:#0d9488 }
+    .kpi-num { font-size:1.55rem;font-weight:800;color:#0f172a;line-height:1.15;
+      font-variant-numeric:tabular-nums;word-break:break-word }
+    .kpi-num.chico { font-size:1rem;line-height:1.3 }
+    .kpi-lbl { font-size:.71rem;font-weight:700;color:#64748b;text-transform:uppercase;
+      letter-spacing:.05em;margin-top:6px }
+    .kpi-sub { font-size:.72rem;color:#94a3b8;margin-top:3px }
+    .kpi-ico { position:absolute;right:14px;top:14px;font-size:1.05rem;color:#cbd5e1 }
+
+    .barra { display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;
+      border:1px solid #e2e8f0;border-radius:14px;padding:14px 18px;margin-bottom:18px;
+      box-shadow:0 2px 8px rgba(0,0,0,.05) }
+    .barra select,.barra input { padding:9px 12px;border:1.5px solid #cbd5e1;border-radius:8px;
+      background:#f8fafc;color:#1e293b;font-size:.875rem;font-family:inherit }
+    .barra select:focus,.barra input:focus { outline:none;border-color:#009688;background:#fff;
+      box-shadow:0 0 0 3px rgba(0,150,136,.15) }
+    .barra .busca { flex:1;min-width:190px }
+    .barra .der { margin-left:auto;display:flex;gap:8px;flex-wrap:wrap }
+
+    .caja { background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;
+      box-shadow:0 2px 8px rgba(0,0,0,.05) }
+    .caja-head { display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:14px 20px;border-bottom:1px solid #f0f0f0;font-size:.85rem;font-weight:700;color:#334155 }
+    .caja-head i { color:#0d9488 }
+    .caja-head .cuenta { font-weight:600;color:#0f766e;font-size:.8rem }
+    .tabla-scroll { overflow-x:auto }
+    .tabla { width:100%;border-collapse:collapse;font-size:.86rem;min-width:800px }
+    .tabla th { background:#f9fafb;padding:10px 13px;text-align:left;font-size:.7rem;font-weight:700;
+      color:#6b7280;text-transform:uppercase;letter-spacing:.04em;border-bottom:2px solid #f0f0f0;white-space:nowrap }
+    .tabla td { padding:10px 13px;border-bottom:1px solid #f5f5f5;color:#374151;vertical-align:top }
+    .tabla tr:hover td { background:#f0fdfa }
+    .tabla .obs { color:#64748b;font-size:.82rem;max-width:280px }
+    .sin-dato { color:#b45309;background:#fef3c7;padding:2px 8px;border-radius:99px;font-size:.75rem;font-weight:600 }
+    .btn-ico { background:#e0f2f1;border:none;cursor:pointer;padding:6px 9px;border-radius:8px;
+      font-size:.82rem;color:#009688 }
+    .btn-ico.del { color:#ef4444;background:#fee2e2;margin-left:5px }
+
+    .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+      align-items:center;justify-content:center;padding:20px }
+    .modal-overlay.open { display:flex }
+    .modal-box { background:#fff;border-radius:16px;width:100%;max-width:620px;max-height:90vh;
+      overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2) }
+    .modal-head { padding:18px 24px 14px;border-bottom:1px solid #f0f0f0;display:flex;
+      align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1 }
+    .modal-head h3 { font-size:1rem;font-weight:700;color:#111;margin:0 }
+    .modal-x { background:none;border:none;font-size:1.1rem;color:#9ca3af;cursor:pointer;padding:4px 8px }
+    .modal-body { padding:20px 24px }
+    .modal-foot { padding:0 24px 22px;display:flex;justify-content:flex-end;gap:10px }
+
+    .campos { display:grid;gap:15px;grid-template-columns:1fr 1fr }
+    @media (max-width:560px){ .campos{grid-template-columns:1fr} }
+    .campo { display:flex;flex-direction:column;gap:6px }
+    .campo.ancho { grid-column:1/-1 }
+    .campo label { font-size:.73rem;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.04em }
+    .campo input,.campo textarea { width:100%;padding:10px 13px;border:1.5px solid #cbd5e1;
+      border-radius:8px;background:#f8fafc;color:#1e293b;font-size:.9rem;font-family:inherit }
+    .campo input:focus,.campo textarea:focus { outline:none;border-color:#009688;background:#fff;
+      box-shadow:0 0 0 3px rgba(0,150,136,.15) }
+    .campo textarea { resize:vertical;min-height:70px }
+    .campo .ayuda { font-size:.72rem;color:#94a3b8;font-weight:500;text-transform:none;letter-spacing:0 }
+    .req { color:#dc2626 }
+
+    #toast { position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);
+      background:#0d9488;color:#fff;padding:12px 24px;border-radius:10px;font-size:.88rem;
+      font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:300;transition:transform .25s;
+      max-width:90vw;text-align:center }
+    #toast.show { transform:translateX(-50%) translateY(0) }
+  </style>
+</head>
+<body>
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+<div class="layout">
+
+  <!-- ═══════════════ SIDEBAR ═══════════════ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sb-header">
+      <div class="sb-brand">
+        <div class="sb-brand-ico"><img src="img/logo.png" alt="HSM"></div>
+        <div class="sb-brand-txt">
+          <h2>Sta. Margarita</h2>
+          <p>SGC ISO 9001:2015</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+      <a class="nav-link" href="dashboard.html">
+        <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
+      </a>
+      <button class="nav-group-btn" data-target="group-iso">
+        <i class="icon fa-solid fa-certificate"></i>
+        <span class="nav-group-label">ISO 9001:2015</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-iso">
+        <a class="nav-link" href="contexto.html"><i class="fa-solid fa-building"></i><span>Contexto del SGC</span><small class="nav-clause">§ 4</small></a>
+        <a class="nav-link" href="liderazgo.html"><i class="fa-solid fa-star"></i><span>Liderazgo y Política</span><small class="nav-clause">§ 5</small></a>
+        <a class="nav-link" href="objetivos.html"><i class="fa-solid fa-bullseye"></i><span>Objetivos de Calidad</span><small class="nav-clause">§ 6.2</small></a>
+        <a class="nav-link" href="informacion-documentada.html"><i class="fa-solid fa-folder-open"></i><span>Información Documentada</span><small class="nav-clause">§ 7.5</small></a>
+        <a class="nav-link" href="riesgos.html"><i class="fa-solid fa-shield-halved"></i><span>Gestión de Riesgos</span><small class="nav-clause">§ 6.1</small></a>
+        <a class="nav-link" href="noconformidades.html"><i class="fa-solid fa-circle-xmark"></i><span>No Conformidades</span><small class="nav-clause">§ 10.2</small></a>
+        <a class="nav-link" href="acciones-correctivas.html"><i class="fa-solid fa-list-check"></i><span>Acciones Correctivas</span><small class="nav-clause">§ 10.2</small></a>
+        <a class="nav-link" href="indicadores.html"><i class="fa-solid fa-chart-line"></i><span>Indicadores</span><small class="nav-clause">§ 9.1</small></a>
+        <a class="nav-link" href="auditorias-internas.html"><i class="fa-solid fa-magnifying-glass"></i><span>Auditorías Internas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="auditorias-externas.html"><i class="fa-solid fa-award"></i><span>Auditorías Externas</span><small class="nav-clause">§ 9.2</small></a>
+        <a class="nav-link" href="revision-direccion.html"><i class="fa-solid fa-clipboard-list"></i><span>Revisión por Dirección</span><small class="nav-clause">§ 9.3</small></a>
+        <a class="nav-link" href="quejas.html"><i class="fa-solid fa-comment-dots"></i><span>Q, S y Felicitaciones</span><small class="nav-clause">§ 8.2.1</small></a>
+        <a class="nav-link" href="satisfaccion.html"><i class="fa-solid fa-face-smile"></i><span>Satisfacción</span><small class="nav-clause">§ 9.1.2</small></a>
+        <a class="nav-link" href="comites.html"><i class="fa-solid fa-users"></i><span>Comités</span></a>
+        <a class="nav-link" href="bitacora.html" id="nav-bitacora"><i class="fa-solid fa-clock-rotate-left"></i><span>Bitácora de Cambios</span></a>
+        <a class="nav-link" href="configuracion.html"><i class="fa-solid fa-sliders"></i><span>Configuración</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-sp">
+        <i class="icon fa-solid fa-shield-heart"></i>
+        <span class="nav-group-label">Seguridad del Paciente</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-sp">
+        <a class="nav-link" href="seguridad-paciente.html"><i class="fa-solid fa-file-medical"></i><span>Notificar Incidente</span></a>
+        <a class="nav-link" href="eventos-adversos.html"><i class="fa-solid fa-hospital-user"></i><span>Dashboard de Incidentes</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-rrhh">
+        <i class="icon fa-solid fa-people-roof"></i>
+        <span class="nav-group-label">Recursos Humanos</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-rrhh">
+        <a class="nav-link" href="personal.html"><i class="fa-solid fa-id-card"></i><span>Directorio de Personal</span></a>
+        <a class="nav-link" href="rrhh-solicitudes.html"><i class="fa-solid fa-file-signature"></i><span>Solicitudes</span></a>
+        <a class="nav-link" href="rrhh-personal.html"><i class="fa-solid fa-users"></i><span>Personal</span></a>
+        <a class="nav-link" href="rrhh-evaluaciones.html"><i class="fa-solid fa-star-half-stroke"></i><span>Evaluaciones</span></a>
+      </div>
+      <button class="nav-group-btn" data-target="group-farmacia">
+        <i class="icon fa-solid fa-pills"></i>
+        <span class="nav-group-label">Farmacia</span>
+        <i class="fa-solid fa-chevron-down nav-chevron"></i>
+      </button>
+      <div class="nav-group-body" id="group-farmacia">
+        <a class="nav-link" href="farmacia-bitacora.html"><i class="fa-solid fa-clipboard-check"></i><span>Bitácora Entrega de Turno</span></a>
+        <a class="nav-link" href="farmacia-controlados.html"><i class="fa-solid fa-tablets"></i><span>Conteo de Controlados</span></a>
+        <a class="nav-link" href="farmacia-dispensacion.html"><i class="fa-solid fa-prescription-bottle-medical"></i><span>Dispensación de Controlados</span></a>
+        <a class="nav-link" href="farmacia-clinica.html"><i class="fa-solid fa-bed-pulse"></i><span>Bitácora Farmacia Clínica</span></a>
+        <a class="nav-link" href="farmacia-dependencias.html"><i class="fa-solid fa-house-medical"></i><span>Salidas a Madres y Casas</span></a>
+        <button class="nav-sub-btn" data-target="sub-libros">
+          <i class="icon fa-solid fa-book-medical"></i>
+          <span class="nav-group-label">Libros Electrónicos</span>
+          <i class="fa-solid fa-chevron-down nav-chevron"></i>
+        </button>
+        <div class="nav-sub-body" id="sub-libros">
+          <a class="nav-link" href="libros-dashboard.html"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></a>
+          <a class="nav-link" href="libros-controlados.html"><i class="fa-solid fa-book-open"></i><span>Libros por Medicamento</span></a>
+          <a class="nav-link" href="libros-recetas.html"><i class="fa-solid fa-receipt"></i><span>Registro de Recetas</span></a>
+        </div>
+        <a class="nav-link" href="farmacia-pft.html"><i class="fa-solid fa-notes-medical"></i><span>Perfil Farmacoterapéutico</span></a>
+      </div>
+    </nav>
+
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar"><i class="fa-solid fa-user"></i></div>
+        <div class="sb-user-info">
+          <div class="sb-user-name" id="sb-user-name">Cargando…</div>
+          <div class="sb-user-role" id="sb-user-role">—</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main class="main">
+
+    <div class="topbar">
+      <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
+      <div>
+        <div class="topbar-page-title">Salidas a Madres y Casas</div>
+        <div class="topbar-sub" id="current-date">Relaci&oacute;n de costo de vales de dependencia</div>
+      </div>
+      <div class="topbar-right">
+        <span class="iso-badge"><i class="fa-solid fa-house-medical"></i> Farmacia</span>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <i class="fa-solid fa-sack-dollar kpi-ico"></i>
+          <div class="kpi-num" id="kpi-total">$0.00</div>
+          <div class="kpi-lbl">Importe total</div>
+          <div class="kpi-sub">seg&uacute;n los filtros</div>
+        </div>
+        <div class="kpi">
+          <i class="fa-solid fa-receipt kpi-ico"></i>
+          <div class="kpi-num" id="kpi-vales">0</div>
+          <div class="kpi-lbl">Vales</div>
+          <div class="kpi-sub">registros</div>
+        </div>
+        <div class="kpi">
+          <i class="fa-solid fa-house-chimney kpi-ico"></i>
+          <div class="kpi-num chico" id="kpi-top-dep">&mdash;</div>
+          <div class="kpi-lbl">Mayor importe</div>
+          <div class="kpi-sub" id="kpi-top-monto"></div>
+        </div>
+        <div class="kpi">
+          <i class="fa-solid fa-divide kpi-ico"></i>
+          <div class="kpi-num" id="kpi-promedio">$0.00</div>
+          <div class="kpi-lbl">Promedio por vale</div>
+          <div class="kpi-sub">&nbsp;</div>
+        </div>
+      </div>
+
+      <div class="barra">
+        <select id="f-mes" onchange="aplicarFiltros()"><option value="">Todos los meses</option></select>
+        <select id="f-dep" onchange="aplicarFiltros()"><option value="">Todas las dependencias</option></select>
+        <input type="text" class="busca" id="f-busca" placeholder="Buscar folio, dependencia u observaci&oacute;n&hellip;" oninput="aplicarFiltros()">
+        <div class="der">
+          <button class="btn-secondary" onclick="limpiarFiltros()">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+          <button class="btn-secondary" onclick="exportarCSV()">
+            <i class="fa-solid fa-download"></i> Exportar CSV
+          </button>
+          <button class="btn-primary" onclick="nuevoVale()">
+            <i class="fa-solid fa-plus"></i> Nuevo vale
+          </button>
+        </div>
+      </div>
+
+      <div class="caja">
+        <div class="caja-head">
+          <span><i class="fa-solid fa-table-list"></i> Vales de dependencia</span>
+          <span class="cuenta" id="tabla-count"></span>
+        </div>
+        <div class="tabla-scroll">
+          <table class="tabla">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Dependencia</th>
+                <th>Almac&eacute;n</th>
+                <th>Folio</th>
+                <th style="text-align:right">Total</th>
+                <th>Observaciones</th>
+                <th style="text-align:center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="vales-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-overlay" id="modal-vale" onclick="if(event.target===this)cerrarModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modal-title">Nuevo vale de dependencia</h3>
+      <button class="modal-x" onclick="cerrarModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="campos">
+        <div class="campo">
+          <label for="v-fecha">Fecha <span class="req">*</span></label>
+          <input type="date" id="v-fecha">
+        </div>
+        <div class="campo">
+          <label for="v-folio">Folio</label>
+          <input type="text" id="v-folio" placeholder="670401" inputmode="numeric">
+        </div>
+        <div class="campo ancho">
+          <label for="v-dependencia">Dependencia que recibe <span class="req">*</span></label>
+          <input type="text" id="v-dependencia" list="dl-dependencias"
+                 placeholder="CASA DE ORACION" autocomplete="off">
+          <span class="ayuda">Escribe o elige de la lista. Puedes registrar casas nuevas.</span>
+          <datalist id="dl-dependencias"></datalist>
+        </div>
+        <div class="campo">
+          <label for="v-almacen">Almac&eacute;n</label>
+          <input type="text" id="v-almacen" list="dl-almacenes" value="FARMACIA" autocomplete="off">
+          <datalist id="dl-almacenes"></datalist>
+        </div>
+        <div class="campo">
+          <label for="v-total">Importe <span class="req">*</span></label>
+          <input type="number" id="v-total" step="0.01" min="0" placeholder="0.00" inputmode="decimal">
+        </div>
+        <div class="campo ancho">
+          <label for="v-observaciones">Observaciones</label>
+          <textarea id="v-observaciones" placeholder="Aclaraciones sobre el vale (opcional)&hellip;"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn-primary" id="btn-guardar" onclick="guardarVale()">
+        <i class="fa-solid fa-floppy-disk"></i> Guardar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/farmacia-dependencias.js"></script>
+<script src="js/sidebar.js"></script>
+</body>
+</html>
