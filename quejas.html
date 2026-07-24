@@ -125,93 +125,166 @@
 
     <div class="page-content">
 
-      <!-- Resumen rápido -->
-      <div class="qj-summary" id="qj-summary" style="display:none">
-        <div class="qj-sum-card qj-sum-queja">
-          <i class="fa-solid fa-face-angry"></i>
-          <div>
-            <span id="cnt-queja">0</span>
-            <small>Quejas</small>
-          </div>
+      <!-- ── Filtros ── -->
+      <div class="qj-filtros">
+        <div class="qj-campo">
+          <label>Periodo</label>
+          <select id="f-periodo" onchange="onPeriodoChange()">
+            <option value="todo">Todo</option>
+            <option value="mes">Este mes</option>
+            <option value="mes-1">Mes pasado</option>
+            <option value="3m">Últimos 3 meses</option>
+            <option value="6m">Últimos 6 meses</option>
+            <option value="12m">Últimos 12 meses</option>
+            <option value="anio">Este año</option>
+            <option value="anio-1">Año pasado</option>
+            <option value="custom">Personalizado…</option>
+          </select>
         </div>
-        <div class="qj-sum-card qj-sum-sugerencia">
-          <i class="fa-solid fa-lightbulb"></i>
-          <div>
-            <span id="cnt-sugerencia">0</span>
-            <small>Sugerencias</small>
-          </div>
+        <div class="qj-campo">
+          <label>Desde</label>
+          <input type="date" id="f-desde" onchange="onFechaManual()">
         </div>
-        <div class="qj-sum-card qj-sum-felicitacion">
-          <i class="fa-solid fa-star"></i>
-          <div>
-            <span id="cnt-felicitacion">0</span>
-            <small>Felicitaciones</small>
-          </div>
+        <div class="qj-campo">
+          <label>Hasta</label>
+          <input type="date" id="f-hasta" onchange="onFechaManual()">
         </div>
-        <div class="qj-sum-card qj-sum-pendiente">
-          <i class="fa-solid fa-clock"></i>
-          <div>
-            <span id="cnt-pendiente">0</span>
-            <small>Pendientes</small>
-          </div>
+        <div class="qj-campo">
+          <label>Tipo</label>
+          <select id="f-tipo" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="queja">Queja</option>
+            <option value="sugerencia">Sugerencia</option>
+            <option value="felicitacion">Felicitación</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Estado</label>
+          <select id="f-status" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="en_proceso">En Proceso</option>
+            <option value="resuelto">Resuelto</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Departamento</label>
+          <select id="f-depto" onchange="applyFilters()">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Origen</label>
+          <select id="f-origen" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="hoja">Formulario web</option>
+            <option value="manual">Captura manual</option>
+          </select>
+        </div>
+        <div class="qj-campo qj-campo-busca">
+          <label>Buscar</label>
+          <input type="text" id="search-input" placeholder="Folio, nombre, descripción…"
+                 oninput="applyFilters()">
+        </div>
+        <div class="qj-acciones">
+          <button class="btn-secondary" onclick="clearFilters()">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+          <button class="btn-secondary" onclick="exportCSV()">
+            <i class="fa-solid fa-download"></i> CSV
+          </button>
+          <button class="btn-primary" id="btn-new-qj" onclick="openNewQJ()" style="display:none">
+            <i class="fa-solid fa-plus"></i> Registrar
+          </button>
         </div>
       </div>
 
-      <!-- Toolbar -->
-      <div class="toolbar">
-        <div class="search-wrap">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" class="search-input" id="search-input"
-                 placeholder="Buscar por folio, nombre o descripción…">
+      <div class="qj-chips" id="qj-chips"></div>
+
+      <!-- ── KPIs (responden a los filtros) ── -->
+      <div class="qj-kpis">
+        <div class="qj-kpi total">
+          <div class="qj-kpi-n" id="cnt-total">0</div>
+          <div class="qj-kpi-l">Total</div>
         </div>
-        <select class="filter-sel" id="f-tipo">
-          <option value="">Todos los tipos</option>
-          <option value="queja">Queja</option>
-          <option value="sugerencia">Sugerencia</option>
-          <option value="felicitacion">Felicitación</option>
-        </select>
-        <select class="filter-sel" id="f-status">
-          <option value="">Todos los estados</option>
-          <option value="pendiente">Pendiente</option>
-          <option value="en_proceso">En Proceso</option>
-          <option value="resuelto">Resuelto</option>
-          <option value="cerrado">Cerrado</option>
-        </select>
-        <button class="btn-secondary" onclick="exportCSV()">
-          <i class="fa-solid fa-download"></i> Exportar CSV
-        </button>
-        <button class="btn-primary" id="btn-new-qj" onclick="openNewQJ()" style="display:none">
-          <i class="fa-solid fa-plus"></i> Registrar
-        </button>
+        <div class="qj-kpi queja">
+          <div class="qj-kpi-n" id="cnt-queja">0</div>
+          <div class="qj-kpi-l">Quejas</div>
+        </div>
+        <div class="qj-kpi sugerencia">
+          <div class="qj-kpi-n" id="cnt-sugerencia">0</div>
+          <div class="qj-kpi-l">Sugerencias</div>
+        </div>
+        <div class="qj-kpi felicitacion">
+          <div class="qj-kpi-n" id="cnt-felicitacion">0</div>
+          <div class="qj-kpi-l">Felicitaciones</div>
+        </div>
+        <div class="qj-kpi pendiente">
+          <div class="qj-kpi-n" id="cnt-pendiente">0</div>
+          <div class="qj-kpi-l">Pendientes</div>
+        </div>
+        <div class="qj-kpi resueltas">
+          <div class="qj-kpi-n" id="cnt-resueltas">0</div>
+          <div class="qj-kpi-l">Resueltas / cerradas</div>
+        </div>
       </div>
 
-      <!-- Tabla -->
-      <div class="table-wrap">
-        <div class="table-head-bar">
+      <!-- ── Gráficas ── -->
+      <div class="qj-charts">
+        <div class="qj-panel">
+          <div class="qj-panel-h"><i class="fa-solid fa-chart-pie"></i> Distribución por tipo
+            <small id="ch-tipo-sub"></small></div>
+          <div class="qj-box" data-chart="ch-tipo"><canvas id="ch-tipo"></canvas></div>
+        </div>
+        <div class="qj-panel">
+          <div class="qj-panel-h"><i class="fa-solid fa-list-check"></i> Estado de atención
+            <small id="ch-status-sub"></small></div>
+          <div class="qj-box" data-chart="ch-status"><canvas id="ch-status"></canvas></div>
+        </div>
+      </div>
+
+      <div class="qj-panel">
+        <div class="qj-panel-h"><i class="fa-solid fa-building"></i> Departamentos más señalados
+          <small>los 10 con más registros en el periodo</small></div>
+        <div class="qj-box tall" data-chart="ch-depto"><canvas id="ch-depto"></canvas></div>
+      </div>
+
+      <div class="qj-panel">
+        <div class="qj-panel-h"><i class="fa-solid fa-chart-column"></i> Tendencia por mes
+          <small id="ch-tend-sub"></small></div>
+        <div class="qj-box tall" data-chart="ch-tend"><canvas id="ch-tend"></canvas></div>
+      </div>
+
+      <!-- ── Tabla ── -->
+      <div class="qj-tabla-wrap">
+        <div class="qj-tabla-head">
           <span class="table-count" id="qj-count">Cargando…</span>
         </div>
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Folio</th>
-              <th>Fecha</th>
-              <th class="center">Tipo</th>
-              <th>Nombre</th>
-              <th>Departamento</th>
-              <th>Descripción</th>
-              <th class="center">Estado</th>
-              <th class="center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="qj-tbody">
-            <tr>
-              <td colspan="8" class="table-empty">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <strong>Cargando…</strong>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="qj-tabla-scroll">
+          <table class="qj-tabla">
+            <thead>
+              <tr>
+                <th>Folio</th>
+                <th>Fecha</th>
+                <th class="center">Tipo</th>
+                <th>Nombre</th>
+                <th>Departamento</th>
+                <th>Descripción</th>
+                <th class="center">Estado</th>
+                <th class="center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="qj-tbody">
+              <tr>
+                <td colspan="8" class="table-empty">
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  <strong>Cargando…</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div><!-- /page-content -->
@@ -408,6 +481,7 @@
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/quejas.js"></script>

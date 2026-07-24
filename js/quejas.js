@@ -68,43 +68,127 @@ async function loadQuejas() {
 
   if (error) { showError(error.message); return }
   _allQJ = data || []
+  llenarDeptos()
   applyFilters()
-  renderSummary()
+}
+
+// ── Departamentos que existen en los datos ────────────────────────
+function llenarDeptos() {
+  const sel = document.getElementById('f-depto')
+  if (!sel) return
+  const actual = sel.value
+  const deptos = [...new Set(_allQJ.map(r => r.departamento).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'es'))
+  sel.innerHTML = '<option value="">Todos</option>' +
+    deptos.map(d => `<option value="${esc(d)}">${esc(d)}</option>`).join('')
+  sel.value = actual
+}
+
+// ── Periodo (preajustes → Desde/Hasta) ────────────────────────────
+function onPeriodoChange() {
+  const p = document.getElementById('f-periodo')?.value || 'todo'
+  const desde = document.getElementById('f-desde')
+  const hasta = document.getElementById('f-hasta')
+  if (!desde || !hasta) return
+  if (p === 'custom') { applyFilters(); return }
+  if (p === 'todo') { desde.value = ''; hasta.value = ''; applyFilters(); return }
+
+  const hoy = new Date(), y = hoy.getFullYear(), m = hoy.getMonth()
+  let d1, d2
+  switch (p) {
+    case 'mes':    d1 = new Date(y, m, 1);      d2 = new Date(y, m + 1, 0); break
+    case 'mes-1':  d1 = new Date(y, m - 1, 1);  d2 = new Date(y, m, 0);     break
+    case '3m':     d1 = new Date(y, m - 2, 1);  d2 = new Date(y, m + 1, 0); break
+    case '6m':     d1 = new Date(y, m - 5, 1);  d2 = new Date(y, m + 1, 0); break
+    case '12m':    d1 = new Date(y, m - 11, 1); d2 = new Date(y, m + 1, 0); break
+    case 'anio':   d1 = new Date(y, 0, 1);      d2 = new Date(y, 11, 31);   break
+    case 'anio-1': d1 = new Date(y - 1, 0, 1);  d2 = new Date(y - 1, 11, 31); break
+    default: return
+  }
+  desde.value = isoFecha(d1)
+  hasta.value = isoFecha(d2)
+  applyFilters()
+}
+
+function onFechaManual() {
+  const sel = document.getElementById('f-periodo')
+  if (sel) sel.value = 'custom'
+  applyFilters()
+}
+
+function isoFecha(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 // ── Filtros ───────────────────────────────────────────────────────
-function setupFilters() {
-  ['search-input','f-tipo','f-status'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', applyFilters)
-  })
-}
+function setupFilters() { /* los eventos van inline en el HTML */ }
 
 function applyFilters() {
-  const q      = (document.getElementById('search-input')?.value || '').toLowerCase()
+  const q      = (document.getElementById('search-input')?.value || '').toLowerCase().trim()
   const tipo   = document.getElementById('f-tipo')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
+  const depto  = document.getElementById('f-depto')?.value  || ''
+  const origen = document.getElementById('f-origen')?.value || ''
+  const desde  = document.getElementById('f-desde')?.value  || ''
+  const hasta  = document.getElementById('f-hasta')?.value  || ''
 
   _filteredQJ = _allQJ.filter(r => {
-    const txt = `${r.folio} ${r.nombre_paciente || ''} ${r.descripcion || ''} ${r.departamento || ''}`.toLowerCase()
-    return (!q      || txt.includes(q))
-        && (!tipo   || r.tipo   === tipo)
-        && (!status || r.status === status)
+    const f = r.fecha || ''
+    if (tipo   && r.tipo   !== tipo)   return false
+    if (status && r.status !== status) return false
+    if (depto  && r.departamento !== depto) return false
+    if (origen && (r.origen || 'manual') !== origen) return false
+    if (desde  && (!f || f < desde)) return false
+    if (hasta  && (!f || f > hasta)) return false
+    if (q) {
+      const txt = `${r.folio || ''} ${r.nombre_paciente || ''} ${r.nombre_presenta || ''} ${r.descripcion || ''} ${r.departamento || ''}`.toLowerCase()
+      if (!txt.includes(q)) return false
+    }
+    return true
   })
+
+  renderChips()
+  renderKPIs()
+  renderCharts()
   renderTable(_filteredQJ)
 }
 
-// ── Resumen ───────────────────────────────────────────────────────
-function renderSummary() {
-  const summary = document.getElementById('qj-summary')
-  if (!summary) return
-  if (_allQJ.length === 0) { summary.style.display = 'none'; return }
-  summary.style.display = 'grid'
+function clearFilters() {
+  ;['f-tipo','f-status','f-depto','f-origen','f-desde','f-hasta','search-input']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
+  const p = document.getElementById('f-periodo'); if (p) p.value = 'todo'
+  applyFilters()
+}
 
-  const cnt = (tipo) => _allQJ.filter(r => r.tipo === tipo).length
-  setText('cnt-queja',       cnt('queja'))
-  setText('cnt-sugerencia',  cnt('sugerencia'))
-  setText('cnt-felicitacion',cnt('felicitacion'))
-  setText('cnt-pendiente',   _allQJ.filter(r => r.status === 'pendiente').length)
+function renderChips() {
+  const el = document.getElementById('qj-chips')
+  if (!el) return
+  const desde = document.getElementById('f-desde')?.value || ''
+  const hasta = document.getElementById('f-hasta')?.value || ''
+  const chips = []
+  chips.push(desde || hasta
+    ? `<span class="qj-chip"><i class="fa-solid fa-calendar-days"></i> ${
+        desde ? fmtDate(desde) : 'inicio'} — ${hasta ? fmtDate(hasta) : 'hoy'}</span>`
+    : `<span class="qj-chip"><i class="fa-solid fa-calendar-days"></i> Todo el histórico</span>`)
+  ;[['f-tipo','Tipo'],['f-status','Estado'],['f-depto','Depto'],['f-origen','Origen']]
+    .forEach(([id, etq]) => {
+      const v = document.getElementById(id)?.value
+      if (v) chips.push(`<span class="qj-chip">${etq}: ${esc(v)}</span>`)
+    })
+  chips.push(`<span class="qj-chip-count">${_filteredQJ.length} de ${_allQJ.length}</span>`)
+  el.innerHTML = chips.join('')
+}
+
+// ── KPIs (sobre lo filtrado) ──────────────────────────────────────
+function renderKPIs() {
+  const b = _filteredQJ
+  const cnt = t => b.filter(r => r.tipo === t).length
+  setText('cnt-total',        b.length)
+  setText('cnt-queja',        cnt('queja'))
+  setText('cnt-sugerencia',   cnt('sugerencia'))
+  setText('cnt-felicitacion', cnt('felicitacion'))
+  setText('cnt-pendiente',    b.filter(r => r.status === 'pendiente').length)
+  setText('cnt-resueltas',    b.filter(r => ['resuelto','cerrado'].includes(r.status)).length)
 }
 
 // ── Render tabla ──────────────────────────────────────────────────
@@ -134,7 +218,7 @@ function renderTable(rows) {
           : ''}</td>
       <td style="white-space:nowrap">${fmtDate(r.fecha)}</td>
       <td class="center">${tipoPill(r.tipo)}</td>
-      <td>${esc(r.nombre_paciente || '—')}</td>
+      <td>${esc(r.nombre_paciente || r.nombre_presenta || '—')}</td>
       <td>${esc(r.departamento || '—')}</td>
       <td><span class="qj-desc" title="${esc(r.descripcion || '')}">${esc(r.descripcion || '—')}</span></td>
       <td class="center">${statusPill(r.status)}</td>
@@ -150,6 +234,161 @@ function renderTable(rows) {
         </div>
       </td>
     </tr>`).join('')
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GRÁFICAS — se recalculan con lo que dejaron los filtros
+// ══════════════════════════════════════════════════════════════════
+const _qjCharts = {}
+const QJ_COLOR = {
+  queja: '#eb6834', sugerencia: '#2a78d6', felicitacion: '#1baf7a',
+}
+const QJ_STATUS_COLOR = {
+  pendiente: '#eda100', en_proceso: '#2a78d6', resuelto: '#1baf7a', cerrado: '#8b908c',
+}
+const QJ_STATUS_LBL = {
+  pendiente: 'Pendiente', en_proceso: 'En proceso', resuelto: 'Resuelto', cerrado: 'Cerrado',
+}
+const QJ_TIPO_LBL = { queja: 'Quejas', sugerencia: 'Sugerencias', felicitacion: 'Felicitaciones' }
+
+function qjCaja(id) { return document.querySelector(`.qj-box[data-chart="${id}"]`) }
+function qjPrep(id) {
+  const c = qjCaja(id); if (!c) return null
+  if (_qjCharts[id]) { _qjCharts[id].destroy(); delete _qjCharts[id] }
+  c.innerHTML = `<canvas id="${id}"></canvas>`
+  return document.getElementById(id)
+}
+function qjVacio(id, msg) {
+  const c = qjCaja(id)
+  if (_qjCharts[id]) { _qjCharts[id].destroy(); delete _qjCharts[id] }
+  if (c) c.innerHTML = `<div class="qj-box-vacio">${msg}</div>`
+}
+
+function renderCharts() {
+  if (typeof Chart === 'undefined') return
+  qjChartTipo()
+  qjChartStatus()
+  qjChartDepto()
+  qjChartTendencia()
+}
+
+function qjContar(campo) {
+  const c = {}
+  _filteredQJ.forEach(r => { const k = r[campo]; if (k) c[k] = (c[k] || 0) + 1 })
+  return c
+}
+
+// Distribución por tipo (dona)
+function qjChartTipo() {
+  const c = qjContar('tipo')
+  const claves = Object.keys(c).sort((a, b) => c[b] - c[a])
+  if (!claves.length) { qjVacio('ch-tipo', 'Sin registros en el periodo'); return }
+  const total = _filteredQJ.length
+  const cv = qjPrep('ch-tipo'); if (!cv) return
+  _qjCharts['ch-tipo'] = new Chart(cv, {
+    type: 'doughnut',
+    data: {
+      labels: claves.map(k => `${QJ_TIPO_LBL[k] || k} — ${c[k]} (${Math.round(c[k] / total * 100)}%)`),
+      datasets: [{ data: claves.map(k => c[k]),
+                   backgroundColor: claves.map(k => QJ_COLOR[k] || '#8b908c'),
+                   borderWidth: 2, borderColor: '#fff' }],
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } } },
+  })
+  const quejas = c['queja'] || 0
+  setText('ch-tipo-sub', total ? `${Math.round(quejas / total * 100)}% son quejas` : '')
+}
+
+// Estado de atención (barras horizontales)
+function qjChartStatus() {
+  const orden = ['pendiente','en_proceso','resuelto','cerrado']
+  const c = qjContar('status')
+  const presentes = orden.filter(k => c[k])
+  if (!presentes.length) { qjVacio('ch-status', 'Sin registros en el periodo'); return }
+  const total = _filteredQJ.length
+  const cv = qjPrep('ch-status'); if (!cv) return
+  _qjCharts['ch-status'] = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: presentes.map(k => QJ_STATUS_LBL[k]),
+      datasets: [{ label: 'Registros', data: presentes.map(k => c[k]),
+                   backgroundColor: presentes.map(k => QJ_STATUS_COLOR[k]), borderRadius: 5 }],
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: i => ` ${i.raw} (${Math.round(i.raw / total * 100)}%)` } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+  })
+  const sinAtender = c['pendiente'] || 0
+  setText('ch-status-sub', total ? `${sinAtender} pendiente${sinAtender !== 1 ? 's' : ''} de atención` : '')
+}
+
+// Departamentos más señalados (top 10, barras horizontales)
+function qjChartDepto() {
+  const c = qjContar('departamento')
+  const top = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 10)
+  if (!top.length) { qjVacio('ch-depto', 'Sin departamentos en el periodo'); return }
+  const cv = qjPrep('ch-depto'); if (!cv) return
+  _qjCharts['ch-depto'] = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: top.map(k => k.length > 26 ? k.slice(0, 26) + '…' : k),
+      datasets: [{ label: 'Registros', data: top.map(k => c[k]),
+                   backgroundColor: '#2a78d6', borderRadius: 5 }],
+    },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { title: i => top[i[0].dataIndex] } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { font: { size: 11 } } } } },
+  })
+}
+
+// Tendencia por mes, apilada por tipo
+function qjChartTendencia() {
+  const fechas = _filteredQJ.map(r => r.fecha).filter(Boolean).sort()
+  if (!fechas.length) { qjVacio('ch-tend', 'Sin registros en el periodo'); setText('ch-tend-sub', ''); return }
+
+  const cubos = {}  // mes → {queja, sugerencia, felicitacion}
+  _filteredQJ.forEach(r => {
+    const ym = (r.fecha || '').slice(0, 7)
+    if (!ym) return
+    if (!cubos[ym]) cubos[ym] = { queja: 0, sugerencia: 0, felicitacion: 0 }
+    if (r.tipo in cubos[ym]) cubos[ym][r.tipo]++
+  })
+  const meses = qjRellenarMeses(Object.keys(cubos).sort()).slice(-24)
+  const cv = qjPrep('ch-tend'); if (!cv) return
+  _qjCharts['ch-tend'] = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: meses.map(qjFmtMes),
+      datasets: ['queja','sugerencia','felicitacion'].map(t => ({
+        label: QJ_TIPO_LBL[t], data: meses.map(m => (cubos[m] || {})[t] || 0),
+        backgroundColor: QJ_COLOR[t], borderRadius: 3, stack: 'x',
+      })),
+    },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 10, font: { size: 11 } } } },
+      scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } } },
+  })
+  setText('ch-tend-sub', `${meses.length} mes${meses.length !== 1 ? 'es' : ''}`)
+}
+
+function qjRellenarMeses(claves) {
+  if (claves.length < 2) return claves
+  const out = []
+  let [y, m] = claves[0].split('-').map(Number)
+  const [fy, fm] = claves[claves.length - 1].split('-').map(Number)
+  while (y < fy || (y === fy && m <= fm)) {
+    out.push(`${y}-${String(m).padStart(2, '0')}`)
+    m++; if (m > 12) { m = 1; y++ }
+  }
+  return out.length > 60 ? claves : out
+}
+function qjFmtMes(ym) {
+  const [y, m] = ym.split('-')
+  const M = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+  return `${M[+m - 1]} ${y.slice(2)}`
 }
 
 // ── Modal helpers ─────────────────────────────────────────────────
