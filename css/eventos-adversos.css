@@ -367,3 +367,51 @@
   transition: background .2s;
 }
 .attach-link:hover { background: #dbeafe; }
+
+/* ═══════════ Periodo activo ═══════════ */
+.periodo-activo {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: .82rem; color: #475569; margin: 0 0 16px;
+}
+.periodo-activo .chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #e0f2f1; color: #0f766e; border-radius: 99px;
+  padding: 4px 12px; font-weight: 600;
+}
+.periodo-activo .chip.warn { background: #fef3c7; color: #92400e; }
+
+/* ═══════════ Gráficas ═══════════ */
+.charts-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+}
+@media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+
+.chart-panel {
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05); overflow: hidden;
+}
+.chart-panel.wide { margin-bottom: 16px; }
+.chart-head {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+  padding: 14px 20px; border-bottom: 1px solid #f0f0f0;
+  font-size: .87rem; font-weight: 700; color: #334155; flex-wrap: wrap;
+}
+.chart-head i { color: #0d9488; margin-right: 6px; }
+.chart-head small { font-weight: 500; color: #94a3b8; font-size: .76rem; }
+.chart-box { position: relative; height: 240px; padding: 16px 20px 20px; }
+.chart-box.tall { height: 300px; }
+.chart-foot {
+  padding: 12px 20px 16px; border-top: 1px solid #f0f0f0;
+  font-size: .82rem; color: #475569;
+}
+.chart-vacio {
+  display: flex; align-items: center; justify-content: center; height: 100%;
+  color: #94a3b8; font-size: .85rem; text-align: center;
+}
+.tend-badge {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px;
+  border-radius: 99px; font-size: .78rem; font-weight: 700; margin-right: 8px;
+}
+.tend-badge.up   { background: #fee2e2; color: #991b1b; }
+.tend-badge.down { background: #d1fae5; color: #065f46; }
+.tend-badge.flat { background: #e2e8f0; color: #475569; }

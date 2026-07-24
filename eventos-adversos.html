@@ -130,6 +130,74 @@
 
     <div class="page-content">
 
+      <!-- ── Filtros (arriba: mandan sobre fichas, gráficas y tabla) ── -->
+      <div class="filters-bar">
+        <div class="filter-group">
+          <label>Periodo</label>
+          <select id="f-periodo" onchange="onPeriodoChange()">
+            <option value="todo">Todo el histórico</option>
+            <option value="mes">Este mes</option>
+            <option value="mes-1">Mes pasado</option>
+            <option value="3m">Últimos 3 meses</option>
+            <option value="6m">Últimos 6 meses</option>
+            <option value="12m">Últimos 12 meses</option>
+            <option value="anio">Este año</option>
+            <option value="anio-1">Año pasado</option>
+            <option value="custom">Personalizado…</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Desde</label>
+          <input type="date" id="f-desde" onchange="onFechaManual()">
+        </div>
+        <div class="filter-group">
+          <label>Hasta</label>
+          <input type="date" id="f-hasta" onchange="onFechaManual()">
+        </div>
+        <div class="filter-group">
+          <label>Tipo</label>
+          <select id="f-type" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Cuasi Falla</option>
+            <option>Evento Adverso</option>
+            <option>Consulta</option>
+            <option>No es un evento Adverso</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Nivel de daño</label>
+          <select id="f-damage" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option>Sin Daño</option>
+            <option>Leve</option>
+            <option>Moderado</option>
+            <option>Grave</option>
+            <option>Muerte</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Categoría</label>
+          <select id="f-subtype" onchange="applyFilters()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Área</label>
+          <select id="f-area" onchange="applyFilters()">
+            <option value="">Todas</option>
+          </select>
+        </div>
+        <div class="filter-group filter-search">
+          <label>Buscar</label>
+          <input type="text" id="f-search" placeholder="Paciente, descripción…" oninput="applyFilters()">
+        </div>
+        <button class="btn-clear-filters" onclick="clearFilters()">
+          <i class="fa-solid fa-xmark"></i> Limpiar
+        </button>
+      </div>
+
+      <div class="periodo-activo" id="periodo-activo"></div>
+
       <!-- ── KPI Cards ── -->
       <div class="kpi-grid">
         <div class="kpi-card blue">
@@ -140,10 +208,11 @@
           </div>
         </div>
         <div class="kpi-card yellow">
-          <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="kpi-icon"><i class="fa-solid fa-shield-halved"></i></div>
           <div class="kpi-body">
             <div class="kpi-val" id="kpi-cuasi">—</div>
             <div class="kpi-lbl">Cuasi Fallas</div>
+            <div class="kpi-sub" id="kpi-cuasi-sub">detectadas antes de llegar al paciente</div>
           </div>
         </div>
         <div class="kpi-card red">
@@ -151,6 +220,7 @@
           <div class="kpi-body">
             <div class="kpi-val" id="kpi-adverso">—</div>
             <div class="kpi-lbl">Eventos Adversos</div>
+            <div class="kpi-sub" id="kpi-adverso-sub">sí alcanzaron al paciente</div>
           </div>
         </div>
         <div class="kpi-card orange">
@@ -177,66 +247,56 @@
         </div>
       </div>
 
-      <!-- ── Filtros ── -->
-      <div class="filters-bar">
-        <div class="filter-group">
-          <label>Tipo</label>
-          <select id="f-type" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option>Cuasi Falla</option>
-            <option>Evento Adverso</option>
-            <option>Consulta</option>
-            <option>No es un evento Adverso</option>
-          </select>
+      <!-- ── Gráficas ── -->
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <div class="chart-head">
+            <span><i class="fa-solid fa-chart-pie"></i> Distribución por tipo</span>
+            <small id="ch-tipo-sub"></small>
+          </div>
+          <div class="chart-box" data-chart="ch-tipo"><canvas id="ch-tipo"></canvas></div>
         </div>
-        <div class="filter-group">
-          <label>Nivel de daño</label>
-          <select id="f-damage" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option>Sin Daño</option>
-            <option>Leve</option>
-            <option>Moderado</option>
-            <option>Grave</option>
-            <option>Muerte</option>
-          </select>
+        <div class="chart-panel">
+          <div class="chart-head">
+            <span><i class="fa-solid fa-heart-pulse"></i> Nivel de daño</span>
+            <small id="ch-dano-sub"></small>
+          </div>
+          <div class="chart-box" data-chart="ch-dano"><canvas id="ch-dano"></canvas></div>
         </div>
-        <div class="filter-group">
-          <label>Subtipo</label>
-          <select id="f-subtype" onchange="applyFilters()">
-            <option value="">Todos</option>
-          </select>
+      </div>
+
+      <div class="chart-panel wide">
+        <div class="chart-head">
+          <span><i class="fa-solid fa-chart-column"></i> Tendencia de notificaciones</span>
+          <small id="ch-tend-sub"></small>
         </div>
-        <div class="filter-group">
-          <label>Mes</label>
-          <select id="f-month" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option value="1">Enero</option>
-            <option value="2">Febrero</option>
-            <option value="3">Marzo</option>
-            <option value="4">Abril</option>
-            <option value="5">Mayo</option>
-            <option value="6">Junio</option>
-            <option value="7">Julio</option>
-            <option value="8">Agosto</option>
-            <option value="9">Septiembre</option>
-            <option value="10">Octubre</option>
-            <option value="11">Noviembre</option>
-            <option value="12">Diciembre</option>
-          </select>
+        <div class="chart-box tall" data-chart="ch-tendencia"><canvas id="ch-tendencia"></canvas></div>
+        <div class="chart-foot" id="ch-tend-foot"></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-panel">
+          <div class="chart-head">
+            <span><i class="fa-solid fa-triangle-exclamation"></i> Factores contribuyentes</span>
+            <small>qué contribuyó a que ocurriera</small>
+          </div>
+          <div class="chart-box tall" data-chart="ch-factores"><canvas id="ch-factores"></canvas></div>
         </div>
-        <div class="filter-group">
-          <label>Año</label>
-          <select id="f-year" onchange="applyFilters()">
-            <option value="">Todos</option>
-          </select>
+        <div class="chart-panel">
+          <div class="chart-head">
+            <span><i class="fa-solid fa-shield-heart"></i> Factores protectores</span>
+            <small>qué evitó que el daño fuera mayor</small>
+          </div>
+          <div class="chart-box tall" data-chart="ch-mitigantes"><canvas id="ch-mitigantes"></canvas></div>
         </div>
-        <div class="filter-group filter-search">
-          <label>Buscar</label>
-          <input type="text" id="f-search" placeholder="Paciente, descripción…" oninput="applyFilters()">
+      </div>
+
+      <div class="chart-panel wide">
+        <div class="chart-head">
+          <span><i class="fa-solid fa-layer-group"></i> Categorías del incidente</span>
+          <small id="ch-cat-sub"></small>
         </div>
-        <button class="btn-clear-filters" onclick="clearFilters()">
-          <i class="fa-solid fa-xmark"></i> Limpiar
-        </button>
+        <div class="chart-box tall" data-chart="ch-categoria"><canvas id="ch-categoria"></canvas></div>
       </div>
 
       <!-- ── Tabla ── -->
@@ -289,6 +349,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/eventos-adversos.js"></script>
