@@ -303,3 +303,8 @@
   background: #ede9fe; color: #5b21b6;
   padding: 2px 8px; border-radius: 20px; margin-top: 4px;
 }
+
+/* Etiqueta para las quejas que llegaron por el formulario web */
+.qj-tag-form { display:inline-block;background:#e0e7ff;color:#3730a3;border-radius:4px;
+  padding:1px 6px;font-size:.62rem;font-weight:700;text-transform:uppercase;
+  letter-spacing:.03em;vertical-align:middle;margin-left:4px }

@@ -128,7 +128,10 @@ function renderTable(rows) {
 
   tbody.innerHTML = rows.map(r => `
     <tr>
-      <td><span class="qj-folio qj-folio-${r.tipo}">${esc(r.folio)}</span></td>
+      <td><span class="qj-folio qj-folio-${r.tipo}">${esc(r.folio)}</span>${
+        r.origen === 'hoja'
+          ? ' <span class="qj-tag-form" title="Llegó por el formulario web">web</span>'
+          : ''}</td>
       <td style="white-space:nowrap">${fmtDate(r.fecha)}</td>
       <td class="center">${tipoPill(r.tipo)}</td>
       <td>${esc(r.nombre_paciente || '—')}</td>
