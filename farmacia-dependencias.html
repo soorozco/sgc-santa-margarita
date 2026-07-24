@@ -76,6 +76,16 @@
     .campo .ayuda { font-size:.72rem;color:#94a3b8;font-weight:500;text-transform:none;letter-spacing:0 }
     .req { color:#dc2626 }
 
+    .aviso-hoja { display:flex;align-items:flex-start;gap:11px;background:#f0fdfa;
+      border:1px solid #99f6e4;border-left:4px solid #0d9488;border-radius:10px;
+      padding:13px 16px;margin-bottom:18px;font-size:.84rem;color:#115e59;line-height:1.55 }
+    .aviso-hoja i { margin-top:3px;color:#0d9488;font-size:1rem }
+    .aviso-hoja strong { color:#0f766e }
+    #ultima-sync { color:#0f766e;font-weight:600 }
+    .tag-hoja { display:inline-block;background:#ccfbf1;color:#0f766e;border-radius:4px;
+      padding:1px 6px;font-size:.68rem;font-weight:700;text-transform:uppercase;
+      letter-spacing:.03em;vertical-align:middle }
+
     #toast { position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);
       background:#0d9488;color:#fff;padding:12px 24px;border-radius:10px;font-size:.88rem;
       font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:300;transition:transform .25s;
@@ -203,6 +213,19 @@
     </div>
 
     <div class="page-content">
+
+      <div class="aviso-hoja">
+        <i class="fa-solid fa-table-cells"></i>
+        <div>
+          Los vales marcados con <span class="tag-hoja">hoja</span> se alimentan
+          autom&aacute;ticamente de la hoja de Google de Farmacia y se actualizan
+          cada hora. <strong>Para corregir uno de esos, h&aacute;galo en la hoja</strong>
+          &mdash; los cambios hechos aqu&iacute; se sobrescriben en la siguiente
+          sincronizaci&oacute;n. El bot&oacute;n <em>Nuevo vale</em> sigue sirviendo
+          para los que no est&eacute;n en la hoja.
+          <span id="ultima-sync"></span>
+        </div>
+      </div>
 
       <div class="kpi-row">
         <div class="kpi">

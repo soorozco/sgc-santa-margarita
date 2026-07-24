@@ -63,9 +63,22 @@ async function cargar() {
   }
 
   _vales = data || []
+  mostrarUltimaSync()
   llenarFiltroMes()
   llenarFiltroDep()
   aplicarFiltros()
+}
+
+// Cuándo corrió por última vez el robot que lee la hoja
+function mostrarUltimaSync() {
+  const el = document.getElementById('ultima-sync')
+  if (!el) return
+  const sellos = _vales.map(v => v.sincronizado).filter(Boolean).sort()
+  if (!sellos.length) { el.textContent = ''; return }
+  const d = new Date(sellos[sellos.length - 1])
+  el.textContent = ` Última sincronización: ${d.toLocaleString('es-MX',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    .replace(/\.$/, '')}.`
 }
 
 // ── Filtros ─────────────────────────────────────────────────────
@@ -156,7 +169,10 @@ function pintarTabla() {
         ? esc(v.dependencia)
         : '<span class="sin-dato">(sin dependencia)</span>'}</td>
       <td>${esc(v.almacen || '—')}</td>
-      <td style="font-variant-numeric:tabular-nums">${esc(v.folio || '—')}</td>
+      <td style="font-variant-numeric:tabular-nums">${esc(v.folio || '—')}${
+        v.origen === 'hoja'
+          ? ' <span class="tag-hoja" title="Se administra desde la hoja de Google">hoja</span>'
+          : ''}</td>
       <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">${money(v.total)}</td>
       <td class="obs">${v.observaciones ? esc(v.observaciones) : '—'}</td>
       <td style="text-align:center;white-space:nowrap">
@@ -187,6 +203,16 @@ function nuevoVale() {
 function editarVale(id) {
   const v = _vales.find(x => x.id === id)
   if (!v) return
+
+  // Los vales que administra la hoja se vuelven a sobrescribir en la
+  // siguiente sincronización: editarlos aquí no sirve de nada.
+  if (v.origen === 'hoja' && !confirm(
+      `El vale ${v.folio} viene de la hoja de Google.\n\n` +
+      'Si lo cambias aquí, la próxima sincronización lo va a regresar ' +
+      'a como está en la hoja.\n\nCorrígelo en la hoja. ¿Editar de todos modos?')) {
+    return
+  }
+
   _editId = id
   setText('modal-title', `Editar vale ${v.folio || ''}`.trim())
   setVal('v-fecha', v.fecha || hoy())
