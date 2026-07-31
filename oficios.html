@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quejas, Sugerencias y Felicitaciones — SGC Hospital Santa Margarita</title>
+  <title>Oficios — SGC Hospital Santa Margarita</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -122,8 +122,8 @@
     <div class="topbar">
       <button id="btn-hamburger" class="btn-hamburger" aria-label="Abrir menú"><i class="fa-solid fa-bars"></i></button>
       <div>
-        <div class="topbar-page-title">Quejas, Sugerencias y Felicitaciones</div>
-        <div class="topbar-sub">Cláusula 9.1.2 — Formato FT-CA-24</div>
+        <div class="topbar-page-title">Oficios</div>
+        <div class="topbar-sub">Oficina de Calidad — comunicaciones oficiales</div>
       </div>
       <div class="topbar-right">
         <div class="topbar-date" id="current-date"></div>
@@ -161,38 +161,34 @@
           <label>Tipo</label>
           <select id="f-tipo" onchange="applyFilters()">
             <option value="">Todos</option>
-            <option value="queja">Queja</option>
-            <option value="sugerencia">Sugerencia</option>
-            <option value="felicitacion">Felicitación</option>
+            <option value="respuesta_queja">Respuesta a queja</option>
+            <option value="solicitud">Solicitud</option>
+            <option value="circular">Circular</option>
+            <option value="otro">Otro</option>
           </select>
         </div>
         <div class="qj-campo">
           <label>Estado</label>
           <select id="f-status" onchange="applyFilters()">
             <option value="">Todos</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en_proceso">En Proceso</option>
-            <option value="resuelto">Resuelto</option>
-            <option value="cerrado">Cerrado</option>
+            <option value="borrador">Borrador</option>
+            <option value="enviado">Enviado</option>
+            <option value="respondido">Respondido</option>
+            <option value="archivado">Archivado</option>
           </select>
         </div>
         <div class="qj-campo">
-          <label>Departamento</label>
-          <select id="f-depto" onchange="applyFilters()">
+          <label>Vínculo</label>
+          <select id="f-vinculo" onchange="applyFilters()">
             <option value="">Todos</option>
-          </select>
-        </div>
-        <div class="qj-campo">
-          <label>Origen</label>
-          <select id="f-origen" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option value="hoja">Formulario web</option>
-            <option value="manual">Captura manual</option>
+            <option value="queja">Con queja</option>
+            <option value="nc">Con no conformidad</option>
+            <option value="sin">Sin vínculo</option>
           </select>
         </div>
         <div class="qj-campo qj-campo-busca">
           <label>Buscar</label>
-          <input type="text" id="search-input" placeholder="Folio, nombre, descripción…"
+          <input type="text" id="search-input" placeholder="Número, asunto, dirigido a…"
                  oninput="applyFilters()">
         </div>
         <div class="qj-acciones">
@@ -202,13 +198,11 @@
           <button class="btn-secondary" onclick="exportCSV()">
             <i class="fa-solid fa-download"></i> CSV
           </button>
-          <button class="btn-primary" id="btn-new-qj" onclick="openNewQJ()" style="display:none">
-            <i class="fa-solid fa-plus"></i> Registrar
+          <button class="btn-primary" id="btn-new-of" onclick="openNewOF()" style="display:none">
+            <i class="fa-solid fa-plus"></i> Registrar oficio
           </button>
         </div>
       </div>
-
-      <div class="qj-chips" id="qj-chips"></div>
 
       <!-- ── KPIs (responden a los filtros) ── -->
       <div class="qj-kpis">
@@ -216,74 +210,44 @@
           <div class="qj-kpi-n" id="cnt-total">0</div>
           <div class="qj-kpi-l">Total</div>
         </div>
-        <div class="qj-kpi queja">
-          <div class="qj-kpi-n" id="cnt-queja">0</div>
-          <div class="qj-kpi-l">Quejas</div>
-        </div>
         <div class="qj-kpi sugerencia">
-          <div class="qj-kpi-n" id="cnt-sugerencia">0</div>
-          <div class="qj-kpi-l">Sugerencias</div>
+          <div class="qj-kpi-n" id="cnt-enviado">0</div>
+          <div class="qj-kpi-l">Enviados</div>
         </div>
         <div class="qj-kpi felicitacion">
-          <div class="qj-kpi-n" id="cnt-felicitacion">0</div>
-          <div class="qj-kpi-l">Felicitaciones</div>
+          <div class="qj-kpi-n" id="cnt-respondido">0</div>
+          <div class="qj-kpi-l">Respondidos</div>
+        </div>
+        <div class="qj-kpi queja">
+          <div class="qj-kpi-n" id="cnt-conqueja">0</div>
+          <div class="qj-kpi-l">Ligados a queja</div>
         </div>
         <div class="qj-kpi pendiente">
-          <div class="qj-kpi-n" id="cnt-pendiente">0</div>
-          <div class="qj-kpi-l">Pendientes</div>
+          <div class="qj-kpi-n" id="cnt-connc">0</div>
+          <div class="qj-kpi-l">Ligados a NC</div>
         </div>
-        <div class="qj-kpi resueltas">
-          <div class="qj-kpi-n" id="cnt-resueltas">0</div>
-          <div class="qj-kpi-l">Resueltas / cerradas</div>
-        </div>
-      </div>
-
-      <!-- ── Gráficas ── -->
-      <div class="qj-charts">
-        <div class="qj-panel">
-          <div class="qj-panel-h"><i class="fa-solid fa-chart-pie"></i> Distribución por tipo
-            <small id="ch-tipo-sub"></small></div>
-          <div class="qj-box" data-chart="ch-tipo"><canvas id="ch-tipo"></canvas></div>
-        </div>
-        <div class="qj-panel">
-          <div class="qj-panel-h"><i class="fa-solid fa-list-check"></i> Estado de atención
-            <small id="ch-status-sub"></small></div>
-          <div class="qj-box" data-chart="ch-status"><canvas id="ch-status"></canvas></div>
-        </div>
-      </div>
-
-      <div class="qj-panel">
-        <div class="qj-panel-h"><i class="fa-solid fa-building"></i> Departamentos más señalados
-          <small>los 10 con más registros en el periodo</small></div>
-        <div class="qj-box tall" data-chart="ch-depto"><canvas id="ch-depto"></canvas></div>
-      </div>
-
-      <div class="qj-panel">
-        <div class="qj-panel-h"><i class="fa-solid fa-chart-column"></i> Tendencia por mes
-          <small id="ch-tend-sub"></small></div>
-        <div class="qj-box tall" data-chart="ch-tend"><canvas id="ch-tend"></canvas></div>
       </div>
 
       <!-- ── Tabla ── -->
       <div class="qj-tabla-wrap">
         <div class="qj-tabla-head">
-          <span class="table-count" id="qj-count">Cargando…</span>
+          <span class="table-count" id="of-count">Cargando…</span>
         </div>
         <div class="qj-tabla-scroll">
           <table class="qj-tabla">
             <thead>
               <tr>
-                <th>Folio</th>
+                <th>Número</th>
                 <th>Fecha</th>
                 <th class="center">Tipo</th>
-                <th>Nombre</th>
-                <th>Departamento</th>
-                <th>Descripción</th>
+                <th>Asunto</th>
+                <th>Dirigido a</th>
+                <th>Vínculo</th>
                 <th class="center">Estado</th>
                 <th class="center">Acciones</th>
               </tr>
             </thead>
-            <tbody id="qj-tbody">
+            <tbody id="of-tbody">
               <tr>
                 <td colspan="8" class="table-empty">
                   <i class="fa-solid fa-spinner fa-spin"></i>
@@ -300,107 +264,113 @@
 </div>
 
 
-<!-- ═══ MODAL — Nueva / Editar ═══ -->
-<div class="modal-overlay" id="modal-new-qj">
+<!-- ═══ MODAL — Nuevo / Editar oficio ═══ -->
+<div class="modal-overlay" id="modal-new-of">
   <div class="modal">
     <div class="modal-head">
       <div class="modal-ttl" id="modal-new-ttl">
-        Registrar Solicitud
-        <small>Recepción de felicitaciones, sugerencias o quejas — FT-CA-24</small>
+        Registrar oficio
+        <small>Oficina de Calidad</small>
       </div>
-      <button class="modal-x" onclick="closeModal('modal-new-qj')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-x" onclick="closeModal('modal-new-of')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
 
       <div class="form-row">
         <div class="field">
+          <label>Número de oficio <span class="req">*</span></label>
+          <input type="text" id="of-numero" placeholder="Ej. HSM/CAL/2026/015">
+        </div>
+        <div class="field">
           <label>Fecha <span class="req">*</span></label>
-          <input type="date" id="nq-fecha">
-        </div>
-        <div class="field">
-          <label>Folio</label>
-          <input type="text" id="nq-folio" placeholder="Auto-generado" readonly
-                 style="background:#f1f5f9;color:var(--txt3)">
+          <input type="date" id="of-fecha">
         </div>
       </div>
 
       <div class="form-row">
         <div class="field">
-          <label>Nombre del paciente / cliente</label>
-          <input type="text" id="nq-nombre" placeholder="Nombre completo">
-        </div>
-        <div class="field">
-          <label>Tipo de solicitud <span class="req">*</span></label>
-          <select id="nq-tipo">
+          <label>Tipo</label>
+          <select id="of-tipo">
             <option value="">— Seleccionar —</option>
-            <option value="queja">Queja</option>
-            <option value="sugerencia">Sugerencia</option>
-            <option value="felicitacion">Felicitación</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="field">
-          <label>Habitación / Área</label>
-          <select id="nq-area" onchange="onQjAreaChange()" style="margin-bottom:8px">
-            <option value="">— Edificio / Área —</option>
-          </select>
-          <select id="nq-hab">
-            <option value="">— Habitación —</option>
+            <option value="respuesta_queja">Respuesta a queja</option>
+            <option value="solicitud">Solicitud</option>
+            <option value="circular">Circular</option>
+            <option value="otro">Otro</option>
           </select>
         </div>
         <div class="field">
-          <label>Número de teléfono</label>
-          <input type="tel" id="nq-telefono" placeholder="Opcional">
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="field">
-          <label>Departamento o área involucrada</label>
-          <select id="nq-departamento">
-            <option value="">— Seleccionar —</option>
+          <label>Estado</label>
+          <select id="of-estado">
+            <option value="borrador">Borrador</option>
+            <option value="enviado" selected>Enviado</option>
+            <option value="respondido">Respondido</option>
+            <option value="archivado">Archivado</option>
           </select>
-        </div>
-        <div class="field">
-          <label>Personal involucrado</label>
-          <input type="text" id="nq-personal" placeholder="Nombre(s) del personal">
         </div>
       </div>
 
       <div class="form-row one">
         <div class="field">
-          <label>Descripción del evento <span class="req">*</span></label>
-          <textarea id="nq-descripcion" rows="4"
-            placeholder="Describa con detalle la felicitación, sugerencia o queja…"></textarea>
+          <label>Asunto <span class="req">*</span></label>
+          <input type="text" id="of-asunto" placeholder="Asunto del oficio">
         </div>
       </div>
 
-      <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
-
       <div class="form-row">
         <div class="field">
-          <label>Nombre de quien presenta</label>
-          <input type="text" id="nq-presenta" placeholder="Nombre">
+          <label>Dirigido a</label>
+          <input type="text" id="of-dirigido" placeholder="Destinatario">
         </div>
         <div class="field">
-          <label>Nombre de quien recibe</label>
-          <input type="text" id="nq-recibe" placeholder="Nombre">
+          <label>Emitido por</label>
+          <input type="text" id="of-emitido" placeholder="Área o persona que emite">
         </div>
       </div>
 
       <div class="form-row one">
         <div class="field">
-          <label>Nombre de recepción Calidad</label>
-          <input type="text" id="nq-calidad" placeholder="Nombre del responsable de Calidad">
+          <label>Firmado por</label>
+          <input type="text" id="of-firmado" placeholder="Nombre de quien firma">
+        </div>
+      </div>
+
+      <div class="qj-sep"><i class="fa-solid fa-link"></i> Vínculos (opcional)</div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Relacionar con queja / sugerencia / felicitación</label>
+          <select id="of-queja">
+            <option value="">— Ninguna —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Relacionar con no conformidad</label>
+          <select id="of-nc">
+            <option value="">— Ninguna —</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="qj-sep"><i class="fa-solid fa-paperclip"></i> Documento</div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Enlace al documento (Google Drive)</label>
+          <input type="url" id="of-url" placeholder="https://drive.google.com/…">
+        </div>
+      </div>
+
+      <div class="form-row one">
+        <div class="field">
+          <label>Notas</label>
+          <textarea id="of-notas" rows="3" placeholder="Observaciones (opcional)"></textarea>
         </div>
       </div>
 
     </div>
     <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeModal('modal-new-qj')">Cancelar</button>
-      <button class="btn-primary" id="btn-save-qj" onclick="submitNewQJ()">
+      <button class="btn-secondary" onclick="closeModal('modal-new-of')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-of" onclick="submitNewOF()">
         <i class="fa-solid fa-floppy-disk"></i> Guardar
       </button>
     </div>
@@ -409,96 +379,47 @@
 
 
 <!-- ═══ MODAL — Detalle ═══ -->
-<div class="modal-overlay" id="modal-detail-qj">
+<div class="modal-overlay" id="modal-detail-of">
   <div class="modal modal-lg">
     <div class="modal-head">
       <div class="modal-ttl">
-        <span id="dq-folio-ttl">—</span>
-        <small id="dq-tipo-ttl">—</small>
+        <span id="dof-numero-ttl">—</span>
+        <small id="dof-tipo-ttl">—</small>
       </div>
-      <button class="modal-x" onclick="closeModal('modal-detail-qj')"><i class="fa-solid fa-xmark"></i></button>
+      <button class="modal-x" onclick="closeModal('modal-detail-of')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
-
-      <!-- Barra de estado -->
-      <div id="dq-status-bar"></div>
-
       <div class="info-grid">
-        <div class="info-item"><label>Folio</label><span id="dq-folio">—</span></div>
-        <div class="info-item"><label>Fecha</label><span id="dq-fecha">—</span></div>
-        <div class="info-item"><label>Tipo</label><span id="dq-tipo">—</span></div>
-        <div class="info-item"><label>Estado</label><span id="dq-status">—</span></div>
-        <div class="info-item"><label>Nombre</label><span id="dq-nombre">—</span></div>
-        <div class="info-item"><label>Habitación / Área</label><span id="dq-habitacion">—</span></div>
-        <div class="info-item"><label>Teléfono</label><span id="dq-telefono">—</span></div>
-        <div class="info-item"><label>Departamento</label><span id="dq-departamento">—</span></div>
-        <div class="info-item info-item-full"><label>Personal involucrado</label><span id="dq-personal">—</span></div>
+        <div class="info-item"><label>Número</label><span id="dof-numero">—</span></div>
+        <div class="info-item"><label>Fecha</label><span id="dof-fecha">—</span></div>
+        <div class="info-item"><label>Tipo</label><span id="dof-tipo">—</span></div>
+        <div class="info-item"><label>Estado</label><span id="dof-estado">—</span></div>
+        <div class="info-item"><label>Dirigido a</label><span id="dof-dirigido">—</span></div>
+        <div class="info-item"><label>Emitido por</label><span id="dof-emitido">—</span></div>
+        <div class="info-item"><label>Firmado por</label><span id="dof-firmado">—</span></div>
+        <div class="info-item"><label>Documento</label><span id="dof-url">—</span></div>
+        <div class="info-item"><label>Queja ligada</label><span id="dof-queja">—</span></div>
+        <div class="info-item"><label>No conformidad ligada</label><span id="dof-nc">—</span></div>
       </div>
-
-      <div class="info-item" style="margin-bottom:18px">
-        <label>Descripción del evento</label>
-        <span id="dq-descripcion" style="display:block;line-height:1.7;color:var(--txt2);margin-top:4px">—</span>
-      </div>
-
-      <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
-      <div class="conformidad-grid">
-        <div class="conf-item">
-          <label>Presentó</label>
-          <span id="dq-presenta">—</span>
-        </div>
-        <div class="conf-item">
-          <label>Recibió</label>
-          <span id="dq-recibe">—</span>
-        </div>
-        <div class="conf-item">
-          <label>Recepción Calidad</label>
-          <span id="dq-calidad">—</span>
-        </div>
-      </div>
-
-      <!-- Seguimiento -->
-      <div id="dq-seguimiento-wrap" style="display:none">
-        <div class="qj-sep"><i class="fa-solid fa-comments"></i> Seguimiento</div>
-        <div id="dq-seguimiento-list"></div>
-      </div>
-
-      <!-- Agregar nota de seguimiento (admin) -->
-      <div id="dq-nota-wrap" style="display:none;margin-top:12px">
-        <div class="field">
-          <label>Agregar nota de seguimiento</label>
-          <textarea id="dq-nota-text" rows="2" placeholder="Escribe una nota o acción tomada…"></textarea>
-        </div>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-          <select id="dq-new-status" class="filter-sel" style="flex:1">
-            <option value="">Sin cambiar estado</option>
-            <option value="en_proceso">Cambiar a: En Proceso</option>
-            <option value="resuelto">Cambiar a: Resuelto</option>
-            <option value="cerrado">Cambiar a: Cerrado</option>
-          </select>
-          <button class="btn-primary" onclick="submitNota()" id="btn-nota">
-            <i class="fa-solid fa-paper-plane"></i> Guardar nota
-          </button>
-        </div>
-      </div>
-
+      <div class="info-item" style="margin-top:14px"><label>Asunto</label><span id="dof-asunto">—</span></div>
+      <div class="info-item" style="margin-top:14px"><label>Notas</label><span id="dof-notas">—</span></div>
     </div>
     <div class="modal-foot">
-      <button class="btn-secondary" onclick="closeModal('modal-detail-qj')">Cerrar</button>
-      <button class="btn-secondary" id="btn-edit-qj" onclick="openEditQJ()" style="display:none">
-        <i class="fa-solid fa-pencil"></i> Editar
+      <button class="btn-secondary" onclick="closeModal('modal-detail-of')">Cerrar</button>
+      <button class="btn-secondary" id="btn-del-of" onclick="deleteOF()" style="display:none;color:#dc2626">
+        <i class="fa-solid fa-trash"></i> Eliminar
+      </button>
+      <button class="btn-primary" id="btn-edit-of" onclick="editOFFromDetail()" style="display:none">
+        <i class="fa-solid fa-pen"></i> Editar
       </button>
     </div>
   </div>
 </div>
 
-
-<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
-<script src="js/areas-catalogo.js"></script>
-<script src="js/quejas.js"></script>
-  <script src="js/sidebar.js"></script>
+<script src="js/oficios.js"></script>
+<script src="js/sidebar.js"></script>
 </body>
 </html>
