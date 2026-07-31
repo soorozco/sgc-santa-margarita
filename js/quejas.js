@@ -21,6 +21,7 @@ async function initQuejas() {
   setCurrentDate()
   await loadDepts()
   populateDeptSelect()
+  populateQjAreas()
   await loadQuejas()
   setupFilters()
   applyRoleUI()
@@ -50,6 +51,67 @@ function populateDeptSelect() {
   const opts = '<option value="">— Seleccionar —</option>' +
     _depts.map(d => `<option value="${esc(d.name)}">${esc(d.name)}</option>`).join('')
   sel.innerHTML = opts
+}
+
+// ── Catálogo de habitaciones (Edificio/Área → Habitación) ─────────
+// Usa HSM_ROOMS_BY_AREA de js/areas-catalogo.js. Se guarda un solo
+// texto en la columna 'habitacion': el código de habitación si se
+// eligió una, o el nombre del área si no.
+function populateQjAreas() {
+  const sel = document.getElementById('nq-area')
+  if (!sel || typeof HSM_AREAS === 'undefined') return
+  sel.innerHTML = '<option value="">— Edificio / Área —</option>' +
+    HSM_AREAS.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('')
+}
+
+function onQjAreaChange() {
+  const area = document.getElementById('nq-area')?.value || ''
+  const sel  = document.getElementById('nq-hab')
+  if (!sel) return
+  const rooms = (typeof HSM_ROOMS_BY_AREA !== 'undefined' && HSM_ROOMS_BY_AREA[area]) || []
+  sel.innerHTML = '<option value="">— Sin habitación específica —</option>' +
+    rooms.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('')
+}
+
+// Reconstruye los dos menús a partir del texto guardado (para editar
+// o para valores que vienen del formulario de Google). Si el valor no
+// está en el catálogo, se conserva tal cual como opción para no perderlo.
+function qjSetLocation(value) {
+  populateQjAreas()
+  const selA = document.getElementById('nq-area')
+  const selH = document.getElementById('nq-hab')
+  if (!selA || !selH) return
+  const v = String(value || '').trim()
+
+  if (!v) { selA.value = ''; onQjAreaChange(); return }
+
+  // ¿Es un código de habitación conocido?
+  const area = typeof hsmAreaDeHabitacion === 'function' ? hsmAreaDeHabitacion(v) : ''
+  if (area) {
+    selA.value = area
+    onQjAreaChange()
+    selH.value = v
+    return
+  }
+  // ¿Es el nombre de un área?
+  if (typeof HSM_AREAS !== 'undefined' && HSM_AREAS.includes(v)) {
+    selA.value = v
+    onQjAreaChange()
+    return
+  }
+  // Valor libre heredado: consérvalo como opción de área para no perderlo.
+  const opt = document.createElement('option')
+  opt.value = v; opt.textContent = v
+  selA.appendChild(opt)
+  selA.value = v
+  onQjAreaChange()
+}
+
+// Lee la ubicación elegida: habitación si hay, si no el área.
+function qjGetLocation() {
+  const area = document.getElementById('nq-area')?.value.trim() || ''
+  const hab  = document.getElementById('nq-hab')?.value.trim() || ''
+  return hab || area || ''
 }
 
 function applyRoleUI() {
@@ -409,11 +471,12 @@ async function openNewQJ() {
   _currentQJId = null
 
   // Limpiar campos
-  const fields = ['nq-nombre','nq-habitacion','nq-telefono','nq-personal',
+  const fields = ['nq-nombre','nq-telefono','nq-personal',
                   'nq-descripcion','nq-presenta','nq-recibe','nq-calidad']
   fields.forEach(id => setVal(id, ''))
   setVal('nq-tipo', '')
   setVal('nq-departamento', '')
+  qjSetLocation('')
   setVal('nq-fecha', new Date().toISOString().split('T')[0])
   setVal('nq-folio', 'Auto-generado')
 
@@ -446,7 +509,7 @@ function openEditQJFromTable(id) {
   setVal('nq-folio',        r.folio || '')
   setVal('nq-nombre',       r.nombre_paciente || '')
   setVal('nq-tipo',         r.tipo || '')
-  setVal('nq-habitacion',   r.habitacion || '')
+  qjSetLocation(r.habitacion || '')
   setVal('nq-telefono',     r.telefono || '')
   setVal('nq-departamento', r.departamento || '')
   setVal('nq-personal',     r.personal_involucrado || '')
@@ -467,7 +530,7 @@ async function submitNewQJ() {
   const folio       = document.getElementById('nq-folio')?.value.trim()
   const nombre      = document.getElementById('nq-nombre')?.value.trim()
   const tipo        = document.getElementById('nq-tipo')?.value
-  const habitacion  = document.getElementById('nq-habitacion')?.value.trim()
+  const habitacion  = qjGetLocation()
   const telefono    = document.getElementById('nq-telefono')?.value.trim()
   const departamento= document.getElementById('nq-departamento')?.value
   const personal    = document.getElementById('nq-personal')?.value.trim()

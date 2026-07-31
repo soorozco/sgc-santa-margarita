@@ -335,7 +335,12 @@
       <div class="form-row">
         <div class="field">
           <label>Habitación / Área</label>
-          <input type="text" id="nq-habitacion" placeholder="Ej. 203, Urgencias">
+          <select id="nq-area" onchange="onQjAreaChange()" style="margin-bottom:8px">
+            <option value="">— Edificio / Área —</option>
+          </select>
+          <select id="nq-hab">
+            <option value="">— Habitación —</option>
+          </select>
         </div>
         <div class="field">
           <label>Número de teléfono</label>
@@ -484,6 +489,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/areas-catalogo.js"></script>
 <script src="js/quejas.js"></script>
   <script src="js/sidebar.js"></script>
 </body>
