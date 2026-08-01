@@ -18,10 +18,16 @@ const _quejaLabel = {}
 const _ncLabel    = {}
 
 const OF_TIPOS = {
-  respuesta_queja: 'Respuesta a queja',
-  solicitud:       'Solicitud',
-  circular:        'Circular',
-  otro:            'Otro',
+  queja:              'Queja',
+  felicitacion:       'Felicitación',
+  sugerencia:         'Sugerencia',
+  no_conformidad:     'No conformidad',
+  desviacion:         'Desviación',
+  oportunidad_mejora: 'Oportunidad de mejora',
+  evento_adverso:     'Evento adverso / incidente',
+  solicitud:          'Solicitud',
+  circular:           'Circular',
+  otro:               'Otro',
 }
 const OF_ESTADOS = {
   borrador:   'Borrador',
@@ -55,6 +61,19 @@ function setCurrentDate() {
   if (el) el.textContent = new Date().toLocaleDateString('es-MX', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
   })
+}
+
+// Sugiere el siguiente número siguiendo la codificación HSMCA/NN/AAAA.
+// Toma el consecutivo más alto del año en curso (serie CA) y suma 1.
+function sugerirNumero(prefijo = 'HSMCA') {
+  const anio = new Date().getFullYear()
+  const re = new RegExp('^' + prefijo + '\\/(\\d+)\\/' + anio + '$')
+  let max = 0
+  _allOF.forEach(o => {
+    const m = re.exec((o.numero || '').replace(/\s/g, ''))
+    if (m) max = Math.max(max, parseInt(m[1], 10))
+  })
+  return `${prefijo}/${String(max + 1).padStart(2, '0')}/${anio}`
 }
 
 function applyRoleUI() {
@@ -263,13 +282,14 @@ function renderTable(rows) {
 function openNewOF() {
   _editMode = false
   _currentOFId = null
-  ;['of-numero','of-asunto','of-dirigido','of-emitido','of-firmado','of-url','of-notas']
+  ;['of-asunto','of-dirigido','of-emitido','of-firmado','of-url','of-notas']
     .forEach(id => setVal(id, ''))
   setVal('of-tipo', '')
   setVal('of-estado', 'enviado')
   setVal('of-queja', '')
   setVal('of-nc', '')
   setVal('of-fecha', new Date().toISOString().split('T')[0])
+  setVal('of-numero', sugerirNumero())   // siguiente número de la codificación
   const ttl = document.getElementById('modal-new-ttl')
   if (ttl) ttl.innerHTML = 'Registrar oficio <small>Oficina de Calidad</small>'
   openModal('modal-new-of')
