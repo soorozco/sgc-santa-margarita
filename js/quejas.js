@@ -8,6 +8,9 @@ let _filteredQJ= []
 let _depts     = []
 let _currentQJId = null
 let _editMode  = false
+let _pendingFiles = []   // imágenes elegidas pero aún no subidas
+let _editAdjuntos = []   // imágenes ya guardadas (al editar)
+const QJ_BUCKET = 'quejas-adjuntos'
 
 // ── Init ─────────────────────────────────────────────────────────
 async function initQuejas() {
@@ -112,6 +115,108 @@ function qjGetLocation() {
   const area = document.getElementById('nq-area')?.value.trim() || ''
   const hab  = document.getElementById('nq-hab')?.value.trim() || ''
   return hab || area || ''
+}
+
+// ── Imágenes adjuntas ────────────────────────────────────────────
+const QJ_MAX_MB = 10
+
+function onQjFilesSelected(input) {
+  const files = Array.from(input.files || [])
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) {
+      showToast(`"${f.name}" no es una imagen y se omitió.`, 'red'); continue
+    }
+    if (f.size > QJ_MAX_MB * 1024 * 1024) {
+      showToast(`"${f.name}" pesa más de ${QJ_MAX_MB} MB y se omitió.`, 'red'); continue
+    }
+    _pendingFiles.push(f)
+  }
+  input.value = ''            // permite volver a elegir el mismo archivo
+  renderQjAdjuntosForm()
+}
+
+function removePendingAdj(i) {
+  _pendingFiles.splice(i, 1)
+  renderQjAdjuntosForm()
+}
+
+// Dibuja, en el formulario, las imágenes ya guardadas (editar) + las nuevas.
+async function renderQjAdjuntosForm() {
+  const cont = document.getElementById('nq-adjuntos')
+  if (!cont) return
+  cont.innerHTML = ''
+
+  // Ya guardadas (modo edición)
+  for (const a of _editAdjuntos) {
+    const div = document.createElement('div')
+    div.className = 'qj-adj'
+    div.innerHTML = `<img alt="${esc(a.file_name || '')}">
+      <button type="button" class="qj-adj-x" title="Eliminar" onclick="deleteExistingAdj('${a.id}')">
+        <i class="fa-solid fa-xmark"></i></button>`
+    cont.appendChild(div)
+    const url = await qjSignedUrl(a.file_path)
+    if (url) div.querySelector('img').src = url
+    div.querySelector('img').onclick = () => url && window.open(url, '_blank')
+  }
+
+  // Nuevas (aún no subidas)
+  _pendingFiles.forEach((f, i) => {
+    const div = document.createElement('div')
+    div.className = 'qj-adj'
+    const url = URL.createObjectURL(f)
+    div.innerHTML = `<img src="${url}" alt="${esc(f.name)}">
+      <button type="button" class="qj-adj-x" title="Quitar" onclick="removePendingAdj(${i})">
+        <i class="fa-solid fa-xmark"></i></button>`
+    div.querySelector('img').onclick = () => window.open(url, '_blank')
+    cont.appendChild(div)
+  })
+}
+
+async function qjSignedUrl(path) {
+  try {
+    const { data } = await db.storage.from(QJ_BUCKET).createSignedUrl(path, 3600)
+    return data?.signedUrl || null
+  } catch (e) { return null }
+}
+
+async function loadAdjuntos(quejaId) {
+  const { data } = await db.from('quejas_adjuntos')
+    .select('id,file_path,file_name,mime_type')
+    .eq('queja_id', quejaId)
+    .order('uploaded_at', { ascending: true })
+  return data || []
+}
+
+// Sube las imágenes pendientes de una queja ya guardada.
+async function uploadPendingFiles(quejaId) {
+  if (!_pendingFiles.length) return { ok: true, subidas: 0 }
+  let subidas = 0
+  for (const f of _pendingFiles) {
+    const ext  = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+    const path = `${quejaId}/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const { error: upErr } = await db.storage.from(QJ_BUCKET)
+      .upload(path, f, { cacheControl: '3600', upsert: false, contentType: f.type })
+    if (upErr) return { ok: false, error: upErr.message, subidas }
+    const { error: rowErr } = await db.from('quejas_adjuntos').insert({
+      queja_id: quejaId, file_path: path, file_name: f.name,
+      file_size_bytes: f.size, mime_type: f.type, uploaded_by: _user.id,
+    })
+    if (rowErr) return { ok: false, error: rowErr.message, subidas }
+    subidas++
+  }
+  return { ok: true, subidas }
+}
+
+async function deleteExistingAdj(id) {
+  const a = _editAdjuntos.find(x => x.id === id)
+  if (!a) return
+  if (!confirm('¿Eliminar esta imagen?')) return
+  await db.storage.from(QJ_BUCKET).remove([a.file_path])
+  const { error } = await db.from('quejas_adjuntos').delete().eq('id', id)
+  if (error) { showToast('No se pudo eliminar: ' + error.message, 'red'); return }
+  _editAdjuntos = _editAdjuntos.filter(x => x.id !== id)
+  renderQjAdjuntosForm()
+  showToast('Imagen eliminada.', 'green')
 }
 
 function applyRoleUI() {
@@ -477,6 +582,9 @@ async function openNewQJ() {
   setVal('nq-tipo', '')
   setVal('nq-departamento', '')
   qjSetLocation('')
+  _pendingFiles = []
+  _editAdjuntos = []
+  renderQjAdjuntosForm()
   setVal('nq-fecha', new Date().toISOString().split('T')[0])
   setVal('nq-folio', 'Auto-generado')
 
@@ -511,6 +619,8 @@ function openEditQJFromTable(id) {
   setVal('nq-tipo',         r.tipo || '')
   qjSetLocation(r.habitacion || '')
   setVal('nq-telefono',     r.telefono || '')
+  _pendingFiles = []
+  loadAdjuntos(id).then(a => { _editAdjuntos = a; renderQjAdjuntosForm() })
   setVal('nq-departamento', r.departamento || '')
   setVal('nq-personal',     r.personal_involucrado || '')
   setVal('nq-descripcion',  r.descripcion || '')
@@ -561,19 +671,35 @@ async function submitNewQJ() {
     updated_at:           new Date().toISOString()
   }
 
-  let error
+  let error, quejaId = _currentQJId
   if (_editMode && _currentQJId) {
     ;({ error } = await db.from('quejas').update(payload).eq('id', _currentQJId))
   } else {
     payload.status     = 'pendiente'
     payload.created_by = _user.id
-    ;({ error } = await db.from('quejas').insert(payload))
+    let data
+    ;({ data, error } = await db.from('quejas').insert(payload).select('id').single())
+    quejaId = data?.id
   }
+
+  if (error) {
+    btn.disabled = false
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar'
+    showToast('Error al guardar: ' + error.message, 'red'); return
+  }
+
+  // Subir las imágenes pendientes (la queja ya existe)
+  if (quejaId && _pendingFiles.length) {
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Subiendo imágenes…'
+    const res = await uploadPendingFiles(quejaId)
+    if (!res.ok) {
+      showToast(`La solicitud se guardó, pero una imagen falló: ${res.error}`, 'red')
+    }
+  }
+  _pendingFiles = []
 
   btn.disabled = false
   btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar'
-
-  if (error) { showToast('Error al guardar: ' + error.message, 'red'); return }
 
   showToast(_editMode ? 'Registro actualizado.' : 'Solicitud registrada correctamente.', 'green')
   closeModal('modal-new-qj')
@@ -634,7 +760,32 @@ async function openDetail(id) {
   setVal('dq-nota-text', '')
   setVal('dq-new-status', '')
 
+  renderDetailAdjuntos(id)
+
   openModal('modal-detail-qj')
+}
+
+// Miniaturas (solo lectura) en el modal de detalle.
+async function renderDetailAdjuntos(quejaId) {
+  const wrap = document.getElementById('dq-adjuntos-wrap')
+  const cont = document.getElementById('dq-adjuntos')
+  if (!wrap || !cont) return
+  cont.innerHTML = ''
+  const adj = await loadAdjuntos(quejaId)
+  if (!adj.length) { wrap.style.display = 'none'; return }
+  wrap.style.display = 'block'
+  for (const a of adj) {
+    const div = document.createElement('div')
+    div.className = 'qj-adj'
+    div.innerHTML = `<img alt="${esc(a.file_name || '')}">`
+    cont.appendChild(div)
+    const url = await qjSignedUrl(a.file_path)
+    if (url) {
+      const img = div.querySelector('img')
+      img.src = url
+      img.onclick = () => window.open(url, '_blank')
+    }
+  }
 }
 
 function openEditQJ() {

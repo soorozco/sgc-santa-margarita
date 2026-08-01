@@ -377,6 +377,20 @@
         </div>
       </div>
 
+      <div class="qj-sep"><i class="fa-solid fa-image"></i> Imágenes adjuntas
+        <small style="font-weight:400;color:var(--txt3)">(opcional)</small></div>
+      <div class="form-row one">
+        <div class="field">
+          <input type="file" id="nq-files" accept="image/*" multiple hidden onchange="onQjFilesSelected(this)">
+          <button type="button" class="btn-secondary" onclick="document.getElementById('nq-files').click()">
+            <i class="fa-solid fa-camera"></i> Agregar imágenes
+          </button>
+          <small style="display:block;color:var(--txt3);margin-top:6px">
+            Formatos JPG, PNG o WEBP · hasta 10 MB cada una</small>
+          <div id="nq-adjuntos" class="qj-adjuntos-grid" style="margin-top:12px"></div>
+        </div>
+      </div>
+
       <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
 
       <div class="form-row">
@@ -438,6 +452,11 @@
       <div class="info-item" style="margin-bottom:18px">
         <label>Descripción del evento</label>
         <span id="dq-descripcion" style="display:block;line-height:1.7;color:var(--txt2);margin-top:4px">—</span>
+      </div>
+
+      <div id="dq-adjuntos-wrap" style="display:none;margin-bottom:18px">
+        <div class="qj-sep"><i class="fa-solid fa-image"></i> Imágenes adjuntas</div>
+        <div id="dq-adjuntos" class="qj-adjuntos-grid"></div>
       </div>
 
       <div class="qj-sep"><i class="fa-solid fa-pen-to-square"></i> Conformidad</div>
