@@ -84,6 +84,20 @@ async function loadCatalogo() {
   _catalogo.forEach(m => { _catByName[m.nombre.toUpperCase()] = { atc: m.atc, alto_riesgo: m.alto_riesgo, ingrediente: m.ingrediente, via: m.via_default } })
   const dl = document.getElementById('dl-meds')
   if (dl) dl.innerHTML = _catalogo.map(m => `<option value="${esc(m.nombre)}">`).join('')
+
+  // Listas por categoría: cada bloque sugiere los suyos (no restringe escribir otros)
+  ;['infusiones', 'antibioticos', 'analgesia'].forEach(cat => {
+    const el = document.getElementById('dl-meds-' + cat)
+    if (el) el.innerHTML = _catalogo
+      .filter(m => m.categoria === cat)
+      .map(m => `<option value="${esc(m.nombre)}">`).join('')
+  })
+}
+
+// Datalist a usar según la categoría del bloque
+function medListId(catKey) {
+  return ['infusiones', 'antibioticos', 'analgesia'].includes(catKey)
+    ? 'dl-meds-' + catKey : 'dl-meds'
 }
 
 // ── Interacciones medicamentosas ────────────────────────────────
@@ -372,7 +386,7 @@ function medRowHtml(catKey, m) {
   m = m || {}
   const mid = m.mid || ('m' + Date.now() + Math.floor(Math.random()*1000))
   return `<tr data-mid="${mid}" data-cat="${catKey}">
-    <td><input list="dl-meds" class="m-nombre" value="${esc(m.medicamento||'')}" oninput="onMedName(this)" placeholder="Buscar medicamento…">
+    <td><input list="${medListId(catKey)}" class="m-nombre" value="${esc(m.medicamento||'')}" oninput="onMedName(this)" placeholder="Buscar medicamento…">
         <span class="m-flags" style="display:block;margin-top:3px"></span></td>
     <td><input class="m-dosis" value="${esc(m.dosis||'')}" style="min-width:70px" placeholder="mg / mEq"></td>
     <td><select class="m-via" onchange="recalc()" style="min-width:135px"><option value="">—</option>${optionList(VIAS, m.via)}</select></td>
