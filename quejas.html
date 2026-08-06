@@ -319,7 +319,15 @@
         </div>
         <div class="field">
           <label>Folio</label>
-          <input type="text" id="nq-folio" placeholder="Se sugiere uno; puedes cambiarlo">
+          <div style="display:flex;gap:6px;align-items:stretch">
+            <input type="text" id="nq-folio" placeholder="Auto-generado" readonly
+                   style="background:#f1f5f9;color:var(--txt3);flex:1">
+            <button type="button" id="btn-edit-folio" onclick="toggleFolioEdit()"
+                    title="Editar folio manualmente"
+                    style="border:1.5px solid #cbd5e1;background:#fff;border-radius:8px;padding:0 12px;cursor:pointer;color:#475569">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
         </div>
       </div>
 

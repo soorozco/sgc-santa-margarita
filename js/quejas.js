@@ -571,6 +571,33 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 // ── Modal: NUEVO / EDITAR ─────────────────────────────────────────
+// Folio: bloqueado por defecto (autogenerado); el lápiz lo desbloquea.
+function lockFolio() {
+  const inp = document.getElementById('nq-folio')
+  const btn = document.getElementById('btn-edit-folio')
+  if (!inp) return
+  inp.setAttribute('readonly', '')
+  inp.style.background = '#f1f5f9'
+  inp.style.color = 'var(--txt3)'
+  if (btn) { btn.innerHTML = '<i class="fa-solid fa-pen"></i>'; btn.title = 'Editar folio manualmente' }
+}
+
+function toggleFolioEdit() {
+  const inp = document.getElementById('nq-folio')
+  const btn = document.getElementById('btn-edit-folio')
+  if (!inp) return
+  if (inp.hasAttribute('readonly')) {
+    // Desbloquear para captura manual
+    inp.removeAttribute('readonly')
+    inp.style.background = '#fff'
+    inp.style.color = 'var(--txt1)'
+    inp.focus(); inp.select()
+    if (btn) { btn.innerHTML = '<i class="fa-solid fa-lock"></i>'; btn.title = 'Bloquear folio' }
+  } else {
+    lockFolio()
+  }
+}
+
 async function openNewQJ() {
   _editMode    = false
   _currentQJId = null
@@ -587,6 +614,7 @@ async function openNewQJ() {
   renderQjAdjuntosForm()
   setVal('nq-fecha', new Date().toISOString().split('T')[0])
   setVal('nq-folio', '')
+  lockFolio()
 
   // Título del modal
   const ttl = document.getElementById('modal-new-ttl')
@@ -616,6 +644,7 @@ function openEditQJFromTable(id) {
 
   setVal('nq-fecha',        r.fecha || '')
   setVal('nq-folio',        r.folio || '')
+  lockFolio()
   setVal('nq-nombre',       r.nombre_paciente || '')
   setVal('nq-tipo',         r.tipo || '')
   qjSetLocation(r.habitacion || '')
