@@ -586,7 +586,7 @@ async function openNewQJ() {
   _editAdjuntos = []
   renderQjAdjuntosForm()
   setVal('nq-fecha', new Date().toISOString().split('T')[0])
-  setVal('nq-folio', 'Auto-generado')
+  setVal('nq-folio', '')
 
   // Título del modal
   const ttl = document.getElementById('modal-new-ttl')
@@ -602,8 +602,9 @@ async function openNewQJ() {
     const num  = String((count || 0) + 1).padStart(2, '0')
     setVal('nq-folio', `QJ-${year}-${num}`)
   } catch (e) {
-    // El trigger de Supabase generará el folio automáticamente al guardar
-    setVal('nq-folio', 'Auto-generado')
+    // Si no se pudo sugerir, se deja vacío: el usuario lo escribe o el
+    // trigger de Supabase lo genera al guardar.
+    setVal('nq-folio', '')
   }
 }
 
