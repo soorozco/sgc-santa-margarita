@@ -267,7 +267,7 @@ function renderTable(rows) {
       <td>${esc(r.fecha || '—')}</td>
       <td class="center">${esc(OF_TIPOS[r.tipo] || '—')}</td>
       <td>${esc(r.asunto || '—')}</td>
-      <td>${esc(r.dirigido_a || '—')}</td>
+      <td>${esc(parseDestinatarios(r.dirigido_a).map(d => d.nombre).join(' · ') || '—')}</td>
       <td>${vinculoCell(r)}</td>
       <td class="center">${estadoBadge(r.estado)}</td>
       <td class="center">
@@ -286,8 +286,7 @@ const OF_FIRMANTE_CARGO = 'Jefatura de Calidad'
 function openNewOF() {
   _editMode = false
   _currentOFId = null
-  ;['of-asunto','of-dirigido','of-dirigido-cargo','of-dirigido2','of-dirigido2-cargo',
-    'of-email-dest','of-emitido','of-cuerpo','of-ccp','of-url','of-notas']
+  ;['of-asunto','of-dirigido','of-email-dest','of-emitido','of-cuerpo','of-ccp','of-url','of-notas']
     .forEach(id => setVal(id, ''))
   setVal('of-tipo', '')
   setVal('of-estado', 'enviado')
@@ -312,9 +311,6 @@ function editOFFromDetail() {
   setVal('of-estado',   r.estado || 'enviado')
   setVal('of-asunto',   r.asunto || '')
   setVal('of-dirigido', r.dirigido_a || '')
-  setVal('of-dirigido-cargo', r.dirigido_cargo || '')
-  setVal('of-dirigido2', r.dirigido2_a || '')
-  setVal('of-dirigido2-cargo', r.dirigido2_cargo || '')
   setVal('of-email-dest', r.email_dest || '')
   setVal('of-emitido',  r.emitido_por || '')
   setVal('of-firmado',  r.firmado_por || '')
@@ -348,9 +344,6 @@ async function submitNewOF() {
     estado:           document.getElementById('of-estado')?.value || 'enviado',
     asunto,
     dirigido_a:       document.getElementById('of-dirigido')?.value.trim() || null,
-    dirigido_cargo:   document.getElementById('of-dirigido-cargo')?.value.trim() || null,
-    dirigido2_a:      document.getElementById('of-dirigido2')?.value.trim() || null,
-    dirigido2_cargo:  document.getElementById('of-dirigido2-cargo')?.value.trim() || null,
     email_dest:       document.getElementById('of-email-dest')?.value.trim() || null,
     emitido_por:      document.getElementById('of-emitido')?.value.trim() || null,
     firmado_por:      document.getElementById('of-firmado')?.value.trim() || null,
@@ -393,16 +386,27 @@ function fechaEnLetras(iso) {
   return `${parseInt(m[3], 10)} de ${OF_MESES[parseInt(m[2], 10) - 1]} de ${m[1]}`
 }
 
+// "Nombre | Cargo" por línea → [{nombre, cargo}, …]
+function parseDestinatarios(texto) {
+  return (texto || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+    const i = l.indexOf('|')
+    return i >= 0
+      ? { nombre: l.slice(0, i).trim(), cargo: l.slice(i + 1).trim() }
+      : { nombre: l, cargo: '' }
+  })
+}
+
 function generarOficio() {
   const r = _allOF.find(x => x.id === _currentOFId)
   if (!r) return
   const doc = document.getElementById('oficio-doc')
   if (!doc) return
 
-  const destCol = (nombre, cargo) => nombre
-    ? `<div class="of-dest-col"><strong>${esc(nombre)}</strong>${cargo ? '<br>' + esc(cargo) : ''}<br>P r e s e n t e</div>`
-    : ''
-  const dests = destCol(r.dirigido_a, r.dirigido_cargo) + destCol(r.dirigido2_a, r.dirigido2_cargo)
+  // Destinatarios: uno por línea con formato "Nombre | Cargo".
+  // Se acomodan en 2 columnas que se apilan hacia abajo si hay más de 2.
+  const dests = parseDestinatarios(r.dirigido_a).map(d =>
+    `<div class="of-dest-col"><strong>${esc(d.nombre)}</strong>${d.cargo ? '<br>' + esc(d.cargo) : ''}<br>P r e s e n t e</div>`
+  ).join('')
 
   const ccp = (r.ccp || '').split('\n').map(s => s.trim()).filter(Boolean)
   const cuerpo = esc(r.cuerpo || '(Sin contenido — edita el oficio y llena el "Cuerpo del oficio".)')
@@ -434,9 +438,10 @@ function prepararCorreoOficio() {
   const r = _allOF.find(x => x.id === _currentOFId)
   if (!r) return
   const to = r.email_dest || ''
+  const primer = parseDestinatarios(r.dirigido_a)[0]?.nombre || ''
   const subject = `Oficio ${r.numero || ''}${r.asunto ? ' — ' + r.asunto : ''}`
   const body =
-    `Estimado(a) ${r.dirigido_a || ''}:\n\n` +
+    `Estimado(a) ${primer}:\n\n` +
     `Por medio del presente le comparto el oficio ${r.numero || ''}` +
     `${r.asunto ? ', referente a: ' + r.asunto : ''}.\n\n` +
     `Quedo atenta a sus comentarios.\n\nAtentamente,\n` +
@@ -458,7 +463,8 @@ function openDetailOF(id) {
   setText('dof-fecha',    r.fecha || '—')
   setText('dof-tipo',     OF_TIPOS[r.tipo] || '—')
   setText('dof-estado',   OF_ESTADOS[r.estado] || r.estado || '—')
-  setText('dof-dirigido', r.dirigido_a || '—')
+  const nombresDest = parseDestinatarios(r.dirigido_a).map(d => d.nombre).join(' · ')
+  setText('dof-dirigido', nombresDest || '—')
   setText('dof-emitido',  r.emitido_por || '—')
   setText('dof-firmado',  r.firmado_por || '—')
   setText('dof-asunto',   r.asunto || '—')
