@@ -282,7 +282,8 @@ function renderTable(rows) {
 function openNewOF() {
   _editMode = false
   _currentOFId = null
-  ;['of-asunto','of-dirigido','of-emitido','of-firmado','of-url','of-notas']
+  ;['of-asunto','of-dirigido','of-dirigido-cargo','of-email-dest','of-emitido',
+    'of-firmado','of-firmado-cargo','of-cuerpo','of-ccp','of-url','of-notas']
     .forEach(id => setVal(id, ''))
   setVal('of-tipo', '')
   setVal('of-estado', 'enviado')
@@ -305,8 +306,13 @@ function editOFFromDetail() {
   setVal('of-estado',   r.estado || 'enviado')
   setVal('of-asunto',   r.asunto || '')
   setVal('of-dirigido', r.dirigido_a || '')
+  setVal('of-dirigido-cargo', r.dirigido_cargo || '')
+  setVal('of-email-dest', r.email_dest || '')
   setVal('of-emitido',  r.emitido_por || '')
   setVal('of-firmado',  r.firmado_por || '')
+  setVal('of-firmado-cargo', r.firmado_cargo || '')
+  setVal('of-cuerpo',   r.cuerpo || '')
+  setVal('of-ccp',      r.ccp || '')
   setVal('of-queja',    r.queja_id || '')
   setVal('of-nc',       r.nonconformity_id || '')
   setVal('of-url',      r.documento_url || '')
@@ -334,8 +340,13 @@ async function submitNewOF() {
     estado:           document.getElementById('of-estado')?.value || 'enviado',
     asunto,
     dirigido_a:       document.getElementById('of-dirigido')?.value.trim() || null,
+    dirigido_cargo:   document.getElementById('of-dirigido-cargo')?.value.trim() || null,
+    email_dest:       document.getElementById('of-email-dest')?.value.trim() || null,
     emitido_por:      document.getElementById('of-emitido')?.value.trim() || null,
     firmado_por:      document.getElementById('of-firmado')?.value.trim() || null,
+    firmado_cargo:    document.getElementById('of-firmado-cargo')?.value.trim() || null,
+    cuerpo:           document.getElementById('of-cuerpo')?.value.trim() || null,
+    ccp:              document.getElementById('of-ccp')?.value.trim() || null,
     queja_id:         document.getElementById('of-queja')?.value || null,
     nonconformity_id: document.getElementById('of-nc')?.value || null,
     documento_url:    document.getElementById('of-url')?.value.trim() || null,
@@ -361,6 +372,58 @@ async function submitNewOF() {
   showToast(_editMode ? 'Oficio actualizado.' : 'Oficio registrado.', 'green')
   closeModal('modal-new-of')
   await loadOficios()
+}
+
+// ── Generar el documento (PDF) ───────────────────────────────────
+const OF_MESES = ['enero','febrero','marzo','abril','mayo','junio','julio',
+                  'agosto','septiembre','octubre','noviembre','diciembre']
+function fechaEnLetras(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || '')
+  if (!m) return iso || ''
+  return `${parseInt(m[3], 10)} de ${OF_MESES[parseInt(m[2], 10) - 1]} de ${m[1]}`
+}
+
+function generarOficio() {
+  const r = _allOF.find(x => x.id === _currentOFId)
+  if (!r) return
+  const doc = document.getElementById('oficio-doc')
+  if (!doc) return
+  const dest = [r.dirigido_a, r.dirigido_cargo].filter(Boolean)
+  const ccp = (r.ccp || '').split('\n').map(s => s.trim()).filter(Boolean)
+  const cuerpo = esc(r.cuerpo || '(Sin contenido — edita el oficio y llena el "Cuerpo del oficio".)')
+    .replace(/\n/g, '<br>')
+  doc.innerHTML = `
+    <div class="of-doc">
+      <div class="of-membrete"><img src="img/logo.png" alt="Hospital Santa Margarita"></div>
+      <div class="of-num">Oficio No. ${esc(r.numero || '')}</div>
+      ${r.asunto ? `<div class="of-asunto"><strong>Asunto:</strong> ${esc(r.asunto)}</div>` : ''}
+      ${dest.length ? `<div class="of-dest">${dest.map(esc).join('<br>')}<br>P r e s e n t e</div>` : ''}
+      <div class="of-cuerpo">${cuerpo}</div>
+      <div class="of-firma">
+        <div>Atentamente,</div>
+        <div>Guadalajara, Jalisco a ${esc(fechaEnLetras(r.fecha))}.</div>
+        <div class="of-firma-nombre">${esc(r.firmado_por || '')}</div>
+        ${r.firmado_cargo ? `<div>${esc(r.firmado_cargo)}</div>` : ''}
+      </div>
+      ${ccp.length ? `<div class="of-ccp">${ccp.map(c => 'c.c.p- ' + esc(c)).join('<br>')}</div>` : ''}
+    </div>`
+  openModal('modal-doc-of')
+}
+
+function prepararCorreoOficio() {
+  const r = _allOF.find(x => x.id === _currentOFId)
+  if (!r) return
+  const to = r.email_dest || ''
+  const subject = `Oficio ${r.numero || ''}${r.asunto ? ' — ' + r.asunto : ''}`
+  const body =
+    `Estimado(a) ${r.dirigido_a || ''}:\n\n` +
+    `Por medio del presente le comparto el oficio ${r.numero || ''}` +
+    `${r.asunto ? ', referente a: ' + r.asunto : ''}.\n\n` +
+    `Quedo atenta a sus comentarios.\n\nAtentamente,\n` +
+    `${r.firmado_por || ''}\n${r.firmado_cargo || ''}\n\n` +
+    `— Recuerde adjuntar el PDF del oficio (botón "Imprimir / Guardar PDF").`
+  window.location.href =
+    `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
 // ── Detalle ──────────────────────────────────────────────────────
