@@ -835,7 +835,7 @@ async function submitNewQJ() {
 const SEG_GRUPOS = [
   { titulo: 'Validación y clasificación', campos: [
     { k: 'procede',         l: 'Procede',           t: 'select', o: ['SI','No'] },
-    { k: 'categoria',       l: 'Categoría',         t: 'text' },
+    { k: 'categoria',       l: 'Categoría',         t: 'select', o: ['Queja','Sugerencia','Felicitación'] },
     { k: 'priorizacion',    l: 'Priorización',      t: 'select', o: ['Ordinaria','Urgente'] },
     { k: 'gravedad',        l: 'Gravedad para el usuario', t: 'select', o: ['Sin daño','Bajo','Moderado','Grave'] },
     { k: 'clasificacion',   l: 'Clasificación',     t: 'text' },
