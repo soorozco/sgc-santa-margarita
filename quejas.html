@@ -309,6 +309,36 @@
         <div class="qj-box tall" data-chart="ch-clasif"><canvas id="ch-clasif"></canvas></div>
       </div>
 
+      <!-- ── Búsqueda rápida de registros (sobre la tabla) ── -->
+      <div class="qj-filtros" style="margin-top:6px">
+        <div class="qj-campo">
+          <label>Folio</label>
+          <input type="text" id="t-folio" placeholder="Ej. CA2651" oninput="applyFilters()">
+        </div>
+        <div class="qj-campo">
+          <label>Fecha</label>
+          <input type="date" id="t-fecha" onchange="applyFilters()">
+        </div>
+        <div class="qj-campo">
+          <label>Tipo</label>
+          <select id="t-tipo" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="queja">Queja</option>
+            <option value="sugerencia">Sugerencia</option>
+            <option value="felicitacion">Felicitación</option>
+          </select>
+        </div>
+        <div class="qj-campo qj-campo-busca">
+          <label>Nombre</label>
+          <input type="text" id="t-nombre" placeholder="Nombre del paciente / cliente" oninput="applyFilters()">
+        </div>
+        <div class="qj-acciones">
+          <button class="btn-secondary" onclick="clearTableFilters()">
+            <i class="fa-solid fa-eraser"></i> Limpiar
+          </button>
+        </div>
+      </div>
+
       <!-- ── Tabla ── -->
       <div class="qj-tabla-wrap">
         <div class="qj-tabla-head">

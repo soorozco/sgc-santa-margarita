@@ -302,6 +302,11 @@ function applyFilters() {
   const clasif = document.getElementById('f-clasif')?.value    || ''
   const desde  = document.getElementById('f-desde')?.value  || ''
   const hasta  = document.getElementById('f-hasta')?.value  || ''
+  // Búsqueda rápida sobre la tabla (folio, fecha, tipo, nombre)
+  const tFolio  = (document.getElementById('t-folio')?.value  || '').toLowerCase().trim()
+  const tFecha  = document.getElementById('t-fecha')?.value   || ''
+  const tTipo   = document.getElementById('t-tipo')?.value    || ''
+  const tNombre = (document.getElementById('t-nombre')?.value || '').toLowerCase().trim()
 
   _filteredQJ = _allQJ.filter(r => {
     const f = r.fecha || ''
@@ -315,6 +320,11 @@ function applyFilters() {
     if (clasif && s.clasificacion !== clasif) return false
     if (desde  && (!f || f < desde)) return false
     if (hasta  && (!f || f > hasta)) return false
+    if (tFolio  && !(r.folio || '').toLowerCase().includes(tFolio)) return false
+    if (tFecha  && f !== tFecha) return false
+    if (tTipo   && r.tipo !== tTipo) return false
+    if (tNombre && !(r.nombre_paciente || '').toLowerCase().includes(tNombre)
+                && !(r.nombre_presenta || '').toLowerCase().includes(tNombre)) return false
     if (q) {
       const txt = `${r.folio || ''} ${r.nombre_paciente || ''} ${r.nombre_presenta || ''} ${r.descripcion || ''} ${r.departamento || ''}`.toLowerCase()
       if (!txt.includes(q)) return false
@@ -328,8 +338,17 @@ function applyFilters() {
   renderTable(_filteredQJ)
 }
 
+// Limpia solo la búsqueda rápida de la tabla
+function clearTableFilters() {
+  ;['t-folio','t-fecha','t-tipo','t-nombre'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = ''
+  })
+  applyFilters()
+}
+
 function clearFilters() {
-  ;['f-tipo','f-status','f-depto','f-origen','f-prioridad','f-gravedad','f-clasif','f-desde','f-hasta','search-input']
+  ;['f-tipo','f-status','f-depto','f-origen','f-prioridad','f-gravedad','f-clasif','f-desde','f-hasta','search-input',
+    't-folio','t-fecha','t-tipo','t-nombre']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
   const p = document.getElementById('f-periodo'); if (p) p.value = 'todo'
   applyFilters()
