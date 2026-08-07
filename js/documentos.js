@@ -1627,7 +1627,11 @@ function sLabel(s) {
 
 function fmtDate(d) {
   if (!d) return '—'
-  return new Date(d + 'T12:00:00').toLocaleDateString('es-MX',
+  // Fecha simple "YYYY-MM-DD": fijar mediodía para evitar corrimiento de zona.
+  // Timestamp completo (con hora): usar tal cual.
+  const s = /^\d{4}-\d{2}-\d{2}$/.test(d) ? d + 'T12:00:00' : d
+  const dt = new Date(s)
+  return isNaN(dt) ? '—' : dt.toLocaleDateString('es-MX',
     { day:'2-digit', month:'short', year:'numeric' })
 }
 
