@@ -403,3 +403,21 @@
   position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
   background:rgba(255,255,255,.7); color:var(--txt3);
 }
+
+/* ── Seguimiento y gestión (Quejas) ─────────────────────────────── */
+.seg-grupo { margin-bottom:16px; }
+.seg-grupo-t {
+  font-size:.8rem; font-weight:700; color:var(--txt2, #475569);
+  text-transform:uppercase; letter-spacing:.03em; margin-bottom:8px;
+  padding-bottom:4px; border-bottom:1px solid var(--bd, #e2e8f0);
+}
+.seg-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+.seg-f { display:flex; flex-direction:column; gap:3px; }
+.seg-f-full { grid-column:1 / -1; }
+.seg-f label { font-size:.75rem; font-weight:600; color:var(--txt2, #64748b); }
+.seg-f input, .seg-f select, .seg-f textarea {
+  padding:7px 10px; border:1.5px solid #cbd5e1; border-radius:8px;
+  font-family:inherit; font-size:.86rem; background:#fff; width:100%;
+}
+.seg-f textarea { resize:vertical; }
+@media (max-width:640px){ .seg-grid { grid-template-columns:1fr; } }

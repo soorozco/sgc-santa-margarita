@@ -737,6 +737,98 @@ async function submitNewQJ() {
 }
 
 // ── Modal: DETALLE ────────────────────────────────────────────────
+// ── Seguimiento y gestión (ciclo completo del buzón) ─────────────
+// Los campos se guardan en la columna JSON quejas.seguimiento.
+const SEG_GRUPOS = [
+  { titulo: 'Validación y clasificación', campos: [
+    { k: 'procede',         l: 'Procede',           t: 'select', o: ['SI','No'] },
+    { k: 'categoria',       l: 'Categoría',         t: 'text' },
+    { k: 'priorizacion',    l: 'Priorización',      t: 'select', o: ['Ordinaria','Urgente'] },
+    { k: 'gravedad',        l: 'Gravedad para el usuario', t: 'select', o: ['Sin daño','Bajo','Moderado','Grave'] },
+    { k: 'clasificacion',   l: 'Clasificación',     t: 'text' },
+    { k: 'subclasificacion',l: 'Subclasificación',  t: 'text' },
+    { k: 'origen_seg',      l: 'Origen',            t: 'select', o: ['Encuesta','Buzón','Físico','Otros medios','Visita','Jefatura de Calidad'] },
+    { k: 'fecha_validacion',l: 'Fecha de validación', t: 'date' },
+    { k: 'hora_validacion', l: 'Hora de validación', t: 'text' },
+  ]},
+  { titulo: 'Investigación', campos: [
+    { k: 'revision_expediente', l: 'Revisión de expediente', t: 'select', o: ['SI','NO','No aplica'] },
+    { k: 'llamada_entrevista',  l: 'Llamada / entrevista',   t: 'select', o: ['Llamada','Entrevista','No aplica'] },
+    { k: 'intentos_llamada',    l: 'Intentos de llamada (máx 3)', t: 'text' },
+    { k: 'respuesta_llamada',   l: 'Respuesta a la llamada', t: 'select', o: ['SI','NO','No aplica'] },
+    { k: 'recibe_llamada',      l: 'Quién recibe / entrevistado', t: 'text' },
+    { k: 'investiga',           l: 'Quién realiza la investigación', t: 'text' },
+    { k: 'investigacion',       l: 'Investigación (detalle)', t: 'textarea' },
+  ]},
+  { titulo: 'Notificación al área', campos: [
+    { k: 'medio_notificacion', l: 'Medio de notificación', t: 'text' },
+    { k: 'fecha_notificacion', l: 'Fecha de notificación', t: 'date' },
+    { k: 'persona_notifica',   l: 'Persona que notifica',  t: 'text' },
+    { k: 'numero_oficio',      l: 'Número de oficio (ver Oficios)', t: 'text' },
+  ]},
+  { titulo: 'Resolución y cierre', campos: [
+    { k: 'resolucion',            l: 'Resolución', t: 'textarea' },
+    { k: 'fecha_resolucion',      l: 'Fecha de resolución', t: 'date' },
+    { k: 'notif_solicitante',     l: 'Notificación al solicitante', t: 'select', o: ['SI','NO','No aplica'] },
+    { k: 'fecha_notif_solicitante', l: 'Fecha de notificación al solicitante', t: 'date' },
+    { k: 'observaciones',         l: 'Observaciones', t: 'textarea' },
+  ]},
+]
+
+function segCampoHtml(c, val) {
+  const v = val == null ? '' : String(val)
+  const id = 'seg-' + c.k
+  if (c.t === 'select') {
+    const opts = ['<option value="">—</option>']
+      .concat(c.o.map(o => `<option value="${esc(o)}"${o === v ? ' selected' : ''}>${esc(o)}</option>`))
+    return `<div class="seg-f"><label>${esc(c.l)}</label><select id="${id}">${opts.join('')}</select></div>`
+  }
+  if (c.t === 'textarea') {
+    return `<div class="seg-f seg-f-full"><label>${esc(c.l)}</label><textarea id="${id}" rows="2">${esc(v)}</textarea></div>`
+  }
+  const type = c.t === 'date' ? 'date' : 'text'
+  return `<div class="seg-f"><label>${esc(c.l)}</label><input type="${type}" id="${id}" value="${esc(v)}"></div>`
+}
+
+function renderGestion(seg) {
+  const cont = document.getElementById('dq-gestion-form')
+  if (!cont) return
+  seg = seg || {}
+  cont.innerHTML = SEG_GRUPOS.map(g => `
+    <div class="seg-grupo">
+      <div class="seg-grupo-t">${esc(g.titulo)}</div>
+      <div class="seg-grid">${g.campos.map(c => segCampoHtml(c, seg[c.k])).join('')}</div>
+    </div>`).join('')
+}
+
+async function saveSeguimiento() {
+  if (!_currentQJId) return
+  const seg = {}
+  SEG_GRUPOS.forEach(g => g.campos.forEach(c => {
+    const el = document.getElementById('seg-' + c.k)
+    const v = el ? el.value.trim() : ''
+    if (v) seg[c.k] = v
+  }))
+  const btn = document.getElementById('btn-save-gestion')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando…' }
+  const { error } = await db.from('quejas')
+    .update({ seguimiento: seg, updated_at: new Date().toISOString() })
+    .eq('id', _currentQJId)
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar seguimiento' }
+  if (error) {
+    if (/seguimiento/.test(error.message)) {
+      showToast('Falta ejecutar la migración sql/quejas_seguimiento_setup.sql en Supabase.', 'red')
+    } else {
+      showToast('Error al guardar: ' + error.message, 'red')
+    }
+    return
+  }
+  // Actualiza el registro en memoria para no perder lo capturado
+  const r = _allQJ.find(x => x.id === _currentQJId)
+  if (r) r.seguimiento = seg
+  showToast('Seguimiento guardado.', 'green')
+}
+
 async function openDetail(id) {
   _currentQJId = id
   const r = _allQJ.find(x => x.id === id)
@@ -791,6 +883,11 @@ async function openDetail(id) {
   setVal('dq-new-status', '')
 
   renderDetailAdjuntos(id)
+
+  // Seguimiento y gestión (solo Calidad/managers)
+  const gestWrap = document.getElementById('dq-gestion-wrap')
+  if (gestWrap) gestWrap.style.display = canManage ? 'block' : 'none'
+  if (canManage) renderGestion(r.seguimiento || {})
 
   openModal('modal-detail-qj')
 }
