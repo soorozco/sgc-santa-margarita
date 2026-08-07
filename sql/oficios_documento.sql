@@ -14,6 +14,8 @@
 ALTER TABLE public.oficios
   ADD COLUMN IF NOT EXISTS cuerpo         text,   -- texto principal del oficio
   ADD COLUMN IF NOT EXISTS dirigido_cargo text,   -- cargo del destinatario
+  ADD COLUMN IF NOT EXISTS dirigido2_a    text,   -- 2º destinatario (nombre)
+  ADD COLUMN IF NOT EXISTS dirigido2_cargo text,  -- 2º destinatario (cargo)
   ADD COLUMN IF NOT EXISTS firmado_cargo  text,   -- cargo de quien firma
   ADD COLUMN IF NOT EXISTS ccp            text,   -- copias (una por línea)
   ADD COLUMN IF NOT EXISTS email_dest     text;   -- correo del destinatario
@@ -21,5 +23,5 @@ ALTER TABLE public.oficios
 -- Verificación
 SELECT column_name FROM information_schema.columns
 WHERE table_schema='public' AND table_name='oficios'
-  AND column_name IN ('cuerpo','dirigido_cargo','firmado_cargo','ccp','email_dest')
+  AND column_name IN ('cuerpo','dirigido_cargo','dirigido2_a','dirigido2_cargo','firmado_cargo','ccp','email_dest')
 ORDER BY column_name;

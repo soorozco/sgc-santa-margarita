@@ -279,14 +279,20 @@ function renderTable(rows) {
 }
 
 // ── Nuevo / Editar ───────────────────────────────────────────────
+// Firmante fijo del oficio (siempre la misma persona)
+const OF_FIRMANTE = 'Dra. Giselle Ivette de la Torre García'
+const OF_FIRMANTE_CARGO = 'Jefatura de Calidad'
+
 function openNewOF() {
   _editMode = false
   _currentOFId = null
-  ;['of-asunto','of-dirigido','of-dirigido-cargo','of-email-dest','of-emitido',
-    'of-firmado','of-firmado-cargo','of-cuerpo','of-ccp','of-url','of-notas']
+  ;['of-asunto','of-dirigido','of-dirigido-cargo','of-dirigido2','of-dirigido2-cargo',
+    'of-email-dest','of-emitido','of-cuerpo','of-ccp','of-url','of-notas']
     .forEach(id => setVal(id, ''))
   setVal('of-tipo', '')
   setVal('of-estado', 'enviado')
+  setVal('of-firmado', OF_FIRMANTE)          // siempre firma la misma persona
+  setVal('of-firmado-cargo', OF_FIRMANTE_CARGO)
   setVal('of-queja', '')
   setVal('of-nc', '')
   setVal('of-fecha', new Date().toISOString().split('T')[0])
@@ -307,6 +313,8 @@ function editOFFromDetail() {
   setVal('of-asunto',   r.asunto || '')
   setVal('of-dirigido', r.dirigido_a || '')
   setVal('of-dirigido-cargo', r.dirigido_cargo || '')
+  setVal('of-dirigido2', r.dirigido2_a || '')
+  setVal('of-dirigido2-cargo', r.dirigido2_cargo || '')
   setVal('of-email-dest', r.email_dest || '')
   setVal('of-emitido',  r.emitido_por || '')
   setVal('of-firmado',  r.firmado_por || '')
@@ -341,6 +349,8 @@ async function submitNewOF() {
     asunto,
     dirigido_a:       document.getElementById('of-dirigido')?.value.trim() || null,
     dirigido_cargo:   document.getElementById('of-dirigido-cargo')?.value.trim() || null,
+    dirigido2_a:      document.getElementById('of-dirigido2')?.value.trim() || null,
+    dirigido2_cargo:  document.getElementById('of-dirigido2-cargo')?.value.trim() || null,
     email_dest:       document.getElementById('of-email-dest')?.value.trim() || null,
     emitido_por:      document.getElementById('of-emitido')?.value.trim() || null,
     firmado_por:      document.getElementById('of-firmado')?.value.trim() || null,
@@ -388,24 +398,34 @@ function generarOficio() {
   if (!r) return
   const doc = document.getElementById('oficio-doc')
   if (!doc) return
-  const dest = [r.dirigido_a, r.dirigido_cargo].filter(Boolean)
+
+  const destCol = (nombre, cargo) => nombre
+    ? `<div class="of-dest-col"><strong>${esc(nombre)}</strong>${cargo ? '<br>' + esc(cargo) : ''}<br>P r e s e n t e</div>`
+    : ''
+  const dests = destCol(r.dirigido_a, r.dirigido_cargo) + destCol(r.dirigido2_a, r.dirigido2_cargo)
+
   const ccp = (r.ccp || '').split('\n').map(s => s.trim()).filter(Boolean)
   const cuerpo = esc(r.cuerpo || '(Sin contenido — edita el oficio y llena el "Cuerpo del oficio".)')
     .replace(/\n/g, '<br>')
+  const firmante = r.firmado_por  || OF_FIRMANTE
+  const cargo    = r.firmado_cargo || OF_FIRMANTE_CARGO
+
   doc.innerHTML = `
     <div class="of-doc">
-      <div class="of-membrete"><img src="img/logo.png" alt="Hospital Santa Margarita"></div>
+      <div class="of-logo"><img src="img/logo.png" alt="Hospital Santa Margarita"></div>
+      <hr class="of-rule">
       <div class="of-num">Oficio No. ${esc(r.numero || '')}</div>
       ${r.asunto ? `<div class="of-asunto"><strong>Asunto:</strong> ${esc(r.asunto)}</div>` : ''}
-      ${dest.length ? `<div class="of-dest">${dest.map(esc).join('<br>')}<br>P r e s e n t e</div>` : ''}
+      ${dests ? `<div class="of-dests">${dests}</div>` : ''}
       <div class="of-cuerpo">${cuerpo}</div>
       <div class="of-firma">
         <div>Atentamente,</div>
         <div>Guadalajara, Jalisco a ${esc(fechaEnLetras(r.fecha))}.</div>
-        <div class="of-firma-nombre">${esc(r.firmado_por || '')}</div>
-        ${r.firmado_cargo ? `<div>${esc(r.firmado_cargo)}</div>` : ''}
+        <div class="of-firma-nombre">${esc(firmante)}</div>
+        <div>${esc(cargo)}</div>
       </div>
       ${ccp.length ? `<div class="of-ccp">${ccp.map(c => 'c.c.p- ' + esc(c)).join('<br>')}</div>` : ''}
+      <hr class="of-rule-foot">
     </div>`
   openModal('modal-doc-of')
 }
