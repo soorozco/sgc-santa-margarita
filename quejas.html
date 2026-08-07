@@ -309,8 +309,10 @@
         <div class="qj-box tall" data-chart="ch-clasif"><canvas id="ch-clasif"></canvas></div>
       </div>
 
-      <!-- ── Búsqueda rápida de registros (sobre la tabla) ── -->
-      <div class="qj-filtros" style="margin-top:6px">
+      <!-- ── Búsqueda de pacientes (sobre la tabla) ── -->
+      <div class="qj-panel">
+        <div class="qj-panel-h"><i class="fa-solid fa-magnifying-glass"></i> Búsqueda de pacientes</div>
+        <div class="qj-filtros" style="background:transparent;border:none;box-shadow:none;border-radius:0;margin:0">
         <div class="qj-campo">
           <label>Folio</label>
           <input type="text" id="t-folio" placeholder="Ej. CA2651" oninput="applyFilters()">
@@ -336,6 +338,7 @@
           <button class="btn-secondary" onclick="clearTableFilters()">
             <i class="fa-solid fa-eraser"></i> Limpiar
           </button>
+        </div>
         </div>
       </div>
 
