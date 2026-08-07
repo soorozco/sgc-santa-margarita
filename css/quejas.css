@@ -421,3 +421,14 @@
 }
 .seg-f textarea { resize:vertical; }
 @media (max-width:640px){ .seg-grid { grid-template-columns:1fr; } }
+
+/* ── Intentos de llamada (casillas con icono de teléfono) ───────── */
+.seg-intentos { display:flex; gap:8px; align-items:center; }
+.seg-int { cursor:pointer; display:inline-flex; }
+.seg-int input { display:none; }
+.seg-int i {
+  font-size:1rem; color:#cbd5e1; padding:7px 9px; border:1.5px solid #e2e8f0;
+  border-radius:8px; transition:all .12s; background:#fff;
+}
+.seg-int input:checked + i { color:#fff; background:#16a34a; border-color:#16a34a; }
+.seg-int:hover i { border-color:#94a3b8; }

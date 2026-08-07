@@ -847,7 +847,7 @@ const SEG_GRUPOS = [
   { titulo: 'Investigación', campos: [
     { k: 'revision_expediente', l: 'Revisión de expediente', t: 'select', o: ['SI','NO','No aplica'] },
     { k: 'llamada_entrevista',  l: 'Llamada / entrevista',   t: 'select', o: ['Llamada','Entrevista','No aplica'] },
-    { k: 'intentos_llamada',    l: 'Intentos de llamada (máx 3)', t: 'text' },
+    { k: 'intentos_llamada',    l: 'Intentos de llamada (máx 3)', t: 'intentos' },
     { k: 'respuesta_llamada',   l: 'Respuesta a la llamada', t: 'select', o: ['SI','NO','No aplica'] },
     { k: 'recibe_llamada',      l: 'Quién recibe / entrevistado', t: 'text' },
     { k: 'investiga',           l: 'Quién realiza la investigación', t: 'text' },
@@ -879,8 +879,22 @@ function segCampoHtml(c, val) {
   if (c.t === 'textarea') {
     return `<div class="seg-f seg-f-full"><label>${esc(c.l)}</label><textarea id="${id}" rows="2">${esc(v)}</textarea></div>`
   }
+  if (c.t === 'intentos') {
+    const n = parseInt(v, 10) || 0
+    const boxes = [1, 2, 3].map(i =>
+      `<label class="seg-int" title="Llamada ${i}"><input type="checkbox" data-i="${i}"${i <= n ? ' checked' : ''}><i class="fa-solid fa-phone"></i></label>`).join('')
+    return `<div class="seg-f"><label>${esc(c.l)}</label>
+      <div class="seg-intentos" data-seg="${c.k}" onchange="segIntentos(event, this)">${boxes}</div></div>`
+  }
   const type = c.t === 'date' ? 'date' : 'text'
   return `<div class="seg-f"><label>${esc(c.l)}</label><input type="${type}" id="${id}" value="${esc(v)}"></div>`
+}
+
+// Casillas de intentos: secuenciales (marcar la i llena 1..i; desmarcar deja 1..i-1)
+function segIntentos(e, cont) {
+  const i = +e.target.dataset.i
+  const nivel = e.target.checked ? i : i - 1
+  cont.querySelectorAll('input').forEach(inp => { inp.checked = (+inp.dataset.i) <= nivel })
 }
 
 function renderGestion(seg) {
@@ -898,8 +912,15 @@ async function saveSeguimiento() {
   if (!_currentQJId) return
   const seg = {}
   SEG_GRUPOS.forEach(g => g.campos.forEach(c => {
-    const el = document.getElementById('seg-' + c.k)
-    const v = el ? el.value.trim() : ''
+    let v = ''
+    if (c.t === 'intentos') {
+      const cont = document.querySelector(`.seg-intentos[data-seg="${c.k}"]`)
+      const n = cont ? cont.querySelectorAll('input:checked').length : 0
+      v = n ? String(n) : ''
+    } else {
+      const el = document.getElementById('seg-' + c.k)
+      v = el ? el.value.trim() : ''
+    }
     if (v) seg[c.k] = v
   }))
   const btn = document.getElementById('btn-save-gestion')
