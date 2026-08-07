@@ -231,10 +231,13 @@ function applyFilters() {
   if (subtipoWrap) subtipoWrap.style.display = (origen === 'externo') ? 'inline-block' : 'none'
   const subtipo = (origen === 'externo') ? (document.getElementById('f-subtipo')?.value || '') : ''
 
-  // Columna "Vigencia verificada" — solo al ver documentos externos
+  // Columnas de norma externa (Vigencia verificada, Publicación DOF, Norma
+  // vigente) — solo al ver documentos externos
   _showVerifCol = (_activeTab === 'docs' && origen === 'externo')
-  const thVerif = document.getElementById('th-verif')
-  if (thVerif) thVerif.style.display = _showVerifCol ? '' : 'none'
+  ;['th-verif','th-dof','th-norma'].forEach(id => {
+    const th = document.getElementById(id)
+    if (th) th.style.display = _showVerifCol ? '' : 'none'
+  })
 
   _filteredDocs = _allDocs.filter(d => {
     const isFT = d.document_types?.code_prefix === 'FT'
@@ -324,7 +327,7 @@ function renderTable(docs) {
 
   if (docs.length === 0) {
     tbody.innerHTML = `
-      <tr><td colspan="9" class="table-empty">
+      <tr><td colspan="12" class="table-empty">
         <i class="fa-solid fa-folder-open"></i>
         <strong>Sin ${_activeTab === 'regs' ? 'registros' : 'documentos'}</strong>
         Ningún documento coincide con los filtros seleccionados.
@@ -359,6 +362,8 @@ function renderTable(docs) {
       ${isRegs ? `<td class="center">${covBadge(doc.code)}</td>` : ''}
       <td class="center"><span class="pill ${sPill(doc.status)}">${sLabel(doc.status)}</span></td>
       ${_showVerifCol ? `<td class="center">${verifCell(doc)}</td>` : ''}
+      ${_showVerifCol ? `<td class="center">${dofCell(doc)}</td>` : ''}
+      ${_showVerifCol ? `<td>${normaCell(doc)}</td>` : ''}
       <td class="center">
         ${canRequest
           ? `<button onclick="openSolBaja('${doc.id}')" class="btn-sol-baja">
@@ -2632,6 +2637,40 @@ function verifCell(doc) {
           title="Última verificación${by}">${fmtDate(doc.last_verified_at)}</span>
     ${robotLine(doc)}
   </div>`
+}
+
+// ── Celda "Publicación DOF" (documentos externos) ────────────────
+function dofCell(doc) {
+  const f = (doc.dof_fecha || '').trim()
+  if (!f) return '<span style="color:var(--txt3)">—</span>'
+  const na = /^no aplica$/i.test(f)
+  const fecha = na
+    ? '<span style="color:var(--txt3)">No aplica</span>'
+    : `<span style="white-space:nowrap;font-weight:600">${esc(f)}</span>`
+  const proy = (doc.dof_proyecto || '').trim()
+  const proyLine = proy
+    ? `<span style="font-size:.72rem;color:#92400e;background:#fef3c7;border-radius:10px;
+         padding:1px 7px;white-space:nowrap" title="${esc(proy)}">
+         <i class="fa-solid fa-hourglass-half"></i> Proyecto</span>`
+    : ''
+  return `<div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+    ${fecha}${proyLine}</div>`
+}
+
+// ── Celda "Norma vigente aplicable" (documentos externos) ─────────
+function normaCell(doc) {
+  const v = (doc.norma_vigente || '').trim()
+  if (!v) return '<span style="color:var(--txt3)">—</span>'
+  if (/^la misma$/i.test(v))
+    return '<span style="color:var(--txt3)" title="Sigue vigente con su misma clave">La misma</span>'
+  // Es una clave equivalente (sustituta) o "Sin sustituta"
+  const cancel = /sin sustituta/i.test(v)
+  const style = cancel
+    ? 'color:#991b1b;font-weight:600'
+    : 'color:#0b6e4f;font-weight:600'
+  const icon = cancel ? 'fa-ban' : 'fa-arrow-right-long'
+  return `<span style="${style};white-space:normal">
+    <i class="fa-solid ${icon}" style="font-size:.72rem"></i> ${esc(v)}</span>`
 }
 
 // Línea con el resultado del robot verificador (GitHub Actions semanal)
