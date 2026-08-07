@@ -133,8 +133,10 @@
 
     <div class="page-content">
 
-      <!-- ── Filtros ── -->
-      <div class="qj-filtros">
+      <!-- ── Búsqueda de pacientes / filtros ── -->
+      <div class="qj-panel">
+        <div class="qj-panel-h"><i class="fa-solid fa-magnifying-glass"></i> Búsqueda de pacientes</div>
+        <div class="qj-filtros" style="background:transparent;border:none;box-shadow:none;border-radius:0;margin:0">
         <div class="qj-campo">
           <label>Periodo</label>
           <select id="f-periodo" onchange="onPeriodoChange()">
@@ -231,6 +233,7 @@
             <i class="fa-solid fa-plus"></i> Registrar
           </button>
         </div>
+        </div>
       </div>
 
       <div class="qj-chips" id="qj-chips"></div>
@@ -307,39 +310,6 @@
         <div class="qj-panel-h"><i class="fa-solid fa-tags"></i> Clasificación
           <small>los 10 con más registros en el periodo</small></div>
         <div class="qj-box tall" data-chart="ch-clasif"><canvas id="ch-clasif"></canvas></div>
-      </div>
-
-      <!-- ── Búsqueda de pacientes (sobre la tabla) ── -->
-      <div class="qj-panel">
-        <div class="qj-panel-h"><i class="fa-solid fa-magnifying-glass"></i> Búsqueda de pacientes</div>
-        <div class="qj-filtros" style="background:transparent;border:none;box-shadow:none;border-radius:0;margin:0">
-        <div class="qj-campo">
-          <label>Folio</label>
-          <input type="text" id="t-folio" placeholder="Ej. CA2651" oninput="applyFilters()">
-        </div>
-        <div class="qj-campo">
-          <label>Fecha</label>
-          <input type="date" id="t-fecha" onchange="applyFilters()">
-        </div>
-        <div class="qj-campo">
-          <label>Tipo</label>
-          <select id="t-tipo" onchange="applyFilters()">
-            <option value="">Todos</option>
-            <option value="queja">Queja</option>
-            <option value="sugerencia">Sugerencia</option>
-            <option value="felicitacion">Felicitación</option>
-          </select>
-        </div>
-        <div class="qj-campo qj-campo-busca">
-          <label>Nombre</label>
-          <input type="text" id="t-nombre" placeholder="Nombre del paciente / cliente" oninput="applyFilters()">
-        </div>
-        <div class="qj-acciones">
-          <button class="btn-secondary" onclick="clearTableFilters()">
-            <i class="fa-solid fa-eraser"></i> Limpiar
-          </button>
-        </div>
-        </div>
       </div>
 
       <!-- ── Tabla ── -->
