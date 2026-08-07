@@ -188,6 +188,31 @@
             <option value="">Todos</option>
             <option value="hoja">Formulario web</option>
             <option value="manual">Captura manual</option>
+            <option value="historico">Histórico</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Priorización</label>
+          <select id="f-prioridad" onchange="applyFilters()">
+            <option value="">Todas</option>
+            <option value="Ordinaria">Ordinaria</option>
+            <option value="Urgente">Urgente</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Gravedad</label>
+          <select id="f-gravedad" onchange="applyFilters()">
+            <option value="">Todas</option>
+            <option value="Sin daño">Sin daño</option>
+            <option value="Bajo">Bajo</option>
+            <option value="Moderado">Moderado</option>
+            <option value="Grave">Grave</option>
+          </select>
+        </div>
+        <div class="qj-campo">
+          <label>Clasificación</label>
+          <select id="f-clasif" onchange="applyFilters()">
+            <option value="">Todas</option>
           </select>
         </div>
         <div class="qj-campo qj-campo-busca">
@@ -262,6 +287,26 @@
         <div class="qj-panel-h"><i class="fa-solid fa-chart-column"></i> Tendencia por mes
           <small id="ch-tend-sub"></small></div>
         <div class="qj-box tall" data-chart="ch-tend"><canvas id="ch-tend"></canvas></div>
+      </div>
+
+      <!-- ── Gráficas de seguimiento (priorización, gravedad, clasificación) ── -->
+      <div class="qj-charts">
+        <div class="qj-panel">
+          <div class="qj-panel-h"><i class="fa-solid fa-flag"></i> Priorización
+            <small id="ch-prio-sub"></small></div>
+          <div class="qj-box" data-chart="ch-prio"><canvas id="ch-prio"></canvas></div>
+        </div>
+        <div class="qj-panel">
+          <div class="qj-panel-h"><i class="fa-solid fa-triangle-exclamation"></i> Gravedad para el usuario
+            <small id="ch-grav-sub"></small></div>
+          <div class="qj-box" data-chart="ch-grav"><canvas id="ch-grav"></canvas></div>
+        </div>
+      </div>
+
+      <div class="qj-panel">
+        <div class="qj-panel-h"><i class="fa-solid fa-tags"></i> Clasificación
+          <small>los 10 con más registros en el periodo</small></div>
+        <div class="qj-box tall" data-chart="ch-clasif"><canvas id="ch-clasif"></canvas></div>
       </div>
 
       <!-- ── Tabla ── -->

@@ -236,6 +236,7 @@ async function loadQuejas() {
   if (error) { showError(error.message); return }
   _allQJ = data || []
   llenarDeptos()
+  populateClasifSelect()
   applyFilters()
 }
 
@@ -296,15 +297,22 @@ function applyFilters() {
   const status = document.getElementById('f-status')?.value || ''
   const depto  = document.getElementById('f-depto')?.value  || ''
   const origen = document.getElementById('f-origen')?.value || ''
+  const prio   = document.getElementById('f-prioridad')?.value || ''
+  const grav   = document.getElementById('f-gravedad')?.value  || ''
+  const clasif = document.getElementById('f-clasif')?.value    || ''
   const desde  = document.getElementById('f-desde')?.value  || ''
   const hasta  = document.getElementById('f-hasta')?.value  || ''
 
   _filteredQJ = _allQJ.filter(r => {
     const f = r.fecha || ''
+    const s = r.seguimiento || {}
     if (tipo   && r.tipo   !== tipo)   return false
     if (status && r.status !== status) return false
     if (depto  && r.departamento !== depto) return false
     if (origen && (r.origen || 'manual') !== origen) return false
+    if (prio   && s.priorizacion  !== prio)   return false
+    if (grav   && s.gravedad      !== grav)   return false
+    if (clasif && s.clasificacion !== clasif) return false
     if (desde  && (!f || f < desde)) return false
     if (hasta  && (!f || f > hasta)) return false
     if (q) {
@@ -321,10 +329,21 @@ function applyFilters() {
 }
 
 function clearFilters() {
-  ;['f-tipo','f-status','f-depto','f-origen','f-desde','f-hasta','search-input']
+  ;['f-tipo','f-status','f-depto','f-origen','f-prioridad','f-gravedad','f-clasif','f-desde','f-hasta','search-input']
     .forEach(id => { const el = document.getElementById(id); if (el) el.value = '' })
   const p = document.getElementById('f-periodo'); if (p) p.value = 'todo'
   applyFilters()
+}
+
+// Llena el filtro de Clasificación con los valores presentes en los datos
+function populateClasifSelect() {
+  const sel = document.getElementById('f-clasif')
+  if (!sel) return
+  const vals = [...new Set(_allQJ.map(r => r.seguimiento && r.seguimiento.clasificacion).filter(Boolean))].sort()
+  const actual = sel.value
+  sel.innerHTML = '<option value="">Todas</option>' +
+    vals.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('')
+  if (actual) sel.value = actual
 }
 
 function renderChips() {
@@ -437,11 +456,21 @@ function renderCharts() {
   qjChartStatus()
   qjChartDepto()
   qjChartTendencia()
+  qjChartPrioridad()
+  qjChartGravedad()
+  qjChartClasif()
 }
 
 function qjContar(campo) {
   const c = {}
   _filteredQJ.forEach(r => { const k = r[campo]; if (k) c[k] = (c[k] || 0) + 1 })
+  return c
+}
+
+// Cuenta por un campo del seguimiento (columna JSON)
+function qjContarSeg(key) {
+  const c = {}
+  _filteredQJ.forEach(r => { const k = r.seguimiento && r.seguimiento[key]; if (k) c[k] = (c[k] || 0) + 1 })
   return c
 }
 
@@ -539,6 +568,70 @@ function qjChartTendencia() {
       scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } } } },
   })
   setText('ch-tend-sub', `${meses.length} mes${meses.length !== 1 ? 'es' : ''}`)
+}
+
+// Priorización (Ordinaria / Urgente)
+const QJ_PRIO_COLOR = { 'Ordinaria': '#8b908c', 'Urgente': '#dc2626' }
+function qjChartPrioridad() {
+  const c = qjContarSeg('priorizacion')
+  const orden = ['Urgente', 'Ordinaria'].filter(k => c[k])
+  const otras = Object.keys(c).filter(k => !['Urgente','Ordinaria'].includes(k))
+  const claves = orden.concat(otras)
+  if (!claves.length) { qjVacio('ch-prio', 'Sin datos de priorización en el periodo'); return }
+  const total = claves.reduce((s, k) => s + c[k], 0)
+  const cv = qjPrep('ch-prio'); if (!cv) return
+  _qjCharts['ch-prio'] = new Chart(cv, {
+    type: 'bar',
+    data: { labels: claves,
+      datasets: [{ label: 'Registros', data: claves.map(k => c[k]),
+        backgroundColor: claves.map(k => QJ_PRIO_COLOR[k] || '#2a78d6'), borderRadius: 5 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: i => ` ${i.raw} (${Math.round(i.raw / total * 100)}%)` } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+  })
+  setText('ch-prio-sub', c['Urgente'] ? `${c['Urgente']} urgente${c['Urgente'] !== 1 ? 's' : ''}` : '')
+}
+
+// Gravedad para el usuario (rampa de severidad, ordenada)
+const QJ_GRAV_ORDEN = ['Sin daño', 'Bajo', 'Moderado', 'Grave']
+const QJ_GRAV_COLOR = { 'Sin daño': '#1baf7a', 'Bajo': '#eda100', 'Moderado': '#eb6834', 'Grave': '#dc2626' }
+function qjChartGravedad() {
+  const c = qjContarSeg('gravedad')
+  const claves = QJ_GRAV_ORDEN.filter(k => c[k])
+  if (!claves.length) { qjVacio('ch-grav', 'Sin datos de gravedad en el periodo'); return }
+  const total = claves.reduce((s, k) => s + c[k], 0)
+  const cv = qjPrep('ch-grav'); if (!cv) return
+  _qjCharts['ch-grav'] = new Chart(cv, {
+    type: 'bar',
+    data: { labels: claves,
+      datasets: [{ label: 'Registros', data: claves.map(k => c[k]),
+        backgroundColor: claves.map(k => QJ_GRAV_COLOR[k]), borderRadius: 5 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: i => ` ${i.raw} (${Math.round(i.raw / total * 100)}%)` } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } },
+  })
+  const graves = (c['Moderado'] || 0) + (c['Grave'] || 0)
+  setText('ch-grav-sub', graves ? `${graves} moderada(s)/grave(s)` : '')
+}
+
+// Clasificación (top 10, barras horizontales, un color)
+function qjChartClasif() {
+  const c = qjContarSeg('clasificacion')
+  const top = Object.keys(c).sort((a, b) => c[b] - c[a]).slice(0, 10)
+  if (!top.length) { qjVacio('ch-clasif', 'Sin datos de clasificación en el periodo'); return }
+  const cv = qjPrep('ch-clasif'); if (!cv) return
+  _qjCharts['ch-clasif'] = new Chart(cv, {
+    type: 'bar',
+    data: { labels: top.map(k => k.length > 26 ? k.slice(0, 26) + '…' : k),
+      datasets: [{ label: 'Registros', data: top.map(k => c[k]),
+        backgroundColor: '#2a78d6', borderRadius: 5 }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: { title: i => top[i[0].dataIndex] } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { ticks: { font: { size: 11 } } } } },
+  })
 }
 
 function qjRellenarMeses(claves) {
