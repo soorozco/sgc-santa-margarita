@@ -838,23 +838,26 @@ const SEG_GRUPOS = [
     { k: 'categoria',       l: 'Categoría',         t: 'select', o: ['Queja','Sugerencia','Felicitación'] },
     { k: 'priorizacion',    l: 'Priorización',      t: 'select', o: ['Ordinaria','Urgente'] },
     { k: 'gravedad',        l: 'Gravedad para el usuario', t: 'select', o: ['Sin daño','Bajo','Moderado','Grave'] },
-    { k: 'clasificacion',   l: 'Clasificación',     t: 'text' },
-    { k: 'subclasificacion',l: 'Subclasificación',  t: 'text' },
+    { k: 'clasificacion',   l: 'Clasificación',     t: 'select', o: ['Atención al usuario','Capacidad instalada','Gasto de bolsillo','Medicamentos','Otro'] },
+    { k: 'subclasificacion',l: 'Subclasificación',  t: 'select', o: ['Trato digno','Proceso','Infraestructura','Comunicación efectiva','Áreas administrativas','Facturación','Seguridad','Cobros injustificados','Equipo y mobiliario','Medicamentos','Atención recibida','Alimentos','Tiempo de espera','Otro'] },
     { k: 'origen_seg',      l: 'Origen',            t: 'select', o: ['Encuesta','Buzón','Físico','Otros medios','Visita','Jefatura de Calidad'] },
     { k: 'fecha_validacion',l: 'Fecha de validación', t: 'date' },
-    { k: 'hora_validacion', l: 'Hora de validación', t: 'text' },
+    { k: 'hora_validacion', l: 'Hora de validación', t: 'time' },
   ]},
   { titulo: 'Investigación', campos: [
     { k: 'revision_expediente', l: 'Revisión de expediente', t: 'select', o: ['SI','NO','No aplica'] },
     { k: 'llamada_entrevista',  l: 'Llamada / entrevista',   t: 'select', o: ['Llamada','Entrevista','No aplica'] },
-    { k: 'intentos_llamada',    l: 'Intentos de llamada (máx 3)', t: 'intentos' },
-    { k: 'respuesta_llamada',   l: 'Respuesta a la llamada', t: 'select', o: ['SI','NO','No aplica'] },
-    { k: 'recibe_llamada',      l: 'Quién recibe / entrevistado', t: 'text' },
-    { k: 'investiga',           l: 'Quién realiza la investigación', t: 'text' },
+    // Se muestran solo si es Llamada
+    { k: 'intentos_llamada',    l: 'Intentos de llamada (máx 3)', t: 'intentos', showWhen: { key: 'llamada_entrevista', values: ['Llamada'] } },
+    { k: 'respuesta_llamada',   l: 'Respuesta a la llamada', t: 'select', o: ['SI','NO','No aplica'], showWhen: { key: 'llamada_entrevista', values: ['Llamada'] } },
+    // Se muestran solo si es Entrevista
+    { k: 'recibe_llamada',      l: 'Quién recibe / entrevistado', t: 'text', showWhen: { key: 'llamada_entrevista', values: ['Entrevista'] } },
+    { k: 'investiga',           l: 'Quién realiza la investigación', t: 'text', showWhen: { key: 'llamada_entrevista', values: ['Entrevista'] } },
+    // Siempre visible
     { k: 'investigacion',       l: 'Investigación (detalle)', t: 'textarea' },
   ]},
   { titulo: 'Notificación al área', campos: [
-    { k: 'medio_notificacion', l: 'Medio de notificación', t: 'text' },
+    { k: 'medio_notificacion', l: 'Medio de notificación', t: 'select', o: ['Oficio','Llamada','Mensaje de texto','Correo electrónico','Personal','No realizada'] },
     { k: 'fecha_notificacion', l: 'Fecha de notificación', t: 'date' },
     { k: 'persona_notifica',   l: 'Persona que notifica',  t: 'text' },
     { k: 'numero_oficio',      l: 'Número de oficio (ver Oficios)', t: 'text' },
@@ -871,23 +874,42 @@ const SEG_GRUPOS = [
 function segCampoHtml(c, val) {
   const v = val == null ? '' : String(val)
   const id = 'seg-' + c.k
+  // Atributos para mostrar/ocultar según otro campo (llamada/entrevista)
+  const sw = c.showWhen
+    ? ` data-sw-key="${esc(c.showWhen.key)}" data-sw-vals="${esc(c.showWhen.values.join('|'))}"`
+    : ''
+
+  let inner, full = false
   if (c.t === 'select') {
+    // Conservar un valor histórico aunque no esté en la lista de opciones
+    const known = c.o.includes(v)
     const opts = ['<option value="">—</option>']
       .concat(c.o.map(o => `<option value="${esc(o)}"${o === v ? ' selected' : ''}>${esc(o)}</option>`))
-    return `<div class="seg-f"><label>${esc(c.l)}</label><select id="${id}">${opts.join('')}</select></div>`
-  }
-  if (c.t === 'textarea') {
-    return `<div class="seg-f seg-f-full"><label>${esc(c.l)}</label><textarea id="${id}" rows="2">${esc(v)}</textarea></div>`
-  }
-  if (c.t === 'intentos') {
+    if (v && !known) opts.push(`<option value="${esc(v)}" selected>${esc(v)}</option>`)
+    inner = `<label>${esc(c.l)}</label><select id="${id}">${opts.join('')}</select>`
+  } else if (c.t === 'textarea') {
+    full = true
+    inner = `<label>${esc(c.l)}</label><textarea id="${id}" rows="2">${esc(v)}</textarea>`
+  } else if (c.t === 'intentos') {
     const n = parseInt(v, 10) || 0
     const boxes = [1, 2, 3].map(i =>
       `<label class="seg-int" title="Llamada ${i}"><input type="checkbox" data-i="${i}"${i <= n ? ' checked' : ''}><i class="fa-solid fa-phone"></i></label>`).join('')
-    return `<div class="seg-f"><label>${esc(c.l)}</label>
-      <div class="seg-intentos" data-seg="${c.k}" onchange="segIntentos(event, this)">${boxes}</div></div>`
+    inner = `<label>${esc(c.l)}</label>
+      <div class="seg-intentos" data-seg="${c.k}" onchange="segIntentos(event, this)">${boxes}</div>`
+  } else {
+    const type = c.t === 'date' ? 'date' : c.t === 'time' ? 'time' : 'text'
+    inner = `<label>${esc(c.l)}</label><input type="${type}" id="${id}" value="${esc(v)}">`
   }
-  const type = c.t === 'date' ? 'date' : 'text'
-  return `<div class="seg-f"><label>${esc(c.l)}</label><input type="${type}" id="${id}" value="${esc(v)}"></div>`
+  return `<div class="seg-f${full ? ' seg-f-full' : ''}" id="segwrap-${c.k}"${sw}>${inner}</div>`
+}
+
+// Muestra/oculta los campos condicionales según su campo controlador
+function segApplyConditions() {
+  document.querySelectorAll('#dq-gestion-form [data-sw-key]').forEach(el => {
+    const ctrl = document.getElementById('seg-' + el.dataset.swKey)
+    const vals = (el.dataset.swVals || '').split('|')
+    el.style.display = (ctrl && vals.includes(ctrl.value)) ? '' : 'none'
+  })
 }
 
 // Casillas de intentos: secuenciales (marcar la i llena 1..i; desmarcar deja 1..i-1)
@@ -906,6 +928,14 @@ function renderGestion(seg) {
       <div class="seg-grupo-t">${esc(g.titulo)}</div>
       <div class="seg-grid">${g.campos.map(c => segCampoHtml(c, seg[c.k])).join('')}</div>
     </div>`).join('')
+
+  // Campos condicionales (llamada / entrevista): re-evaluar al cambiar el control
+  const ctrlKeys = [...new Set([...cont.querySelectorAll('[data-sw-key]')].map(e => e.dataset.swKey))]
+  ctrlKeys.forEach(k => {
+    const s = document.getElementById('seg-' + k)
+    if (s) s.addEventListener('change', segApplyConditions)
+  })
+  segApplyConditions()
 }
 
 async function saveSeguimiento() {
