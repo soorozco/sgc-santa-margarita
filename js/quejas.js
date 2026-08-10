@@ -1108,16 +1108,23 @@ async function loadNotas(qjId) {
 async function submitNota() {
   const btn   = document.getElementById('btn-nota')
   const texto = document.getElementById('dq-nota-text')?.value.trim()
-  const newStatus = document.getElementById('dq-new-status')?.value || null
+  const statusSel = document.getElementById('dq-new-status')
+  const newStatus = statusSel?.value || null
 
-  if (!texto) { showToast('Escribe el texto de la nota.', 'red'); return }
+  // Se permite guardar con nota, con cambio de estado, o ambos.
+  if (!texto && !newStatus) {
+    showToast('Escribe una nota o selecciona un nuevo estado.', 'red'); return
+  }
 
   btn.disabled = true
   btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
 
+  // Si solo se cambia el estado (sin nota), se deja constancia en el historial.
+  const statusLbl = newStatus && statusSel.selectedOptions[0]
+    ? statusSel.selectedOptions[0].textContent.trim() : ''
   const notaPayload = {
     queja_id:      _currentQJId,
-    nota:          texto,
+    nota:          texto || `Estado cambiado a "${statusLbl}"`,
     status_change: newStatus || null,
     created_by:    _user.id
   }
