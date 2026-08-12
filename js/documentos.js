@@ -327,7 +327,7 @@ function renderTable(docs) {
 
   if (docs.length === 0) {
     tbody.innerHTML = `
-      <tr><td colspan="12" class="table-empty">
+      <tr><td colspan="14" class="table-empty">
         <i class="fa-solid fa-folder-open"></i>
         <strong>Sin ${_activeTab === 'regs' ? 'registros' : 'documentos'}</strong>
         Ningún documento coincide con los filtros seleccionados.
@@ -361,6 +361,7 @@ function renderTable(docs) {
       ${isRegs ? `<td class="center">${retLabel}</td>` : ''}
       ${isRegs ? `<td class="center">${covBadge(doc.code)}</td>` : ''}
       <td class="center"><span class="pill ${sPill(doc.status)}">${sLabel(doc.status)}</span></td>
+      <td class="center">${proxCell(doc)}</td>
       ${_showVerifCol ? `<td class="center">${verifCell(doc)}</td>` : ''}
       ${_showVerifCol ? `<td class="center">${dofCell(doc)}</td>` : ''}
       ${_showVerifCol ? `<td>${normaCell(doc)}</td>` : ''}
@@ -689,6 +690,7 @@ function openEdit(docId) {
   setVal('edit-custodian',    doc.custodian_position || '')
   setVal('edit-vigencia',     doc.retention_years || 2)
   setVal('edit-elab-date',    doc.elaboration_date || '')
+  setVal('edit-template-url', doc.template_url || '')
   setVal('edit-desc',         doc.description || '')
   setVal('edit-status',       doc.status || 'borrador')
 
@@ -749,6 +751,7 @@ async function submitEdit() {
     status:            document.getElementById('edit-status')?.value     || 'borrador',
     retention_years:   parseInt(document.getElementById('edit-vigencia')?.value) || 2,
     elaboration_date:  document.getElementById('edit-elab-date')?.value  || null,
+    template_url:      document.getElementById('edit-template-url')?.value.trim() || null,
     elaborated_by:     document.getElementById('edit-elaborated-by')?.value || null,
     reviewed_by:       document.getElementById('edit-reviewed-by')?.value   || null,
     authorized_by:     document.getElementById('edit-authorized-by')?.value || null,
@@ -2612,6 +2615,21 @@ function renderExtFicha(doc) {
            Sin datos capturados — edita el documento para llenar la ficha de control externo.
          </div>`}
   `
+}
+
+// ── Celda "Próxima revisión" = fecha de elaboración + 2 años ──────
+function proxCell(doc) {
+  // Documentos externos (NOMs) usan la verificación de vigencia, no esta regla.
+  if ((doc.code || '').toUpperCase().startsWith('DE-')) return '<span style="color:var(--txt3)">—</span>'
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(doc.elaboration_date || '')
+  if (!m) return '<span style="color:var(--txt3)">—</span>'
+  const next = `${parseInt(m[1], 10) + 2}-${m[2]}-${m[3]}`
+  const vencida = new Date(next + 'T12:00:00') < new Date()
+  const est = vencida
+    ? 'color:#991b1b;font-weight:600'
+    : 'color:var(--txt2, #334155)'
+  const t = vencida ? 'Revisión vencida' : '2 años después de la fecha de elaboración'
+  return `<span style="white-space:nowrap;${est}" title="${t}">${fmtDate(next)}${vencida ? ' <i class="fa-solid fa-triangle-exclamation"></i>' : ''}</span>`
 }
 
 // ── Celda "Vigencia verificada" en la tabla (documentos externos) ─
