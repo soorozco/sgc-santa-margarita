@@ -264,11 +264,13 @@ const TREND_METRICS = [
 ]
 
 // Color por nivel (semáforo): verde alto · amarillo medio · rojo bajo
+// Umbrales pensados para satisfacción (escala 1-5): ≥4.5 alto (~90%),
+// 4.0-4.5 medio (~80%, mejorable), <4.0 bajo (foco de atención).
 function trendColor(avg, hasData) {
-  if (!hasData) return '#cbd5e1'
-  if (avg >= 4)  return '#1baf7a'   // alto
-  if (avg >= 3)  return '#f59e0b'   // medio
-  return '#dc2626'                  // bajo
+  if (!hasData)   return '#cbd5e1'
+  if (avg >= 4.5) return '#1baf7a'   // alto
+  if (avg >= 4)   return '#f59e0b'   // medio
+  return '#dc2626'                   // bajo
 }
 
 function updateChart() {
