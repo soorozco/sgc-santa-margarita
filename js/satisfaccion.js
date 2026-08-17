@@ -254,25 +254,31 @@ function renderScoresPanel() {
 }
 
 // ── Trend chart ───────────────────────────────────────────────
+// Servicios comparables en la gráfica de tendencia
+const TREND_METRICS = [
+  { k:'general',    l:'Servicio General', col:'q_servicio_general',    pt:'circle'   },
+  { k:'enfermeria', l:'Enfermería',       col:'q_atencion_enfermeria', pt:'triangle' },
+  { k:'medico',     l:'Atención Médica',  col:'q_atencion_medico',     pt:'rect'     },
+  { k:'alimentos',  l:'Alimentos',        col:'q_alimentos',           pt:'rectRot'  },
+  { k:'higiene',    l:'Higiene',          col:'q_higiene',             pt:'star'     },
+]
+
+// Color por nivel (semáforo): verde alto · amarillo medio · rojo bajo
+function trendColor(avg, hasData) {
+  if (!hasData) return '#cbd5e1'
+  if (avg >= 4)  return '#1baf7a'   // alto
+  if (avg >= 3)  return '#f59e0b'   // medio
+  return '#dc2626'                  // bajo
+}
+
 function updateChart() {
-  const metric  = document.getElementById('chart-metric')?.value || 'general'
-  const colKey  = METRIC_KEY[metric] || 'q_servicio_general'
+  const checked = [...document.querySelectorAll('#metric-checks input:checked')].map(i => i.value)
+  const chosen  = TREND_METRICS.filter(m => checked.includes(m.k))
 
-  // Group by YYYY-MM
-  const byMonth = {}
-  _surveys.forEach(s => {
-    const ym = (s.survey_date||'').substring(0,7)
-    if (!ym) return
-    if (!byMonth[ym]) byMonth[ym] = []
-    if (s[colKey] != null && s[colKey] > 0) byMonth[ym].push(s[colKey])
-  })
-
-  const labels = Object.keys(byMonth).sort()
-  const avgs   = labels.map(ym => {
-    const arr = byMonth[ym]
-    return arr.length ? parseFloat((arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(2)) : null
-  })
-  const counts = labels.map(ym => byMonth[ym].length)
+  // Eje de meses común a todas las líneas
+  const monthsSet = new Set()
+  _surveys.forEach(s => { const ym = (s.survey_date||'').substring(0,7); if (ym) monthsSet.add(ym) })
+  const labels = [...monthsSet].sort()
 
   const fmtLabel = ym => {
     const [y,m] = ym.split('-')
@@ -280,50 +286,54 @@ function updateChart() {
     return months[parseInt(m)] + ' ' + y.slice(2)
   }
 
+  const datasets = chosen.map(m => {
+    const byMonth = {}
+    _surveys.forEach(s => {
+      const ym = (s.survey_date||'').substring(0,7)
+      const v  = s[m.col]
+      if (ym && v != null && v > 0) (byMonth[ym] = byMonth[ym] || []).push(v)
+    })
+    const data = labels.map(ym => {
+      const a = byMonth[ym]
+      return a && a.length ? parseFloat((a.reduce((x,y)=>x+y,0)/a.length).toFixed(2)) : null
+    })
+    const all = [].concat(...Object.values(byMonth))
+    const overall = all.length ? all.reduce((x,y)=>x+y,0)/all.length : 0
+    const color = trendColor(overall, all.length > 0)
+    return {
+      label: m.l, data,
+      borderColor: color, backgroundColor: color, pointBackgroundColor: color,
+      pointStyle: m.pt, pointRadius: 4, borderWidth: 2.5, tension: .3, fill: false, spanGaps: true
+    }
+  })
+
   if (_chartTrend) _chartTrend.destroy()
   const ctx = document.getElementById('chart-trend')
   if (!ctx) return
 
+  if (!datasets.length) {
+    _chartTrend = new Chart(ctx, {
+      type:'line', data:{ labels:[], datasets:[] },
+      options:{ responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{ display:false },
+          title:{ display:true, text:'Selecciona al menos un servicio para comparar',
+            color:'#94a3b8', font:{ size:13 } } } }
+    })
+    return
+  }
+
   _chartTrend = new Chart(ctx, {
     type:'line',
-    data:{
-      labels: labels.map(fmtLabel),
-      datasets:[{
-        label:'Promedio',
-        data: avgs,
-        borderColor:'#2563eb',
-        backgroundColor:'rgba(37,99,235,.08)',
-        borderWidth:2.5,
-        pointRadius:4,
-        pointBackgroundColor:'#2563eb',
-        tension:.3,
-        fill:true
-      },{
-        label:'Encuestas',
-        data: counts,
-        borderColor:'#94a3b8',
-        backgroundColor:'transparent',
-        borderWidth:1.5,
-        borderDash:[4,3],
-        pointRadius:3,
-        tension:.3,
-        yAxisID:'y2'
-      }]
-    },
+    data:{ labels: labels.map(fmtLabel), datasets },
     options:{
       responsive:true, maintainAspectRatio:false,
-      plugins:{ legend:{ display:true, position:'top',
-        labels:{ font:{size:11}, boxWidth:12 } },
-        tooltip:{ callbacks:{ label: ctx => ctx.datasetIndex===0
-          ? ' Promedio: ' + ctx.parsed.y : ' Encuestas: ' + ctx.parsed.y }
-        }
+      plugins:{
+        legend:{ display:true, position:'top', labels:{ usePointStyle:true, font:{size:11}, boxWidth:14 } },
+        tooltip:{ callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y ?? '—'}` } }
       },
       scales:{
-        y:{ min:1, max:5, ticks:{ stepSize:.5, font:{size:11} },
-            grid:{ color:'rgba(0,0,0,.05)' } },
-        y2:{ position:'right', grid:{display:false},
-             ticks:{ font:{size:10}, color:'#94a3b8' } },
-        x: { ticks:{ font:{size:11} }, grid:{color:'rgba(0,0,0,.04)'} }
+        y:{ min:1, max:5, ticks:{ stepSize:.5, font:{size:11} }, grid:{ color:'rgba(0,0,0,.05)' } },
+        x:{ ticks:{ font:{size:11} }, grid:{ color:'rgba(0,0,0,.04)' } }
       }
     }
   })

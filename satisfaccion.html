@@ -162,15 +162,22 @@
         <div class="panel">
           <div class="panel-head">
             <div class="panel-ttl"><i class="fa-solid fa-chart-line"></i> Tendencia de Satisfacción</div>
-            <select class="filter-sel" id="chart-metric" onchange="updateChart()" style="font-size:.786rem;padding:5px 28px 5px 10px">
-              <option value="general">Servicio General</option>
-              <option value="enfermeria">Enfermería</option>
-              <option value="medico">Atención Médica</option>
-              <option value="alimentos">Alimentos</option>
-              <option value="higiene">Higiene</option>
-            </select>
           </div>
           <div class="panel-body">
+            <div id="metric-checks" style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:.8rem;margin-bottom:8px">
+              <span style="color:#64748b;font-weight:600;margin-right:2px">Comparar:</span>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="general" checked onchange="updateChart()"> Servicio General</label>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="enfermeria" checked onchange="updateChart()"> Enfermería</label>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="medico" checked onchange="updateChart()"> Atención Médica</label>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="alimentos" checked onchange="updateChart()"> Alimentos</label>
+              <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="higiene" checked onchange="updateChart()"> Higiene</label>
+            </div>
+            <div style="font-size:.72rem;color:#64748b;margin-bottom:8px">
+              Color por nivel:
+              <b style="color:#1baf7a">● alto (≥4)</b> &nbsp;
+              <b style="color:#f59e0b">● medio (3–4)</b> &nbsp;
+              <b style="color:#dc2626">● bajo (&lt;3)</b>
+            </div>
             <div class="chart-area"><canvas id="chart-trend"></canvas></div>
           </div>
         </div>
