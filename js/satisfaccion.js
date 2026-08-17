@@ -8,6 +8,7 @@ let _filtered= []      // after filters
 let _page    = 1
 const PAGE_SIZE = 20
 let _chartTrend = null
+let _chartComments = null
 let _comments = []     // comment blocks in new survey form [{type,category,text}]
 
 // ── Rating map ────────────────────────────────────────────────
@@ -122,6 +123,7 @@ async function loadSurveys() {
   renderKPIs()
   renderScoresPanel()
   updateChart()
+  updateCommentsChart()
 }
 
 // ── Tipo helpers (normaliza legacy QUEJA/SUGERENCIA/FELICITACION) ──
@@ -351,6 +353,55 @@ function updateChart() {
       },
       scales:{
         y:{ min:1, max:5, ticks:{ stepSize:.5, font:{size:11} }, grid:{ color:'rgba(0,0,0,.05)' } },
+        x:{ ticks:{ font:{size:11} }, grid:{ color:'rgba(0,0,0,.04)' } }
+      }
+    }
+  })
+}
+
+// ── Gráfica de comentarios positivos vs negativos por mes ─────────
+function updateCommentsChart() {
+  const byMonth = {}
+  _surveys.forEach(s => {
+    const ym = (s.survey_date||'').substring(0,7)
+    if (!ym) return
+    if (!byMonth[ym]) byMonth[ym] = { pos:0, neg:0 }
+    getSurveyCommentTypes(s).forEach(t => {
+      const n = ctypeNorm(t)
+      if (n === 'POSITIVO')      byMonth[ym].pos++
+      else if (n === 'NEGATIVO') byMonth[ym].neg++
+    })
+  })
+
+  const labels = Object.keys(byMonth).sort()
+  const fmtLabel = ym => {
+    const [y,m] = ym.split('-')
+    const months = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+    return months[parseInt(m)] + ' ' + y.slice(2)
+  }
+  const pos = labels.map(ym => byMonth[ym].pos)
+  const neg = labels.map(ym => byMonth[ym].neg)
+
+  if (_chartComments) _chartComments.destroy()
+  const ctx = document.getElementById('chart-comments')
+  if (!ctx) return
+
+  _chartComments = new Chart(ctx, {
+    type:'line',
+    data:{ labels: labels.map(fmtLabel), datasets:[
+      { label:'Positivos', data:pos, borderColor:'#1baf7a', backgroundColor:'rgba(27,175,122,.12)',
+        pointBackgroundColor:'#1baf7a', borderWidth:2.5, pointRadius:4, tension:.3, fill:true },
+      { label:'Negativos', data:neg, borderColor:'#dc2626', backgroundColor:'rgba(220,38,38,.10)',
+        pointBackgroundColor:'#dc2626', borderWidth:2.5, pointRadius:4, tension:.3, fill:true },
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{ display:true, position:'top', labels:{ usePointStyle:true, font:{size:11}, boxWidth:14 } },
+        tooltip:{ callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y}` } }
+      },
+      scales:{
+        y:{ beginAtZero:true, ticks:{ precision:0, font:{size:11} }, grid:{ color:'rgba(0,0,0,.05)' } },
         x:{ ticks:{ font:{size:11} }, grid:{ color:'rgba(0,0,0,.04)' } }
       }
     }
