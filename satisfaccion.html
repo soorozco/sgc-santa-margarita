@@ -173,10 +173,11 @@
               <label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" value="higiene" checked onchange="updateChart()"> Higiene</label>
             </div>
             <div style="font-size:.72rem;color:#64748b;margin-bottom:8px">
-              Color por nivel:
-              <b style="color:#1baf7a">● alto (≥4.5)</b> &nbsp;
-              <b style="color:#f59e0b">● medio (4–4.5)</b> &nbsp;
-              <b style="color:#dc2626">● bajo (&lt;4)</b>
+              Cada color es un área. Franjas de fondo por nivel:
+              <b style="color:#1baf7a">▬ alto (≥4.5)</b> &nbsp;
+              <b style="color:#f59e0b">▬ medio (4–4.5)</b> &nbsp;
+              <b style="color:#dc2626">▬ bajo (&lt;4)</b>.
+              Los puntos por debajo de 4 se marcan con rombo ◆.
             </div>
             <div class="chart-area"><canvas id="chart-trend"></canvas></div>
           </div>

@@ -254,23 +254,36 @@ function renderScoresPanel() {
 }
 
 // ── Trend chart ───────────────────────────────────────────────
-// Servicios comparables en la gráfica de tendencia
+// Servicios comparables en la gráfica de tendencia — un color por área
 const TREND_METRICS = [
-  { k:'general',    l:'Servicio General', col:'q_servicio_general',    pt:'circle'   },
-  { k:'enfermeria', l:'Enfermería',       col:'q_atencion_enfermeria', pt:'triangle' },
-  { k:'medico',     l:'Atención Médica',  col:'q_atencion_medico',     pt:'rect'     },
-  { k:'alimentos',  l:'Alimentos',        col:'q_alimentos',           pt:'rectRot'  },
-  { k:'higiene',    l:'Higiene',          col:'q_higiene',             pt:'star'     },
+  { k:'general',    l:'Servicio General', col:'q_servicio_general',    c:'#2563eb' },
+  { k:'enfermeria', l:'Enfermería',       col:'q_atencion_enfermeria', c:'#db2777' },
+  { k:'medico',     l:'Atención Médica',  col:'q_atencion_medico',     c:'#06b6d4' },
+  { k:'alimentos',  l:'Alimentos',        col:'q_alimentos',           c:'#9333ea' },
+  { k:'higiene',    l:'Higiene',          col:'q_higiene',             c:'#334155' },
 ]
 
-// Color por nivel (semáforo): verde alto · amarillo medio · rojo bajo
-// Umbrales pensados para satisfacción (escala 1-5): ≥4.5 alto (~90%),
-// 4.0-4.5 medio (~80%, mejorable), <4.0 bajo (foco de atención).
-function trendColor(avg, hasData) {
-  if (!hasData)   return '#cbd5e1'
-  if (avg >= 4.5) return '#1baf7a'   // alto
-  if (avg >= 4)   return '#f59e0b'   // medio
-  return '#dc2626'                   // bajo
+// Franjas de fondo (semáforo por nivel de satisfacción, escala 1-5):
+// ≥4.5 alto (~90%), 4.0-4.5 medio (~80%, mejorable), <4.0 bajo (foco de atención).
+const TREND_ZONES = [
+  { from:5,   to:4.5, color:'rgba(27,175,122,.12)' },  // verde
+  { from:4.5, to:4.0, color:'rgba(245,158,11,.12)' },  // amarillo
+  { from:4.0, to:1,   color:'rgba(220,38,38,.10)' },   // rojo
+]
+const trendZonesPlugin = {
+  id: 'trendZones',
+  beforeDatasetsDraw(chart) {
+    const { ctx, chartArea, scales } = chart
+    const y = scales?.y
+    if (!chartArea || !y) return
+    ctx.save()
+    TREND_ZONES.forEach(z => {
+      const y1 = y.getPixelForValue(z.from), y2 = y.getPixelForValue(z.to)
+      ctx.fillStyle = z.color
+      ctx.fillRect(chartArea.left, Math.min(y1, y2), chartArea.right - chartArea.left, Math.abs(y2 - y1))
+    })
+    ctx.restore()
+  }
 }
 
 function updateChart() {
@@ -299,13 +312,15 @@ function updateChart() {
       const a = byMonth[ym]
       return a && a.length ? parseFloat((a.reduce((x,y)=>x+y,0)/a.length).toFixed(2)) : null
     })
-    const all = [].concat(...Object.values(byMonth))
-    const overall = all.length ? all.reduce((x,y)=>x+y,0)/all.length : 0
-    const color = trendColor(overall, all.length > 0)
+    // Marcar los puntos por debajo de 4 (zona baja) con rombo y más grandes
+    const pStyle = data.map(v => (v != null && v < 4) ? 'rectRot' : 'circle')
+    const pRad   = data.map(v => v == null ? 0 : (v < 4 ? 6 : 3.5))
+    const pBorder= data.map(v => (v != null && v < 4) ? '#991b1b' : m.c)
     return {
       label: m.l, data,
-      borderColor: color, backgroundColor: color, pointBackgroundColor: color,
-      pointStyle: m.pt, pointRadius: 4, borderWidth: 2.5, tension: .3, fill: false, spanGaps: true
+      borderColor: m.c, backgroundColor: m.c, pointBackgroundColor: m.c, pointBorderColor: pBorder,
+      pointStyle: pStyle, pointRadius: pRad, pointBorderWidth: 1.5,
+      borderWidth: 2.5, tension: .3, fill: false, spanGaps: true
     }
   })
 
@@ -326,11 +341,12 @@ function updateChart() {
 
   _chartTrend = new Chart(ctx, {
     type:'line',
+    plugins:[trendZonesPlugin],
     data:{ labels: labels.map(fmtLabel), datasets },
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{
-        legend:{ display:true, position:'top', labels:{ usePointStyle:true, font:{size:11}, boxWidth:14 } },
+        legend:{ display:true, position:'top', labels:{ usePointStyle:false, font:{size:11}, boxWidth:22 } },
         tooltip:{ callbacks:{ label: c => ` ${c.dataset.label}: ${c.parsed.y ?? '—'}` } }
       },
       scales:{
