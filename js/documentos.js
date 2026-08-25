@@ -219,7 +219,10 @@ function setupSearchFilter() {
 }
 
 function applyFilters() {
-  const q      = (document.getElementById('search-input')?.value || '').toLowerCase()
+  // Búsqueda insensible a acentos; varios conceptos separados por comas → OR
+  const sinAcentos = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  const q      = sinAcentos(document.getElementById('search-input')?.value || '')
+  const qTerms = q.split(',').map(t => t.trim()).filter(Boolean)
   const dept   = document.getElementById('f-dept')?.value   || ''
   const type   = document.getElementById('f-type')?.value   || ''
   const status = document.getElementById('f-status')?.value || ''
@@ -244,7 +247,7 @@ function applyFilters() {
     // Filtrado por tab activo
     if (_activeTab === 'docs' && isFT)  return false
     if (_activeTab === 'regs' && !isFT) return false
-    const txt = `${d.code} ${d.name} ${d.custodian_position || ''}`.toLowerCase()
+    const txt = sinAcentos(`${d.code} ${d.name} ${d.custodian_position || ''} ${d.external_meta?.codigo_externo || ''} ${d.norma_vigente || ''}`)
     const matchRet = !ret ||
       (ret === 'sin' && d.retention_years == null) ||
       (ret === 'con' && d.retention_years != null)
@@ -255,7 +258,7 @@ function applyFilters() {
       (origen === 'externo' && isExterno) ||
       (origen === 'interno' && !isExterno)
     const matchSubtipo = !subtipo || codeSubtype === subtipo
-    return (!q || txt.includes(q))
+    return (!qTerms.length || qTerms.some(t => txt.includes(t)))
         && (!dept   || d.department_id    === dept)
         && (!type   || d.document_type_id === type)
         && (!status || d.status           === status)
