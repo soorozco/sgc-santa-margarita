@@ -70,6 +70,18 @@
   .opt-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px }
   .opt-row .opt{ text-align:center; font-weight:600 }
   .hint{ color:var(--mut); font-size:.82rem; margin-top:4px }
+  .attach-btns{ display:flex; gap:10px; flex-wrap:wrap }
+  .attach-btn{ flex:1; min-width:130px; border:1.5px dashed var(--teal); background:#eef7f4; color:var(--teal-d);
+               border-radius:12px; padding:14px 10px; font-size:.95rem; font-weight:700; cursor:pointer }
+  .attach-btn:active{ transform:scale(.99) }
+  .files{ display:flex; flex-wrap:wrap; gap:10px; margin-top:10px }
+  .file-chip{ position:relative; width:78px; height:78px; border-radius:12px; overflow:hidden;
+              border:1px solid var(--line); background:#f3f8f6; display:flex; align-items:center;
+              justify-content:center; text-align:center }
+  .file-chip img{ width:100%; height:100%; object-fit:cover }
+  .file-chip .doc{ font-size:.62rem; color:var(--mut); padding:4px; word-break:break-word }
+  .file-chip .rm{ position:absolute; top:2px; right:2px; width:22px; height:22px; border-radius:50%;
+                  background:rgba(0,0,0,.6); color:#fff; border:none; font-size:14px; line-height:1; cursor:pointer }
   .back{ background:none; border:none; color:var(--teal); font-weight:600; font-size:.95rem; cursor:pointer; padding:6px 0; margin-bottom:8px }
 
   /* Gracias */
@@ -133,6 +145,18 @@
           <label><span class="req">*</span>Su mensaje</label>
           <textarea class="ta" id="qz-desc" placeholder="Describa lo que desea compartir…"></textarea>
           <div class="q-err" id="qz-desc-err"></div>
+        </div>
+
+        <div class="field">
+          <label>Fotos o archivos <span style="font-weight:400;color:var(--mut)">(opcional)</span></label>
+          <div class="attach-btns">
+            <button type="button" class="attach-btn" onclick="document.getElementById('qz-cam').click()">📷 Tomar foto</button>
+            <button type="button" class="attach-btn" onclick="document.getElementById('qz-file').click()">📎 Adjuntar archivo</button>
+          </div>
+          <input type="file" id="qz-cam"  accept="image/*" capture="environment" style="display:none" onchange="addQzFiles(this.files); this.value=''">
+          <input type="file" id="qz-file" accept="image/*,application/pdf" multiple  style="display:none" onchange="addQzFiles(this.files); this.value=''">
+          <div id="qz-files" class="files"></div>
+          <div class="hint">Puede adjuntar fotos como evidencia. Hasta 5 archivos, 10&nbsp;MB cada uno.</div>
         </div>
 
         <div class="field">

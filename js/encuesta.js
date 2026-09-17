@@ -94,6 +94,16 @@ const SURVEY = [
 let _ans  = {}   // respuestas por id
 let _sec  = 0    // sección actual
 let _sending = false
+let _qzFiles = []             // adjuntos del buzón (File[])
+const QZ_BUCKET = 'quejas-adjuntos'
+const MAX_FILES = 5, MAX_MB = 10
+
+function uuid() {
+  if (crypto.randomUUID) return crypto.randomUUID()
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8); return v.toString(16)
+  })
+}
 
 // Habitación fija cuando el QR trae ?hab=JP05 (no se le pregunta al paciente)
 const _habFija = (new URLSearchParams(location.search).get('hab') || '').trim().toUpperCase()
@@ -115,7 +125,46 @@ function startSurvey() {
 }
 function startQueja()  {
   if (_habFija) { const el = $('qz-hab'); if (el) { el.value = _habFija; el.readOnly = true } }
+  _qzFiles = []; renderQzFiles()
   showScreen('screen-queja')
+}
+
+// ── Adjuntos del buzón ────────────────────────────────────────────
+function addQzFiles(fileList) {
+  for (const f of fileList) {
+    if (_qzFiles.length >= MAX_FILES) { alert('Máximo ' + MAX_FILES + ' archivos.'); break }
+    const okTipo = f.type.startsWith('image/') || f.type === 'application/pdf'
+    if (!okTipo) { alert('Solo se permiten fotos o PDF: ' + f.name); continue }
+    if (f.size > MAX_MB * 1024 * 1024) { alert('El archivo supera ' + MAX_MB + ' MB: ' + f.name); continue }
+    _qzFiles.push(f)
+  }
+  renderQzFiles()
+}
+function removeQzFile(i) { _qzFiles.splice(i, 1); renderQzFiles() }
+function renderQzFiles() {
+  const cont = $('qz-files'); if (!cont) return
+  cont.innerHTML = _qzFiles.map((f, i) => {
+    const inner = f.type.startsWith('image/')
+      ? `<img src="${URL.createObjectURL(f)}" alt="">`
+      : `<span class="doc">📄<br>${esc(f.name.slice(0, 18))}</span>`
+    return `<div class="file-chip">${inner}<button type="button" class="rm" onclick="removeQzFile(${i})">×</button></div>`
+  }).join('')
+}
+async function subirAdjuntos(quejaId) {
+  let subidas = 0
+  for (const f of _qzFiles) {
+    const ext = (f.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '')
+    const path = `${quejaId}/${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const { error: up } = await db.storage.from(QZ_BUCKET)
+      .upload(path, f, { cacheControl: '3600', upsert: false, contentType: f.type })
+    if (up) continue
+    await db.from('quejas_adjuntos').insert({
+      queja_id: quejaId, file_path: path, file_name: f.name,
+      file_size_bytes: f.size, mime_type: f.type, uploaded_by: null,
+    })
+    subidas++
+  }
+  return subidas
 }
 
 // ¿Se debe mostrar esta sección según respuestas previas?
@@ -306,7 +355,9 @@ async function enviarQueja() {
 
   _sending = true
   const hab = $('qz-hab').value.trim()
+  const quejaId = uuid()          // id del lado del cliente → enlaza adjuntos sin leer
   const payload = {
+    id:             quejaId,
     fecha:          new Date().toISOString().slice(0, 10),
     folio:          folioWeb(),
     tipo,
@@ -322,8 +373,17 @@ async function enviarQueja() {
     sincronizado:   false,
   }
   const { error } = await db.from('quejas').insert(payload)
+  if (error) { _sending = false; alert('No se pudo enviar. Intente de nuevo.\n\n' + error.message); return }
+
+  // Subir adjuntos (si falla alguno, la queja igual quedó guardada)
+  if (_qzFiles.length) {
+    const btn = document.querySelector('#screen-queja .btn-pri')
+    if (btn) btn.textContent = 'Enviando archivos…'
+    try { await subirAdjuntos(quejaId) } catch (e) { /* la queja ya se guardó */ }
+    if (btn) btn.textContent = 'Enviar'
+  }
+  _qzFiles = []
   _sending = false
-  if (error) { alert('No se pudo enviar. Intente de nuevo.\n\n' + error.message); return }
   $('gracias-qz-txt').style.display = 'block'
   showScreen('screen-gracias')
 }
