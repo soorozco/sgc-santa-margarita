@@ -53,7 +53,7 @@ const SURVEY = [
     preguntas:[
       { id:'q12_recibio', n:12, texto:'Durante su estancia, ¿recibió alimentos proporcionados por el hospital?', tipo:'opcion', obl:true, opciones:['Sí','No'] },
     ]},
-  { titulo:'Evaluación de alimentos',
+  { titulo:'Evaluación de alimentos', soloSi:{ id:'q12_recibio', val:'Sí' },
     preguntas:[
       { id:'q_alimentos',     n:13, texto:'¿Cómo calificaría la calidad de los alimentos recibidos?', tipo:'esc', esc:ESC5, obl:true },
       { id:'q14_presentacion',n:14, texto:'¿Cómo calificaría la presentación y temperatura de los alimentos?', tipo:'esc', esc:ESC5, obl:true },
@@ -62,7 +62,7 @@ const SURVEY = [
     preguntas:[
       { id:'q15_alta', n:15, texto:'Al momento de responder esta encuesta, ¿ya concluyó su trámite de alta hospitalaria?', tipo:'opcion', obl:true, opciones:['Sí','No'] },
     ]},
-  { titulo:'Evaluación del egreso',
+  { titulo:'Evaluación del egreso', soloSi:{ id:'q15_alta', val:'Sí' },
     preguntas:[
       { id:'q_tramites_egreso', n:16, texto:'¿Cómo calificaría la facilidad y rapidez de los trámites de egreso?', tipo:'esc', esc:ESC5, obl:true },
       { id:'q17_info_egreso',   n:17, texto:'¿Recibió información clara sobre los cuidados y recomendaciones posteriores a su egreso?', tipo:'opcion', obl:true, opciones:['Sí, completamente','Parcialmente','No','No aplica'] },
@@ -164,9 +164,11 @@ function preguntaHtml(q) {
   let campo = ''
   if (q.tipo === 'esc' || q.tipo === 'opcion') {
     const opts = q.tipo === 'esc' ? Object.keys(q.esc) : q.opciones
-    campo = `<div class="opts">` + opts.map(o =>
-      `<button type="button" class="opt${val === o ? ' on' : ''}" onclick="setAns('${q.id}', this)" data-v="${esc(o)}">${esc(o)}</button>`
-    ).join('') + `</div>`
+    campo = `<div class="opts">` + opts.map(o => {
+      const na = o === 'No aplica'   // se separa del resto de la escala
+      return (na ? '<div class="opt-sep"></div>' : '') +
+        `<button type="button" class="opt${na ? ' opt-na' : ''}${val === o ? ' on' : ''}" onclick="setAns('${q.id}', this)" data-v="${esc(o)}">${esc(o)}</button>`
+    }).join('') + `</div>`
   } else if (q.tipo === 'nps') {
     campo = `<div class="nps">` + Array.from({length:11}, (_,i) =>
       `<button type="button" class="npsb${val === String(i) ? ' on' : ''}" onclick="setAns('${q.id}', this)" data-v="${i}">${i}</button>`
