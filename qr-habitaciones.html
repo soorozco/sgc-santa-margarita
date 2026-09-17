@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR por habitación — Hospital Santa Margarita</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔳</text></svg>">
+<style>
+  :root{ --teal:#0e7c66; --teal-d:#0b4a40; --green:#1baf7a; --ink:#14312a; --mut:#5b6b66 }
+  *{ box-sizing:border-box }
+  body{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+        background:#eef3f2; color:var(--ink); margin:0; padding:20px }
+  .bar{ max-width:900px; margin:0 auto 8px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center }
+  .bar input{ padding:10px 12px; border:1px solid #cfdcd8; border-radius:8px; min-width:330px; font-size:.9rem }
+  .bar button{ background:var(--teal); color:#fff; border:none; border-radius:8px; padding:10px 18px; font-weight:700; cursor:pointer }
+  .note{ max-width:900px; margin:0 auto 18px; color:var(--mut); font-size:.85rem; text-align:center }
+
+  .area{ max-width:900px; margin:0 auto 10px }
+  .area-h{ font-size:1.05rem; font-weight:800; color:var(--teal-d); margin:18px 0 10px;
+           border-bottom:2px solid var(--green); padding-bottom:6px }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px }
+  .card{ background:#fff; border:1px solid #dbe7e3; border-radius:14px; text-align:center;
+         padding:12px 10px 14px; break-inside:avoid }
+  .card .hosp{ font-size:.62rem; color:var(--mut); font-weight:700; letter-spacing:.3px; text-transform:uppercase }
+  .card .qbox{ display:flex; justify-content:center; margin:8px 0 6px }
+  .card .qbox img,.card .qbox canvas{ width:150px; height:150px }
+  .card .room{ font-size:1.25rem; font-weight:800; color:var(--teal-d) }
+  .card .area-lbl{ font-size:.68rem; color:var(--mut) }
+  .card .cta{ font-size:.66rem; color:var(--green); font-weight:700; margin-top:4px }
+
+  @media print{
+    body{ background:#fff; padding:0 }
+    .bar,.note{ display:none }
+    .area{ max-width:100% }
+    .area-h{ break-after:avoid }
+    .card{ box-shadow:none }
+  }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <input id="base" value="https://soorozco.github.io/sgc-santa-margarita/encuesta.html">
+    <button onclick="generar()">Generar</button>
+    <button onclick="window.print()">🖨️ Imprimir todo</button>
+  </div>
+  <p class="note">Cada QR abre la encuesta con la habitación ya puesta (el paciente no la escribe). Ajusta la liga base si tu sitio usa otra dirección, presiona “Generar” y luego “Imprimir todo”. Recorta y pega cada tarjeta en su habitación.</p>
+
+  <div id="out"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const ROOMS_BY_AREA = {
+      'Central Juan Pablo II': ['JP01','JP02','JP03','JP04','JP05','JP06','JP07','JP08','JP09','JP10','JP11','JP12','JP13','JP14','JP15','JP16','JP17'],
+      'Central Planta Baja (PB)': ['PB104','PB105','PB107','PB109','PB111','PB112','PB113','PB114','PB115','PB116','PB117'],
+      'Central Planta Baja (PA)': ['PA204','PA206','PA207','PA212','PA213','PA214','PA215','PA216','PA218'],
+      'Central Planta Alta': ['PA202'],
+      'Central Ginecología': ['GIN01','GIN02','GIN03','GIN05','GIN06','GIN07','GIN08','GIN10','GIN11','GIN13','GIN15','GIN16','GIN17'],
+      'Central Pediatría': ['PED01','PED02','PED03','PED04','PED05'],
+      'Master Suite': ['SU01','SU02','SU03'],
+      'Quirófano': ['QX01','QX02'],
+      'Unidad de Terapia Intensiva': ['UTI01','UTI02','UTI03','UTI04'],
+      'Urgencias': ['ACV01'],
+    }
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
+
+    function generar(){
+      const base = document.getElementById('base').value.trim()
+      const out = document.getElementById('out')
+      out.innerHTML = ''
+      let total = 0
+      for (const [area, rooms] of Object.entries(ROOMS_BY_AREA)){
+        const sec = document.createElement('div'); sec.className = 'area'
+        sec.innerHTML = `<div class="area-h">${esc(area)} · ${rooms.length} habitacion${rooms.length!==1?'es':''}</div>`
+        const grid = document.createElement('div'); grid.className = 'grid'
+        rooms.forEach(room => {
+          const card = document.createElement('div'); card.className = 'card'
+          card.innerHTML = `<div class="hosp">Hospital Santa Margarita</div>
+            <div class="qbox"></div>
+            <div class="room">${esc(room)}</div>
+            <div class="area-lbl">${esc(area)}</div>
+            <div class="cta">Escanee — su opinión nos importa</div>`
+          grid.appendChild(card)
+          new QRCode(card.querySelector('.qbox'), {
+            text: base + '?hab=' + encodeURIComponent(room),
+            width: 150, height: 150, colorDark: '#0b4a40', colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          })
+          total++
+        })
+        sec.appendChild(grid); out.appendChild(sec)
+      }
+      const c = document.createElement('p'); c.className = 'note'
+      c.textContent = total + ' habitaciones · listo para imprimir'
+      out.insertBefore(c, out.firstChild)
+    }
+    generar()
+  </script>
+</body>
+</html>

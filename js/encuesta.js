@@ -95,6 +95,9 @@ let _ans  = {}   // respuestas por id
 let _sec  = 0    // sección actual
 let _sending = false
 
+// Habitación fija cuando el QR trae ?hab=JP05 (no se le pregunta al paciente)
+const _habFija = (new URLSearchParams(location.search).get('hab') || '').trim().toUpperCase()
+
 const $ = id => document.getElementById(id)
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))
 
@@ -105,8 +108,15 @@ function showScreen(id) {
   window.scrollTo(0, 0)
 }
 function goHome()      { showScreen('screen-home') }
-function startSurvey() { _ans = {}; _sec = 0; showScreen('screen-survey'); renderSection() }
-function startQueja()  { showScreen('screen-queja') }
+function startSurvey() {
+  _ans = {}; _sec = 0
+  if (_habFija) _ans.habitacion = _habFija   // ya viene del QR
+  showScreen('screen-survey'); renderSection()
+}
+function startQueja()  {
+  if (_habFija) { const el = $('qz-hab'); if (el) { el.value = _habFija; el.readOnly = true } }
+  showScreen('screen-queja')
+}
 
 // ¿Se debe mostrar esta sección según respuestas previas?
 function seccionAplica(i) {
@@ -144,6 +154,12 @@ function renderSection() {
 }
 
 function preguntaHtml(q) {
+  // Si la habitación viene del QR, mostrarla fija (no se pregunta)
+  if (q.id === 'habitacion' && _habFija) {
+    return `<div class="q"><div class="q-t">Habitación</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:#e7f4f0;color:var(--teal-d);
+        border-radius:12px;padding:11px 16px;font-weight:700;font-size:1.05rem">🛏️ ${esc(_habFija)}</div></div>`
+  }
   const val = _ans[q.id]
   let campo = ''
   if (q.tipo === 'esc' || q.tipo === 'opcion') {
@@ -310,4 +326,10 @@ async function enviarQueja() {
   showScreen('screen-gracias')
 }
 
-document.addEventListener('DOMContentLoaded', goHome)
+document.addEventListener('DOMContentLoaded', () => {
+  if (_habFija) {
+    const b = $('room-badge')
+    if (b) { b.textContent = '🛏️ Habitación ' + _habFija; b.style.display = 'inline-block' }
+  }
+  goHome()
+})
