@@ -368,6 +368,7 @@ function renderTable(docs) {
       ${_showVerifCol ? `<td class="center">${verifCell(doc)}</td>` : ''}
       ${_showVerifCol ? `<td class="center">${dofCell(doc)}</td>` : ''}
       ${_showVerifCol ? `<td>${normaCell(doc)}</td>` : ''}
+      <td class="center">${aprobCell(doc)}</td>
       <td class="center">
         ${canRequest
           ? `<button onclick="openSolBaja('${doc.id}')" class="btn-sol-baja">
@@ -697,6 +698,18 @@ function openEdit(docId) {
   setVal('edit-desc',         doc.description || '')
   setVal('edit-status',       doc.status || 'borrador')
 
+  // Checklist de aprobación por área
+  const chkEnv = document.getElementById('edit-propuesta-enviada')
+  const chkApr = document.getElementById('edit-aprobado-area')
+  if (chkEnv) chkEnv.checked = doc.propuesta_enviada === true
+  if (chkApr) chkApr.checked = doc.aprobado_area === true
+  setVal('edit-propuesta-fecha', doc.propuesta_fecha || '')
+  setVal('edit-aprobado-fecha',  doc.aprobado_fecha  || '')
+  const pf = document.getElementById('edit-propuesta-fecha')
+  const af = document.getElementById('edit-aprobado-fecha')
+  if (pf) pf.disabled = !(chkEnv && chkEnv.checked)
+  if (af) af.disabled = !(chkApr && chkApr.checked)
+
   // Personal selects — re-poblar y seleccionar
   populatePersonalSelects()
   setVal('edit-elaborated-by', doc.elaborated_by  || '')
@@ -759,6 +772,10 @@ async function submitEdit() {
     reviewed_by:       document.getElementById('edit-reviewed-by')?.value   || null,
     authorized_by:     document.getElementById('edit-authorized-by')?.value || null,
     description:       document.getElementById('edit-desc')?.value.trim() || null,
+    propuesta_enviada: document.getElementById('edit-propuesta-enviada')?.checked || false,
+    propuesta_fecha:   document.getElementById('edit-propuesta-fecha')?.value  || null,
+    aprobado_area:     document.getElementById('edit-aprobado-area')?.checked || false,
+    aprobado_fecha:    document.getElementById('edit-aprobado-fecha')?.value   || null,
     updated_at:        new Date().toISOString()
   }
 
@@ -773,6 +790,15 @@ async function submitEdit() {
   let { error } = await db.from('documents')
     .update(payload)
     .eq('id', _currentDocId)
+
+  // Si las columnas del checklist de aprobación no existen aún, reintentar sin ellas
+  if (error && (error.code === '42703') &&
+      /propuesta_enviada|propuesta_fecha|aprobado_area|aprobado_fecha/.test(error.message)) {
+    const { propuesta_enviada:_a, propuesta_fecha:_b, aprobado_area:_c, aprobado_fecha:_d, ...pf } = payload
+    const { error: errA } = await db.from('documents').update(pf).eq('id', _currentDocId)
+    error = errA
+    if (!errA) showToast('Guardado, pero falta correr la migración sql/documentos_checklist_aprobacion.sql para el checklist de aprobación.', 'yellow')
+  }
 
   // Si authorized_by no existe aún en la tabla, reintentar sin ese campo
   if (error && (error.message.includes('authorized_by') || error.code === '42703')) {
@@ -2692,6 +2718,39 @@ function normaCell(doc) {
   const icon = cancel ? 'fa-ban' : 'fa-arrow-right-long'
   return `<span style="${style};white-space:normal">
     <i class="fa-solid ${icon}" style="font-size:.72rem"></i> ${esc(v)}</span>`
+}
+
+// Checklist de aprobación por área (propuesta enviada / aprobado)
+function aprobCell(doc) {
+  const env = doc.propuesta_enviada === true
+  const apr = doc.aprobado_area === true
+  const envDate = doc.propuesta_fecha ? ` (${fmtDate(doc.propuesta_fecha)})` : ''
+  const aprDate = doc.aprobado_fecha ? ` (${fmtDate(doc.aprobado_fecha)})` : ''
+  const chip = (on, icon, label, date) =>
+    `<span class="aprob-chip ${on ? 'on' : 'off'}" title="${label}${on ? date : ' — pendiente'}">
+       <i class="fa-solid ${on ? 'fa-check' : 'fa-minus'}"></i> ${icon}</span>`
+  return `<span class="aprob-col">
+    ${chip(env, 'Propuesta', 'Propuesta enviada al área', envDate)}
+    ${chip(apr, 'Aprobado',  'Aprobado por el área',      aprDate)}
+  </span>`
+}
+
+// Habilita/limpia el campo de fecha de cada paso del checklist de aprobación
+function toggleAprobFecha(which) {
+  const map = {
+    propuesta: ['edit-propuesta-enviada', 'edit-propuesta-fecha'],
+    aprobado:  ['edit-aprobado-area',     'edit-aprobado-fecha'],
+  }
+  const [chkId, dateId] = map[which] || []
+  const chk  = document.getElementById(chkId)
+  const date = document.getElementById(dateId)
+  if (!chk || !date) return
+  date.disabled = !chk.checked
+  if (chk.checked) {
+    if (!date.value) date.value = new Date().toISOString().split('T')[0]
+  } else {
+    date.value = ''
+  }
 }
 
 // Línea con el resultado del robot verificador (GitHub Actions semanal)

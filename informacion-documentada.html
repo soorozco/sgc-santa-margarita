@@ -280,6 +280,7 @@
               <th id="th-verif" style="display:none" class="center">Vigencia verificada</th>
               <th id="th-dof"   style="display:none" class="center">Publicación DOF</th>
               <th id="th-norma" style="display:none">Norma vigente aplicable</th>
+              <th id="th-aprob" class="center">Aprobación del área</th>
               <th class="center">Solicitud de Baja</th>
               <th class="center">Acciones</th>
             </tr>
@@ -1040,6 +1041,27 @@
         <div class="field">
           <label>Descripción / Alcance</label>
           <textarea id="edit-desc" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- Checklist de aprobación por área (ISO 9001 §7.5) -->
+      <div class="form-row one">
+        <div class="field">
+          <label>Aprobación del área</label>
+          <div class="aprob-check">
+            <label class="aprob-item">
+              <input type="checkbox" id="edit-propuesta-enviada"
+                     onchange="toggleAprobFecha('propuesta')">
+              <span><i class="fa-solid fa-paper-plane"></i> Propuesta enviada al área</span>
+              <input type="date" id="edit-propuesta-fecha" disabled>
+            </label>
+            <label class="aprob-item">
+              <input type="checkbox" id="edit-aprobado-area"
+                     onchange="toggleAprobFecha('aprobado')">
+              <span><i class="fa-solid fa-circle-check"></i> Aprobado por el área</span>
+              <input type="date" id="edit-aprobado-fecha" disabled>
+            </label>
+          </div>
         </div>
       </div>
 

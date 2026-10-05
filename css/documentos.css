@@ -833,3 +833,40 @@
 .badge-cov--loading { background: #f3f4f6; color: #9ca3af; }
 .badge-cov--none    { background: #fef3c7; color: #92400e; }
 .badge-cov--ok      { background: #d1fae5; color: #065f46; }
+
+/* ── Checklist de aprobación por área (modal de edición) ───────────── */
+.aprob-check {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: .7rem .85rem;
+  background: #fafafa;
+}
+.aprob-item {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+.aprob-item input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex: none; }
+.aprob-item > span { flex: 1 1 auto; }
+.aprob-item > span i { color: #0d9488; margin-right: .25rem; }
+.aprob-item input[type="date"] {
+  flex: none; width: 160px;
+  padding: .35rem .5rem; border: 1px solid #d1d5db; border-radius: 7px; font: inherit;
+}
+.aprob-item input[type="date"]:disabled { background: #f3f4f6; color: #9ca3af; }
+
+/* ── Columna de aprobación en la tabla ─────────────────────────────── */
+.aprob-col { display: inline-flex; flex-direction: column; gap: .2rem; align-items: flex-start; }
+.aprob-chip {
+  display: inline-flex; align-items: center; gap: .3rem;
+  font-size: .72rem; font-weight: 600; white-space: nowrap;
+  padding: .12rem .4rem; border-radius: 999px;
+}
+.aprob-chip.on  { background: #d1fae5; color: #065f46; }
+.aprob-chip.off { background: #f3f4f6; color: #9ca3af; }
