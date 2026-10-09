@@ -69,6 +69,15 @@
   .prog-tall .wt{ font-weight:700; color:var(--navy); font-size:.9rem }
   .prog-tall .wc{ font-size:.8rem; color:var(--mut) }
 
+  /* Conferencia magistral */
+  .speaker{ display:flex; gap:14px; align-items:center }
+  .speaker img{ width:92px; height:92px; border-radius:50%; object-fit:cover; border:3px solid var(--navy); flex:none }
+  .speaker .sp-name{ font-family:'Montserrat'; font-weight:800; color:var(--navy); font-size:1.05rem; line-height:1.2 }
+  .speaker .sp-sub{ font-size:.85rem; color:var(--orange); font-weight:700; margin-top:4px }
+  .sp-bio{ font-size:.9rem; color:#374151; line-height:1.55; margin-top:12px }
+  .sp-bio p{ margin:.55rem 0 }
+  .sp-bio i.q{ color:var(--navy) }
+
   /* Talleres */
   .taller-list{ display:flex; flex-direction:column; gap:10px; margin-top:.4rem }
   .taller{ display:flex; align-items:flex-start; gap:.7rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s }
@@ -284,6 +293,24 @@
       </button>
       <div class="foot-links no-print" style="margin-top:14px">
         <a href="#" onclick="location.reload()">Registrar a otra persona</a>
+      </div>
+    </section>
+
+    <!-- CONFERENCIA MAGISTRAL -->
+    <section class="card">
+      <h2 class="sec"><i class="fa-solid fa-star"></i> Conferencia Magistral</h2>
+      <div class="speaker">
+        <img src="img/gabriel-heras.jpg" alt="Dr. Gabriel Heras La Calle">
+        <div>
+          <div class="sp-name">Dr. Gabriel Heras La Calle</div>
+          <div class="sp-sub">“Humanizando los servicios de salud” · 11:00 h · España</div>
+        </div>
+      </div>
+      <div class="sp-bio">
+        <p>Especialista en Medicina Intensiva, es el creador y fundador del <b>Proyecto HU-CI</b>, una iniciativa internacional de investigación para la humanización de la asistencia sanitaria, que busca un cambio de modelo organizativo que conserve la dignidad de las personas: pacientes, usuarios, familiares y profesionales de la salud.</p>
+        <p>Dirige actualmente el <b>Máster de Humanización de la Universidad de Barcelona</b> y es director del Comité de Humanización de la Federación Panamericana e Ibérica de la Medicina Crítica y Terapia Intensiva.</p>
+        <p>Se ha iniciado también en la carrera literaria con el libro <i class="q">En primera línea</i>, un emocionante relato sobre la lucha de un médico durante la pandemia: una bella historia de esfuerzo y superación.</p>
+        <p>Es actualmente jefe de Servicio de la Unidad de Gestión Clínica de Medicina Intensiva del Hospital Comarcal Santa Ana de Motril, en Granada.</p>
       </div>
     </section>
 
