@@ -38,7 +38,7 @@ serve(async (req) => {
     });
 
   try {
-    const { folio, nombre, email, categoria, taller, taller_nombre } = await req.json();
+    const { folio, nombre, email, profesion, grado, taller, taller_nombre } = await req.json();
     const USER = Deno.env.get("GMAIL_USER");
     const PASS = Deno.env.get("GMAIL_APP_PASSWORD");
     if (!USER || !PASS) return json({ ok: false, error: "GMAIL_USER / GMAIL_APP_PASSWORD no configurados" }, 500);
@@ -59,7 +59,8 @@ serve(async (req) => {
           <p>Hola <b>${esc(nombre)}</b>, tu registro quedó confirmado. 🎉</p>
           <table style="width:100%;border-collapse:collapse;font-size:15px">
             <tr><td style="padding:6px 0;color:#6b7280">Folio</td><td style="text-align:right"><b style="color:#d14e2b;font-size:18px">${esc(folio)}</b></td></tr>
-            <tr><td style="padding:6px 0;color:#6b7280">Categoría</td><td style="text-align:right">${esc(categoria || "—")}</td></tr>
+            ${profesion ? `<tr><td style="padding:6px 0;color:#6b7280">Profesión</td><td style="text-align:right">${esc(profesion)}</td></tr>` : ""}
+            ${grado ? `<tr><td style="padding:6px 0;color:#6b7280">Grado académico</td><td style="text-align:right">${esc(grado)}</td></tr>` : ""}
             <tr><td style="padding:6px 0;color:#6b7280">Taller</td><td style="text-align:right">${tallerTxt}</td></tr>
             <tr><td style="padding:6px 0;color:#6b7280">Fecha</td><td style="text-align:right"><b>Viernes 23 de octubre de 2026 · 7:30 h</b></td></tr>
             <tr><td style="padding:6px 0;color:#6b7280">Sede</td><td style="text-align:right">Salón de Usos Múltiples, HSM</td></tr>
@@ -70,7 +71,7 @@ serve(async (req) => {
 
     const text =
       `Hola ${nombre}, tu registro a las Primeras Jornadas Médicas quedó confirmado.\n` +
-      `Folio: ${folio}\nCategoría: ${categoria || "—"}\n${tallerTxt}\n` +
+      `Folio: ${folio}\n${profesion ? "Profesión: " + profesion + "\n" : ""}${tallerTxt}\n` +
       `Fecha: Viernes 23 de octubre de 2026, 7:30 h · Salón de Usos Múltiples, HSM.\n` +
       `Presenta este folio el día del evento.`;
 

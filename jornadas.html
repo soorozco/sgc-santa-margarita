@@ -52,6 +52,8 @@
     width:100%; padding:.7rem .8rem; border:1px solid #cfd6e2; border-radius:10px; font:inherit; background:#fff }
   input:focus,select:focus{ outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(22,58,122,.12) }
   .hint{ font-size:.78rem; color:var(--mut); margin-top:.25rem }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px }
+  @media (max-width:430px){ .grid2{ grid-template-columns:1fr } }
 
   /* Talleres */
   .taller-list{ display:flex; flex-direction:column; gap:10px; margin-top:.4rem }
@@ -149,23 +151,85 @@
           <span class="hint" style="font-weight:400"> (tal como quieres que aparezca en tu constancia)</span></label>
         <input type="text" id="f-nombre" autocomplete="name" required>
 
-        <label class="fl">Correo electrónico <span class="req">*</span></label>
-        <input type="email" id="f-email" autocomplete="email" required>
+        <div class="grid2">
+          <div>
+            <label class="fl">Edad</label>
+            <input type="number" id="f-edad" min="1" max="120" inputmode="numeric">
+          </div>
+          <div>
+            <label class="fl">Sexo</label>
+            <select id="f-sexo">
+              <option value="">— Selecciona —</option>
+              <option>Femenino</option>
+              <option>Masculino</option>
+              <option>Prefiero no decir</option>
+            </select>
+          </div>
+        </div>
 
-        <label class="fl">Teléfono (WhatsApp)</label>
-        <input type="tel" id="f-tel" autocomplete="tel" placeholder="33 1234 5678">
+        <div class="grid2">
+          <div>
+            <label class="fl">Municipio</label>
+            <input type="text" id="f-municipio" autocomplete="address-level2">
+          </div>
+          <div>
+            <label class="fl">Estado</label>
+            <input type="text" id="f-estado" autocomplete="address-level1" placeholder="Jalisco">
+          </div>
+        </div>
 
-        <label class="fl">Categoría <span class="req">*</span></label>
-        <select id="f-cat" required>
-          <option value="">— Selecciona —</option>
-          <option>Médico general</option>
-          <option>Médico especialista</option>
-          <option>Médico residente / interno</option>
-          <option>Enfermera(o)</option>
-          <option>Estudiante</option>
-          <option>Personal de salud</option>
-          <option>Otro</option>
-        </select>
+        <div class="grid2">
+          <div>
+            <label class="fl">País</label>
+            <input type="text" id="f-pais" autocomplete="country-name" value="México">
+          </div>
+          <div>
+            <label class="fl">Grado académico</label>
+            <select id="f-grado">
+              <option value="">— Selecciona —</option>
+              <option>Estudiante</option>
+              <option>Técnico</option>
+              <option>Licenciatura</option>
+              <option>Especialidad</option>
+              <option>Maestría</option>
+              <option>Doctorado</option>
+              <option>Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label class="fl">Profesión</label>
+            <input type="text" id="f-profesion" placeholder="Ej. Médico, Enfermero(a)">
+          </div>
+          <div>
+            <label class="fl">Especialidad</label>
+            <input type="text" id="f-especialidad" placeholder="Si aplica">
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label class="fl">Universidad</label>
+            <input type="text" id="f-universidad">
+          </div>
+          <div>
+            <label class="fl">Institución de procedencia</label>
+            <input type="text" id="f-institucion" placeholder="Dónde laboras / estudias">
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div>
+            <label class="fl">Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="f-email" autocomplete="email" required>
+          </div>
+          <div>
+            <label class="fl">Teléfono (WhatsApp)</label>
+            <input type="tel" id="f-tel" autocomplete="tel" placeholder="33 1234 5678">
+          </div>
+        </div>
 
         <label class="fl">Taller (15:00–18:00) — elige uno</label>
         <p class="hint" style="margin:.1rem 0 .5rem">Cupo limitado a 30 por taller. Cuando un taller se llena deja de aparecer. Puedes registrarte sin taller.</p>
@@ -199,7 +263,7 @@
         <div class="qbox" id="pase-qr"></div>
         <div class="datos">
           <div><span>Nombre</span><b id="pase-nombre">—</b></div>
-          <div><span>Categoría</span><b id="pase-cat">—</b></div>
+          <div><span>Profesión</span><b id="pase-cat">—</b></div>
           <div><span>Taller</span><b id="pase-taller">—</b></div>
           <div><span>Evento</span><b>23 oct 2026 · 7:30 h</b></div>
         </div>

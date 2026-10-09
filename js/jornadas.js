@@ -90,10 +90,9 @@ function selTaller(num) {
 }
 
 async function enviarRegistro() {
-  const nombre = $('f-nombre').value.trim()
-  const email  = $('f-email').value.trim()
-  const tel    = $('f-tel').value.trim()
-  const cat    = $('f-cat').value
+  const val = id => ($(id)?.value || '').trim()
+  const nombre = val('f-nombre')
+  const email  = val('f-email')
 
   const msg = $('form-msg')
   const show = (t, kind='err') => { msg.textContent = t; msg.className = 'msg show ' + kind }
@@ -101,7 +100,6 @@ async function enviarRegistro() {
 
   if (nombre.length < 3) return show('Escribe tu nombre completo.')
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return show('Escribe un correo válido.')
-  if (!cat) return show('Selecciona tu categoría.')
 
   const btn = $('btn-submit')
   btn.disabled = true
@@ -110,10 +108,21 @@ async function enviarRegistro() {
   const taller = _tallerSel === '' ? null : parseInt(_tallerSel)
   const medio  = window._googleUser ? 'google' : 'correo'
   const authUid = window._googleUser?.id || null
+  const edadN  = parseInt(val('f-edad'))
 
   const { data, error } = await db.rpc('jornadas_registrar', {
-    p_nombre: nombre, p_email: email, p_telefono: tel || null,
-    p_categoria: cat, p_taller: taller, p_medio: medio, p_auth_uid: authUid
+    p_nombre: nombre, p_email: email, p_telefono: val('f-tel') || null,
+    p_taller: taller, p_medio: medio, p_auth_uid: authUid,
+    p_edad: Number.isFinite(edadN) ? edadN : null,
+    p_sexo: val('f-sexo') || null,
+    p_municipio: val('f-municipio') || null,
+    p_estado: val('f-estado') || null,
+    p_pais: val('f-pais') || null,
+    p_grado_academico: val('f-grado') || null,
+    p_profesion: val('f-profesion') || null,
+    p_especialidad: val('f-especialidad') || null,
+    p_universidad: val('f-universidad') || null,
+    p_institucion: val('f-institucion') || null
   })
 
   btn.disabled = false
@@ -150,7 +159,7 @@ function mostrarPase(d, yaExistia) {
   }
   $('pase-folio').textContent  = d.folio
   $('pase-nombre').textContent = d.nombre
-  $('pase-cat').textContent    = d.categoria || '—'
+  $('pase-cat').textContent    = d.profesion || '—'
   $('pase-taller').textContent = d.taller ? `${d.taller}. ${d.taller_nombre || ''}` : 'Sin taller'
 
   const qbox = $('pase-qr'); qbox.innerHTML = ''
@@ -169,7 +178,8 @@ async function enviarCorreoConfirmacion(d) {
   try {
     await db.functions.invoke('jornadas-correo', {
       body: { folio: d.folio, nombre: d.nombre, email: d.email,
-              categoria: d.categoria, taller: d.taller, taller_nombre: d.taller_nombre }
+              profesion: d.profesion, grado: d.grado_academico,
+              taller: d.taller, taller_nombre: d.taller_nombre }
     })
   } catch (_) { /* aún no desplegado */ }
 }
