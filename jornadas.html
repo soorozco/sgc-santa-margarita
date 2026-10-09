@@ -183,12 +183,12 @@
 
         <div class="grid2">
           <div>
-            <label class="fl">Municipio</label>
-            <input type="text" id="f-municipio" autocomplete="address-level2">
+            <label class="fl">Estado</label>
+            <select id="f-estado" onchange="onEstadoChange()"><option value="">— Selecciona —</option></select>
           </div>
           <div>
-            <label class="fl">Estado</label>
-            <input type="text" id="f-estado" autocomplete="address-level1" placeholder="Jalisco">
+            <label class="fl">Municipio</label>
+            <span id="municipio-wrap"><input type="text" id="f-municipio" autocomplete="address-level2"></span>
           </div>
         </div>
 

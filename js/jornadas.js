@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (selEdad) for (let a = 18; a <= 90; a++) {
     const o = document.createElement('option'); o.value = a; o.textContent = a; selEdad.appendChild(o)
   }
+  const selEst = $('f-estado')
+  if (selEst) ESTADOS.forEach(e => {
+    const o = document.createElement('option'); o.value = e; o.textContent = e; selEst.appendChild(o)
+  })
   await cargarDisponibilidad()
   // Si vuelve de Google OAuth con sesión, prefinaliza
   try {
@@ -216,3 +220,20 @@ function prefillDesdeGoogle(user) {
 }
 
 function esc(s){ return String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+
+// ─── Estado / Municipio ─────────────────────────────────────────────
+const ESTADOS = ['Aguascalientes','Baja California','Baja California Sur','Campeche','Chiapas','Chihuahua','Ciudad de México','Coahuila','Colima','Durango','Estado de México','Guanajuato','Guerrero','Hidalgo','Jalisco','Michoacán','Morelos','Nayarit','Nuevo León','Oaxaca','Puebla','Querétaro','Quintana Roo','San Luis Potosí','Sinaloa','Sonora','Tabasco','Tamaulipas','Tlaxcala','Veracruz','Yucatán','Zacatecas','Otro']
+
+const JALISCO_MUN = ['Acatic','Acatlán de Juárez','Ahualulco de Mercado','Amacueca','Amatitán','Ameca','Arandas','El Arenal','Atemajac de Brizuela','Atengo','Atenguillo','Atotonilco el Alto','Atoyac','Autlán de Navarro','Ayotlán','Ayutla','La Barca','Bolaños','Cabo Corrientes','Cañadas de Obregón','Casimiro Castillo','Chapala','Chimaltitán','Chiquilistlán','Cihuatlán','Cocula','Colotlán','Concepción de Buenos Aires','Cuautitlán de García Barragán','Cuautla','Cuquío','Degollado','Ejutla','Encarnación de Díaz','Etzatlán','El Grullo','Guachinango','Guadalajara','Gómez Farías','Hostotipaquillo','Huejúcar','Huejuquilla el Alto','La Huerta','Ixtlahuacán de los Membrillos','Ixtlahuacán del Río','Jalostotitlán','Jamay','Jesús María','Jilotlán de los Dolores','Jocotepec','Juanacatlán','Juchitlán','Lagos de Moreno','El Limón','Magdalena','La Manzanilla de la Paz','Mascota','Mazamitla','Mexticacán','Mezquitic','Mixtlán','Ocotlán','Ojuelos de Jalisco','Pihuamo','Poncitlán','Puerto Vallarta','Quitupan','El Salto','San Cristóbal de la Barranca','San Diego de Alejandría','San Gabriel','San Ignacio Cerro Gordo','San Juan de los Lagos','San Juanito de Escobedo','San Julián','San Marcos','San Martín de Bolaños','San Martín Hidalgo','San Miguel el Alto','San Sebastián del Oeste','Santa María de los Ángeles','Santa María del Oro','Sayula','Tala','Talpa de Allende','Tamazula de Gordiano','Tapalpa','Tecalitlán','Tecolotlán','Techaluta de Montenegro','Tenamaxtlán','Teocaltiche','Teocuitatlán de Corona','Tepatitlán de Morelos','Tequila','Teuchitlán','Tizapán el Alto','Tlajomulco de Zúñiga','San Pedro Tlaquepaque','Tolimán','Tomatlán','Tonalá','Tonaya','Tonila','Totatiche','Tototlán','Tuxcacuesco','Tuxcueca','Tuxpan','Unión de San Antonio','Unión de Tula','Valle de Guadalupe','Valle de Juárez','Villa Corona','Villa Guerrero','Villa Hidalgo','Villa Purificación','Yahualica de González Gallo','Zacoalco de Torres','Zapopan','Zapotiltic','Zapotitlán de Vadillo','Zapotlán del Rey','Zapotlán el Grande','Zapotlanejo']
+
+function onEstadoChange() {
+  const est = $('f-estado')?.value
+  const wrap = $('municipio-wrap')
+  if (!wrap) return
+  if (est === 'Jalisco') {
+    const opts = JALISCO_MUN.map(m => `<option>${esc(m)}</option>`).join('')
+    wrap.innerHTML = `<select id="f-municipio"><option value="">— Selecciona —</option>${opts}</select>`
+  } else {
+    wrap.innerHTML = `<input type="text" id="f-municipio" autocomplete="address-level2">`
+  }
+}
