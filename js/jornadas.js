@@ -184,6 +184,7 @@ async function enviarCorreoConfirmacion(d) {
     await db.functions.invoke('jornadas-correo', {
       body: { folio: d.folio, nombre: d.nombre, email: d.email,
               profesion: d.profesion, grado: d.grado_academico,
+              categoria: d.profesion,  // compat con la función ya desplegada
               taller: d.taller, taller_nombre: d.taller_nombre }
     })
   } catch (_) { /* aún no desplegado */ }
