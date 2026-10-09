@@ -8,11 +8,19 @@ let _tallerSel = ''       // '' = sin taller
 
 const $ = id => document.getElementById(id)
 
+// Cliente de auth AISLADO para el evento (no pisa la sesión del admin:
+// usa su propio storageKey). Reusa URL/KEY públicas de js/config.js.
+const jAuth = (typeof SUPABASE_URL !== 'undefined')
+  ? supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { storageKey: 'sb-jornadas-auth', persistSession: true, detectSessionInUrl: true, flowType: 'pkce' }
+    })
+  : db
+
 document.addEventListener('DOMContentLoaded', async () => {
   await cargarDisponibilidad()
   // Si vuelve de Google OAuth con sesión, prefinaliza
   try {
-    const { data } = await db.auth.getUser()
+    const { data } = await jAuth.auth.getUser()
     if (data?.user) prefillDesdeGoogle(data.user)
   } catch (_) {}
 })
@@ -169,7 +177,7 @@ async function enviarCorreoConfirmacion(d) {
 // ─── Google (se activa al configurar OAuth en Supabase) ─────────────
 async function registrarseConGoogle() {
   try {
-    const { error } = await db.auth.signInWithOAuth({
+    const { error } = await jAuth.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: BASE_URL + 'jornadas.html' }
     })
