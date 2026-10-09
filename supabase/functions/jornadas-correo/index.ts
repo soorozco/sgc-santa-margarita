@@ -48,6 +48,39 @@ serve(async (req) => {
       ? `Taller ${taller}: ${esc(taller_nombre || "")}`
       : "Sin taller (programa general)";
 
+    const PROG: [string, string, string][] = [
+      ["7:30", "Registro", ""],
+      ["8:00", "Entronización del Sagrado Corazón", "Pbro. Santiago Garibay Rojas"],
+      ["8:10", "Bienvenida", "Dr. Julio César Mijangos Méndez"],
+      ["8:20", "Memoria, presente y futuro del Hospital Santa Margarita", "Dr. Celso Cerda González"],
+      ["8:50", "Obesidad 2026: GLP-1/GIP y cambio de paradigma", "Vicepresidente AJMI"],
+      ["9:20", "Preeclampsia y riesgo cardiovascular", "Dr. Heriberto Ravelero Rodríguez"],
+      ["9:50", "Intermedio · Intervención Ballet Flamenco", ""],
+      ["10:30", "Inauguración", "Autoridades e invitados especiales"],
+      ["11:00", "Conferencia Magistral: “Humanizando los servicios de salud”", "Dr. Gabriel Heras La Calle (España)"],
+      ["11:30", "TEP: de Urgencias a la UCI", "Dr. Ricardo Campos Cerda"],
+      ["12:00", "Sepsis: nuevas guías 2026", "Dr. Julio César Mijangos Méndez"],
+      ["12:40", "POCUS y VExUS para el médico clínico", "Dra. Diana G. Bravo Lozano"],
+      ["13:20", "Cánulas nasales de alto flujo: indicaciones, monitoreo y retiro", "Dra. Ana A. Velarde Pineda"],
+      ["14:00", "Comida · Intervención ballet folclórico", ""],
+      ["18:00", "Clausura", ""],
+    ];
+    const progRows = PROG.map(([t, ti, sp]) =>
+      `<tr><td style="color:#d14e2b;font-weight:bold;padding:4px 10px 4px 0;white-space:nowrap;vertical-align:top">${t}</td>` +
+      `<td style="padding:4px 0;color:#14312a"><b>${esc(ti)}</b>${sp ? `<br><span style="color:#6b7280">${esc(sp)}</span>` : ""}</td></tr>`
+    ).join("");
+    const progHtml = `
+      <h3 style="margin:24px 0 8px;color:#163a7a;font-size:16px">Programa</h3>
+      <table style="width:100%;border-collapse:collapse;font-size:13px">${progRows}</table>
+      <div style="background:#fff3ee;border:1px solid #f3c9b6;border-radius:10px;padding:10px 14px;margin-top:10px">
+        <div style="color:#d14e2b;font-weight:bold;margin-bottom:4px">15:00 – 18:00 · Talleres</div>
+        <div style="font-size:13px;color:#14312a;line-height:1.5">
+          <b>1.</b> Manejo de la vía aérea — <span style="color:#6b7280">Dra. Lesly Rivero Villalobos</span><br>
+          <b>2.</b> Evaluación VExUS y USG — <span style="color:#6b7280">Dra. Iris Xóchitl Ortíz Macías</span><br>
+          <b>3.</b> Herramientas de Inteligencia Artificial en Investigación en Salud — <span style="color:#6b7280">Dr. Julio César Mijangos Méndez</span>
+        </div>
+      </div>`;
+
     const html = `
       <div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;color:#1f2937">
         <div style="background:#163a7a;color:#fff;padding:20px;border-radius:12px 12px 0 0;text-align:center">
@@ -66,6 +99,7 @@ serve(async (req) => {
             <tr><td style="padding:6px 0;color:#6b7280">Sede</td><td style="text-align:right">Salón de Usos Múltiples, HSM</td></tr>
           </table>
           <p style="margin-top:18px;font-size:14px;color:#6b7280">Presenta este folio el día del evento. Guarda este correo.</p>
+          ${progHtml}
         </div>
       </div>`;
 
@@ -73,7 +107,10 @@ serve(async (req) => {
       `Hola ${nombre}, tu registro a las Primeras Jornadas Médicas quedó confirmado.\n` +
       `Folio: ${folio}\n${profesion ? "Profesión: " + profesion + "\n" : ""}${tallerTxt}\n` +
       `Fecha: Viernes 23 de octubre de 2026, 7:30 h · Salón de Usos Múltiples, HSM.\n` +
-      `Presenta este folio el día del evento.`;
+      `Presenta este folio el día del evento.\n\n` +
+      `PROGRAMA\n` +
+      PROG.map(([t, ti, sp]) => `${t}  ${ti}${sp ? " (" + sp + ")" : ""}`).join("\n") +
+      `\n15:00-18:00  Talleres: 1) Manejo de la vía aérea; 2) Evaluación VExUS y USG; 3) Herramientas de IA en Investigación en Salud.`;
 
     const client = new SMTPClient({
       connection: {
