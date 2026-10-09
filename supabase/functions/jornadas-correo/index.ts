@@ -1,15 +1,23 @@
 // Edge Function: correo de confirmación de registro — Jornadas Médicas
-// Despliegue (cuando tengas la cuenta de Resend):
-//   1) En Supabase → Edge Functions, crea un secreto:
-//        supabase secrets set RESEND_API_KEY=xxxxxxxx
-//        supabase secrets set JORNADAS_FROM="Jornadas HSM <jornadas@tudominio.com>"
-//      (Si no verificas dominio, usa el remitente de prueba: onboarding@resend.dev)
-//   2) supabase functions deploy jornadas-correo --no-verify-jwt
+// Envía por GMAIL SMTP (sin dominio) usando una CONTRASEÑA DE APLICACIÓN.
 //
-// La llave de Resend NUNCA va en el código ni en el repo: vive solo como secreto.
+// Requisitos en la cuenta de Gmail remitente (calidadhsm.gdl@gmail.com):
+//   1) Activar "Verificación en 2 pasos".
+//   2) Crear una "Contraseña de aplicación" (16 caracteres) en
+//      https://myaccount.google.com/apppasswords
+//
+// Despliegue (en tu terminal, dentro de sgc-web):
+//   supabase login
+//   supabase link --project-ref tdxkvvmdxnbarjsaknse
+//   supabase secrets set GMAIL_USER=calidadhsm.gdl@gmail.com
+//   supabase secrets set GMAIL_APP_PASSWORD="xxxxxxxxxxxxxxxx"   # sin espacios
+//   supabase functions deploy jornadas-correo --no-verify-jwt
+//
+// La contraseña de aplicación NUNCA va en el código ni en el repo: vive como secreto.
 // El front la invoca con db.functions.invoke('jornadas-correo', { body: {...} }).
 
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -24,11 +32,16 @@ const esc = (s: string) =>
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
 
+  const json = (obj: unknown, status = 200) =>
+    new Response(JSON.stringify(obj), {
+      status, headers: { ...CORS, "Content-Type": "application/json" },
+    });
+
   try {
     const { folio, nombre, email, categoria, taller, taller_nombre } = await req.json();
-    const KEY = Deno.env.get("RESEND_API_KEY");
-    const FROM = Deno.env.get("JORNADAS_FROM") || "Jornadas HSM <onboarding@resend.dev>";
-    if (!KEY) return json({ ok: false, error: "RESEND_API_KEY no configurada" }, 500);
+    const USER = Deno.env.get("GMAIL_USER");
+    const PASS = Deno.env.get("GMAIL_APP_PASSWORD");
+    if (!USER || !PASS) return json({ ok: false, error: "GMAIL_USER / GMAIL_APP_PASSWORD no configurados" }, 500);
     if (!email || !folio) return json({ ok: false, error: "faltan datos" }, 400);
 
     const tallerTxt = taller
@@ -55,25 +68,32 @@ serve(async (req) => {
         </div>
       </div>`;
 
-    const r = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from: FROM, to: [email],
-        subject: `Registro confirmado · Jornadas Médicas HSM — ${folio}`,
-        html,
-      }),
+    const text =
+      `Hola ${nombre}, tu registro a las Primeras Jornadas Médicas quedó confirmado.\n` +
+      `Folio: ${folio}\nCategoría: ${categoria || "—"}\n${tallerTxt}\n` +
+      `Fecha: Viernes 23 de octubre de 2026, 7:30 h · Salón de Usos Múltiples, HSM.\n` +
+      `Presenta este folio el día del evento.`;
+
+    const client = new SMTPClient({
+      connection: {
+        hostname: "smtp.gmail.com",
+        port: 465,
+        tls: true,
+        auth: { username: USER, password: PASS },
+      },
     });
 
-    const out = await r.json();
-    return json({ ok: r.ok, resend: out }, r.ok ? 200 : 502);
+    await client.send({
+      from: `Jornadas Médicas HSM <${USER}>`,
+      to: email,
+      subject: `Registro confirmado · Jornadas Médicas HSM — ${folio}`,
+      content: text,
+      html,
+    });
+    await client.close();
+
+    return json({ ok: true });
   } catch (e) {
     return json({ ok: false, error: String(e) }, 500);
-  }
-
-  function json(obj: unknown, status = 200) {
-    return new Response(JSON.stringify(obj), {
-      status, headers: { ...CORS, "Content-Type": "application/json" },
-    });
   }
 });
