@@ -17,6 +17,11 @@ const jAuth = (typeof SUPABASE_URL !== 'undefined')
   : db
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Llenar el selector de edades (18–90)
+  const selEdad = $('f-edad')
+  if (selEdad) for (let a = 18; a <= 90; a++) {
+    const o = document.createElement('option'); o.value = a; o.textContent = a; selEdad.appendChild(o)
+  }
   await cargarDisponibilidad()
   // Si vuelve de Google OAuth con sesión, prefinaliza
   try {
