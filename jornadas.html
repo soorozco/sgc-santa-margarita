@@ -55,6 +55,20 @@
   .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px }
   @media (max-width:430px){ .grid2{ grid-template-columns:1fr } }
 
+  /* Programa */
+  .prog .it{ display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line) }
+  .prog .it:last-child{ border-bottom:none }
+  .prog .t{ flex:none; width:58px; font-family:'Montserrat'; font-weight:800; color:var(--orange); font-size:.88rem; padding-top:1px }
+  .prog .c .ti{ font-weight:700; color:var(--navy); font-size:.95rem; line-height:1.25 }
+  .prog .c .sp{ font-size:.82rem; color:var(--mut) }
+  .prog .brk .ti{ color:var(--mut); font-weight:600; font-style:italic }
+  .prog-tall{ background:#fff3ee; border:1px solid #f3c9b6; border-radius:12px; padding:12px 14px; margin:12px 0 }
+  .prog-tall .h{ font-family:'Montserrat'; font-weight:800; color:var(--orange); margin-bottom:6px }
+  .prog-tall .w{ display:flex; gap:10px; padding:6px 0 }
+  .prog-tall .n{ flex:none; width:22px; height:22px; border-radius:50%; background:var(--orange); color:#fff; font-weight:800; font-size:.8rem; display:flex; align-items:center; justify-content:center }
+  .prog-tall .wt{ font-weight:700; color:var(--navy); font-size:.9rem }
+  .prog-tall .wc{ font-size:.8rem; color:var(--mut) }
+
   /* Talleres */
   .taller-list{ display:flex; flex-direction:column; gap:10px; margin-top:.4rem }
   .taller{ display:flex; align-items:flex-start; gap:.7rem; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; cursor:pointer; transition:.15s }
@@ -270,6 +284,38 @@
       </button>
       <div class="foot-links no-print" style="margin-top:14px">
         <a href="#" onclick="location.reload()">Registrar a otra persona</a>
+      </div>
+    </section>
+
+    <!-- PROGRAMA -->
+    <section class="card">
+      <h2 class="sec"><i class="fa-regular fa-calendar-days"></i> Programa</h2>
+      <div class="prog">
+        <div class="it"><div class="t">7:30</div><div class="c"><div class="ti">Registro</div></div></div>
+        <div class="it"><div class="t">8:00</div><div class="c"><div class="ti">Entronización del Sagrado Corazón</div><div class="sp">Pbro. Santiago Garibay Rojas</div></div></div>
+        <div class="it"><div class="t">8:10</div><div class="c"><div class="ti">Bienvenida</div><div class="sp">Dr. Julio César Mijangos Méndez</div></div></div>
+        <div class="it"><div class="t">8:20</div><div class="c"><div class="ti">Memoria, presente y futuro del Hospital Santa Margarita</div><div class="sp">Dr. Celso Cerda González</div></div></div>
+        <div class="it"><div class="t">8:50</div><div class="c"><div class="ti">Obesidad 2026: GLP-1/GIP y cambio de paradigma</div><div class="sp">Vicepresidente AJMI</div></div></div>
+        <div class="it"><div class="t">9:20</div><div class="c"><div class="ti">Preeclampsia y riesgo cardiovascular</div><div class="sp">Dr. Heriberto Ravelero Rodríguez</div></div></div>
+        <div class="it brk"><div class="t">9:50</div><div class="c"><div class="ti">Intermedio · Intervención Ballet Flamenco</div></div></div>
+        <div class="it"><div class="t">10:30</div><div class="c"><div class="ti">Inauguración</div><div class="sp">Autoridades e invitados especiales</div></div></div>
+        <div class="it"><div class="t">11:00</div><div class="c"><div class="ti">Conferencia Magistral: “Humanizando los servicios de salud”</div><div class="sp">Dr. Gabriel Heras La Calle (España)</div></div></div>
+        <div class="it"><div class="t">11:30</div><div class="c"><div class="ti">TEP: de Urgencias a la UCI</div><div class="sp">Dr. Ricardo Campos Cerda</div></div></div>
+        <div class="it"><div class="t">12:00</div><div class="c"><div class="ti">Sepsis: nuevas guías 2026</div><div class="sp">Dr. Julio César Mijangos Méndez</div></div></div>
+        <div class="it"><div class="t">12:40</div><div class="c"><div class="ti">POCUS y VExUS para el médico clínico</div><div class="sp">Dra. Diana G. Bravo Lozano</div></div></div>
+        <div class="it"><div class="t">13:20</div><div class="c"><div class="ti">Cánulas nasales de alto flujo: indicaciones, monitoreo y retiro</div><div class="sp">Dra. Ana A. Velarde Pineda</div></div></div>
+        <div class="it brk"><div class="t">14:00</div><div class="c"><div class="ti">Comida · Intervención ballet folclórico</div></div></div>
+      </div>
+
+      <div class="prog-tall">
+        <div class="h">15:00 – 18:00 · Talleres</div>
+        <div class="w"><div class="n">1</div><div><div class="wt">Manejo de la vía aérea</div><div class="wc">Coordina: Dra. Lesly Rivero Villalobos</div></div></div>
+        <div class="w"><div class="n">2</div><div><div class="wt">Evaluación VExUS y USG</div><div class="wc">Coordina: Dra. Iris Xóchitl Ortíz Macías</div></div></div>
+        <div class="w"><div class="n">3</div><div><div class="wt">Herramientas de Inteligencia Artificial en Investigación en Salud</div><div class="wc">Coordina: Dr. Julio César Mijangos Méndez</div></div></div>
+      </div>
+
+      <div class="prog">
+        <div class="it"><div class="t">18:00</div><div class="c"><div class="ti">Clausura</div></div></div>
       </div>
     </section>
 
