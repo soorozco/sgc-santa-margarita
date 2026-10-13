@@ -5,6 +5,8 @@ let _part = []            // participantes
 let _tallerName = {}      // num -> nombre
 let _talleres = []        // [{num,nombre,cupo,ocupados}]
 let _charts = {}          // instancias Chart.js
+let _role = 'lector'
+let _disp = null          // última disponibilidad
 
 const $ = id => document.getElementById(id)
 const setText = (id, t) => { const e = $(id); if (e) e.textContent = t }
@@ -21,8 +23,13 @@ document.addEventListener('DOMContentLoaded', init)
 async function init() {
   const auth = await requireAuth()
   if (!auth) return
+  _role = auth.profile?.roles?.name || 'lector'
   setText('sb-user-name', auth.profile?.full_name || auth.user.email.split('@')[0])
   setText('sb-user-role', auth.profile?.roles?.display_name || 'Usuario')
+  // El ajuste de cupos solo para admin / responsable de calidad
+  if (['administrador', 'responsable_calidad'].includes(_role)) {
+    const card = $('jm-admin'); if (card) card.style.display = 'block'
+  }
   const el = $('current-date')
   if (el) el.textContent = new Date().toLocaleDateString('es-MX',
     { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
@@ -37,6 +44,7 @@ async function cargar() {
 
   // KPIs + nombres de taller
   const d = disp.data
+  _disp = d
   if (d) {
     setText('k-total', d.registrados)
     setText('k-total-sub', 'de ' + d.cupo_total + ' de cupo')
@@ -57,6 +65,43 @@ async function cargar() {
   _part = parts.data || []
   renderTabla()
   renderCharts()
+  renderCupoAdmin()
+}
+
+// ── Ajustar cupos (emergente) ───────────────────────────────────────
+function renderCupoAdmin() {
+  if (!$('jm-admin') || $('jm-admin').style.display === 'none') return
+  if (_disp) {
+    setText('cupo-total-now', `${_disp.registrados} inscritos · cupo ${_disp.cupo_total}`)
+    const inT = $('cupo-total-in'); if (inT && document.activeElement !== inT) inT.value = _disp.cupo_total
+  }
+  $('cupo-talleres').innerHTML = _talleres.map(t => `
+    <div class="cupo-row">
+      <div class="cupo-lbl">Taller ${t.num}: ${esc(t.nombre)}</div>
+      <div class="cupo-now">${t.ocupados} inscritos · cupo ${t.cupo}</div>
+      <input type="number" id="cupo-t-${t.num}" min="${t.ocupados}" value="${t.cupo}">
+      <button class="jm-btn" onclick="guardarCupo('taller', ${t.num})">Actualizar</button>
+    </div>`).join('')
+}
+
+async function guardarCupo(que, taller) {
+  const input = que === 'total' ? $('cupo-total-in') : $('cupo-t-' + taller)
+  const cupo = parseInt(input?.value)
+  if (!Number.isFinite(cupo) || cupo < 1) { alert('Escribe un número válido.'); return }
+
+  const { data, error } = await db.rpc('jornadas_set_cupo',
+    { p_que: que, p_cupo: cupo, p_taller: taller ?? null })
+
+  if (error) { alert('Error al actualizar: ' + error.message); return }
+  if (!data.ok) {
+    if (data.code === 'MENOR_QUE_INSCRITOS')
+      alert(`No puedes poner un cupo menor a los ya inscritos (${data.inscritos}).`)
+    else if (data.code === 'CUPO_INVALIDO') alert('El cupo debe ser un número mayor a 0.')
+    else alert('No se pudo actualizar (' + data.code + ').')
+    return
+  }
+  await cargar()
+  alert('Cupo actualizado correctamente.')
 }
 
 // ── Gráficas ─────────────────────────────────────────────────────────
