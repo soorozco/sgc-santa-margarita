@@ -3,6 +3,8 @@
 
 let _part = []            // participantes
 let _tallerName = {}      // num -> nombre
+let _talleres = []        // [{num,nombre,cupo,ocupados}]
+let _charts = {}          // instancias Chart.js
 
 const $ = id => document.getElementById(id)
 const setText = (id, t) => { const e = $(id); if (e) e.textContent = t }
@@ -43,7 +45,8 @@ async function cargar() {
     const cupoTall = (d.talleres || []).reduce((a, t) => a + (t.cupo || 0), 0)
     setText('k-tall', enTall)
     setText('k-tall-sub', 'de ' + cupoTall + ' lugares')
-    ;(d.talleres || []).forEach(t => { _tallerName[t.num] = t.nombre })
+    _talleres = d.talleres || []
+    _talleres.forEach(t => { _tallerName[t.num] = t.nombre })
   }
 
   if (parts.error) {
@@ -53,6 +56,52 @@ async function cargar() {
   }
   _part = parts.data || []
   renderTabla()
+  renderCharts()
+}
+
+// ── Gráficas ─────────────────────────────────────────────────────────
+const PALETTE = ['#163a7a','#d14e2b','#1a9d6b','#c3922f','#1b98e0','#9b5de5','#ef476f','#118ab2','#8ac926','#6a4c93','#f4a261','#5b6b66']
+
+function agrupa(fn) {
+  const m = {}
+  _part.forEach(p => { const k = (fn(p) || '—') + ''; m[k] = (m[k] || 0) + 1 })
+  return Object.entries(m).sort((a, b) => b[1] - a[1])
+}
+
+function renderCharts() {
+  if (typeof Chart === 'undefined') return
+  Object.values(_charts).forEach(c => c && c.destroy()); _charts = {}
+
+  // Cupo de talleres — barras horizontales apiladas (ocupados / disponibles)
+  const tl = _talleres.map(t => `${t.num}. ${t.nombre}`)
+  _charts.taller = new Chart($('ch-taller'), {
+    type: 'bar',
+    data: { labels: tl, datasets: [
+      { label: 'Ocupados',    data: _talleres.map(t => t.ocupados || 0), backgroundColor: '#d14e2b' },
+      { label: 'Disponibles', data: _talleres.map(t => Math.max((t.cupo || 0) - (t.ocupados || 0), 0)), backgroundColor: '#e5e7eb' }
+    ]},
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      scales: { x: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }, y: { stacked: true } },
+      plugins: { legend: { position: 'bottom' },
+        tooltip: { callbacks: { afterTitle: (it) => { const t = _talleres[it[0].dataIndex]; return `${t.ocupados} de ${t.cupo} lugares` } } } } }
+  })
+
+  // Inscritos por estado — barras horizontales
+  const est = agrupa(p => p.estado)
+  _charts.estado = new Chart($('ch-estado'), {
+    type: 'bar',
+    data: { labels: est.map(x => x[0]), datasets: [{ label: 'Inscritos', data: est.map(x => x[1]), backgroundColor: '#163a7a' }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } } }
+  })
+
+  // Inscritos por profesión — dona
+  const prof = agrupa(p => p.profesion)
+  _charts.prof = new Chart($('ch-prof'), {
+    type: 'doughnut',
+    data: { labels: prof.map(x => x[0]), datasets: [{ data: prof.map(x => x[1]), backgroundColor: prof.map((_, i) => PALETTE[i % PALETTE.length]) }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+  })
 }
 
 function filtrados() {
