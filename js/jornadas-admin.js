@@ -69,6 +69,20 @@ async function cargar() {
 }
 
 // ── Ajustar cupos (emergente) ───────────────────────────────────────
+function toggleCupo() {
+  const body = $('jm-cupo-body'); const btn = $('jm-cupo-toggle')
+  if (!body) return
+  const abrir = body.style.display === 'none'
+  body.style.display = abrir ? 'block' : 'none'
+  if (btn) {
+    btn.classList.toggle('open', abrir)
+    btn.innerHTML = abrir
+      ? '<i class="fa-solid fa-xmark"></i> Cerrar ajuste de cupos'
+      : '<i class="fa-solid fa-gauge-high"></i> Ajustar cupos (uso emergente)'
+  }
+  if (abrir) renderCupoAdmin()
+}
+
 function renderCupoAdmin() {
   if (!$('jm-admin') || $('jm-admin').style.display === 'none') return
   if (_disp) {

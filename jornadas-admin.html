@@ -34,6 +34,9 @@
     .cupo-now{ color:#6b7280;font-size:.82rem;min-width:150px }
     .cupo-row input{ width:90px;padding:.5rem .6rem;border:1px solid #cfd6e2;border-radius:8px;font:inherit }
     .cupo-row .jm-btn{ padding:.5rem .9rem }
+    .jm-btn-danger{ background:#c0392b;color:#fff;border:none;border-radius:9px;padding:.7rem 1.15rem;font-weight:700;cursor:pointer;display:inline-flex;gap:.55rem;align-items:center;font-size:.95rem }
+    .jm-btn-danger:hover{ background:#a5281b }
+    .jm-btn-danger.open{ background:#6b7280 }
   </style>
 </head>
 <body>
@@ -192,15 +195,19 @@
       </div>
 
       <div class="jm-wrap" id="jm-admin" style="display:none;margin-bottom:18px">
-        <div class="cupo-head"><i class="fa-solid fa-gauge-high" style="color:#d14e2b"></i> Ajustar cupos (uso emergente)</div>
-        <p class="jm-count" style="margin:0 0 6px">Aumenta la capacidad si se llena. <b>No afecta inscripciones existentes</b> y no puedes bajar un cupo por debajo de lo ya inscrito.</p>
-        <div class="cupo-row">
-          <div class="cupo-lbl">Cupo total del evento</div>
-          <div class="cupo-now" id="cupo-total-now">—</div>
-          <input type="number" id="cupo-total-in" min="1">
-          <button class="jm-btn" onclick="guardarCupo('total')">Actualizar</button>
+        <button class="jm-btn-danger" id="jm-cupo-toggle" onclick="toggleCupo()">
+          <i class="fa-solid fa-gauge-high"></i> Ajustar cupos (uso emergente)
+        </button>
+        <div id="jm-cupo-body" style="display:none;margin-top:14px">
+          <p class="jm-count" style="margin:0 0 6px">Aumenta la capacidad si se llena. <b>No afecta inscripciones existentes</b> y no puedes bajar un cupo por debajo de lo ya inscrito.</p>
+          <div class="cupo-row">
+            <div class="cupo-lbl">Cupo total del evento</div>
+            <div class="cupo-now" id="cupo-total-now">—</div>
+            <input type="number" id="cupo-total-in" min="1">
+            <button class="jm-btn" onclick="guardarCupo('total')">Actualizar</button>
+          </div>
+          <div id="cupo-talleres"></div>
         </div>
-        <div id="cupo-talleres"></div>
       </div>
 
       <div class="jm-charts">
