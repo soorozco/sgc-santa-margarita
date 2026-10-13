@@ -37,6 +37,20 @@
     .jm-btn-danger{ background:#c0392b;color:#fff;border:none;border-radius:9px;padding:.7rem 1.15rem;font-weight:700;cursor:pointer;display:inline-flex;gap:.55rem;align-items:center;font-size:.95rem }
     .jm-btn-danger:hover{ background:#a5281b }
     .jm-btn-danger.open{ background:#6b7280 }
+    .jm-edit-btn{ background:#eef3fb;color:#163a7a;border:1px solid #d6e0f0;border-radius:7px;padding:.35rem .6rem;cursor:pointer;font-weight:600;font-size:.8rem;white-space:nowrap }
+    .jm-edit-btn:hover{ background:#dfe9f8 }
+    .jm-ovl{ display:none;position:fixed;inset:0;background:rgba(16,42,92,.45);z-index:999;align-items:flex-start;justify-content:center;overflow:auto;padding:30px 14px }
+    .jm-ovl.show{ display:flex }
+    .jm-modal{ background:#fff;border-radius:16px;max-width:620px;width:100%;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25) }
+    .jm-modal h3{ margin:0 0 4px;color:#163a7a }
+    .jm-modal .msub{ color:#6b7280;font-size:.85rem;margin:0 0 16px }
+    .jm-grid{ display:grid;grid-template-columns:1fr 1fr;gap:12px 14px }
+    @media(max-width:520px){ .jm-grid{ grid-template-columns:1fr } }
+    .jm-field label{ display:block;font-weight:600;font-size:.82rem;margin-bottom:.3rem;color:#374151 }
+    .jm-field input,.jm-field select{ width:100%;padding:.55rem .7rem;border:1px solid #cfd6e2;border-radius:8px;font:inherit }
+    .jm-field.col2{ grid-column:1 / -1 }
+    .jm-modal-foot{ display:flex;justify-content:flex-end;gap:10px;margin-top:18px }
+    .jm-btn-sec{ background:#fff;color:#374151;border:1px solid #cfd6e2;border-radius:9px;padding:.6rem 1rem;font-weight:600;cursor:pointer }
   </style>
 </head>
 <body>
@@ -230,6 +244,7 @@
                 <th>Municipio</th><th>Estado</th><th>País</th><th>Grado</th><th>Profesión</th>
                 <th>Especialidad</th><th>Universidad</th><th>Institución</th>
                 <th>Correo</th><th>Teléfono</th><th>Taller</th><th>Medio</th>
+                <th id="th-acc" style="display:none">Acciones</th>
               </tr>
             </thead>
             <tbody id="jm-body"></tbody>
@@ -238,6 +253,37 @@
       </div>
     </div>
   </main>
+</div>
+
+<!-- Modal: corregir datos del inscrito -->
+<div class="jm-ovl" id="jm-edit-ovl">
+  <div class="jm-modal">
+    <h3><i class="fa-solid fa-pen-to-square"></i> Corregir datos</h3>
+    <p class="msub" id="jm-edit-folio">—</p>
+    <div class="jm-grid">
+      <div class="jm-field col2"><label>Nombre completo *</label><input type="text" id="e-nombre"></div>
+      <div class="jm-field"><label>Edad</label><input type="number" id="e-edad" min="1" max="120"></div>
+      <div class="jm-field"><label>Sexo</label>
+        <select id="e-sexo"><option value="">—</option><option>Femenino</option><option>Masculino</option><option>Prefiero no decir</option></select>
+      </div>
+      <div class="jm-field"><label>Municipio</label><input type="text" id="e-municipio"></div>
+      <div class="jm-field"><label>Estado</label><input type="text" id="e-estado"></div>
+      <div class="jm-field"><label>País</label><input type="text" id="e-pais"></div>
+      <div class="jm-field"><label>Grado académico</label>
+        <select id="e-grado"><option value="">—</option><option>Estudiante</option><option>Técnico</option><option>Licenciatura</option><option>Especialidad</option><option>Maestría</option><option>Doctorado</option><option>Otro</option></select>
+      </div>
+      <div class="jm-field"><label>Profesión</label><input type="text" id="e-profesion"></div>
+      <div class="jm-field"><label>Especialidad</label><input type="text" id="e-especialidad"></div>
+      <div class="jm-field"><label>Universidad</label><input type="text" id="e-universidad"></div>
+      <div class="jm-field"><label>Institución de procedencia</label><input type="text" id="e-institucion"></div>
+      <div class="jm-field col2"><label>Teléfono</label><input type="tel" id="e-telefono"></div>
+    </div>
+    <p class="msub" style="margin:14px 0 0">El correo y el taller no se editan aquí.</p>
+    <div class="jm-modal-foot">
+      <button class="jm-btn-sec" onclick="cerrarEdicion()">Cancelar</button>
+      <button class="jm-btn" id="e-save" onclick="guardarEdicion()"><i class="fa-solid fa-floppy-disk"></i> Guardar cambios</button>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

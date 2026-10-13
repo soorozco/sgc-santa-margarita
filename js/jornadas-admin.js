@@ -6,6 +6,7 @@ let _tallerName = {}      // num -> nombre
 let _talleres = []        // [{num,nombre,cupo,ocupados}]
 let _charts = {}          // instancias Chart.js
 let _role = 'lector'
+let _canEdit = false
 let _disp = null          // última disponibilidad
 
 const $ = id => document.getElementById(id)
@@ -26,9 +27,11 @@ async function init() {
   _role = auth.profile?.roles?.name || 'lector'
   setText('sb-user-name', auth.profile?.full_name || auth.user.email.split('@')[0])
   setText('sb-user-role', auth.profile?.roles?.display_name || 'Usuario')
-  // El ajuste de cupos solo para admin / responsable de calidad
-  if (['administrador', 'responsable_calidad'].includes(_role)) {
+  // Ajuste de cupos y edición solo para admin / responsable de calidad
+  _canEdit = ['administrador', 'responsable_calidad'].includes(_role)
+  if (_canEdit) {
     const card = $('jm-admin'); if (card) card.style.display = 'block'
+    const th = $('th-acc'); if (th) th.style.display = ''
   }
   const el = $('current-date')
   if (el) el.textContent = new Date().toLocaleDateString('es-MX',
@@ -59,7 +62,7 @@ async function cargar() {
 
   if (parts.error) {
     $('jm-count').textContent = 'Error al cargar: ' + parts.error.message
-    $('jm-body').innerHTML = `<tr><td colspan="17" class="jm-empty">No se pudieron cargar los inscritos.</td></tr>`
+    $('jm-body').innerHTML = `<tr><td colspan="${_canEdit?18:17}" class="jm-empty">No se pudieron cargar los inscritos.</td></tr>`
     return
   }
   _part = parts.data || []
@@ -185,7 +188,7 @@ function renderTabla() {
     : `${rows.length} de ${_part.length} inscritos`
 
   if (!rows.length) {
-    $('jm-body').innerHTML = `<tr><td colspan="17" class="jm-empty">Sin resultados.</td></tr>`
+    $('jm-body').innerHTML = `<tr><td colspan="${_canEdit?18:17}" class="jm-empty">Sin resultados.</td></tr>`
     return
   }
   $('jm-body').innerHTML = rows.map(p => `
@@ -207,6 +210,7 @@ function renderTabla() {
       <td>${esc(p.telefono || '—')}</td>
       <td class="jm-taller">${esc(tallerTxt(p))}</td>
       <td>${esc(p.medio || '—')}</td>
+      ${_canEdit ? `<td><button class="jm-edit-btn" onclick="editarInscrito('${p.id}')"><i class="fa-solid fa-pen"></i> Editar</button></td>` : ''}
     </tr>`).join('')
 }
 
@@ -237,3 +241,57 @@ function exportarCSV() {
   a.click()
   URL.revokeObjectURL(a.href)
 }
+
+// ── Corregir datos de un inscrito (modal) ───────────────────────────
+let _editId = null
+
+function editarInscrito(id) {
+  const p = _part.find(x => x.id === id); if (!p) return
+  _editId = id
+  setText('jm-edit-folio', `${p.folio} · ${p.email}`)
+  const set = (el, v) => { const e = $(el); if (e) e.value = v }
+  set('e-nombre', p.nombre || '')
+  set('e-edad', p.edad ?? '')
+  set('e-sexo', p.sexo || '')
+  set('e-municipio', p.municipio || '')
+  set('e-estado', p.estado || '')
+  set('e-pais', p.pais || '')
+  set('e-grado', p.grado_academico || '')
+  set('e-profesion', p.profesion || '')
+  set('e-especialidad', p.especialidad || '')
+  set('e-universidad', p.universidad || '')
+  set('e-institucion', p.institucion_procedencia || '')
+  set('e-telefono', p.telefono || '')
+  $('jm-edit-ovl').classList.add('show')
+}
+
+function cerrarEdicion() { $('jm-edit-ovl').classList.remove('show'); _editId = null }
+
+async function guardarEdicion() {
+  if (!_editId) return
+  const nombre = ($('e-nombre').value || '').trim()
+  if (nombre.length < 3) { alert('Escribe el nombre completo.'); return }
+  const edadN = parseInt($('e-edad').value)
+  const v = id => (($(id)?.value || '').trim() || null)
+  const btn = $('e-save'); btn.disabled = true
+  const { data, error } = await db.rpc('jornadas_editar', {
+    p_id: _editId, p_nombre: nombre,
+    p_edad: Number.isFinite(edadN) ? edadN : null,
+    p_sexo: $('e-sexo').value || null,
+    p_municipio: v('e-municipio'), p_estado: v('e-estado'), p_pais: v('e-pais'),
+    p_grado_academico: $('e-grado').value || null, p_profesion: v('e-profesion'),
+    p_especialidad: v('e-especialidad'), p_universidad: v('e-universidad'),
+    p_institucion: v('e-institucion'), p_telefono: v('e-telefono')
+  })
+  btn.disabled = false
+  if (error) { alert('Error al guardar: ' + error.message); return }
+  if (!data.ok) { alert('No se pudo guardar (' + data.code + ').'); return }
+  cerrarEdicion()
+  await cargar()
+  alert('Datos corregidos correctamente.')
+}
+
+// Cerrar el modal al hacer clic fuera
+document.addEventListener('click', e => {
+  if (e.target && e.target.id === 'jm-edit-ovl') cerrarEdicion()
+})
