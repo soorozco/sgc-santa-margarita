@@ -193,6 +193,7 @@ function renderTabla() {
   }
   $('jm-body').innerHTML = rows.map(p => `
     <tr>
+      ${_canEdit ? `<td><button class="jm-edit-btn" onclick="editarInscrito('${p.id}')"><i class="fa-solid fa-pen"></i> Editar</button></td>` : ''}
       <td class="jm-folio">${esc(p.folio)}</td>
       <td>${fmtFecha(p.created_at)}</td>
       <td>${esc(p.nombre)}</td>
@@ -210,7 +211,6 @@ function renderTabla() {
       <td>${esc(p.telefono || '—')}</td>
       <td class="jm-taller">${esc(tallerTxt(p))}</td>
       <td>${esc(p.medio || '—')}</td>
-      ${_canEdit ? `<td><button class="jm-edit-btn" onclick="editarInscrito('${p.id}')"><i class="fa-solid fa-pen"></i> Editar</button></td>` : ''}
     </tr>`).join('')
 }
 
