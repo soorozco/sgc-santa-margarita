@@ -64,8 +64,8 @@ function renderTalleres() {
   const cont = $('taller-list')
   const rows = (_disp.talleres || []).map(t => {
     const full = t.restantes <= 0
-    const cls  = full ? 'full' : (t.restantes <= 5 ? 'low' : 'ok')
-    const txt  = full ? 'Agotado' : `${t.restantes} de ${t.cupo} lugares disponibles`
+    const cls  = full ? 'full' : 'ok'
+    const txt  = full ? 'Agotado' : 'Disponible'
     return `
       <label class="taller ${_tallerSel == t.num ? 'sel' : ''} ${full ? 'full' : ''}" data-num="${t.num}">
         <input type="radio" name="taller" value="${t.num}" ${full ? 'disabled' : ''}
