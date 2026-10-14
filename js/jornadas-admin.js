@@ -257,7 +257,16 @@ function editarInscrito(id) {
   set('e-estado', p.estado || '')
   set('e-pais', p.pais || '')
   set('e-grado', p.grado_academico || '')
-  set('e-profesion', p.profesion || '')
+  // Profesión: si el valor guardado no está en la lista (dato viejo de texto libre), lo agrega para no perderlo
+  const selP = $('e-profesion')
+  if (selP) {
+    const vp = p.profesion || ''
+    if (vp && ![...selP.options].some(o => o.value === vp || o.text === vp)) {
+      const o = document.createElement('option'); o.textContent = vp
+      selP.insertBefore(o, selP.options[1] || null)
+    }
+    selP.value = vp
+  }
   set('e-especialidad', p.especialidad || '')
   set('e-universidad', p.universidad || '')
   set('e-institucion', p.institucion_procedencia || '')
