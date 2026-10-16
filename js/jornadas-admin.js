@@ -27,12 +27,14 @@ async function init() {
   _role = auth.profile?.roles?.name || 'lector'
   setText('sb-user-name', auth.profile?.full_name || auth.user.email.split('@')[0])
   setText('sb-user-role', auth.profile?.roles?.display_name || 'Usuario')
-  // Ajuste de cupos y edición solo para admin / responsable de calidad
+  // Edición de datos: solo admin / responsable de calidad
   _canEdit = ['administrador', 'responsable_calidad'].includes(_role)
-  if (_canEdit) {
-    const card = $('jm-admin'); if (card) card.style.display = 'block'
-    const th = $('th-acc'); if (th) th.style.display = ''
-  }
+  // Ajuste de cupos: admin / responsable + correos autorizados (ej. Capital Humano)
+  const _email = (auth.user?.email || '').toLowerCase()
+  const _CUPO_EMAILS = ['jefaturachumano@hsmgdl.com']
+  const canCupo = _canEdit || _CUPO_EMAILS.includes(_email)
+  if (canCupo) { const card = $('jm-admin'); if (card) card.style.display = 'block' }
+  if (_canEdit) { const th = $('th-acc'); if (th) th.style.display = '' }
   const el = $('current-date')
   if (el) el.textContent = new Date().toLocaleDateString('es-MX',
     { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
