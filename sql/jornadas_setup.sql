@@ -22,7 +22,7 @@ create table if not exists public.jornadas_talleres (
 );
 
 insert into public.jornadas_talleres (num, nombre, coordina, cupo) values
-  (1, 'Manejo de la vía aérea', 'Dra. Lesly Rivero Villalobos', 30),
+  (1, 'Manejo de la vía aérea', 'Dr. Natanael Cuenca', 30),
   (2, 'Evaluación VExUS y USG', 'Dra. Iris Xóchitl Ortíz Macías', 30),
   (3, 'Herramientas de Inteligencia Artificial en Investigación en Salud', 'Dr. Julio César Mijangos Méndez', 30)
 on conflict (num) do nothing;
