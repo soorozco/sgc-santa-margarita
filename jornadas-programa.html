@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
+  [hidden]{ display:none !important }
   :root{
     --navy:#163a7a; --navy-d:#102a5c; --orange:#d14e2b;
     --gold:#c3922f; --ink:#1f2937; --mut:#6b7280; --line:#e5e7eb; --bg:#f4f6fb; --card:#fff;
@@ -77,6 +78,16 @@
 
   <main class="wrap">
 
+    <!-- CONSTANCIA: aparece solo al terminar las Jornadas (js/jornadas-fin.js) -->
+    <section class="card" data-constancia hidden style="text-align:center;border:2px solid var(--gold)">
+      <h2 style="margin:.1rem 0 .4rem;color:var(--navy);font-size:1.15rem"><i class="fa-solid fa-award" style="color:var(--gold)"></i> Descarga tu constancia</h2>
+      <p style="margin:0 0 12px;color:var(--mut);font-size:.95rem">¡Gracias por acompañarnos! Ten a la mano el folio de tu pase de registro.</p>
+      <a href="jornadas-constancia.html"
+         style="display:inline-flex;align-items:center;justify-content:center;gap:.5rem;background:var(--orange);color:#fff;font-weight:700;text-decoration:none;padding:.85rem 1.5rem;border-radius:11px;font-size:1.02rem">
+        <i class="fa-solid fa-file-arrow-down"></i> Descargar mi constancia
+      </a>
+    </section>
+
     <!-- CONFERENCIA MAGISTRAL -->
     <section class="card">
       <h2 class="sec"><i class="fa-solid fa-star"></i> Conferencia Magistral</h2>
@@ -140,5 +151,6 @@
 
   <p class="pie">Hospital Santa Margarita · Garibaldi No. 880, Guadalajara, Jalisco · Avalado por el Colegio de Medicina Crítica de Jalisco</p>
 
+  <script src="js/jornadas-fin.js"></script>
 </body>
 </html>

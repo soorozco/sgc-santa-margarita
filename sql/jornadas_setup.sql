@@ -202,6 +202,11 @@ declare
   v public.jornadas_participantes%rowtype;
   v_tnombre text;
 begin
+  -- La constancia solo se entrega al terminar las Jornadas
+  if now() < timestamptz '2026-10-23 18:00:00-06' then
+    return json_build_object('ok', false, 'code', 'NO_DISPONIBLE');
+  end if;
+
   if p_folio is not null and length(trim(p_folio)) > 0 then
     select * into v from public.jornadas_participantes
       where upper(folio) = upper(trim(p_folio)) limit 1;
