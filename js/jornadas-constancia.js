@@ -5,7 +5,7 @@ const $ = id => document.getElementById(id)
 
 const PLANTILLA   = 'img/constancia-jornadas.jpg'
 const PAGINA      = { w: 1042.56, h: 781.92 }      // tamaño del formato original (pt)
-const NOMBRE_POS  = { x: 521, base: 424, maxW: 580, size: 34, minSize: 16 }
+const NOMBRE_POS  = { x: 521, base: 424, maxW: 580, size: 34, minSize: 14 }
 const NOMBRE_RGB  = [3, 34, 84]                    // azul del título "CONSTANCIA"
 
 let actual = null
@@ -42,8 +42,8 @@ async function buscarConstancia() {
     return
   }
 
-  actual = data
-  $('cert-nombre').textContent = data.nombre
+  actual = { ...data, nombre: data.nombre.trim().toLocaleUpperCase('es-MX') }
+  $('cert-nombre').textContent = actual.nombre
   $('cert-folio').textContent  = 'Folio: ' + data.folio
   $('form-view').style.display = 'none'
   $('cert-wrap').style.display = 'block'
@@ -86,7 +86,7 @@ async function descargarPDF() {
     page.drawImage(img, { x: 0, y: 0, width: PAGINA.w, height: PAGINA.h })
 
     const font   = await pdf.embedFont(StandardFonts.TimesRomanBold)
-    const nombre = textoCompatible(font, actual.nombre.trim())
+    const nombre = textoCompatible(font, actual.nombre)
     let size = NOMBRE_POS.size
     while (size > NOMBRE_POS.minSize && font.widthOfTextAtSize(nombre, size) > NOMBRE_POS.maxW) size--
     page.drawText(nombre, {
